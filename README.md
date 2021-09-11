@@ -1,6 +1,6 @@
-# book_adapter
+# BookAdapter - ePub Reader & Library Management
 
-A new Flutter project. This project uses riverpod MVC+S state management.
+A new Flutter project built for android. This project uses riverpod MVC+S state management.
 Read about MVC+S [here](https://blog.gskinner.com/archives/2020/09/flutter-state-management-with-mvcs.html)
 Read about Riverpod [here](https://codewithandrea.com/videos/flutter-state-management-riverpod/)
 
