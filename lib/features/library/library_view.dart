@@ -4,7 +4,6 @@ import 'package:book_adapter/features/library/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
-import 'package:book_adapter/model/user_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
