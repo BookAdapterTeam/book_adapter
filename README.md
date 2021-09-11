@@ -1,6 +1,6 @@
 # book_adapter
 
-A new Flutter project.
+A new Flutter project. This project uses riverpod.
 
 ## Getting Started
 
