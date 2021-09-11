@@ -8,7 +8,6 @@ final baseCommandProvider = Provider<BaseCommand>((ref) {
 class BaseCommand {
   BaseCommand(this.ref) {
     userModelNotifier = ref.watch(userModelProvider.notifier);
-
   }
   final ProviderRef ref;
 
