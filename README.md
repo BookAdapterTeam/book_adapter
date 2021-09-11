@@ -1,6 +1,7 @@
 # book_adapter
 
-A new Flutter project. This project uses riverpod MVC+S state management. Read more [here](https://blog.gskinner.com/archives/2020/09/flutter-state-management-with-mvcs.html)
+A new Flutter project. This project uses riverpod MVC+S state management.
+Read about MVC+S [here](https://blog.gskinner.com/archives/2020/09/flutter-state-management-with-mvcs.html)
 
 ## Getting Started
 
