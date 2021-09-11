@@ -4,6 +4,7 @@ import 'package:book_adapter/features/library/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
+import 'package:book_adapter/model/user_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,10 +17,7 @@ class LibraryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // ref.watch returns the value exposed by a provider and rebuild the widget when that value changes.
-    // final userData = ref.watch(userModelProvider);
-    // final List<BookItem> books = userData.books;
-    
+    final books = ref.watch(userModelProvider).books;
     return Scaffold(
       appBar: AppBar(
         title: Text('Library'.i18n),
@@ -35,38 +33,11 @@ class LibraryView extends ConsumerWidget {
           ),
         ],
       ),
-      // To work with lists that may contain a large number of items, it’s best
-      // to use the ListView.builder constructor.
-      //
-      // In contrast to the default ListView constructor, which requires
-      // building all Widgets up front, the ListView.builder constructor lazily
-      // builds Widgets as they’re scrolled into view.
-      body: FutureBuilder<Either<Failure, List<BookItem>>>(
-        future: ref.read(refreshCommandProvider).run(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            final resp = snapshot.data!;
-            return resp.fold(
-              (failure) => Center(child: Text(failure.message),),
-              (books) => hasBooks(books),
-            );
-            // return const Center(child: Text('done'),);
-          }
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator(),);
-          }
-
-          if (snapshot.hasError) {
-            return const Center(child: Text('Unknown Error'),);
-          }
-
-          return const Center(child: CircularProgressIndicator(),);
-        }
-      ),
+      body: hasBooks(books),
     );
   }
 
-  ListView hasBooks(List<BookItem> books) {
+  Widget hasBooks(List<BookItem> books) {
     return ListView.builder(
       // Providing a restorationId allows the ListView to restore the
       // scroll position when a user leaves and returns to the app after it

@@ -1,4 +1,5 @@
 import 'package:book_adapter/commands/base_command.dart' as commands;
+import 'package:book_adapter/commands/refresh_command.dart' as commands;
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
@@ -8,11 +9,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:i18n_extension/i18n_widget.dart';
 
 /// The Widget that configures your application.
-class MyApp extends ConsumerWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends ConsumerState<MyApp> {
+  @override
+  void initState() {
+    super.initState();
+    
+    // Refresh the books with the server on app start
+    ref.read(commands.refreshCommandProvider).run();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     // TODO: Will be used for controlling the auth state
     /*final baseCommand = */ref.watch(commands.baseCommandProvider);
     return MaterialApp(

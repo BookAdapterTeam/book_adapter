@@ -7,8 +7,7 @@ final baseCommandProvider = Provider<BaseCommand>((ref) {
 // Provide quick lookup methods for all the top-level models and services. Keeps the Command code slightly cleaner.
 class BaseCommand {
   BaseCommand(this.ref) {
-    userModelNotifier = ref.watch(userModelProvider.notifier);
-
+    userModelNotifier = ref.read(userModelProvider.notifier);
   }
   final ProviderRef ref;
 

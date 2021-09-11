@@ -30,6 +30,8 @@ class RefreshBooksCommand extends BaseCommand {
       return Future.value(const Right(books));
     } on FirebaseException catch (e) {
       return Left(Failure(e.message ?? 'Unknown Firebase Exception'));
+    } on Exception catch (_) {
+      return Left(Failure('Unexpected Exception'));
     }
   } 
 }
