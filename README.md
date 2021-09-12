@@ -6,6 +6,8 @@ A new Flutter project built for android. This project uses riverpod state manage
 
 [Read about Riverpod](https://codewithandrea.com/videos/flutter-state-management-riverpod/)
 
+Documentation is in the "docs" folder.
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
