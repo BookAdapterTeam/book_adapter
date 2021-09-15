@@ -1,76 +1,54 @@
 name: book_adapter
 description: A new Flutter project.
-publish_to: 'none' 
+publish_to: "none"
 version: 1.0.0+1
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
+  cloud_firestore: ^2.5.2
+  cupertino_icons: ^1.0.2
+  dartz: ^0.10.0
+  enum_to_string: ^2.0.1
+  epubx: ^3.0.0-dev.3
+  file_picker: ^4.0.0
+  firebase_analytics: ^8.3.2
+  firebase_auth: ^3.1.1
+  firebase_core: ^1.6.0
+  firebase_storage: ^10.0.3
   flutter:
     sdk: flutter
-
-  # Architecture
-  hooks_riverpod: ^1.0.0-dev.7
-  dartz: ^0.10.0
-  responsive_builder: ^0.4.1
-  multi_screen_layout: ^2.0.0
-
-  # Firebase
-  # https://github.com/FirebaseExtended/flutterfire
-  uuid: ^3.0.4
-  firebase_core: ^1.6.0
-  firebase_auth: ^3.1.1
-  cloud_firestore: ^2.5.2
-  firebase_storage: ^10.0.3
-  # cloud_functions: ^3.0.3
-  # firebase_crashlytics: ^2.2.1
-  # firebase_performance: ^0.7.1
-  # firebase_remote_config: ^0.11.0
-
-  # Local Database
-  hive: ^2.0.4
-  hive_flutter: ^1.1.0
-
-  # Localization
-  intl: ^0.17.0
-  i18n_extension: ^4.1.0
   flutter_localizations:
     sdk: flutter
-  cupertino_icons: ^1.0.2
-
-  # For Key-Value local storage
-  shared_preferences: ^2.0.5
-
-  # Convert between Enum and String
-  enum_to_string: ^2.0.1
-
-  # Choose a book file from the device
-  file_picker: ^4.0.0
-  epubx: ^3.0.0-dev.3
-  path_provider: ^2.0.1
-
-  # Logging
+  hive: ^2.0.4
+  hive_flutter: ^1.1.0
+  hooks_riverpod: ^1.0.0-dev.7
+  i18n_extension: ^4.1.0
+  intl: ^0.17.0
   logger: ^1.1.0
+  multi_screen_layout: ^2.0.0
+  path_provider: ^2.0.1
+  responsive_builder: ^0.4.1
+  shared_preferences: ^2.0.5
+  uuid: ^3.0.4
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^1.0.4
   build_runner: ^2.1.1
-  hive_generator: ^1.1.0
   flutter_gen_runner: ^3.1.1
   flutter_launcher_icons: ^0.9.0
+  flutter_lints: ^1.0.4
   flutter_native_splash: ^1.2.3
+  flutter_test:
+    sdk: flutter
+  hive_generator: ^1.1.0
 
 # Uncomment the flutter_icons section when adding an icon, then run
 # flutter pub run flutter_launcher_icons:main
-
 # flutter_icons:
 #  android: "launcher_icon"
 #  ios: true
 #  image_path: "assets/icon/icon.png"
-
 flutter_gen:
   integrations:
     flutter_svg: true
