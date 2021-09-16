@@ -8,6 +8,12 @@ A new Flutter project built for android. This project uses riverpod state manage
 
 Documentation is in the "docs" folder.
 
+## Setup
+
+Add your Google services file from Firebase to your app, [tutorial here](https://firebase.google.com/docs/flutter/setup?platform=ios)
+
+If you need to connect to the official Firebase backend, contact @getBoolean for the GoogleService-Info.plist and google-services.json
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
