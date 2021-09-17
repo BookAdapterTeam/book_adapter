@@ -135,6 +135,40 @@ jobs:
         with:
           name: android_apk
           path: build/app/outputs/flutter-apk/app-release.apk
+  
+  build_apk_with_firebase:
+    name: Build Flutter (Android APK With Firebase)
+    needs: [flutter_test]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Install the Firebase google services
+        env:
+          ANDROID_GOOGLE_SERVICES_BASE64: ${{ secrets.ANDROID_GOOGLE_SERVICES_BASE64 }}
+        run: |
+          # create variables
+          SERVICES_PATH=build/app/google-services.json
+
+          # import google services from secrets
+          echo -n "$ANDROID_GOOGLE_SERVICES_BASE64" | base64 --decode --output $SERVICES_PATH
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "12.x"
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: "stable"
+      - run: flutter pub get
+      - run: flutter clean
+      - name: Build Android APK
+        run: flutter build apk --release
+      - name: Upload apk
+        uses: actions/upload-artifact@v2
+        with:
+          name: android_apk
+          path: build/app/outputs/flutter-apk/app-release.apk
 
   # Disabled, not currently supported with Github
   # build_windows:
