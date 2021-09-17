@@ -23,6 +23,7 @@ dependencies:
   firebase_auth: ^3.1.1
   cloud_firestore: ^2.5.2
   firebase_storage: ^10.0.3
+  firebase_analytics: ^8.3.2
   # cloud_functions: ^3.0.3
   # firebase_crashlytics: ^2.2.1
   # firebase_performance: ^0.7.1
