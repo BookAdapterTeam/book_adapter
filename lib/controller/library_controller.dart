@@ -1,5 +1,5 @@
+import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/failure.dart';
-import 'package:book_adapter/features/library/book_item.dart';
 import 'package:book_adapter/model/user_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_core/firebase_core.dart';

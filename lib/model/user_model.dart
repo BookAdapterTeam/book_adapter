@@ -1,5 +1,5 @@
+import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/user_data.dart';
-import 'package:book_adapter/features/library/book_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final userModelProvider = StateNotifierProvider<UserModelNotifier, UserData>((ref) {

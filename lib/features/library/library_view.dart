@@ -1,4 +1,4 @@
-import 'package:book_adapter/features/library/book_item.dart';
+import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';

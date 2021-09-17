@@ -1,4 +1,4 @@
-import 'package:book_adapter/features/library/book_item.dart';
+import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:flutter/material.dart';
 
