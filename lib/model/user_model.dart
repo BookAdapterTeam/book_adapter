@@ -15,6 +15,8 @@ class UserModelNotifier extends StateNotifier<UserData> {
 
   // Put functions here using copyWith to change data
 
+  // TODO: Add functions such as currentUser for authentication
+
   // Update UserData with new list of books
   void setBooks(List<BookItem> books) {
     state = state.copyWith(books: books);

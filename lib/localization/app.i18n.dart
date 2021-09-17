@@ -3,11 +3,14 @@ import 'package:i18n_extension/i18n_extension.dart';
 const String legalese = 'Legal stuff here.';
 
 extension Localization on String {
+  // Example in English. It is not required to enter it in for English
   static final _t = Translations.byLocale('en_us') +
     {
       'en_us': {
         'Book Adapter': 'Book Adapter',
         legalese: 'Blah blah.',
+        'Library': 'Library',
+        'Settings': 'Settings',
       },
     }
     // + 

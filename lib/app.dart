@@ -1,8 +1,8 @@
-import 'package:book_adapter/commands/base_command.dart' as commands;
-import 'package:book_adapter/commands/refresh_command.dart' as commands;
+import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
+import 'package:book_adapter/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -22,13 +22,13 @@ class _MyAppState extends ConsumerState<MyApp> {
     super.initState();
     
     // Refresh the books with the server on app start
-    ref.read(commands.refreshCommandProvider).run();
+    ref.read(libraryControllerProvider).refresh();
   }
 
   @override
   Widget build(BuildContext context) {
     // TODO: Will be used for controlling the auth state
-    /*final baseCommand = */ref.watch(commands.baseCommandProvider);
+    /*final userData = */ref.watch(userModelProvider);
     return MaterialApp(
       // Providing a restorationScopeId allows the Navigator built by the
       // MaterialApp to restore the navigation stack when a user leaves and
