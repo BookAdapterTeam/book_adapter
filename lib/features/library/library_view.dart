@@ -1,5 +1,6 @@
-import 'package:book_adapter/features/library/book_item.dart';
+import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
+import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:book_adapter/model/user_model.dart';
@@ -15,10 +16,20 @@ class LibraryView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final books = ref.watch(userModelProvider).books;
+    final isLoading = ref.watch(libraryViewController);
+    final viewController = ref.watch(libraryViewController.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text('Library'.i18n),
         actions: [
+          IconButton(
+            icon: isLoading ? const CircularProgressIndicator(
+              color: Colors.white,
+            ) : const Icon(Icons.refresh),
+            onPressed: () {
+              viewController.refreshBooks();
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.settings),
             onPressed: () {
