@@ -2,7 +2,7 @@
 
 A new Flutter project built for android. This project uses riverpod state management with MVC+S architecture.
 
-[Read about MVC+S](https://blog.gskinner.com/archives/2020/09/flutter-state-management-with-mvcs.html)
+[Read about MVC+S](https://www.guru99.com/mvc-tutorial.html)
 
 [Read about Riverpod](https://codewithandrea.com/videos/flutter-state-management-riverpod/)
 
