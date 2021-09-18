@@ -1,6 +1,18 @@
 # BookAdapter - ePub Reader & Library Management
 
-A new Flutter project built for android. This project uses riverpod state management with MVC+S architecture.
+A new Flutter app built for android for reading ePub books.
+
+Documentation is in the "docs" folder.
+
+## Architecture
+This project uses riverpod state management with MVC+S architecture.
+
+
+> Domain Logic (rules around data storage, manipulation, and validation) and Application Logic (what your application actually does. How it behaves.) You also find that:
+
+Domain Logic naturally belongs in the Model tier.
+
+Application Logic naturally belongs in the Controller tier.
 
 Model – Holds the state of the application and provides an API to access/filter/manipulate that data. Its concern is data encapsulation and management. It contains logic to structure, validate or compare different pieces of data that we call Domain Logic. It also notifies the view of any changes in the data.
 
@@ -12,19 +24,22 @@ Controller – Contains the applications logic. They are used to complete any si
 
 Services – Services fetch data from the outside world, and return it to the app. Controllers call on services and inject the results into the model. Services do not touch the model directly.
 
-Source: gskinner
+Source: [gskinner](https://blog.gskinner.com/archives/2020/09/flutter-state-management-with-mvcs.html)
 
 [Example Usage](https://github.com/jpoh281/riverpod_mvcs_counter)
 
 [Read about Riverpod](https://codewithandrea.com/videos/flutter-state-management-riverpod/)
 
-Documentation is in the "docs" folder.
-
 ## Setup
 
-Add your Google services file from Firebase to your app, [tutorial here](https://firebase.google.com/docs/flutter/setup?platform=ios)
-
-If you need to connect to the official Firebase backend, contact @getBoolean for the GoogleService-Info.plist and google-services.json
+1. Clone the repo
+2. Install Flutter
+3. Open the project in VSCode, install the Flutter plugin.
+4. Run "flutter pub get" in terminal or press the button when prompted by VSCode
+5. Setup Firebase for the app with analytics enabled, [tutorial here](https://firebase.google.com/docs/flutter/setup?platform=android)
+   - If you need to connect to the official Firebase backend, contact @getBoolean for the (iOS) GoogleService-Info.plist or (Android) google-services.json. It is not guarenteed you will be given access.
+6. Enable Email login in Firebase console "Authentication"
+7. ...
 
 ## Getting Started
 
