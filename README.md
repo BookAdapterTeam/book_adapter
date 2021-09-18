@@ -2,13 +2,15 @@
 
 A new Flutter project built for android. This project uses riverpod state management with MVC+S architecture.
 
-MODEL – Holds the state of the application and provides an API to access/filter/manipulate that data. Its concern is data encapsulation and management. It contains logic to structure, validate or compare different pieces of data that we call Domain Logic.
+Model – Holds the state of the application and provides an API to access/filter/manipulate that data. Its concern is data encapsulation and management. It contains logic to structure, validate or compare different pieces of data that we call Domain Logic. It also notifies the view of any changes in the data.
 
-VIEW – Views are all the Widgets and Pages within the Flutter Application. These views may contain a “view controller” themselves, but that is still considered part of the view application tier.
+View – Views are all the Widgets and Pages within the Flutter Application. These views may contain a "view controller" themselves, but that is still considered part of the view application tier.
 
-CONTROLLER – The controller layer is represented by various Commands which contain the Application Logic of the app. Commands are used to complete any significant action within your app.
+ViewController - A controller that handles UI state changes due to user interaction. ViewController makes calls on other controllers, it does not touch the model directly. If the view needs to handle UI state changes due to user interaction, use a view controller to manage and hold the state.
 
-SERVICES – Services fetch data from the outside world, and return it to the app. Commands call on services and inject the results into the model. Services do not touch the model directly.
+Controller – Contains the applications logic. They are used to complete any significant action within the app. Controllers managing UI state should be separated as a ViewController
+
+Services – Services fetch data from the outside world, and return it to the app. Controllers call on services and inject the results into the model. Services do not touch the model directly.
 
 Source: gskinner
 
