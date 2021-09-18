@@ -34,12 +34,20 @@ Source: [gskinner](https://blog.gskinner.com/archives/2020/09/flutter-state-mana
 
 1. Clone the repo
 2. Install Flutter
-3. Open the project in VSCode, install the Flutter plugin.
+3. Open the project in VSCode, install the Flutter plugin
 4. Run "flutter pub get" in terminal or press the button when prompted by VSCode
 5. Setup Firebase for the app with analytics enabled, [tutorial here](https://firebase.google.com/docs/flutter/setup?platform=android)
    - If you need to connect to the official Firebase backend, contact @getBoolean for the (iOS) GoogleService-Info.plist or (Android) google-services.json. It is not guarenteed you will be given access.
 6. Enable Email login in Firebase console "Authentication"
 7. ...
+
+## Contributing
+1. Choose an existing issue to fix/implement
+2. Fork the 'main' branch and give it a relevant name
+3. Implemement your changes. Do not make more changes than necessary
+4. Resolve all linter problems (other than todos). It cannot merge otherwise
+5. Open a Pull Request from your branch to main
+6. The PR can be merged by an Admin if there are no issues
 
 ## Getting Started
 
