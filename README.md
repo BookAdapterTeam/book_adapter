@@ -14,7 +14,7 @@ Services – Services fetch data from the outside world, and return it to the ap
 
 Source: gskinner
 
-[Read about MVC](https://www.guru99.com/mvc-tutorial.html)
+[Example Usage](https://github.com/jpoh281/riverpod_mvcs_counter)
 
 [Read about Riverpod](https://codewithandrea.com/videos/flutter-state-management-riverpod/)
 
