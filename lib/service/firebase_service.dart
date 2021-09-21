@@ -103,4 +103,30 @@ class FirebaseService extends BaseFirebaseService {
   Future<void> signOut() async {
     await _firebaseAuth.signOut();
   }
+
+  // Database
+  /// WIP
+  /// 
+  /// Get a list of books from the user's database
+  @override
+  Future<Either<Failure, List<BookItem>>> getBooks() async {
+    try {
+      // TODO: Implement Firebase call to database to get the list of user books
+      await Future.delayed(const Duration(seconds: 1));
+      const List<BookItem> books = [
+        BookItem(name: 'Book 0', id: '0'),
+        BookItem(name: 'Book 1', id: '1'),
+        BookItem(name: 'Book 2', id: '2'),
+      ];
+      
+      // Return our books to the caller in case they care
+      // ignore: prefer_const_constructors
+      return Right(books);
+    } on FirebaseException catch (e) {
+      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books', e.code));
+    } on Exception catch (_) {
+      return Left(Failure('Unexpected Exception, Could Not Refresh Books'));
+    }
+  }
+
 }
