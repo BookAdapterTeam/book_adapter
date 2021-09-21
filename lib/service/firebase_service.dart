@@ -5,11 +5,12 @@ import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// Provider to easily get access to the [FirebaseService] functions from anywhere in the app
+/// Provider to easily get access to the [FirebaseService] functions
 final firebaseServiceProvider = Provider<FirebaseService>((ref) {
   return FirebaseService();
 });
 
+/// Provider to easily get access to the user stream from [FirebaseService]
 final authStateChangesProvider = StreamProvider<User?>((ref) {
   final firebaseService = ref.read(firebaseServiceProvider);
   return firebaseService.authStateChange;
