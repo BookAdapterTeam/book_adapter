@@ -7,16 +7,19 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions from anywhere in the app
 final firebaseServiceProvider = Provider<FirebaseService>((ref) {
-  final firebaseAuth = FirebaseAuth.instance;
+  return FirebaseService();
+});
 
-  return FirebaseService(firebaseAuth);
+final authStateChangesProvider = StreamProvider<User?>((ref) {
+  final firebaseService = ref.read(firebaseServiceProvider);
+  return firebaseService.authStateChange;
 });
 
 /// A utility class to handle all Firebase calls
 class FirebaseService extends BaseFirebaseService {
-  FirebaseService(this._firebaseAuth) : super(_firebaseAuth);
+  FirebaseService() : super(_firebaseAuth);
 
-  final FirebaseAuth _firebaseAuth;
+  static final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
   // Authentication
 
