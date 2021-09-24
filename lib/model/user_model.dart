@@ -3,9 +3,7 @@ import 'package:book_adapter/data/user_data.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final userModelProvider = StateNotifierProvider<UserModelNotifier, UserData>((ref) {
-  const userData = UserData(
-    books: [],
-  );
+  const userData = UserData();
 
   return UserModelNotifier(userData);
 });

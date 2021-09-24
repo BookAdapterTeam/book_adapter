@@ -14,7 +14,7 @@ class LibraryViewController extends StateNotifier<bool> {
 
   refreshBooks() async {
     state = true;
-    await _read(libraryControllerProvider).refresh();
+    await _read(libraryControllerProvider).fetchBooks();
     state = false;
   }
 }

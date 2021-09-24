@@ -10,12 +10,6 @@ final firebaseServiceProvider = Provider<FirebaseService>((ref) {
   return FirebaseService();
 });
 
-/// Provider to easily get access to the user stream from [FirebaseService]
-final authStateChangesProvider = StreamProvider<User?>((ref) {
-  final firebaseService = ref.read(firebaseServiceProvider);
-  return firebaseService.authStateChange;
-});
-
 /// A utility class to handle all Firebase calls
 class FirebaseService extends BaseFirebaseService {
   FirebaseService() : super(_firebaseAuth);
@@ -41,7 +35,7 @@ class FirebaseService extends BaseFirebaseService {
   /// 
   /// Right [UserCredential] is returned if successful
   /// 
-  /// Left [Failure] maybe returned with the following error code:
+  /// Left [FirebaseFailure] maybe returned with the following error code:
   /// - **invalid-email**:
   ///  - Returned if the email address is not valid.
   /// - **user-disabled**:
@@ -51,6 +45,8 @@ class FirebaseService extends BaseFirebaseService {
   /// - **wrong-password**:
   ///  - Returned if the password is invalid for the given email, or the account
   ///    corresponding to the email does not have a password set.
+  /// 
+  /// Left [Failure] returned for any other exception
   @override
   Future<Either<Failure, UserCredential>> signIn({required String email, required String password}) async {
     try {
@@ -74,7 +70,7 @@ class FirebaseService extends BaseFirebaseService {
   /// 
   /// Right [UserCredential] is returned if successful
   /// 
-  /// Left [Failure] maybe returned with the following error code:
+  /// Left [FirebaseFailure] maybe returned with the following error code:
   /// - **email-already-in-use**:
   ///  - Returned if there already exists an account with the given email address.
   /// - **invalid-email**:
@@ -84,6 +80,8 @@ class FirebaseService extends BaseFirebaseService {
   ///    email/password accounts in the Firebase Console, under the Auth tab.
   /// - **weak-password**:
   ///  - Returned if the password is not strong enough.
+  /// 
+  /// Left [Failure] returned for any other exception
   @override
   Future<Either<Failure, UserCredential>> signUp({required String email, required String password}) async {
     try {

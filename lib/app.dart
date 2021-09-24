@@ -22,7 +22,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     super.initState();
     
     // Refresh the books with the server on app start
-    ref.read(libraryControllerProvider).refresh();
+    ref.read(libraryControllerProvider).fetchBooks();
   }
 
   @override
