@@ -16,7 +16,7 @@ class LibraryController {
   Future<Either<Failure, List<BookItem>>> refresh() async {
     // Make service call and inject results into the model
     final Either<Failure, List<BookItem>> res = await _ref.read(firebaseServiceProvider).getBooks();
-    res.fold(
+    return res.fold(
       // Firebase call to get the updated books failed
       (failure) {
         return Left(failure);
@@ -28,8 +28,5 @@ class LibraryController {
         return Right(books);
       }
     );
-
-    // It should not get here, but incase it somehow does
-    return Left(Failure('Unexpected Failure, Could Not Refresh Books'));
   }
 }
