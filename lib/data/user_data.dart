@@ -8,11 +8,11 @@ import 'package:flutter/cupertino.dart';
 @immutable
 class UserData extends Equatable {
   const UserData({
-    required this.books,
+    this.books,
   });
 
   // In the future, this would contain other data about Users, such as Collections, Series, etc
-  final List<BookItem> books;
+  final List<BookItem>? books;
 
   // The following was generated with VSCode extention "Dart Data Class Generator"
   UserData copyWith({
@@ -25,7 +25,7 @@ class UserData extends Equatable {
 
   Map<String, dynamic> toMap() {
     return {
-      'books': books.map((x) => x.toMap()).toList(),
+      'books': books?.map((x) => x.toMap()).toList(),
     };
   }
 
@@ -43,5 +43,5 @@ class UserData extends Equatable {
   bool get stringify => true;
 
   @override
-  List<Object> get props => [books];
+  List<Object> get props => [books ?? []];
 }

@@ -5,25 +5,42 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-// import 'package:book_adapter/app.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_test/flutter_test.dart';
+import 'package:book_adapter/app.dart';
+import 'package:book_adapter/service/firebase_service.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-// void main() {
-//   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-//     // Build our app and trigger a frame.
-//     await tester.pumpWidget(const MyApp());
+import 'mock_firebase_service.dart';
 
-//     // Verify that our counter starts at 0.
-//     expect(find.text('0'), findsOneWidget);
-//     expect(find.text('1'), findsNothing);
+void main() {
+  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame.
+    final container = ProviderContainer();
+    final firebaseService = container.read(fakeFirebaseServiceProvider);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [
+        firebaseServiceProvider.overrideWithValue(firebaseService),
+      ],
+      child: const MyApp(),
+    ));
 
-//     // Tap the '+' icon and trigger a frame.
-//     await tester.tap(find.byIcon(Icons.add));
-//     await tester.pump();
 
-//     // Verify that our counter has incremented.
-//     expect(find.text('0'), findsNothing);
-//     expect(find.text('1'), findsOneWidget);
-//   });
-// }
+
+    // The first frame is a loading state.
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+    // Re-render. libraryControllerProvider should have finished fetching the books by now
+    await tester.pump();
+
+    // No-longer loading
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+
+    // Rendered three ListTiles with the data returned by MockFirebaseService
+    expect(tester.widgetList(find.byType(ListTile)), [
+      isA<ListTile>(),
+      isA<ListTile>(),
+      isA<ListTile>(),
+    ]);
+  });
+}

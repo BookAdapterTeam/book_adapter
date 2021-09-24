@@ -1,9 +1,9 @@
+import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
-import 'package:book_adapter/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -15,7 +15,9 @@ class LibraryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final books = ref.watch(userModelProvider).books;
+    final bookList = ref.watch(bookListProvider);
+    final books = bookList.data?.value;
+
     final isLoading = ref.watch(libraryViewController);
     final viewController = ref.watch(libraryViewController.notifier);
     return Scaffold(
@@ -41,7 +43,7 @@ class LibraryView extends ConsumerWidget {
           ),
         ],
       ),
-      body: hasBooks(books),
+      body: books == null ? const CircularProgressIndicator() : hasBooks(books),
     );
   }
 
