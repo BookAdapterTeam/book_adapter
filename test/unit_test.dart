@@ -40,7 +40,7 @@ void main() {
     // TODO: Test signup
     // FirebaseAuth mock does not support mocking creating a user, need to figure out another solution to test
 
-    test('Test Login', () async {
+    test('Test Logout', () async {
       // Use the mock firebase service logged in
       final firebaseService = MockFirebaseService(firebaseAuth: MockFirebaseAuth(signedIn: true));
       final container = ProviderContainer(
