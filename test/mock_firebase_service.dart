@@ -4,15 +4,16 @@ import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final fakeFirebaseServiceProvider = Provider<MockFirebaseService>((ref) {
-  return MockFirebaseService();
+  return MockFirebaseService(firebaseAuth: MockFirebaseAuth());
 });
 
 class MockFirebaseService implements FirebaseService {
-
-  static final firebaseAuth = MockFirebaseAuth();
+  MockFirebaseService({required this.firebaseAuth});
+  final FirebaseAuth firebaseAuth;
 
   @override
   Stream<User?> get authStateChange => firebaseAuth.authStateChanges();
