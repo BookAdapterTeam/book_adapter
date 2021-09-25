@@ -8,7 +8,7 @@ Documentation is in the "docs" folder.
 
 This project uses riverpod state management with MVC+S architecture.
 
-> Domain Logic (rules around data storage, manipulation, and validation) and Application Logic (what your application actually does. How it behaves.) You also find that:
+Domain Logic (rules around data storage, manipulation, and validation) and Application Logic (what your application actually does. How it behaves.) You also find that:
 
 - Domain Logic naturally belongs in the Model tier.
 
