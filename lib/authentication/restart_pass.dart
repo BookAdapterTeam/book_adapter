@@ -43,18 +43,18 @@ class _LoginPageState extends State<restart_pass>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("login"),
-        ),
+      //  appBar: AppBar(),
         body: Container(
             padding: EdgeInsets.all(25.0),
             child: Form(
               key: formKey,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
+                  const Text('Enter email account you have linked'),
                   TextFormField(
-                    decoration: const InputDecoration( labelText: "Email" ),
+                    decoration: const InputDecoration( labelText: 'Email' ),
                     validator: (value)=> value!.isEmpty ?'Email can\'t be empty': null,
                     onSaved: (value)=> _email=value!,
                   ),
@@ -69,7 +69,7 @@ class _LoginPageState extends State<restart_pass>{
                     }
                     ),
                   ElevatedButton(
-                      child: const Text('Cancle', style: TextStyle(fontSize: 20.0)),
+                      child: const Text('Cancel', style: TextStyle(fontSize: 20.0)),
                       onPressed : () {
                         Navigator.push(
                           context,

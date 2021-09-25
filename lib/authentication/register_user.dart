@@ -26,18 +26,17 @@ class _registerPageState extends State<register_user>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text("Register"),
-        ),
+         appBar: AppBar(),
         body: Container(
-            padding: EdgeInsets.all(25.0),
+            padding: const EdgeInsets.all(25.0),
             child: Form(
               key: formKey,
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
                   TextFormField(
-                    decoration: const InputDecoration( labelText: "Username" ),
+                    decoration: const InputDecoration( labelText: 'Username' ),
                     validator: (value)=> value!.isEmpty ?'Username can\'t be empty': null,
                     onSaved: (value)=> _username=value!,
                   ),
@@ -48,7 +47,7 @@ class _registerPageState extends State<register_user>{
                       if( value!.isEmpty) {
                         return 'Please a Enter';
                       }
-                      if(!RegExp("^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]").hasMatch(value)){
+                      if(!RegExp('^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]').hasMatch(value)){
                         return 'Please a valid Email';
                       }
                       return null;
@@ -56,18 +55,19 @@ class _registerPageState extends State<register_user>{
                     onSaved: (value)=> _email=value!,
                   ),
                   TextFormField(
-                    decoration: const InputDecoration(labelText: "Enter Password"),
+                    decoration: const InputDecoration(labelText: 'Enter Password'),
                     obscureText: true,
                     validator: (value)=> value!.isEmpty ?'password can\'t be empty': null,
                     onSaved: (value)=> _password1=value!,
                   ),
                   TextFormField(
-                      decoration: const InputDecoration(labelText: "Re-enter Password"),
+                      decoration: const InputDecoration(labelText: 'Re-enter Password'),
                       obscureText: true,
                       validator: (value)=> value!.isEmpty ?'password can\'t be empty': null,
                       onSaved: (value)=> _password2=value!
                   ),
-                  FlatButton(
+
+                  ElevatedButton(
                     child: const Text('Register', style: TextStyle(fontSize: 20.0)),
                     onPressed: validateAndSave,
                   )
