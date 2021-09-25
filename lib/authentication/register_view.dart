@@ -1,4 +1,5 @@
 import 'package:book_adapter/authentication/register_view_controller.dart';
+import 'package:book_adapter/data/failure.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -74,7 +75,20 @@ class RegisterView extends ConsumerWidget {
                   ),
                   ElevatedButton(
                     child: const Text('Register', style: TextStyle(fontSize: 20.0)),
-                    onPressed: () => viewController.register(),
+                    onPressed: () async {
+                      final res = await viewController.register();
+                      return res.fold(
+                        (failure) => ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              failure is FirebaseFailure
+                                ? '${failure.code}: ${failure.message}'
+                                : failure.message
+                            )
+                          )),
+                        (user) => Navigator.of(context).pop(),
+                      );
+                    },
                   )
                 ],
               ),

@@ -12,7 +12,7 @@ final firebaseControllerProvider = Provider<FirebaseController>((ref) {
 
 /// Provider to easily get access to the user stream from [FirebaseService]
 final authStateChangesProvider = StreamProvider<User?>((ref) {
-  final firebaseController = ref.read(firebaseControllerProvider);
+  final firebaseController = ref.watch(firebaseControllerProvider);
   return firebaseController.authStateChange;
 });
 

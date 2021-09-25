@@ -46,7 +46,7 @@ class LibraryView extends ConsumerWidget {
           ),
         ],
       ),
-      body: books == null ? const CircularProgressIndicator(key: ValueKey('loading_books'),) : hasBooks(books),
+      body: books == null ? const Center(child: CircularProgressIndicator(key: ValueKey('loading_books'),)) : hasBooks(books),
     );
   }
 

@@ -1,5 +1,6 @@
 import 'package:book_adapter/authentication/login_view.dart';
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/features/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -19,8 +20,9 @@ class AuthChecker extends ConsumerWidget {
         // Route to user screen
         return child;
       },
-      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator(),),),
+      loading: () => const LoadingView(),
       error: (e, st) => Scaffold(body: Center(child: Text('Error: $e'),),),
     );
   }
 }
+

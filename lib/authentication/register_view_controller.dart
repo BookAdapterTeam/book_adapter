@@ -1,4 +1,7 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/data/failure.dart';
+import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,12 +19,14 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
     state = state.copyWith(email: email, password: password, verifyPassword: verifyPassword);
   }
 
-  Future<void> register() async {
+  Future<Either<Failure, User>> register() async {
     state = state.copyWith(isLoading: true);
-    await _read(firebaseControllerProvider).signUp(
+    final res = await _read(firebaseControllerProvider).signUp(
       email: state.email, password: state.password,
     );
     state = state.copyWith(isLoading: false);
+
+    return res;
   }
 }
 
