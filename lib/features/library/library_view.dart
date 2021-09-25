@@ -20,34 +20,35 @@ class LibraryView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final bookList = ref.watch(bookListProvider);
     final user = ref.watch(firebaseControllerProvider).currentUser;
-    final books = bookList.data?.value;
 
-    final isLoading = ref.watch(libraryViewController);
+    // final isLoading = ref.watch(libraryViewController);
     final viewController = ref.watch(libraryViewController.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text('Library'.i18n),
         actions: [
           IconButton(
-            key: const ValueKey('refresh'),
-            icon: isLoading ? const CircularProgressIndicator(
-              key: ValueKey('loading_refresh'),
-              color: Colors.white,
-            ) : const Icon(Icons.refresh),
+            key: const ValueKey('signOut'),
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sign out'.i18n,
             onPressed: () {
-              viewController.refreshBooks();
+              // Log out the user
+              // TODO: Add pop up asking for confirmation
+              viewController.signOut();
             },
           ),
           if (user != null) ... [
             IconButton(
               key: const ValueKey('profile'),
-              icon: CircleAvatar(
+              icon: user.photoURL != null 
+              ? CircleAvatar(
                 backgroundImage:
                   // TODO: Remove UserPreferences and use placeholder icon
                   // TODO: Use user uploaded photo instead of from oAuth profile image
-                  NetworkImage(user.photoURL ?? UserPreferences.myUser.imagePath),
+                  NetworkImage(user.photoURL!),
                 backgroundColor: Colors.grey,
-              ),// const Icon(Icons.settings),
+              )
+              : const Icon(Icons.account_circle),// const Icon(Icons.settings),
               onPressed: () {
                 // Navigate to the settings page. If the user leaves and returns
                 // to the app after it has been killed while running in the
@@ -58,40 +59,59 @@ class LibraryView extends ConsumerWidget {
           ],
         ],
       ),
-      body: books == null ? const CircularProgressIndicator(key: ValueKey('loading_books'),) : hasBooks(books),
+      body: bookList.when(
+        data: (books) => _LibraryListView(books: books),
+        loading: () => const Center(child: CircularProgressIndicator(key: ValueKey('loading_books'))),
+        error: (e, st) => Center(child: Text(e.toString())),
+      )
     );
   }
+}
 
-  Widget hasBooks(List<BookItem> books) {
-    return ListView.builder(
-      // Providing a restorationId allows the ListView to restore the
-      // scroll position when a user leaves and returns to the app after it
-      // has been killed while running in the background.
-      restorationId: 'bookListView',
-      itemCount: books.length,
-      itemBuilder: (BuildContext context, int index) {
-        final book = books[index];
+class _LibraryListView extends ConsumerWidget {
+  const _LibraryListView({
+    Key? key,
+    required this.books,
+  }) : super(key: key);
+  final List<BookItem> books;
 
-        return ListTile(
-          title: Text('Book: ${book.name}'),
-          subtitle: Text('ID: ${book.id}'),
-          leading: const CircleAvatar(
-            // Display the Flutter Logo image asset.
-            foregroundImage: AssetImage('assets/images/flutter_logo.png'),
-          ),
-          onTap: () {
-            // Navigate to the details page. If the user leaves and returns to
-            // the app after it has been killed while running in the
-            // background, the navigation stack is restored.
-            Navigator.restorablePushNamed(
-              context,
-              BookItemDetailsView.routeName,
-              // Convert the book object to a map so that it can be passed through Navigator
-              arguments: book.toMap(),
-            );
-          }
-        );
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewController = ref.watch(libraryViewController.notifier);
+    return RefreshIndicator(
+      onRefresh: () {
+        return viewController.refreshBooks();
       },
+      child: ListView.builder(
+        // Providing a restorationId allows the ListView to restore the
+        // scroll position when a user leaves and returns to the app after it
+        // has been killed while running in the background.
+        restorationId: 'bookListView',
+        itemCount: books.length,
+        itemBuilder: (BuildContext context, int index) {
+          final book = books[index];
+
+          return ListTile(
+            title: Text('Book: ${book.name}'),
+            subtitle: Text('ID: ${book.id}'),
+            leading: const CircleAvatar(
+              // Display the Flutter Logo image asset.
+              foregroundImage: AssetImage('assets/images/flutter_logo.png'),
+            ),
+            onTap: () {
+              // Navigate to the details page. If the user leaves and returns to
+              // the app after it has been killed while running in the
+              // background, the navigation stack is restored.
+              Navigator.restorablePushNamed(
+                context,
+                BookItemDetailsView.routeName,
+                // Convert the book object to a map so that it can be passed through Navigator
+                arguments: book.toMap(),
+              );
+            }
+          );
+        },
+      ),
     );
   }
 }

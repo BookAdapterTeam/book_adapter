@@ -1,10 +1,10 @@
 import 'package:book_adapter/controller/library_controller.dart';
+import 'package:book_adapter/features/auth/auth_checker.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view.dart';
 import 'package:book_adapter/features/profile/edit_profile_page.dart';
 import 'package:book_adapter/features/profile/profile.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
-import 'package:book_adapter/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,8 +29,6 @@ class _MyAppState extends ConsumerState<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Will be used for controlling the auth state
-    /*final userData = */ref.watch(userModelProvider);
     return MaterialApp(
       // Providing a restorationScopeId allows the Navigator built by the
       // MaterialApp to restore the navigation stack when a user leaves and
@@ -75,7 +73,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               default:
                 page = const LibraryView();
             }
-            return I18n(child: page);
+            return I18n(child: AuthChecker(child: page));
           },
         );
       },

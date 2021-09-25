@@ -141,4 +141,44 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
+  /// Send reset password email
+  @override
+  Future<Either<Failure, void>> resetPassword(String email) async {
+    try {
+      await _firebaseAuth.sendPasswordResetEmail(email: email);
+      return const Right(null);
+    } on FirebaseException catch (e) {
+      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email', e.code));
+    } on Exception catch (_) {
+      return Left(Failure('Unexpected Exception, Could Not Send Reset Email'));
+    }
+  }
+
+  /// Set display name
+  /// 
+  /// Returns [true] if successful
+  /// Returns [false] if the user is not authenticated
+  @override
+  Future<bool> setDisplayName(String name) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      return false;
+    }
+    await user.updateDisplayName(name);
+    return true;
+  }
+
+  /// Set profile photo
+  /// 
+  /// Returns [true] if successful
+  /// Returns [false] if the user is not authenticated
+  @override
+  Future<bool> setProfilePhoto(String photoURL) async {
+    final user = _firebaseAuth.currentUser;
+    if (user == null) {
+      return false;
+    }
+    await user.updatePhotoURL(photoURL);
+    return true;
+  }
 }
