@@ -10,9 +10,9 @@ This project uses riverpod state management with MVC+S architecture.
 
 > Domain Logic (rules around data storage, manipulation, and validation) and Application Logic (what your application actually does. How it behaves.) You also find that:
 
-Domain Logic naturally belongs in the Model tier.
+- Domain Logic naturally belongs in the Model tier.
 
-Application Logic naturally belongs in the Controller tier.
+- Application Logic naturally belongs in the Controller tier.
 
 Model – Holds the state of the application and provides an API to access/filter/manipulate that data. Its concern is data encapsulation and management. It contains logic to structure, validate or compare different pieces of data that we call Domain Logic. It also notifies the view of any changes in the data.
 
