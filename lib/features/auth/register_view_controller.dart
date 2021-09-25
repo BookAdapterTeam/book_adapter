@@ -27,6 +27,15 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
   //   state = state.copyWith(photoUrl: url);
   // }
 
+   String? validate({String? string, required String message}) {
+    if (string == null) {
+      return null;
+    }
+    if (string.isEmpty) {
+      return message;
+    }
+  }
+
   void validateInput() {
     bool isButtonEnabled = state.isButtonEnabled;
     if (

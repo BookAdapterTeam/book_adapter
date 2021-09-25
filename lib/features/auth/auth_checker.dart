@@ -1,5 +1,5 @@
-import 'package:book_adapter/authentication/login_view.dart';
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/features/auth/login_view.dart';
 import 'package:book_adapter/features/widgets/loading_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
