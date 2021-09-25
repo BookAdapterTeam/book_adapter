@@ -19,34 +19,11 @@ Future<void> init() async {
 }
 
 class _LoginPageState extends State<login_page>{
-  late String _email;
-  late String _password;
+  //final AuthService _auth =AuthService();
+   String _email='';
+   String _password='';
 
   final formKey= GlobalKey<FormState>();
-  bool  validateAndSave()
-  {
-    final form= formKey.currentState;
-    if(form!.validate()){
-      form.save();
-      return true;
-    }
-    return false;
-  }
-  void validateandsubmmit() {
-    if(validateAndSave()){
-      try {
-        Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => homepage()));
-      }
-      catch(e){
-        print('Error: $e');
-      }
-
-    }
-
-  }
-
 
 
   @override
@@ -64,19 +41,38 @@ class _LoginPageState extends State<login_page>{
                 children: <Widget>[
                   TextFormField(
                     decoration: const InputDecoration( labelText: 'Email' ),
-                    validator: (value)=> value!.isEmpty ?'Email can\'t be empty': null,
-                    onSaved: (value)=> _email=value!,
+                   // validator: (value)=> value!.isEmpty ?'Email can\'t be empty': null,
+                    onChanged: (value){
+                      setState(() {
+                        _email=value;
+
+                      });
+
+                    },
+
+                   //  validator: (value)=> value!.isEmpty ?'Email can\'t be empty': null,
+                   //  onSaved: (value)=> _email=value!,
                   ),
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'Password'),
+                    onChanged: (value){
+                      setState(() {
+                        _password=value;
+
+                      });
+
+                    },
                     obscureText: true,
-                    validator: (value)=> value!.isEmpty ?'password can\'t be empty': null,
-                    onSaved: (value)=> _password=value!,
+                   // validator: (value)=> value!.isEmpty ?'password can\'t be empty': null,
+                    // onSaved: (value)=> _password=value!,
                   ),
                   ElevatedButton(
                     child: const Text('Login', style: TextStyle(fontSize: 20.0), ),
 
-                    onPressed: validateAndSave,
+                    onPressed: () async {
+                      print(_email);
+                      print(_password);
+                    }
                   ),
                   ElevatedButton(
 

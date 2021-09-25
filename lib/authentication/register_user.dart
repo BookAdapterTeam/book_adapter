@@ -8,21 +8,13 @@ class register_user extends StatefulWidget{
 class _registerPageState extends State<register_user>{
 
   final formKey= GlobalKey<FormState>();
-  void  validateAndSave()
-  {
-    final form= formKey.currentState;
-    if(form!.validate()){
 
-      print('Form is valid. Email $_email, password: $_password1');
-    }else{
-      print('Form is invalid. Email $_email, password: $_password1');
-    }
-  }
+  //final AuthService _auth =AuthService();
 
-  late String _username;
-  late String _email;
-  late String _password1;
-  late String _password2;
+   String _username='';
+   String _email='';
+   String _password1='';
+   String _password2='';
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,13 +29,20 @@ class _registerPageState extends State<register_user>{
                 children: <Widget>[
                   TextFormField(
                     decoration: const InputDecoration( labelText: 'Username' ),
-                    validator: (value)=> value!.isEmpty ?'Username can\'t be empty': null,
-                    onSaved: (value)=> _username=value!,
+                    onChanged: (value){
+                      setState(() {
+                        _username=value;
+
+                      });
+
+                    },
+                  //  validator: (value)=> value!.isEmpty ?'Username can\'t be empty': null,
+                   // onSaved: (value)=> _username=value!,
                   ),
                   TextFormField(
                     keyboardType: TextInputType.text,
                     decoration: const InputDecoration( labelText: "Email" ),
-                    validator: ( value) {
+                   /* validator: ( value) {
                       if( value!.isEmpty) {
                         return 'Please a Enter';
                       }
@@ -51,25 +50,51 @@ class _registerPageState extends State<register_user>{
                         return 'Please a valid Email';
                       }
                       return null;
+                    },*/
+                   // onSaved: (value)=> _email=value!,
+                    onChanged: (value){
+                      setState(() {
+                        _email=value;
+
+                      });
+
                     },
-                    onSaved: (value)=> _email=value!,
                   ),
                   TextFormField(
                     decoration: const InputDecoration(labelText: 'Enter Password'),
                     obscureText: true,
-                    validator: (value)=> value!.isEmpty ?'password can\'t be empty': null,
-                    onSaved: (value)=> _password1=value!,
+                   // validator: (value)=> value!.isEmpty ?'password can\'t be empty': null,
+                    //onSaved: (value)=> _password1=value!,
+                    onChanged: (value){
+                      setState(() {
+                        _password1=value;
+
+                      });
+
+                    },
                   ),
                   TextFormField(
                       decoration: const InputDecoration(labelText: 'Re-enter Password'),
                       obscureText: true,
-                      validator: (value)=> value!.isEmpty ?'password can\'t be empty': null,
-                      onSaved: (value)=> _password2=value!
+                     // validator: (value)=> value!.isEmpty ?'password can\'t be empty': null,
+                      //onSaved: (value)=> _password2=value!
+                    onChanged: (value){
+                      setState(() {
+                        _password2=value;
+
+                      });
+
+                    },
                   ),
 
                   ElevatedButton(
                     child: const Text('Register', style: TextStyle(fontSize: 20.0)),
-                    onPressed: validateAndSave,
+                      onPressed: () async {
+                        print(_username);
+                        print(_email);
+                        print(_password1);
+                        print(_password1);
+                      }
                   )
                 ],
               ),
