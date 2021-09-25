@@ -1,5 +1,5 @@
-import 'package:book_adapter/authentication/login_page.dart';
-import 'package:book_adapter/authentication/register_user.dart';
+import 'package:book_adapter/authentication/login_view.dart';
+import 'package:book_adapter/authentication/register_view.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -64,7 +64,7 @@ class _LoginPageState extends State<restart_pass>{
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => register_user()),
+                            builder: (context) => RegisterView()),
                       );
                     }
                     ),
@@ -74,7 +74,7 @@ class _LoginPageState extends State<restart_pass>{
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => login_page()),
+                              builder: (context) => LoginView()),
                         );
                       }
                   ),

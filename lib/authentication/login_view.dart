@@ -1,5 +1,4 @@
-import 'package:book_adapter/authentication/homepage.dart';
-import 'package:book_adapter/authentication/register_user.dart';
+import 'package:book_adapter/authentication/register_view.dart';
 import 'package:book_adapter/authentication/restart_pass.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,9 +6,10 @@ import 'package:flutter/material.dart';
 
 
 
-class login_page extends StatefulWidget{
+class LoginView extends StatefulWidget{
+  const LoginView({Key? key}) : super(key: key);
 
-
+  @override
   State<StatefulWidget> createState() => _LoginPageState();
 }
 
@@ -18,7 +18,7 @@ Future<void> init() async {
   await Firebase.initializeApp();
 }
 
-class _LoginPageState extends State<login_page>{
+class _LoginPageState extends State<LoginView>{
   //final AuthService _auth =AuthService();
    String _email='';
    String _password='';
@@ -81,7 +81,7 @@ class _LoginPageState extends State<login_page>{
                     onPressed : (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => register_user())
+                        MaterialPageRoute(builder: (context) => RegisterView())
                       );
                     }
                   ),

@@ -1,8 +1,7 @@
 import 'package:book_adapter/controller/library_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final libraryViewController =
-    StateNotifierProvider<LibraryViewController, bool>((ref) {
+final libraryViewController = StateNotifierProvider<LibraryViewController, bool>((ref) {
   return LibraryViewController(ref.read);
 });
 

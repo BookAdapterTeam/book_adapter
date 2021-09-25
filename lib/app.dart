@@ -1,3 +1,4 @@
+import 'package:book_adapter/authentication/auth_checker.dart';
 import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view.dart';
@@ -67,7 +68,7 @@ class _MyAppState extends ConsumerState<MyApp> {
               default:
                 page = const LibraryView();
             }
-            return I18n(child: page);
+            return I18n(child: AuthChecker(child: page));
           },
         );
       },
