@@ -110,7 +110,7 @@ class FirebaseController {
   ///  - Returned if the password field is empty
   /// - **Password cannot be less than six characters**
   ///  - Returned if the password is less than six characters
-  Future<Either<Failure, User>> signUp({required String email, required String password}) async {
+  Future<Either<Failure, User>> signUp({required String email, required String password, String? username}) async {
     // Guards, return Failure object with reason for failure
     // The message should be displayed to the user
     if (email.isEmpty) {
@@ -124,7 +124,7 @@ class FirebaseController {
     final res = await _firebaseService.signUp(email: email, password: password);
 
     // If sign up failed, return the failure object
-    // If sign up is successful, return the user object in case the caller cares
+    // If sign up is successful, return the user object, update the username
     return res.fold(
       (failure) => Left(failure),
       (userCred) {
@@ -133,8 +133,10 @@ class FirebaseController {
           return Left(Failure('Sign Up Failed, User is NULL'));
         }
 
-        // TODO: Upload user data to database here
-
+        // Set username
+        if (username != null) {
+          setDisplayName(username);
+        }
         return Right(user);
       },
     );
@@ -144,7 +146,7 @@ class FirebaseController {
   ///
   /// If successful, it also update the stream [authStateChange]
   Future<void> signOut() async {
-    await _firebaseService.signOut();
+    return await _firebaseService.signOut();
   }
 
   // Database
@@ -153,5 +155,26 @@ class FirebaseController {
   /// Get a list of books from the user's database
   Future<Either<Failure, List<BookItem>>> getBooks() async {
     return _firebaseService.getBooks();
+  }
+
+  /// Send reset password email
+  Future<Either<Failure, void>> resetPassword(String email) async {
+    return await _firebaseService.resetPassword(email);
+  }
+
+  /// Set display name
+  /// 
+  /// Returns [true] if successful
+  /// Returns [false] if the user is not authenticated
+  Future<bool> setDisplayName(String name) async {
+    return await _firebaseService.setDisplayName(name);
+  }
+
+  /// Set profile photo
+  /// 
+  /// Returns [true] if successful
+  /// Returns [false] if the user is not authenticated
+  Future<bool> setProfilePhoto(String photoURL) async {
+    return await _firebaseService.setProfilePhoto(photoURL);
   }
 }
