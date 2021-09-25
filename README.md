@@ -51,7 +51,7 @@ Run the following command
 
 ### Integration tests
 
-Launch emulator, then run the following command
+Launch an emulator, then run the following command
 
 - `flutter drive --target=test_driver/app.dart`
 
