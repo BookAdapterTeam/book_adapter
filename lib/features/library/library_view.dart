@@ -25,7 +25,9 @@ class LibraryView extends ConsumerWidget {
         title: Text('Library'.i18n),
         actions: [
           IconButton(
+            key: const ValueKey('refresh'),
             icon: isLoading ? const CircularProgressIndicator(
+              key: ValueKey('loading_refresh'),
               color: Colors.white,
             ) : const Icon(Icons.refresh),
             onPressed: () {
@@ -33,6 +35,7 @@ class LibraryView extends ConsumerWidget {
             },
           ),
           IconButton(
+            key: const ValueKey('settings'),
             icon: const Icon(Icons.settings),
             onPressed: () {
               // Navigate to the settings page. If the user leaves and returns
@@ -43,7 +46,7 @@ class LibraryView extends ConsumerWidget {
           ),
         ],
       ),
-      body: books == null ? const CircularProgressIndicator() : hasBooks(books),
+      body: books == null ? const CircularProgressIndicator(key: ValueKey('loading_books'),) : hasBooks(books),
     );
   }
 
