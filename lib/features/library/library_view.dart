@@ -4,9 +4,7 @@ import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/profile/profile.dart';
-import 'package:book_adapter/features/settings/settings_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
-import 'package:book_adapter/utils/user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -41,14 +39,12 @@ class LibraryView extends ConsumerWidget {
             IconButton(
               key: const ValueKey('profile'),
               icon: user.photoURL != null 
-              ? CircleAvatar(
-                backgroundImage:
-                  // TODO: Remove UserPreferences and use placeholder icon
-                  // TODO: Use user uploaded photo instead of from oAuth profile image
-                  NetworkImage(user.photoURL!),
-                backgroundColor: Colors.grey,
-              )
-              : const Icon(Icons.account_circle),// const Icon(Icons.settings),
+                ? CircleAvatar(
+                  backgroundImage:
+                    NetworkImage(user.photoURL!),
+                  backgroundColor: Colors.grey,
+                )
+                : const Icon(Icons.account_circle),
               onPressed: () {
                 // Navigate to the settings page. If the user leaves and returns
                 // to the app after it has been killed while running in the

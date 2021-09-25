@@ -3,10 +3,8 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/profile/change_password.dart';
 import 'package:book_adapter/features/profile/edit_profile_page.dart';
-import 'package:book_adapter/utils/user_preferences.dart';
-import 'package:book_adapter/widget/appbar_widget.dart';
-import 'package:book_adapter/widget/button_widget.dart';
-import 'package:book_adapter/widget/profile_widget.dart';
+import 'package:book_adapter/features/profile/widgets/button_widget.dart';
+import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,29 +18,27 @@ class ProfileView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.read(firebaseControllerProvider).currentUser;
-    // final user = UserPreferences.myUser;
     const String title = 'Profile Page';
 
     return Scaffold(
-      appBar: buildAppBar(context, title),
+      appBar: AppBar(title: const Text(title)),
       body: ListView(
         physics: const BouncingScrollPhysics(),
         children: [
           if (user != null) ... [
-            const SizedBox(height: 24),
-            if (user.photoURL != null) ... [
-              ProfileWidget(
+            const SizedBox(height: 64),
+            user.photoURL != null
+              ? ProfileWidget(
                 imagePath: user.photoURL!,
                 onClicked: () {
                   Navigator.restorablePushNamed(context, EditProfileView.routeName);
                 },
-              ),
-              const SizedBox(height: 24),
-            ],
+              )
+              : const Icon(Icons.account_circle, size: 128,),
             Center(child: _NameWidget(user: user)),
-            const SizedBox(height: 24),
+            const SizedBox(height: 64),
             const Center(child: SignOutButton()),
-            const SizedBox(height: 24),
+            const SizedBox(height: 12),
             const Center(child: ChangePasswordButton()),
           ]
         ],

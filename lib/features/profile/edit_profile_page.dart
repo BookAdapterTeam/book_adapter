@@ -2,10 +2,9 @@
 
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/profile/profile.dart';
-import 'package:book_adapter/widget/appbar_widget.dart';
-import 'package:book_adapter/widget/button_widget.dart';
-import 'package:book_adapter/widget/profile_widget.dart';
-import 'package:book_adapter/widget/textfield_widget.dart';
+import 'package:book_adapter/features/profile/widgets/button_widget.dart';
+import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
+import 'package:book_adapter/features/profile/widgets/textfield_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -18,7 +17,7 @@ class EditProfileView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.read(firebaseControllerProvider).currentUser!;
     return Scaffold(
-      appBar: buildAppBar(context, 'Edit Profile'),
+      appBar: AppBar(title: const Text('Edit Profile')),
       body: ListView(
         
         physics: const BouncingScrollPhysics(),

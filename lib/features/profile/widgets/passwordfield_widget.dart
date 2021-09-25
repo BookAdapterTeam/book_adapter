@@ -1,6 +1,6 @@
 //Widget for password field
 
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 import 'package:passwordfield/passwordfield.dart';
 
 class PasswordfieldWidget extends StatefulWidget {
@@ -36,7 +36,7 @@ class _PasswordfieldWidgetState extends State<PasswordfieldWidget> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(widget.label,
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 24)),
         const SizedBox(height: 8),
         PasswordField(
           

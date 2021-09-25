@@ -1,11 +1,10 @@
 //Handles password change action
 
+import 'package:book_adapter/features/profile/widgets/button_widget.dart';
+import 'package:book_adapter/features/profile/widgets/passwordfield_widget.dart';
+import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
 import 'package:book_adapter/model/user.dart';
 import 'package:book_adapter/utils/user_preferences.dart';
-import 'package:book_adapter/widget/appbar_widget.dart';
-import 'package:book_adapter/widget/button_widget.dart';
-import 'package:book_adapter/widget/passwordfield_widget.dart';
-import 'package:book_adapter/widget/profile_widget.dart';
 import 'package:flutter/material.dart';
 
 class ChangePassword extends StatefulWidget {
@@ -21,7 +20,7 @@ class _ChangePasswordState extends State<ChangePassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: buildAppBar(context, 'Change Password'),
+        appBar: AppBar(title: const Text('Change Password'),),
         body: ListView(
           physics: const BouncingScrollPhysics(),
           children: [
