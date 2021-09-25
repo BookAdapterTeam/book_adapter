@@ -106,6 +106,16 @@ class FirebaseService extends BaseFirebaseService {
     await _firebaseAuth.signOut();
   }
 
+  /// Returns the current [User] if they are currently signed-in, or `null` if
+  /// not.
+  ///
+  /// You should not use this getter to determine the users current state,
+  /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
+  /// subscribe to updates.
+  User? get currentUser {
+    return _firebaseAuth.currentUser;
+  }
+
   // Database
   /// WIP
   /// 

@@ -6,7 +6,6 @@ import 'package:book_adapter/widget/appbar_widget.dart';
 import 'package:book_adapter/widget/button_widget.dart';
 import 'package:book_adapter/widget/passwordfield_widget.dart';
 import 'package:book_adapter/widget/profile_widget.dart';
-import 'package:book_adapter/widget/textfield_widget.dart';
 import 'package:flutter/material.dart';
 
 class ChangePassword extends StatefulWidget {
@@ -22,9 +21,9 @@ class _ChangePasswordState extends State<ChangePassword> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: buildAppBar(context, "Change Password"),
+        appBar: buildAppBar(context, 'Change Password'),
         body: ListView(
-          physics: BouncingScrollPhysics(),
+          physics: const BouncingScrollPhysics(),
           children: [
             const SizedBox(height: 24),
             ProfileWidget(
@@ -33,25 +32,25 @@ class _ChangePasswordState extends State<ChangePassword> {
                 onClicked: () async {}),
             const SizedBox(height: 24),
             PasswordfieldWidget(
-              label: "Old Password",
+              label: 'Old Password',
               text: user.name,
               onChanged: (name) {},
             ),
             const SizedBox(height: 24),
             PasswordfieldWidget(
-              label: "New Password",
+              label: 'New Password',
               text: user.email,
               onChanged: (email) {},
             ),
             const SizedBox(height: 24),
-            Center(child: SubmitButton()),
+            Center(child: submitButton()),
           ],
         ));
   }
 
-  Widget SubmitButton() => ButtonWidget(
-      text: 'Submit',
-      onClicked: () {
-        // TODO Save password
-      });
+  Widget submitButton() => ButtonWidget(
+    text: 'Submit',
+    onClicked: () {
+      // TODO Save password
+    });
 }

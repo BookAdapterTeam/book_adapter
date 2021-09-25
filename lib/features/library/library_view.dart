@@ -1,9 +1,12 @@
+import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
+import 'package:book_adapter/features/profile/profile.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
+import 'package:book_adapter/utils/user_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -16,6 +19,7 @@ class LibraryView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bookList = ref.watch(bookListProvider);
+    final user = ref.watch(firebaseControllerProvider).currentUser;
     final books = bookList.data?.value;
 
     final isLoading = ref.watch(libraryViewController);
@@ -34,16 +38,24 @@ class LibraryView extends ConsumerWidget {
               viewController.refreshBooks();
             },
           ),
-          IconButton(
-            key: const ValueKey('settings'),
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              // Navigate to the settings page. If the user leaves and returns
-              // to the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(context, SettingsView.routeName);
-            },
-          ),
+          if (user != null) ... [
+            IconButton(
+              key: const ValueKey('profile'),
+              icon: CircleAvatar(
+                backgroundImage:
+                  // TODO: Remove UserPreferences and use placeholder icon
+                  // TODO: Use user uploaded photo instead of from oAuth profile image
+                  NetworkImage(user.photoURL ?? UserPreferences.myUser.imagePath),
+                backgroundColor: Colors.grey,
+              ),// const Icon(Icons.settings),
+              onPressed: () {
+                // Navigate to the settings page. If the user leaves and returns
+                // to the app after it has been killed while running in the
+                // background, the navigation stack is restored.
+                Navigator.restorablePushNamed(context, ProfileView.routeName);
+              },
+            ),
+          ],
         ],
       ),
       body: books == null ? const CircularProgressIndicator(key: ValueKey('loading_books'),) : hasBooks(books),

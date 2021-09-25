@@ -1,8 +1,6 @@
 //Widget for profile page
 
-import 'dart:io';
-
-import "package:flutter/material.dart";
+import 'package:flutter/material.dart';
 
 class ProfileWidget extends StatelessWidget {
   final String imagePath;

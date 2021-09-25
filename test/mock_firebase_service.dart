@@ -71,4 +71,7 @@ class MockFirebaseService implements FirebaseService {
       return Left(Failure('Unexpected Exception, Could Not SignUp'));
     }
   }
+
+  @override
+  User? get currentUser => firebaseAuth.currentUser;
 }

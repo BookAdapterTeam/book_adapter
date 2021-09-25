@@ -1,6 +1,8 @@
 import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view.dart';
+import 'package:book_adapter/features/profile/edit_profile_page.dart';
+import 'package:book_adapter/features/profile/profile.dart';
 import 'package:book_adapter/features/settings/settings_view.dart';
 import 'package:book_adapter/model/user_model.dart';
 import 'package:flutter/material.dart';
@@ -59,6 +61,12 @@ class _MyAppState extends ConsumerState<MyApp> {
             switch (routeSettings.name) {
               case SettingsView.routeName:
                 page = const SettingsView();
+                break;
+              case ProfileView.routeName:
+                page = const ProfileView();
+                break;
+              case EditProfileView.routeName:
+                page = const EditProfileView();
                 break;
               case BookItemDetailsView.routeName:
                 page = const BookItemDetailsView();
