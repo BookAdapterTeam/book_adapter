@@ -1,16 +1,18 @@
-// Imports the Flutter Driver API.
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
 
+// Launch an emulator, then run the following command
+// `flutter drive --target=test_driver/app.dart`
 void main() {
   group('BookAdapter App', () {
     // First, define the Finders and use them to locate widgets from the
     // test suite. Note: the Strings provided to the `byValueKey` method must
-    // be the same as the Strings we used for the Keys in step 1.
-    final refreshLoadingIndicatorFinder = find.byValueKey('loading_refresh');
-    final booksLoadingIndicatorFinder = find.byValueKey('loading_books');
-    final settingsButtonFinder = find.byValueKey('settings');
-    final refreshButtonFinder = find.byValueKey('refresh');
+    // be the same as the Strings we used for the Keys
+
+    // final refreshLoadingIndicatorFinder = find.byValueKey('loading_refresh');
+    // final booksLoadingIndicatorFinder = find.byValueKey('loading_books');
+    // final settingsButtonFinder = find.byValueKey('settings');
+    // final refreshButtonFinder = find.byValueKey('refresh');
 
     late FlutterDriver driver;
 
@@ -24,7 +26,7 @@ void main() {
       await driver.close();
     });
 
-    // Add tests here, example tests below
+    // Add tests here, example tests are below
 
     // test('starts at 0', () async {
     //   // Use the `driver.getText` method to verify the counter starts at 0.

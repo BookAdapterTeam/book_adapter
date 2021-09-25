@@ -10,6 +10,8 @@ import 'mock_firebase_service.dart';
 class MockUserCredential extends Mock implements UserCredential {}
 class MockitoFirebaseAuth extends Mock implements FirebaseAuth {}
 
+// Run the following command
+// - `flutter test`
 void main() {
   group('Auth', () {
     test('Test Login', () async {

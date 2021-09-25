@@ -13,6 +13,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'mock_firebase_service.dart';
 
+// Run the following command
+// - `flutter test`
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
