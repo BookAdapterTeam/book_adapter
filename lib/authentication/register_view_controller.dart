@@ -16,7 +16,23 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
   final Reader _read;
 
   void updateData({String? email, String? password, String? verifyPassword}) {
-    state = state.copyWith(email: email, password: password, verifyPassword: verifyPassword);
+    state = state.copyWith(email: email?.trim(), password: password, verifyPassword: verifyPassword);
+
+    validateInput();
+  }
+
+  void validateInput() {
+    bool isButtonEnabled = state.isButtonEnabled;
+    if (
+      state.password == state.verifyPassword
+      && state.password.length >= 6
+      && state.email.isNotEmpty
+    ) {
+      isButtonEnabled = true;
+    } else {
+      isButtonEnabled = false;
+    }
+    state = state.copyWith(isButtonEnabled: isButtonEnabled);
   }
 
   Future<Either<Failure, User>> register() async {
@@ -36,6 +52,7 @@ class RegisterViewData {
   final String password;
   final String verifyPassword;
   final bool isLoading;
+  final bool isButtonEnabled;
 
 //<editor-fold desc="Data Methods">
 
@@ -44,6 +61,7 @@ class RegisterViewData {
     this.password = '',
     this.verifyPassword = '',
     this.isLoading = false,
+    this.isButtonEnabled = false,
   });
 
   RegisterViewData copyWith({
@@ -51,12 +69,14 @@ class RegisterViewData {
     String? password,
     String? verifyPassword,
     bool? isLoading,
+    bool? isButtonEnabled,
   }) {
     return RegisterViewData(
       email: email ?? this.email,
       password: password ?? this.password,
       verifyPassword: verifyPassword ?? this.verifyPassword,
       isLoading: isLoading ?? this.isLoading,
+      isButtonEnabled: isButtonEnabled ?? this.isButtonEnabled,
     );
   }
 //</editor-fold>
