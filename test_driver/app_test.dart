@@ -6,7 +6,7 @@ import 'package:test/test.dart';
 // `flutter drive --target=test_driver/app.dart`
 
 // Writing integration tests documentation
-// https://flutter.dev/docs/cookbook/testing/integration/introduction#2-add-the-flutter_driver-dependency
+// https://flutter.dev/docs/cookbook/testing/integration/introduction
 void main() {
   group('BookAdapter App', () {
     // First, define the Finders and use them to locate widgets from the
