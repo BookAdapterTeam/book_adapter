@@ -71,4 +71,37 @@ class MockFirebaseService implements FirebaseService {
       return Left(Failure('Unexpected Exception, Could Not SignUp'));
     }
   }
+
+  /// Send reset password email
+  @override
+  Future<Either<Failure, void>> resetPassword(String email) async {
+    try {
+      await firebaseAuth.sendPasswordResetEmail(email: email);
+      return const Right(null);
+    } on FirebaseException catch (e) {
+      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email', e.code));
+    } on Exception catch (_) {
+      return Left(Failure('Unexpected Exception, Could Not Send Reset Email'));
+    }
+  }
+
+  @override
+  Future<bool> setDisplayName(String name) async {
+    final user = firebaseAuth.currentUser;
+    if (user == null) {
+      return false;
+    }
+    await user.updateDisplayName(name);
+    return true;
+  }
+
+  @override
+  Future<bool> setProfilePhoto(String photoURL) async {
+    final user = firebaseAuth.currentUser;
+    if (user == null) {
+      return false;
+    }
+    await user.updatePhotoURL(photoURL);
+    return true;
+  }
 }

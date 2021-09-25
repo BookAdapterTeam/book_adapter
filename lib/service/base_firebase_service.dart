@@ -69,4 +69,18 @@ abstract class BaseFirebaseService {
   /// Get a list of books from the user's database
   Future<Either<Failure, List<BookItem>>> getBooks();
 
+  /// Send reset password email
+  Future<void> resetPassword(String email);
+
+  /// Set display name
+  /// 
+  /// Returns [true] if successful
+  /// Returns [false] if the user is not authenticated
+  Future<bool> setDisplayName(String name);
+
+  /// Set profile photo
+  /// 
+  /// Returns [true] if successful
+  /// Returns [false] if the user is not authenticated
+  Future<bool> setProfilePhoto(String photoURL);
 }
