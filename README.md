@@ -5,8 +5,8 @@ A new Flutter app built for android for reading ePub books.
 Documentation is in the "docs" folder.
 
 ## Architecture
-This project uses riverpod state management with MVC+S architecture.
 
+This project uses riverpod state management with MVC+S architecture.
 
 > Domain Logic (rules around data storage, manipulation, and validation) and Application Logic (what your application actually does. How it behaves.) You also find that:
 
@@ -41,7 +41,22 @@ Source: [gskinner](https://blog.gskinner.com/archives/2020/09/flutter-state-mana
 6. Enable Email login in Firebase console "Authentication"
 7. ...
 
+## Testing
+
+### Unit tests and widget tests
+
+Run the following command
+
+- `flutter test`
+
+### Integration tests
+
+Launch emulator, then run the following command
+
+- `flutter drive --target=test_driver/app.dart`
+
 ## Contributing
+
 1. Choose an existing issue to fix/implement
 2. Fork the 'main' branch and give it a relevant name
 3. Implemement your changes. Do not make more changes than necessary
