@@ -5,14 +5,14 @@ A new Flutter app built for android for reading ePub books.
 Documentation is in the "docs" folder.
 
 ## Architecture
+
 This project uses riverpod state management with MVC+S architecture.
 
+Domain Logic (rules around data storage, manipulation, and validation) and Application Logic (what your application actually does. How it behaves.) You also find that:
 
-> Domain Logic (rules around data storage, manipulation, and validation) and Application Logic (what your application actually does. How it behaves.) You also find that:
+- Domain Logic naturally belongs in the Model tier.
 
-Domain Logic naturally belongs in the Model tier.
-
-Application Logic naturally belongs in the Controller tier.
+- Application Logic naturally belongs in the Controller tier.
 
 Model – Holds the state of the application and provides an API to access/filter/manipulate that data. Its concern is data encapsulation and management. It contains logic to structure, validate or compare different pieces of data that we call Domain Logic. It also notifies the view of any changes in the data.
 
@@ -41,7 +41,22 @@ Source: [gskinner](https://blog.gskinner.com/archives/2020/09/flutter-state-mana
 6. Enable Email login in Firebase console "Authentication"
 7. ...
 
+## Testing
+
+### Unit tests and widget tests
+
+Run the following command
+
+- `flutter test`
+
+### Integration tests
+
+Launch an emulator, then run the following command
+
+- `flutter drive --target=test_driver/app.dart`
+
 ## Contributing
+
 1. Choose an existing issue to fix/implement
 2. Fork the 'main' branch and give it a relevant name
 3. Implemement your changes. Do not make more changes than necessary
