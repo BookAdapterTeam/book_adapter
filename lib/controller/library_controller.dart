@@ -6,7 +6,7 @@ import 'package:dartz/dartz.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// The list of books
-final bookListProvider = FutureProvider<List<BookItem>?>((ref) async {
+final bookListProvider = FutureProvider<List<BookItem>>((ref) async {
   // Obtains the Repository instance
   final libraryController = ref.read(libraryControllerProvider);
 
@@ -14,7 +14,7 @@ final bookListProvider = FutureProvider<List<BookItem>?>((ref) async {
   final res = await libraryController.fetchBooks();
   
   return res.fold(
-    (failure) => null,
+    (failure) => [],
     (books) => books,
   );
 });

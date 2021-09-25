@@ -1,3 +1,4 @@
+import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/controller/library_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -11,9 +12,13 @@ class LibraryViewController extends StateNotifier<bool> {
 
   final Reader _read;
 
-  refreshBooks() async {
+  Future<void> refreshBooks() async {
     state = true;
     await _read(libraryControllerProvider).fetchBooks();
     state = false;
+  }
+
+  Future<void> signOut() async {
+    await _read(firebaseControllerProvider).signOut();
   }
 }
