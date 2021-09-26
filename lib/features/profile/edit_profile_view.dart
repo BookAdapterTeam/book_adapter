@@ -14,7 +14,7 @@ class EditProfileView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.read(firebaseControllerProvider).currentUser;
+    final user = ref.watch(firebaseControllerProvider).currentUser;
     final viewController = ref.watch(editProfileViewController.notifier);
     final usernameController = useTextEditingController();
 

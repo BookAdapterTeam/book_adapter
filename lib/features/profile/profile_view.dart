@@ -16,7 +16,7 @@ class ProfileView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.read(firebaseControllerProvider).currentUser;
+    final user = ref.watch(firebaseControllerProvider).currentUser;
     const String title = 'Profile Page';
 
     // final isLoading = ref.watch(profileViewController);
