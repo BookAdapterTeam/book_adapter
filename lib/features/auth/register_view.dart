@@ -4,11 +4,10 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class RegisterView extends ConsumerWidget {
-  RegisterView({Key? key}) : super(key: key);
-
   final _formKey = GlobalKey<FormState>();
 
+class RegisterView extends ConsumerWidget {
+  const RegisterView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

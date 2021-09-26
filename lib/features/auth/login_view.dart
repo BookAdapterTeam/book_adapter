@@ -6,10 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
+  final _formKey = GlobalKey<FormState>();
 
 class LoginView extends ConsumerWidget {
-  LoginView({Key? key}) : super(key: key);
-  final _formKey = GlobalKey<FormState>();
+  const LoginView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -176,7 +176,7 @@ class _SignupButton extends StatelessWidget {
       onPressed : (){
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => RegisterView())
+          MaterialPageRoute(builder: (context) => const RegisterView())
         );
       }
     );
