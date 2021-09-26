@@ -3,7 +3,7 @@ import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
-import 'package:book_adapter/features/profile/profile.dart';
+import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,21 +20,11 @@ class LibraryView extends ConsumerWidget {
     final user = ref.watch(firebaseControllerProvider).currentUser;
 
     // final isLoading = ref.watch(libraryViewController);
-    final viewController = ref.watch(libraryViewController.notifier);
+    // final viewController = ref.watch(libraryViewController.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text('Library'.i18n),
         actions: [
-          IconButton(
-            key: const ValueKey('signOut'),
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign out'.i18n,
-            onPressed: () {
-              // Log out the user
-              // TODO: Add pop up asking for confirmation
-              viewController.signOut();
-            },
-          ),
           if (user != null) ... [
             IconButton(
               key: const ValueKey('profile'),

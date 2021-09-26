@@ -1,7 +1,7 @@
 // Handles Profile edit action
 
 import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/features/profile/profile.dart';
+import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:book_adapter/features/profile/widgets/button_widget.dart';
 import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
 import 'package:book_adapter/features/profile/widgets/textfield_widget.dart';
@@ -11,7 +11,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class EditProfileView extends ConsumerWidget {
   const EditProfileView({Key? key}) : super(key: key);
 
-  static const routeName = '${ProfileView.routeName}/editProfile';
+  static const routeName = '/editProfile';
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,7 +19,6 @@ class EditProfileView extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Edit Profile')),
       body: ListView(
-        
         physics: const BouncingScrollPhysics(),
         children: [
           const SizedBox(height: 24),
