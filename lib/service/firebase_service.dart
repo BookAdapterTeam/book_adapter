@@ -126,9 +126,9 @@ class FirebaseService extends BaseFirebaseService {
       // TODO: Implement Firebase call to database to get the list of user books
       await Future.delayed(const Duration(seconds: 1));
       const List<BookItem> books = [
-        BookItem(name: 'Book 0', id: '0'),
-        BookItem(name: 'Book 1', id: '1'),
-        BookItem(name: 'Book 2', id: '2'),
+        // BookItem(name: 'Book 0', id: '0'),
+        // BookItem(name: 'Book 1', id: '1'),
+        // BookItem(name: 'Book 2', id: '2'),
       ];
       
       // Return our books to the caller in case they care
