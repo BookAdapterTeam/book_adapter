@@ -68,36 +68,38 @@ class _LibraryListView extends ConsumerWidget {
       onRefresh: () {
         return viewController.refreshBooks();
       },
-      child: ListView.builder(
-        // Providing a restorationId allows the ListView to restore the
-        // scroll position when a user leaves and returns to the app after it
-        // has been killed while running in the background.
-        restorationId: 'bookListView',
-        itemCount: books.length,
-        itemBuilder: (BuildContext context, int index) {
-          final book = books[index];
+      child: books.isNotEmpty 
+        ? ListView.builder(
+          // Providing a restorationId allows the ListView to restore the
+          // scroll position when a user leaves and returns to the app after it
+          // has been killed while running in the background.
+          restorationId: 'bookListView',
+          itemCount: books.length,
+          itemBuilder: (BuildContext context, int index) {
+            final book = books[index];
 
-          return ListTile(
-            title: Text('Book: ${book.name}'),
-            subtitle: Text('ID: ${book.id}'),
-            leading: const CircleAvatar(
-              // Display the Flutter Logo image asset.
-              foregroundImage: AssetImage('assets/images/flutter_logo.png'),
-            ),
-            onTap: () {
-              // Navigate to the details page. If the user leaves and returns to
-              // the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(
-                context,
-                BookItemDetailsView.routeName,
-                // Convert the book object to a map so that it can be passed through Navigator
-                arguments: book.toMap(),
-              );
-            }
-          );
-        },
-      ),
+            return ListTile(
+              title: Text('Book: ${book.name}'),
+              subtitle: Text('ID: ${book.id}'),
+              leading: const CircleAvatar(
+                // Display the Flutter Logo image asset.
+                foregroundImage: AssetImage('assets/images/flutter_logo.png'),
+              ),
+              onTap: () {
+                // Navigate to the details page. If the user leaves and returns to
+                // the app after it has been killed while running in the
+                // background, the navigation stack is restored.
+                Navigator.restorablePushNamed(
+                  context,
+                  BookItemDetailsView.routeName,
+                  // Convert the book object to a map so that it can be passed through Navigator
+                  arguments: book.toMap(),
+                );
+              }
+            );
+          },
+        )
+        : Center(child: Text("You don't have any books", style: Theme.of(context).textTheme.bodyText2,)),
     );
   }
 }
