@@ -58,6 +58,11 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
     final success = await _read(firebaseControllerProvider).setDisplayName(state.username);
     state = state.copyWith(isLoading: false);
 
+    
+    if (res.isRight()) {
+      state = const RegisterViewData();
+    }
+
     return res.fold(
       (failure) => Left(failure),
       (user) => success ? Right(user) : Left(Failure('Set Display Name Failed'))
