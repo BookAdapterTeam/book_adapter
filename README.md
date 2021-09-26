@@ -33,13 +33,14 @@ Source: [gskinner](https://blog.gskinner.com/archives/2020/09/flutter-state-mana
 ## Setup
 
 1. Clone the repo
-2. Install Flutter
-3. Open the project in VSCode, install the Flutter plugin
-4. Run "flutter pub get" in terminal or press the button when prompted by VSCode
-5. Setup Firebase for the app with analytics enabled, [tutorial here](https://firebase.google.com/docs/flutter/setup?platform=android)
+2. Install Flutter [instructions here](https://flutter.dev/docs/get-started/install)
+5. Open the project in Android Studio or VSCode, install the Flutter plugin
+6. Setup Firebase for the app with analytics enabled, [tutorial here](https://firebase.google.com/docs/flutter/setup?platform=android)
    - If you need to connect to the official Firebase backend, contact @getBoolean for the (iOS) GoogleService-Info.plist or (Android) google-services.json. It is not guarenteed you will be given access.
-6. Enable `Email/Password` login in Firebase console "Authentication"
-7. ...
+7. Enable `Email/Password` login in the Firebase console "Authentication" tab
+8. Launch the emulator installed in step 2
+9. Run `flutter pub get` in terminal or press the button when prompted by VSCode
+10. Launch the app to the emulator with `flutter run`, or with the play button in Android Studio with the emulator selected in the dropdown menu
 
 ## Testing
 
@@ -64,7 +65,7 @@ Launch an emulator, then run the following command
 5. Open a Pull Request from your branch to main
 6. The PR can be merged by an Admin if there are no issues
 
-## Getting Started
+## Getting Started with Flutter
 
 This project is a starting point for a Flutter application.
 
