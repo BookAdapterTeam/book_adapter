@@ -25,6 +25,11 @@ class LoginViewController extends StateNotifier<LoginViewData> {
     final res = await _read(firebaseControllerProvider).signIn(
       email: state.email, password: state.password,
     );
+
+    if (res.isRight()) {
+      state = const LoginViewData();
+    }
+
     state = state.copyWith(isLoading: false);
 
     return res;
