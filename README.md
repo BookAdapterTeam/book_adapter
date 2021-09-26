@@ -38,7 +38,7 @@ Source: [gskinner](https://blog.gskinner.com/archives/2020/09/flutter-state-mana
 4. Run "flutter pub get" in terminal or press the button when prompted by VSCode
 5. Setup Firebase for the app with analytics enabled, [tutorial here](https://firebase.google.com/docs/flutter/setup?platform=android)
    - If you need to connect to the official Firebase backend, contact @getBoolean for the (iOS) GoogleService-Info.plist or (Android) google-services.json. It is not guarenteed you will be given access.
-6. Enable Email login in Firebase console "Authentication"
+6. Enable `Email/Password` login in Firebase console "Authentication"
 7. ...
 
 ## Testing
