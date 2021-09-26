@@ -15,7 +15,7 @@ class AuthChecker extends ConsumerWidget {
       data: (user) {
         if (user == null) {
           // Route to login screen
-          return const LoginView();
+          return LoginView();
         }
         // Route to user screen
         return child;

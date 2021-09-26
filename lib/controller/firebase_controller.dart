@@ -25,6 +25,16 @@ class FirebaseController {
   /// Notifies about changes to the user's sign-in state (such as sign-in or
   /// sign-out).
   Stream<User?> get authStateChange => _firebaseService.authStateChange;
+
+  /// Returns the current [User] if they are currently signed-in, or `null` if
+  /// not.
+  ///
+  /// You should not use this getter to determine the users current state,
+  /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
+  /// subscribe to updates.
+  User? get currentUser {
+    return _firebaseService.currentUser;
+  }
  
   /// Attempts to sign in a user with the given email address and password.
   ///

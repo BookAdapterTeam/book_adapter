@@ -1,8 +1,9 @@
+import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
-import 'package:book_adapter/features/settings/settings_view.dart';
+import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -16,34 +17,32 @@ class LibraryView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final bookList = ref.watch(bookListProvider);
+    final user = ref.watch(firebaseControllerProvider).currentUser;
 
     // final isLoading = ref.watch(libraryViewController);
-    final viewController = ref.watch(libraryViewController.notifier);
+    // final viewController = ref.watch(libraryViewController.notifier);
     return Scaffold(
       appBar: AppBar(
         title: Text('Library'.i18n),
         actions: [
-          IconButton(
-            key: const ValueKey('signOut'),
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign out'.i18n,
-            onPressed: () {
-              // Log out the user
-              // TODO: Add pop up asking for confirmation
-              viewController.signOut();
-            },
-          ),
-          IconButton(
-            key: const ValueKey('settings'),
-            icon: const Icon(Icons.settings),
-            tooltip: 'Settings'.i18n,
-            onPressed: () {
-              // Navigate to the settings page. If the user leaves and returns
-              // to the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(context, SettingsView.routeName);
-            },
-          ),
+          if (user != null) ... [
+            IconButton(
+              key: const ValueKey('profile'),
+              icon: user.photoURL != null 
+                ? CircleAvatar(
+                  backgroundImage:
+                    NetworkImage(user.photoURL!),
+                  backgroundColor: Colors.grey,
+                )
+                : const Icon(Icons.account_circle),
+              onPressed: () {
+                // Navigate to the settings page. If the user leaves and returns
+                // to the app after it has been killed while running in the
+                // background, the navigation stack is restored.
+                Navigator.restorablePushNamed(context, ProfileView.routeName);
+              },
+            ),
+          ],
         ],
       ),
       body: bookList.when(

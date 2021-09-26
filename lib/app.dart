@@ -2,7 +2,9 @@ import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/features/auth/auth_checker.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view.dart';
-import 'package:book_adapter/features/settings/settings_view.dart';
+import 'package:book_adapter/features/profile/change_password_view.dart';
+import 'package:book_adapter/features/profile/edit_profile_view.dart';
+import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -55,17 +57,29 @@ class _MyAppState extends ConsumerState<MyApp> {
           builder: (BuildContext context) {
             final Widget page;
             switch (routeSettings.name) {
-              case SettingsView.routeName:
-                page = const SettingsView();
+              case ProfileView.routeName:
+                page = const ProfileView(key: ValueKey('profile_view'));
+                break;
+              case EditProfileView.routeName:
+                page = const EditProfileView(key: ValueKey('edit_profile_view'));
+                break;
+              case ChangePasswordView.routeName:
+                page = const ChangePasswordView(key: ValueKey('change_password_view'));
                 break;
               case BookItemDetailsView.routeName:
-                page = const BookItemDetailsView();
+                page = const BookItemDetailsView(key: ValueKey('book_item_details'));
                 break;
               case LibraryView.routeName:
               default:
-                page = const LibraryView();
+                page = const LibraryView(key: ValueKey('library_view'));
             }
-            return I18n(child: AuthChecker(child: page));
+
+            return I18n(
+              child: AuthChecker(
+                key: const ValueKey('auth_checker'),
+                child: page,
+              )
+            );
           },
         );
       },

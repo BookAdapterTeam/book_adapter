@@ -4,10 +4,10 @@ import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final _formKey = GlobalKey<FormState>();
-
 class RegisterView extends ConsumerWidget {
-  const RegisterView({Key? key}) : super(key: key);
+  RegisterView({Key? key}) : super(key: key);
+
+  final _formKey = GlobalKey<FormState>();
 
 
   @override
@@ -31,7 +31,7 @@ class RegisterView extends ConsumerWidget {
                 // TODO: Add image picker for profile image, upload to Firebase Storage
 
                 // Enter username
-                _UsernameTextField(viewController: viewController),
+                _UsernameTextField(data: data, viewController: viewController),
                 const SizedBox(height: 8,),
                 
                 // Enter email
@@ -208,14 +208,17 @@ class _EmailTextField extends StatelessWidget {
 class _UsernameTextField extends StatelessWidget {
   const _UsernameTextField({
     Key? key,
+    required this.data,
     required this.viewController,
   }) : super(key: key);
 
+  final RegisterViewData data;
   final RegisterViewController viewController;
 
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: data.username,
       decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Username' ),
       onChanged: (usernameValue){
         viewController.updateData(username: usernameValue);

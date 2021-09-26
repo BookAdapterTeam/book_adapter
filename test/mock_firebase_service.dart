@@ -72,6 +72,10 @@ class MockFirebaseService implements FirebaseService {
     }
   }
 
+  /// Get the current user
+  @override
+  User? get currentUser => firebaseAuth.currentUser;
+
   /// Send reset password email
   @override
   Future<Either<Failure, void>> resetPassword(String email) async {
