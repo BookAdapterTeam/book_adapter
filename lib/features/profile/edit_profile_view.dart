@@ -72,6 +72,7 @@ class _SubmitButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final data = ref.watch(editProfileViewController);
     final viewController = ref.watch(editProfileViewController.notifier);
     return ElevatedButton(
       child: const Text('Submit', style: TextStyle(fontSize: 20.0)),
@@ -84,8 +85,8 @@ class _SubmitButton extends ConsumerWidget {
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
         } else {
           Navigator.of(context).pop();
-          const snackBar = SnackBar(
-            content: Text('Updating Userdata Failed')
+          final snackBar = SnackBar(
+            content: Text('Updated Username to ${data.username}')
           );
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
