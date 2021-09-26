@@ -2,7 +2,6 @@
 
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/profile/edit_profile_view_controller.dart';
-import 'package:book_adapter/features/profile/widgets/button_widget.dart';
 import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -29,11 +28,11 @@ class EditProfileView extends HookConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 24),
+              // TODO: Will never show because there is no way to set the photo
               if (user != null && user.photoURL != null) ... [
                 ProfileWidget(
-                  imagePath: user.photoURL!,
-                  isEdit: true, 
-                  onClicked: () async {}
+                  photoUrl: user.photoURL!,
+                  onPressed: () async {}
                 ),
                 const SizedBox(height: 24),
               ],
@@ -64,13 +63,6 @@ class EditProfileView extends HookConsumerWidget {
       )
     );    
   }
-
-  Widget submitButton() => ButtonWidget(
-    text: 'Submit',
-    onClicked: () {
-      // TODO: Change email if it is different
-    },
-  );
 }
 
 class _SubmitButton extends ConsumerWidget {

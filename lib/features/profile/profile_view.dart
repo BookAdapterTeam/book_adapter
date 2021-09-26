@@ -4,7 +4,6 @@ import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/profile/change_password_view.dart';
 import 'package:book_adapter/features/profile/edit_profile_view.dart';
 import 'package:book_adapter/features/profile/profile_view_controller.dart';
-import 'package:book_adapter/features/profile/widgets/button_widget.dart';
 import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -41,8 +40,8 @@ class ProfileView extends ConsumerWidget {
                 const SizedBox(height: 64),
                 /*user.photoURL != null
                   ? */ProfileWidget(
-                    imagePath: user.photoURL ?? 'https://i.imgur.com/WxNkK7J.png',
-                    onClicked: () {
+                    photoUrl: user.photoURL ?? 'https://i.imgur.com/WxNkK7J.png',
+                    onPressed: () {
                       Navigator.restorablePushNamed(context, EditProfileView.routeName);
                     },
                   )
@@ -110,13 +109,11 @@ class ChangePasswordButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: ButtonWidget(
-        text: 'Change Password',
-        onClicked: () {
-          Navigator.restorablePushNamed(context, ChangePasswordView.routeName);
-        },
-      ),
+    return ElevatedButton(
+      child: const Text('Change Password'),
+      onPressed: () {
+        Navigator.restorablePushNamed(context, ChangePasswordView.routeName);
+      },
     );
   }
 }
