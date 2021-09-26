@@ -15,6 +15,17 @@ abstract class BaseFirebaseService {
   /// sign-out).
   Stream<User?> get authStateChange => _firebaseAuth.authStateChanges();
 
+  /// Notifies about changes to any user updates.
+  ///
+  /// This is a superset of both [authStateChanges] and [idTokenChanges]. It
+  /// provides events on all user changes, such as when credentials are linked,
+  /// unlinked and when updates to the user profile are made. The purpose of
+  /// this Stream is for listening to realtime updates to the user state
+  /// (signed-in, signed-out, different user & token refresh) without
+  /// manually having to call [reload] and then rehydrating changes to your
+  /// application.
+  Stream<User?> get userChanges => _firebaseAuth.userChanges();
+
   /// Attempts to sign in a user with the given email address and password.
   ///
   /// If successful, it also signs the user in into the app and updates
@@ -62,6 +73,15 @@ abstract class BaseFirebaseService {
   ///
   /// If successful, it also update the stream [authStateChange]
   Future<void> signOut();
+
+  /// Returns the current [User] if they are currently signed-in, or `null` if
+  /// not.
+  ///
+  /// You should not use this getter to determine the users current state,
+  /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
+  /// subscribe to updates.
+  User? get currentUser;
+
 
   // Database
   /// WIP

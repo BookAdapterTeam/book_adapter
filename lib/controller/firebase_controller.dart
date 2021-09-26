@@ -11,9 +11,24 @@ final firebaseControllerProvider = Provider<FirebaseController>((ref) {
 });
 
 /// Provider to easily get access to the user stream from [FirebaseService]
-final authStateChangesProvider = StreamProvider<User?>((ref) {
+final authStateChangesProvider = StreamProvider<User?>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
-  return firebaseController.authStateChange;
+
+  final authStates = firebaseController.authStateChange;
+
+  await for (final user in authStates) {
+    yield user;
+  }
+});
+
+/// Provider to get access to stream of user changes
+final userChangesProvider = StreamProvider<User?>((ref) async* {
+  final firebaseController = ref.watch(firebaseControllerProvider);
+  final userChanges = firebaseController.userChanges;
+
+  await for (final user in userChanges) {
+    yield user;
+  }
 });
 
 class FirebaseController {
@@ -35,6 +50,17 @@ class FirebaseController {
   User? get currentUser {
     return _firebaseService.currentUser;
   }
+
+  /// Notifies about changes to any user updates.
+  ///
+  /// This is a superset of both [authStateChanges] and [idTokenChanges]. It
+  /// provides events on all user changes, such as when credentials are linked,
+  /// unlinked and when updates to the user profile are made. The purpose of
+  /// this Stream is for listening to realtime updates to the user state
+  /// (signed-in, signed-out, different user & token refresh) without
+  /// manually having to call [reload] and then rehydrating changes to your
+  /// application.
+  Stream<User?> get userChanges => _firebaseService.userChanges;
  
   /// Attempts to sign in a user with the given email address and password.
   ///
