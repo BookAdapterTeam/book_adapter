@@ -3,7 +3,7 @@ import 'package:book_adapter/features/auth/auth_checker.dart';
 import 'package:book_adapter/features/library/book_item_details_view.dart';
 import 'package:book_adapter/features/library/library_view.dart';
 import 'package:book_adapter/features/profile/change_password_view.dart';
-import 'package:book_adapter/features/profile/edit_profile_page.dart';
+import 'package:book_adapter/features/profile/edit_profile_view.dart';
 import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';

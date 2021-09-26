@@ -2,11 +2,10 @@
 
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/profile/change_password_view.dart';
-import 'package:book_adapter/features/profile/edit_profile_page.dart';
+import 'package:book_adapter/features/profile/edit_profile_view.dart';
 import 'package:book_adapter/features/profile/profile_view_controller.dart';
 import 'package:book_adapter/features/profile/widgets/button_widget.dart';
 import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -21,50 +20,14 @@ class ProfileView extends ConsumerWidget {
     final user = ref.read(firebaseControllerProvider).currentUser;
     const String title = 'Profile Page';
 
-    final isLoading = ref.watch(profileViewController);
-    final viewController = ref.watch(profileViewController.notifier);
+    // final isLoading = ref.watch(profileViewController);
+    // final viewController = ref.watch(profileViewController.notifier);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text(title),
-        actions: [
-          IconButton(
-            key: const ValueKey('signOut'),
-            icon: const Icon(Icons.logout),
-            tooltip: 'Sign out',
-            onPressed: () {
-              // Log out the user
-              // TODO: Add pop up asking for confirmation
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return Expanded(
-                    child: AlertDialog(
-                      title: const Text('Logout'),
-                      content: const Text('Are you sure you want to log out?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text('CANCEL'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).popUntil(ModalRoute.withName('/'));
-                            viewController.signOut();
-                          },
-                          child: const Text('LOGOUT'),
-                        ),
-                      ],
-                    ),
-
-                  );
-                },
-              );
-              
-            },
-          ),
+        actions: const [
+          _LogOutButton(),
         ],
       ),
       body: SingleChildScrollView(
@@ -97,6 +60,49 @@ class ProfileView extends ConsumerWidget {
   }
 }
 
+class _LogOutButton extends ConsumerWidget {
+  const _LogOutButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final viewController = ref.watch(profileViewController.notifier);
+    return IconButton(
+      key: const ValueKey('signOut'),
+      icon: const Icon(Icons.logout),
+      tooltip: 'Sign out',
+      onPressed: () {
+        // Log out the user
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Logout'),
+              content: const Text('Are you sure you want to log out?'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('CANCEL'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).popUntil(ModalRoute.withName('/'));
+                    viewController.signOut();
+                  },
+                  child: const Text('LOGOUT'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+}
+
 class ChangePasswordButton extends StatelessWidget {
   const ChangePasswordButton({
     Key? key,
@@ -122,7 +128,8 @@ class _NameWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final user = ref.read(firebaseControllerProvider).currentUser;
+    final firebaseController = ref.watch(firebaseControllerProvider);
+    final user = firebaseController.currentUser;
     return user != null ? Center(
       child: Column(
         children: [
@@ -144,4 +151,3 @@ class _NameWidget extends ConsumerWidget {
     ) : const SizedBox();
   }
 }
-//
