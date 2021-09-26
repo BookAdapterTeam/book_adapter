@@ -1,9 +1,13 @@
+import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/user_data.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final userModelProvider = StateNotifierProvider<UserModelNotifier, UserData>((ref) {
-  const userData = UserData();
+  final firebaseController = ref.watch(firebaseControllerProvider);
+  
+  final userData = UserData(currentUser: firebaseController.currentUser);
 
   return UserModelNotifier(userData);
 });
@@ -13,7 +17,15 @@ class UserModelNotifier extends StateNotifier<UserData> {
 
   // Put functions here using copyWith to change data
 
-  // TODO: Add functions such as currentUser for authentication
+  /// Returns the current [User] if they are currently signed-in, or `null` if
+  /// not.
+  ///
+  /// You should not use this getter to determine the users current state,
+  /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
+  /// subscribe to updates.
+  User? get currentUser {
+    return state.currentUser;
+  }
 
   // Update UserData with new list of books
   void setBooks(List<BookItem> books) {
