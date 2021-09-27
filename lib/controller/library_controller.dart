@@ -7,10 +7,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 /// The list of books
 final bookListProvider = FutureProvider<List<BookItem>>((ref) async {
-  // Obtains the Repository instance
-  final libraryController = ref.read(libraryControllerProvider);
+  // Obtains the controller instance
+  final libraryController = ref.watch(libraryControllerProvider);
 
-  // Fetch the todos and expose them to the UI.
+  // Fetch the books and expose them to the UI.
   final res = await libraryController.fetchBooks();
   
   return res.fold(
