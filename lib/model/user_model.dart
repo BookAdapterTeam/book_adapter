@@ -28,7 +28,20 @@ class UserModelNotifier extends StateNotifier<UserData> {
   }
 
   // Update UserData with new list of books
-  void setBooks(List<BookItem> books) {
+  void setBooks(List<Book> books) {
     state = state.copyWith(books: books);
+  }
+
+  // Update UserData with new book
+  void addBook(Book book) {
+    state = state.copyWith(books: [...state.books, book]);
+  }
+
+  // Update UserData with new book
+  void deleteBook(Book book) {
+    state = state.copyWith(books: [
+      for (final loopBook in state.books)
+       if (book != loopBook) loopBook,
+    ]);
   }
 }

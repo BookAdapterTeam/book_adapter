@@ -1,6 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:dartz/dartz.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// A utility class to handle all Firebase calls
@@ -63,12 +67,6 @@ abstract class BaseFirebaseService {
   /// If successful, it also update the stream [authStateChange]
   Future<void> signOut();
 
-  // Database
-  /// WIP
-  /// 
-  /// Get a list of books from the user's database
-  Future<Either<Failure, List<BookItem>>> getBooks();
-
   /// Send reset password email
   Future<void> resetPassword(String email);
 
@@ -83,4 +81,20 @@ abstract class BaseFirebaseService {
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   Future<bool> setProfilePhoto(String photoURL);
+
+  // Database
+  
+  /// WIP
+  /// 
+  /// Get a list of books from the user's database
+  Future<Either<Failure, List<Book>>> getBooks();
+
+  /// Add a book to Firebase Database
+  Future<Either<Failure, Book>> addBook(PlatformFile file, Uint8List bytes, {String collection = 'Default'});
+
+  /// Upload a book to Firebase Storage
+  Future<Either<Failure, void>> uploadBook(PlatformFile file, Uint8List bytes);
+
+  /// Create a shelf
+  Future<Either<Failure, Shelf>> addShelf(String name);
 }

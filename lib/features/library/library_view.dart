@@ -59,7 +59,7 @@ class _LibraryListView extends ConsumerWidget {
     Key? key,
     required this.books,
   }) : super(key: key);
-  final List<BookItem> books;
+  final List<Book> books;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -79,7 +79,7 @@ class _LibraryListView extends ConsumerWidget {
             final book = books[index];
 
             return ListTile(
-              title: Text('Book: ${book.name}'),
+              title: Text('Book: ${book.title}'),
               subtitle: Text('ID: ${book.id}'),
               leading: const CircleAvatar(
                 // Display the Flutter Logo image asset.

@@ -2,7 +2,7 @@
 import 'package:book_adapter/data/book_item.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 
 @immutable
 class UserData extends Equatable {
@@ -13,12 +13,12 @@ class UserData extends Equatable {
 
   // In the future, this would contain other data about Users, such as Collections, Series, etc
   final User? currentUser;
-  final List<BookItem> books;
+  final List<Book> books;
 
   // The following was generated with VSCode extention "Dart Data Class Generator"
   UserData copyWith({
     User? currentUser,
-    List<BookItem>? books,
+    List<Book>? books,
   }) {
     return UserData(
       currentUser: currentUser ?? this.currentUser,

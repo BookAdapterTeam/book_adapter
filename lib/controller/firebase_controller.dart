@@ -2,8 +2,10 @@ import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 final firebaseControllerProvider = Provider<FirebaseController>((ref) {
   final firebaseService = ref.watch(firebaseServiceProvider);
@@ -159,14 +161,6 @@ class FirebaseController {
     return await _firebaseService.signOut();
   }
 
-  // Database
-  /// WIP
-  /// 
-  /// Get a list of books from the user's database
-  Future<Either<Failure, List<BookItem>>> getBooks() async {
-    return _firebaseService.getBooks();
-  }
-
   /// Send reset password email
   Future<Either<Failure, void>> resetPassword(String email) async {
     return await _firebaseService.resetPassword(email);
@@ -187,4 +181,38 @@ class FirebaseController {
   Future<bool> setProfilePhoto(String photoURL) async {
     return await _firebaseService.setProfilePhoto(photoURL);
   }
+
+  // Database
+
+  /// WIP
+  /// 
+  /// Get a list of books from the user's database
+  Future<Either<Failure, List<Book>>> getBooks() async {
+    return _firebaseService.getBooks();
+  }
+
+  /// WIP
+  /// 
+  /// Get a list of books from the user's database
+  Future<Either<Failure, Book>> addBook(PlatformFile file) async {
+    if (file.readStream == null) {
+      return Left(Failure('File readStream was null'));
+    }
+    // Upload book details to database
+    final stream = http.ByteStream(file.readStream!);
+    final bytes = await stream.toBytes();
+    
+    // Upload book to storage
+    _firebaseService.uploadBook(file, bytes);
+
+    // Add book to database
+    final res = await _firebaseService.addBook(file, bytes);
+
+    return res.fold(
+      (failure) => Left(failure),
+      (book) => Right(book),
+    );
+  }
+
+
 }

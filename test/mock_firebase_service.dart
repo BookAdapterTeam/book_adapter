@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
+import 'package:file_picker/src/platform_file.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -20,12 +24,12 @@ class MockFirebaseService implements FirebaseService {
 
   // Mock get list of books
   @override
-  Future<Either<Failure, List<BookItem>>> getBooks() async {
+  Future<Either<Failure, List<Book>>> getBooks() async {
     try {
-      const List<BookItem> books = [
-        BookItem(name: 'Book 0', id: '0'),
-        BookItem(name: 'Book 1', id: '1'),
-        BookItem(name: 'Book 2', id: '2'),
+      const List<Book> books = [
+        // Book(title: 'Book 0', id: '0'),
+        // Book(title: 'Book 1', id: '1'),
+        // Book(title: 'Book 2', id: '2'),
       ];
       
       // Return our books to the caller in case they care
@@ -107,5 +111,23 @@ class MockFirebaseService implements FirebaseService {
     }
     await user.updatePhotoURL(photoURL);
     return true;
+  }
+
+  @override
+  Future<Either<Failure, Shelf>> addShelf(String name) {
+    // TODO: implement addShelf
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Book>> addBook(PlatformFile file, Uint8List bytes, {String collection = 'Default'}) {
+    // TODO: implement addBook
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, void>> uploadBook(PlatformFile file, Uint8List bytes) {
+    // TODO: implement uploadBook
+    throw UnimplementedError();
   }
 }
