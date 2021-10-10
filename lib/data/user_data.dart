@@ -1,5 +1,5 @@
 // ignore_for_file: sort_constructors_first
-import 'package:book_adapter/data/book_item.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';

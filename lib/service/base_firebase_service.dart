@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';

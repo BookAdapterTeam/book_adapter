@@ -1,40 +1,47 @@
 import 'dart:convert';
 
-import 'package:equatable/equatable.dart';
+import 'item.dart';
 
-class Shelf extends Equatable {
+class Shelf extends Item {
   final String name;
-  final String userId;
 
   const Shelf({
+    required id,
+    required userId,
     required this.name,
-    required this.userId,
-  });
+  }) : super(id: id, userId: userId);
 
+  @override
   Shelf copyWith({
-    String? name,
+    String? id,
     String? userId,
+    String? name,
   }) {
     return Shelf(
-      name: name ?? this.name,
+      id: id ?? this.id,
       userId: userId ?? this.userId,
+      name: name ?? this.name,
     );
   }
 
+  @override
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
+      'id': id,
       'userId': userId,
+      'name': name,
     };
   }
 
   factory Shelf.fromMap(Map<String, dynamic> map) {
     return Shelf(
-      name: map['name'],
+      id: map['id'],
       userId: map['userId'],
+      name: map['name'],
     );
   }
 
+  @override
   String toJson() => json.encode(toMap());
 
   factory Shelf.fromJson(String source) => Shelf.fromMap(json.decode(source));
@@ -43,5 +50,5 @@ class Shelf extends Equatable {
   bool get stringify => true;
 
   @override
-  List<Object> get props => [name, userId];
+  List<Object> get props => [id, userId, name];
 }

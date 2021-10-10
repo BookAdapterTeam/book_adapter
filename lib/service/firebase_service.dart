@@ -1,8 +1,7 @@
-import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/base_firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -171,19 +170,41 @@ class FirebaseService extends BaseFirebaseService {
 
   // Database
 
-  /// WIP
-  /// 
+  static final CollectionReference<Book> _bookCollection = _firestore.collection('books')
+    .withConverter<Book>(
+      fromFirestore: (doc, _) {
+        final data = doc.data();
+        data!.addAll({'id': doc.id});
+        return Book.fromMap(data);
+      },
+      toFirestore: (book, _) => book.toMap(),
+    );
+
+  // Get books stream
+  static Stream<QuerySnapshot<Book>> get booksStream {
+    return _bookCollection.snapshots();
+  }
+
+  // Provide the stream with riverpod for easy access
+  final bookStreamProvider = StreamProvider<List<Book>>((ref) async* {
+    // Parse the value received and emit a Message instance
+    await for (final value in booksStream) {
+      yield value.docs.map((e) => e.data()).toList();
+    }
+  });
+
   /// Get a list of books from the user's database
   @override
   Future<Either<Failure, List<Book>>> getBooks() async {
     try {
-      // TODO: Implement Firebase call to database to get the list of user books
-      await Future.delayed(const Duration(seconds: 1));
-      const List<Book> books = [
-        // BookItem(name: 'Book 0', id: '0'),
-        // BookItem(name: 'Book 1', id: '1'),
-        // BookItem(name: 'Book 2', id: '2'),
-      ];
+
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) {
+        return Left(Failure('User not logged in'));
+      }
+      
+      final bookQuery = await _bookCollection.where('userId', isEqualTo: userId).get();
+      final books = bookQuery.docs.map((doc) => doc.data()).toList();
       
       // Return our books to the caller in case they care
       // ignore: prefer_const_constructors
@@ -204,20 +225,18 @@ class FirebaseService extends BaseFirebaseService {
         return Left(Failure('User not logged in'));
       }
 
-      final CollectionReference<Book> defaultShelf = _firestore.collection('shelves/$userId-$collection/books').withConverter<Book>(
-        fromFirestore: (snapshot, _) => Book.fromMap(snapshot.data()!),
-        toFirestore: (book, _) => book.toMap(),
-      );
-
-      final openedBook = await EpubReader.openBook(bytes);
+      // Create a book object to add to the collection
+      final EpubBookRef openedBook = await EpubReader.openBook(bytes);
+      final String id = uuid.v4();
       final book = Book(
+        id: id,
+        userId: userId,
         title: openedBook.Title ?? '',
         authors: openedBook.AuthorList?.join(',') ?? '',
-        id: file.name,
         addedDate: DateTime.now().toUtc(),
         filename: file.name,
       );
-      await defaultShelf.doc(uuid.v4()).set(book);
+      await _bookCollection.doc(id).set(book);
       
       // Return our books to the caller in case they care
       // ignore: prefer_const_constructors
@@ -232,7 +251,10 @@ class FirebaseService extends BaseFirebaseService {
   /// Upload a book to Firebase Storage
   @override
   Future<Either<Failure, void>> uploadBook(PlatformFile file, Uint8List bytes) async {
+    const String epubContentType = 'application/epub+zip';
+
     try {
+    
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
         return Left(Failure('User not logged in'));
@@ -242,13 +264,20 @@ class FirebaseService extends BaseFirebaseService {
       if (filePath == null) {
         return Left(Failure('File path was null'));
       }
-
-      // Upload book file
-      await _storage.ref('$userId/${file.name}').putFile(io.File(filePath));
-      
-      // Return our books to the caller in case they care
-      // ignore: prefer_const_constructors
-      return Right(null);
+      // Return failed if file already exists
+      try {
+        await _storage.ref('$userId/${file.name}').getDownloadURL();
+        return(Left(Failure('Book already exists')));
+      } on FirebaseException catch (e) {
+        if (e.code == '403') {
+          await _storage.ref('$userId/${file.name}').putData(
+            bytes, SettableMetadata(contentType: epubContentType),
+          );
+        }
+      } on Exception catch (e) {
+        return Left(Failure(e.toString()));
+      }
+      return const Right(null);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
     } on Exception catch (e) {
@@ -258,7 +287,7 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Create a shelf in firestore
   @override
-  Future<Either<Failure, Shelf>> addShelf(String name) async {
+  Future<Either<Failure, Shelf>> addShelf(String shelfName) async {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
@@ -270,8 +299,14 @@ class FirebaseService extends BaseFirebaseService {
         toFirestore: (shelf, _) => shelf.toMap(),
       );
 
-      final shelf = Shelf(name: '$userId-$name', userId: userId);
-      shelvesRef.add(shelf);
+      // Create a shelf with a custom id so that it can easily be referenced later
+      final String id = uuid.v4();
+      final shelf = Shelf(
+        id: '$userId-$shelfName',
+        name: shelfName,
+        userId: userId
+      );
+      await shelvesRef.doc(id).set(shelf);
       
       // Return the shelf to the caller in case they care
       return Right(shelf);

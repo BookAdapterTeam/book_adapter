@@ -11,6 +11,7 @@ extension Localization on String {
         legalese: 'Blah blah.',
         'Library': 'Library',
         'Settings': 'Settings',
+        'This is the reader in the future': 'This is the reader in the future',
       },
     }
     // + 

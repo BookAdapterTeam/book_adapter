@@ -1,5 +1,5 @@
-import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
@@ -184,34 +184,43 @@ class FirebaseController {
 
   // Database
 
-  /// WIP
-  /// 
+  StreamProvider<List<Book>> get bookStreamProvider => _firebaseService.bookStreamProvider;
+
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
     return _firebaseService.getBooks();
   }
 
-  /// WIP
-  /// 
   /// Get a list of books from the user's database
   Future<Either<Failure, Book>> addBook(PlatformFile file) async {
     if (file.readStream == null) {
       return Left(Failure('File readStream was null'));
     }
-    // Upload book details to database
+    // Get the book data into memory for upload
     final stream = http.ByteStream(file.readStream!);
     final bytes = await stream.toBytes();
     
     // Upload book to storage
-    _firebaseService.uploadBook(file, bytes);
+    final uploadRes = await _firebaseService.uploadBook(file, bytes);
+    return uploadRes.fold(
+      (failure) {
+        if (failure.message == 'Book already exists') {
+          print(failure.message);
+        }
+        return Left(failure);
+      },
+      (_) async {
+        // Add book details to database if upload successful
+        final res = await _firebaseService.addBook(file, bytes);
 
-    // Add book to database
-    final res = await _firebaseService.addBook(file, bytes);
-
-    return res.fold(
-      (failure) => Left(failure),
-      (book) => Right(book),
+        return res.fold(
+          (failure) => Left(failure),
+          (book) => Right(book),
+        );
+      }
     );
+
+    
   }
 
 

@@ -1,9 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/src/platform_file.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -130,4 +131,8 @@ class MockFirebaseService implements FirebaseService {
     // TODO: implement uploadBook
     throw UnimplementedError();
   }
+
+  @override
+  // TODO: implement bookStreamProvider
+  StreamProvider<List<Book>> get bookStreamProvider => throw UnimplementedError();
 }
