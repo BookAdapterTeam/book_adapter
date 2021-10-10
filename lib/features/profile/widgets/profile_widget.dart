@@ -27,10 +27,13 @@ class ProfileWidget extends StatelessWidget {
           Positioned(
             bottom: 0,
             right: 4,
-            child: _EditIcon(color: color),
-          )
-        ]
-      )
+            child: _EditIcon(
+              color: color,
+              onPressed: onPressed,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -76,23 +79,28 @@ class _EditIcon extends StatelessWidget {
   const _EditIcon({
     Key? key,
     required this.color,
+    required this.onPressed,
   }) : super(key: key);
   final Color color;
+  final VoidCallback onPressed;
 
   @override
   Widget build(BuildContext context) {
-    return _Circle(
-      color: Colors.white,
-      all: 3,
+    return InkWell(
       child: _Circle(
-        color: color,
-        all: 8,
-        child: const Icon(
-          Icons.edit,
-          color: Colors.white,
-          size: 30,
+        color: Colors.white,
+        all: 3,
+        child: _Circle(
+          color: color,
+          all: 8,
+          child: const Icon(
+            Icons.edit,
+            color: Colors.white,
+            size: 30,
+          ),
         ),
       ),
+      onTap: onPressed,
     );
   }
 }

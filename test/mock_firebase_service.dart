@@ -108,4 +108,7 @@ class MockFirebaseService implements FirebaseService {
     await user.updatePhotoURL(photoURL);
     return true;
   }
+  @override
+  // TODO: implement userChanges
+  Stream<User?> get userChanges => throw UnimplementedError();
 }
