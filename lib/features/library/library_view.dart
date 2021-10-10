@@ -61,6 +61,7 @@ class _AddBookButton extends ConsumerWidget {
     return IconButton(
       onPressed: () async {
         final message = await viewController.addBooks();
+        // TODO: Show snackbar if a book upload failed. Currently libraryViewController does not return failures for upload fails
         if (message != null) {
           final SnackBar snackBar = SnackBar(content: Text(message));
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
