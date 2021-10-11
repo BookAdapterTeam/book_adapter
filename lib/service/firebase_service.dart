@@ -226,7 +226,7 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Add a book to Firebase Firestore
   @override
-  Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default'}) async {
+  Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl}) async {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
@@ -242,6 +242,7 @@ class FirebaseService extends BaseFirebaseService {
         authors: openedBook.AuthorList?.join(',') ?? '',
         addedDate: DateTime.now().toUtc(),
         filename: file.name,
+        imageUrl: imageUrl,
       );
       await _bookCollection.doc(id).set(book);
       
@@ -274,11 +275,8 @@ class FirebaseService extends BaseFirebaseService {
       final String filename = file.name;
 
       final res = await uploadFile(userId, bytes, filename, epubContentType);
-      if (res != null) {
-        return Left(res);
-      }
       
-      return const Right(null);
+      return res;
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
     } on Exception catch (e) {
@@ -288,7 +286,7 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Upload a book cover photo to Firebase Storage
   @override
-  Future<Either<Failure, void>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook) async {
+  Future<Either<Failure, String>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook) async {
     const imageContentType = 'image/png';
     try {
     
@@ -338,11 +336,8 @@ class FirebaseService extends BaseFirebaseService {
       final String filename = '${file.name}.png';
 
       final res = await uploadFile(userId, Uint8List.fromList(bytes), filename, imageContentType);
-      if (res != null) {
-        return Left(res);
-      }
       
-      return const Right(null);
+      return res;
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
     } on Exception catch (e) {
@@ -353,17 +348,18 @@ class FirebaseService extends BaseFirebaseService {
   }
 
   @override
-  Future<Failure?> uploadFile(String userId, Uint8List bytes, String filename, String contentType) async {
+  Future<Either<Failure, String>> uploadFile(String userId, Uint8List bytes, String filename, String contentType) async {
     try {
       // Check if file exists, exit if it does
       await _storage.ref('$userId/$filename').getDownloadURL();
-      return Failure('File already exists');
+      return Left(Failure('File already exists'));
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
       await _storage.ref('$userId/$filename').putData(
         bytes, SettableMetadata(contentType: contentType),
       );
-      return null;
+      final url = await _storage.ref('$userId/$filename').getDownloadURL();
+      return Right(url);
     }
   }
 

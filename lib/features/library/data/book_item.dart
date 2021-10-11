@@ -11,6 +11,7 @@ class Book extends Item {
   final String authors;
   final String description;
   final String filename;
+  final String? imageUrl;
   final String genre;
   final String language;
   final DateTime? lastRead;
@@ -26,6 +27,7 @@ class Book extends Item {
     this.authors = '',
     this.description = '',
     required this.filename,
+    this.imageUrl,
     this.genre = '',
     this.language = '',
     this.lastRead,
@@ -43,6 +45,7 @@ class Book extends Item {
     String? authors,
     String? description,
     String? filename,
+    String? imageUrl,
     String? genre,
     String? language,
     DateTime? lastRead,
@@ -58,6 +61,7 @@ class Book extends Item {
       authors: authors ?? this.authors,
       description: description ?? this.description,
       filename: filename ?? this.filename,
+      imageUrl: imageUrl ?? this.imageUrl,
       genre: genre ?? this.genre,
       language: language ?? this.language,
       lastRead: lastRead ?? this.lastRead,
@@ -76,6 +80,7 @@ class Book extends Item {
       'authors': authors,
       'description': description,
       'filename': filename,
+      'imageUrl': imageUrl,
       'genre': genre,
       'language': language,
       'lastRead': lastRead?.millisecondsSinceEpoch,
@@ -95,6 +100,7 @@ class Book extends Item {
       authors: map['authors'],
       description: map['description'],
       filename: map['filename'],
+      imageUrl: map['imageUrl'],
       genre: map['genre'],
       language: map['language'],
       lastRead: lastRead != null ? DateTime.fromMillisecondsSinceEpoch(lastRead) : null,
@@ -114,6 +120,7 @@ class Book extends Item {
       'authors': authors,
       'description': description,
       'filename': filename,
+      'imageUrl': imageUrl,
       'genre': genre,
       'language': language,
       'lastRead': lastRead != null ? Timestamp.fromDate(lastRead!) : null,
@@ -132,6 +139,7 @@ class Book extends Item {
       authors: map['authors'],
       description: map['description'],
       filename: map['filename'],
+      imageUrl: map['imageUrl'],
       genre: map['genre'],
       language: map['language'],
       lastRead: map['lastRead']?.toDate(),
@@ -159,6 +167,7 @@ class Book extends Item {
       authors,
       description,
       filename,
+      imageUrl ?? 'No image',
       genre,
       language,
       lastRead ?? 'Not read yet',

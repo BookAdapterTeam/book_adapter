@@ -4,6 +4,7 @@ import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:book_adapter/features/reader/book_reader_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -84,15 +85,14 @@ class _LibraryListView extends ConsumerWidget {
         itemCount: books.length,
         itemBuilder: (BuildContext context, int index) {
           final book = books[index];
+          final imageUrl = book.imageUrl;
 
           return ListTile(
             title: Text(book.title),
             subtitle: Text(book.authors),
-            leading: const CircleAvatar(
-              // Display the Flutter Logo image asset.
-              foregroundImage: AssetImage('assets/images/flutter_logo.png'),
-              backgroundColor: Colors.transparent,
-            ),
+            leading: imageUrl != null 
+              ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
+              : null,
             onTap: () {
               // Navigate to the details page. If the user leaves and returns to
               // the app after it has been killed while running in the

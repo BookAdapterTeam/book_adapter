@@ -218,11 +218,16 @@ class FirebaseController {
 
   Future<Either<Failure, Book>> _handleBookUploaded(Uint8List bytes, PlatformFile file) async {
     final EpubBookRef openedBook = await EpubReader.openBook(bytes);
-    final added = await _firebaseService.addBook(file, openedBook);
+    final res = await _firebaseService.uploadCoverPhoto(file, openedBook);
+    final String? imageUrl = res.fold(
+      (failure) => null,
+      (url) => url,
+    );
+
+    final added = await _firebaseService.addBook(file, openedBook, imageUrl: imageUrl);
     return added.fold(
       (failure) => Left(failure),
       (book) async {
-        await _firebaseService.uploadCoverPhoto(file, openedBook);
         return Right(book);
       },
     );
