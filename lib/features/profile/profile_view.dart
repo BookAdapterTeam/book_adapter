@@ -17,7 +17,7 @@ class ProfileView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userStreamAsyncValue = ref.watch(userChangesProvider);
-    final user = userStreamAsyncValue.data?.value;
+    final user = userStreamAsyncValue.asData?.value;
     const String title = 'Profile Page';
 
     // final isLoading = ref.watch(profileViewController);
@@ -127,7 +127,7 @@ class _NameWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userStreamAsyncValue = ref.watch(userChangesProvider);
-    final user = userStreamAsyncValue.data?.value;
+    final user = userStreamAsyncValue.asData?.value;
     return user != null ? Center(
       child: Column(
         children: [

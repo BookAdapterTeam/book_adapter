@@ -6,7 +6,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final userModelProvider = StateNotifierProvider<UserModelNotifier, UserData>((ref) {
   final userStreamAsyncValue = ref.watch(userChangesProvider);
-  final user = userStreamAsyncValue.data?.value;
+  final user = userStreamAsyncValue.asData?.value;
   
   final userData = UserData(currentUser: user);
 
