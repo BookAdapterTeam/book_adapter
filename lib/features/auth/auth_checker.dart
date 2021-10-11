@@ -20,8 +20,8 @@ class AuthChecker extends ConsumerWidget {
         // Route to user screen
         return child;
       },
-      loading: () => const LoadingView(),
-      error: (e, st) => Scaffold(body: Center(child: Text('Error: $e'),),),
+      loading: (userAsync) => const LoadingView(),
+      error: (e, st, userAsync) => Scaffold(body: Center(child: Text('Error: $e'),),),
     );
   }
 }

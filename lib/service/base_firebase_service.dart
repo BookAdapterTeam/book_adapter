@@ -1,19 +1,30 @@
-import 'package:book_adapter/data/book_item.dart';
+import 'dart:typed_data';
+
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:dartz/dartz.dart';
+import 'package:epubx/epubx.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 /// A utility class to handle all Firebase calls
 abstract class BaseFirebaseService {
-  BaseFirebaseService(this._firebaseAuth);
-
-  final FirebaseAuth _firebaseAuth;
+  BaseFirebaseService();
 
   // Authentication
 
   /// Notifies about changes to the user's sign-in state (such as sign-in or
   /// sign-out).
-  Stream<User?> get authStateChange => _firebaseAuth.authStateChanges();
+  Stream<User?> get authStateChange;
+
+  /// Returns the current [User] if they are currently signed-in, or `null` if
+  /// not.
+  ///
+  /// You should not use this getter to determine the users current state,
+  /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
+  /// subscribe to updates.
+  User? get currentUser;
 
   /// Notifies about changes to any user updates.
   ///
@@ -24,7 +35,7 @@ abstract class BaseFirebaseService {
   /// (signed-in, signed-out, different user & token refresh) without
   /// manually having to call [reload] and then rehydrating changes to your
   /// application.
-  Stream<User?> get userChanges => _firebaseAuth.userChanges();
+  Stream<User?> get userChanges;
 
   /// Attempts to sign in a user with the given email address and password.
   ///
@@ -74,21 +85,6 @@ abstract class BaseFirebaseService {
   /// If successful, it also update the stream [authStateChange]
   Future<void> signOut();
 
-  /// Returns the current [User] if they are currently signed-in, or `null` if
-  /// not.
-  ///
-  /// You should not use this getter to determine the users current state,
-  /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
-  /// subscribe to updates.
-  User? get currentUser;
-
-
-  // Database
-  /// WIP
-  /// 
-  /// Get a list of books from the user's database
-  Future<Either<Failure, List<BookItem>>> getBooks();
-
   /// Send reset password email
   Future<void> resetPassword(String email);
 
@@ -103,4 +99,24 @@ abstract class BaseFirebaseService {
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   Future<bool> setProfilePhoto(String photoURL);
+
+  // Database
+  
+  /// Get a list of books from the user's database
+  Future<Either<Failure, List<Book>>> getBooks();
+
+  /// Add a book to Firebase Database
+  Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default'});
+
+  /// Upload a book to Firebase Storage
+  Future<Either<Failure, void>> uploadBook(PlatformFile file, Uint8List bytes);
+
+  /// Upload a book cover photo to Firebase Storage
+  Future<Either<Failure, void>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook);
+
+  /// Upload a file to Firebase Storage
+  Future<void> uploadFile(String userId, Uint8List bytes, String filename, String contentType);
+
+  /// Create a shelf
+  Future<Either<Failure, Shelf>> addShelf(String name);
 }

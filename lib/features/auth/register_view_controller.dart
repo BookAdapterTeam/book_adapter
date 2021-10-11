@@ -52,12 +52,18 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
 
   Future<Either<Failure, User>> register() async {
     state = state.copyWith(isLoading: true);
+
+    // Register
     final res = await _read(firebaseControllerProvider).signUp(
       email: state.email, password: state.password,
     );
+
+    // Update with username
     final success = await _read(firebaseControllerProvider).setDisplayName(state.username);
     state = state.copyWith(isLoading: false);
 
+    // Create default shelf
+    _read(firebaseControllerProvider).addShelf('Default');
     
     if (res.isRight()) {
       state = const RegisterViewData();

@@ -1,9 +1,14 @@
-import 'package:book_adapter/data/book_item.dart';
+import 'dart:typed_data';
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
+import 'package:epubx/epubx.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 final firebaseControllerProvider = Provider<FirebaseController>((ref) {
   final firebaseService = ref.watch(firebaseServiceProvider);
@@ -185,14 +190,6 @@ class FirebaseController {
     return await _firebaseService.signOut();
   }
 
-  // Database
-  /// WIP
-  /// 
-  /// Get a list of books from the user's database
-  Future<Either<Failure, List<BookItem>>> getBooks() async {
-    return _firebaseService.getBooks();
-  }
-
   /// Send reset password email
   Future<Either<Failure, void>> resetPassword(String email) async {
     return await _firebaseService.resetPassword(email);
@@ -213,4 +210,60 @@ class FirebaseController {
   Future<bool> setProfilePhoto(String photoURL) async {
     return await _firebaseService.setProfilePhoto(photoURL);
   }
+
+  // Database
+
+  StreamProvider<List<Book>> get bookStreamProvider => _firebaseService.bookStreamProvider;
+
+  /// Get a list of books from the user's database
+  Future<Either<Failure, List<Book>>> getBooks() async {
+    return _firebaseService.getBooks();
+  }
+
+  /// Get a list of books from the user's database
+  Future<Either<Failure, Book>> addBook(PlatformFile file) async {
+    if (file.readStream == null) {
+      return Left(Failure('File readStream was null'));
+    }
+    // Get the book data into memory for upload
+    final stream = http.ByteStream(file.readStream!);
+    final bytes = await stream.toBytes();
+    
+    // Upload book to storage
+    final uploadRes = await _firebaseService.uploadBook(file, bytes);
+    return uploadRes.fold(
+      (failure) {
+        return Left(failure);
+      },
+      (_) async {
+        // Add book details to database if upload successful
+        return await _handleBookUploaded(bytes, file);
+      }
+    );
+  }
+
+  Future<Either<Failure, Book>> _handleBookUploaded(Uint8List bytes, PlatformFile file) async {
+    final EpubBookRef openedBook = await EpubReader.openBook(bytes);
+    final res = await _firebaseService.uploadCoverPhoto(file, openedBook);
+    final String? imageUrl = res.fold(
+      (failure) => null,
+      (url) => url,
+    );
+
+    final added = await _firebaseService.addBook(file, openedBook, imageUrl: imageUrl);
+    return added.fold(
+      (failure) => Left(failure),
+      (book) async {
+        return Right(book);
+      },
+    );
+  }
+
+
+  /// Get a list of books from the user's database
+  Future<Either<Failure, Shelf>> addShelf(String name) async {
+    // Upload book to storage
+    return await _firebaseService.addShelf(name);
+  }
+
 }

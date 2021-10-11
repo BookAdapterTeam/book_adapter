@@ -1,10 +1,10 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/controller/library_controller.dart';
-import 'package:book_adapter/data/book_item.dart';
-import 'package:book_adapter/features/library/book_item_details_view.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/profile/profile_view.dart';
+import 'package:book_adapter/features/reader/book_reader_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,28 +18,39 @@ class LibraryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bookList = ref.watch(bookListProvider);
-    
-    // final isLoading = ref.watch(libraryViewController);
-    // final viewController = ref.watch(libraryViewController.notifier);
+    final LibraryViewData data = ref.watch(libraryViewController);
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Library'.i18n),
         actions: const [
-          ProfileButton(),
+          _AddBookButton(),
+          _ProfileButton(),
         ],
       ),
-      body: bookList.when(
-        data: (books) => _LibraryListView(books: books),
-        loading: () => const Center(child: CircularProgressIndicator(key: ValueKey('loading_books'))),
-        error: (e, st) => Center(child: Text(e.toString())),
-      )
+      body: data.books != null
+        ? _LibraryListView(books: data.books!)
+        : const Center(child: CircularProgressIndicator(key: ValueKey('loading_books'))),
     );
   }
 }
 
-class ProfileButton extends ConsumerWidget {
-  const ProfileButton({
+class _AddBookButton extends ConsumerWidget {
+  const _AddBookButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+    return IconButton(
+      onPressed: () => viewController.addBooks(context),
+      iconSize: 36,
+      icon: const Icon(Icons.add_rounded)
+    );
+  }
+}
+
+class _ProfileButton extends ConsumerWidget {
+  const _ProfileButton({
     Key? key,
   }) : super(key: key);
 
@@ -62,14 +73,14 @@ class ProfileButton extends ConsumerWidget {
           },
         );
       },
-      loading: () => IconButton(
+      loading: (userA) => IconButton(
           key: const ValueKey('profile'),
           icon: const Icon(Icons.account_circle),
           onPressed: () {
             Navigator.restorablePushNamed(context, ProfileView.routeName);
           },
         ),
-      error: (e, st) {
+      error: (e, st, userA) {
         log.e('Error getting user data', e, st);
         return IconButton(
           key: const ValueKey('profile'),
@@ -98,47 +109,41 @@ class _LibraryListView extends ConsumerWidget {
     Key? key,
     required this.books,
   }) : super(key: key);
-  final List<BookItem> books;
+  final List<Book> books;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewController = ref.watch(libraryViewController.notifier);
-    return RefreshIndicator(
-      onRefresh: () {
-        return viewController.refreshBooks();
-      },
-      child: books.isNotEmpty 
-        ? ListView.builder(
-          // Providing a restorationId allows the ListView to restore the
-          // scroll position when a user leaves and returns to the app after it
-          // has been killed while running in the background.
-          restorationId: 'bookListView',
-          itemCount: books.length,
-          itemBuilder: (BuildContext context, int index) {
-            final book = books[index];
+    return books.isNotEmpty 
+      ? ListView.builder(
+        // Providing a restorationId allows the ListView to restore the
+        // scroll position when a user leaves and returns to the app after it
+        // has been killed while running in the background.
+        restorationId: 'bookListView',
+        itemCount: books.length,
+        itemBuilder: (BuildContext context, int index) {
+          final book = books[index];
+          final imageUrl = book.imageUrl;
 
-            return ListTile(
-              title: Text('Book: ${book.name}'),
-              subtitle: Text('ID: ${book.id}'),
-              leading: const CircleAvatar(
-                // Display the Flutter Logo image asset.
-                foregroundImage: AssetImage('assets/images/flutter_logo.png'),
-              ),
-              onTap: () {
-                // Navigate to the details page. If the user leaves and returns to
-                // the app after it has been killed while running in the
-                // background, the navigation stack is restored.
-                Navigator.restorablePushNamed(
-                  context,
-                  BookItemDetailsView.routeName,
-                  // Convert the book object to a map so that it can be passed through Navigator
-                  arguments: book.toMap(),
-                );
-              }
-            );
-          },
-        )
-        : Center(child: Text("You don't have any books", style: Theme.of(context).textTheme.bodyText2,)),
-    );
+          return ListTile(
+            title: Text(book.title),
+            subtitle: Text(book.authors),
+            leading: imageUrl != null 
+              ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
+              : null,
+            onTap: () {
+              // Navigate to the details page. If the user leaves and returns to
+              // the app after it has been killed while running in the
+              // background, the navigation stack is restored.
+              Navigator.restorablePushNamed(
+                context,
+                BookReaderView.routeName,
+                // Convert the book object to a map so that it can be passed through Navigator
+                arguments: book.toMapSerializable(),
+              );
+            }
+          );
+        },
+      )
+      : Center(child: Text("You don't have any books", style: Theme.of(context).textTheme.bodyText2,));
   }
 }

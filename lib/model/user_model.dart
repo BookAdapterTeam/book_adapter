@@ -1,12 +1,12 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/data/book_item.dart';
 import 'package:book_adapter/data/user_data.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final userModelProvider = StateNotifierProvider<UserModelNotifier, UserData>((ref) {
   final userStreamAsyncValue = ref.watch(userChangesProvider);
-  final user = userStreamAsyncValue.data?.value;
+  final user = userStreamAsyncValue.asData?.value;
   
   final userData = UserData(currentUser: user);
 
@@ -29,7 +29,20 @@ class UserModelNotifier extends StateNotifier<UserData> {
   }
 
   // Update UserData with new list of books
-  void setBooks(List<BookItem> books) {
+  void setBooks(List<Book> books) {
     state = state.copyWith(books: books);
+  }
+
+  // Update UserData with new book
+  void addBook(Book book) {
+    state = state.copyWith(books: [...state.books, book]);
+  }
+
+  // Update UserData with new book
+  void deleteBook(Book book) {
+    state = state.copyWith(books: [
+      for (final loopBook in state.books)
+       if (book != loopBook) loopBook,
+    ]);
   }
 }

@@ -15,7 +15,7 @@ class EditProfileView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userStreamAsyncValue = ref.watch(userChangesProvider);
-    final user = userStreamAsyncValue.data?.value;
+    final user = userStreamAsyncValue.asData?.value;
     final viewController = ref.watch(editProfileViewController.notifier);
     final usernameController = useTextEditingController();
 
