@@ -282,6 +282,7 @@ class FirebaseService extends BaseFirebaseService {
         addedDate: DateTime.now().toUtc(),
         filename: file.name,
         imageUrl: imageUrl,
+        collectionIds: ['$userId-Default'],
       );
       await _booksRef.doc(id).set(book);
       

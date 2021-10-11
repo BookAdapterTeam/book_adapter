@@ -16,6 +16,7 @@ class Book extends Item {
   final String publisher;
   final int? readingProgress;
   final int? wordCount;
+  final List<String> collectionIds;
 
   const Book({
     required String id,
@@ -32,6 +33,7 @@ class Book extends Item {
     this.publisher = '',
     this.readingProgress,
     this.wordCount,
+    required this.collectionIds,
   }) : super(id: id, userId: userId, title: title, subtitle: subtitle, imageUrl: imageUrl);
 
   @override
@@ -53,6 +55,7 @@ class Book extends Item {
     String? publisher,
     int? readingProgress,
     int? wordCount,
+    List<String>? collectionIds,
   }) {
     return Book(
       id: id ?? this.id,
@@ -69,6 +72,7 @@ class Book extends Item {
       publisher: publisher ?? this.publisher,
       readingProgress: readingProgress ?? this.readingProgress,
       wordCount: wordCount ?? this.wordCount,
+      collectionIds: collectionIds ?? this.collectionIds,
     );
   }
 
@@ -89,6 +93,7 @@ class Book extends Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
+      'collectionIds': collectionIds
     };
   }
 
@@ -109,6 +114,7 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
+      collectionIds: map['collectionIds'],
     );
   }
 
@@ -129,6 +135,7 @@ class Book extends Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
+      'collectionIds': collectionIds
     };
   }
 
@@ -148,6 +155,7 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
+      collectionIds: List<String>.from(map['collectionIds']),
     );
   }
 
@@ -176,6 +184,7 @@ class Book extends Item {
       publisher,
       readingProgress ?? 'Not started reading',
       wordCount ?? 'Unknown word count',
+      collectionIds,
     ];
   }
 }
