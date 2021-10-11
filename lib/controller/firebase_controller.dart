@@ -1,7 +1,8 @@
 import 'dart:typed_data';
+
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
@@ -215,6 +216,8 @@ class FirebaseController {
 
   StreamProvider<List<Book>> get bookStreamProvider => _firebaseService.bookStreamProvider;
 
+  StreamProvider<List<BookCollection>> get collectionsStreamProvider => _firebaseService.collectionsStreamProvider;
+
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
     return _firebaseService.getBooks();
@@ -229,41 +232,48 @@ class FirebaseController {
     final stream = http.ByteStream(file.readStream!);
     final bytes = await stream.toBytes();
     
+    // Upload to Firestore
+    final firestoreRes = await _uploadToFirestore(bytes, file);
+    if (firestoreRes.isLeft()) {
+      return Left(firestoreRes.swap().getOrElse(() => Failure('Could not add book to Firestore')));
+    }
+    
     // Upload book to storage
-    final uploadRes = await _firebaseService.uploadBook(file, bytes);
-    return uploadRes.fold(
-      (failure) {
-        return Left(failure);
-      },
-      (_) async {
-        // Add book details to database if upload successful
-        return await _handleBookUploaded(bytes, file);
-      }
-    );
+    final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(file, bytes);
+    if (uploadRes.isLeft()) {
+      return Left(uploadRes.swap().getOrElse(() => Failure('Could not add book to Firebase Storage')));
+    }
+
+    return firestoreRes;
   }
 
-  Future<Either<Failure, Book>> _handleBookUploaded(Uint8List bytes, PlatformFile file) async {
-    final EpubBookRef openedBook = await EpubReader.openBook(bytes);
-    final res = await _firebaseService.uploadCoverPhoto(file, openedBook);
-    final String? imageUrl = res.fold(
-      (failure) => null,
-      (url) => url,
-    );
+  Future<Either<Failure, Book>> _uploadToFirestore(Uint8List bytes, PlatformFile file) async {
+    try {
+      final EpubBookRef openedBook = await EpubReader.openBook(bytes);
 
-    final added = await _firebaseService.addBook(file, openedBook, imageUrl: imageUrl);
-    return added.fold(
-      (failure) => Left(failure),
-      (book) async {
-        return Right(book);
-      },
-    );
+      final res = await _firebaseService.uploadCoverPhoto(file, openedBook);
+      final String? imageUrl = res.fold(
+        (failure) => null,
+        (url) => url,
+      );
+
+      final added = await _firebaseService.addBook(file, openedBook, imageUrl: imageUrl);
+      return added.fold(
+        (failure) => Left(failure),
+        (book) async {
+          return Right(book);
+        },
+      );
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
+    }
   }
 
 
   /// Get a list of books from the user's database
-  Future<Either<Failure, Shelf>> addShelf(String name) async {
+  Future<Either<Failure, BookCollection>> addCollection(String name) async {
     // Upload book to storage
-    return await _firebaseService.addShelf(name);
+    return await _firebaseService.addCollection(name);
   }
 
 }

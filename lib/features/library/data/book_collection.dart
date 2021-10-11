@@ -1,30 +1,31 @@
 import 'dart:convert';
 
-import 'item.dart';
+import 'package:equatable/equatable.dart';
 
-class Shelf extends Item {
+class BookCollection extends Equatable {
+
+  final String id;
+  final String userId;
   final String name;
 
-  const Shelf({
-    required id,
-    required userId,
+  const BookCollection({
+    required this.id,
+    required this.userId,
     required this.name,
-  }) : super(id: id, userId: userId);
+  });
 
-  @override
-  Shelf copyWith({
+  BookCollection copyWith({
     String? id,
     String? userId,
     String? name,
   }) {
-    return Shelf(
+    return BookCollection(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       name: name ?? this.name,
     );
   }
 
-  @override
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -33,18 +34,17 @@ class Shelf extends Item {
     };
   }
 
-  factory Shelf.fromMap(Map<String, dynamic> map) {
-    return Shelf(
+  String toJson() => json.encode(toMap());
+
+  factory BookCollection.fromMap(Map<String, dynamic> map) {
+    return BookCollection(
       id: map['id'],
       userId: map['userId'],
       name: map['name'],
     );
   }
 
-  @override
-  String toJson() => json.encode(toMap());
-
-  factory Shelf.fromJson(String source) => Shelf.fromMap(json.decode(source));
+  factory BookCollection.fromJson(String source) => BookCollection.fromMap(json.decode(source));
 
   @override
   bool get stringify => true;

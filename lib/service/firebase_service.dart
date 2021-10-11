@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/base_firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
@@ -184,21 +184,48 @@ class FirebaseService extends BaseFirebaseService {
     return true;
   }
 
-  // Database
+  // Database *************************************************************************
 
-  static final CollectionReference<Book> _bookCollection = _firestore.collection('books')
+  static final CollectionReference<BookCollection> _collectionsRef = _firestore.collection('collections').withConverter<BookCollection>(
+    fromFirestore: (doc, _) {
+      final data = doc.data();
+      data!.addAll({'id': doc.id});
+      return BookCollection.fromMap(data);
+    },
+    toFirestore: (collection, _) => collection.toMap(),
+  );
+
+  // Get books stream
+  static Stream<QuerySnapshot<BookCollection>> get collectionsStream {
+    return _collectionsRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
+  }
+
+  // Provide the stream with riverpod for easy access
+  final collectionsStreamProvider = StreamProvider<List<BookCollection>>((ref) async* {
+    // Parse the value received and emit a Message instance
+    try {
+      await for (final value in collectionsStream) {
+        yield value.docs.map((e) => e.data()).toList();
+      }
+    } on FirebaseException catch (_) {
+
+    }
+    
+  });
+
+  static final CollectionReference<Book> _booksRef = _firestore.collection('books')
     .withConverter<Book>(
       fromFirestore: (doc, _) {
         final data = doc.data();
         data!.addAll({'id': doc.id});
-        return Book.fromMap(data);
+        return Book.fromMapFirebase(data);
       },
-      toFirestore: (book, _) => book.toMap(),
+      toFirestore: (book, _) => book.toMapFirebase(),
     );
 
   // Get books stream
   static Stream<QuerySnapshot<Book>> get booksStream {
-    return _bookCollection.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
+    return _booksRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
   }
 
   // Provide the stream with riverpod for easy access
@@ -223,7 +250,7 @@ class FirebaseService extends BaseFirebaseService {
         return Left(Failure('User not logged in'));
       }
       
-      final bookQuery = await _bookCollection.where('userId', isEqualTo: userId).get();
+      final bookQuery = await _booksRef.where('userId', isEqualTo: userId).get();
       final books = bookQuery.docs.map((doc) => doc.data()).toList();
       
       // Return our books to the caller in case they care
@@ -246,17 +273,36 @@ class FirebaseService extends BaseFirebaseService {
       }
 
       // Create a book object to add to the collection
+      final title = openedBook.Title ?? '';
+      final subtitle = openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
+      final filename = file.name;
       final String id = uuid.v4();
       final book = Book(
         id: id,
         userId: userId,
-        title: openedBook.Title ?? '',
-        authors: openedBook.AuthorList?.join(',') ?? '',
+        title: title,
+        subtitle: subtitle,
         addedDate: DateTime.now().toUtc(),
-        filename: file.name,
+        filename: filename,
         imageUrl: imageUrl,
+        collectionIds: ['$userId-Default'],
       );
-      await _bookCollection.doc(id).set(book);
+
+      // Check books for duplicates, return Failure if any are found
+      final duplicatesQuerySnapshot = await _booksRef
+        .where('userId', isEqualTo: userId)
+        .where('title', isEqualTo: title)
+        .where('filename', isEqualTo: filename)
+        .get();
+
+      final duplicates = duplicatesQuerySnapshot.docs;
+
+      if (duplicates.isNotEmpty) {
+        return Left(Failure('Book has already been uploaded'));
+      }
+
+      // Add book to Firestore
+      await _booksRef.doc(id).set(book);
       
       // Return our books to the caller in case they care
       // ignore: prefer_const_constructors
@@ -270,7 +316,7 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Upload a book to Firebase Storage
   @override
-  Future<Either<Failure, void>> uploadBook(PlatformFile file, Uint8List bytes) async {
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, Uint8List bytes) async {
     const String epubContentType = 'application/epub+zip';
 
     try {
@@ -377,28 +423,23 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Create a shelf in firestore
   @override
-  Future<Either<Failure, Shelf>> addShelf(String shelfName) async {
+  Future<Either<Failure, BookCollection>> addCollection(String collectionName) async {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
         return Left(Failure('User not logged in'));
       }
 
-      final CollectionReference<Shelf> shelvesRef = _firestore.collection('shelves').withConverter<Shelf>(
-        fromFirestore: (snapshot, _) => Shelf.fromMap(snapshot.data()!),
-        toFirestore: (shelf, _) => shelf.toMap(),
-      );
-
       // Create a shelf with a custom id so that it can easily be referenced later
-      final shelf = Shelf(
-        id: '$userId-$shelfName',
-        name: shelfName,
+      final bookCollection = BookCollection(
+        id: '$userId-$collectionName',
+        name: collectionName,
         userId: userId
       );
-      await shelvesRef.doc('$userId-$shelfName').set(shelf);
+      await _collectionsRef.doc('$userId-$collectionName').set(bookCollection);
       
       // Return the shelf to the caller in case they care
-      return Right(shelf);
+      return Right(bookCollection);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(e.message ?? e.toString(), e.code));
     } on Exception catch (e) {

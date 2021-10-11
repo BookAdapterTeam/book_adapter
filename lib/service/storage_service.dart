@@ -66,27 +66,32 @@ class StorageService {
     bool withData = false,
     bool withReadStream = false,
   }) async {
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
-      dialogTitle: dialogTitle,
-      type: type,
-      allowedExtensions: allowedExtensions,
-      onFileLoading: onFileLoading,
-      allowCompression: allowCompression,
-      allowMultiple: allowMultiple,
-      withData: withData,
-      withReadStream: withReadStream,
-    );
+    try {
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+        dialogTitle: dialogTitle,
+        type: type,
+        allowedExtensions: allowedExtensions,
+        onFileLoading: onFileLoading,
+        allowCompression: allowCompression,
+        allowMultiple: allowMultiple,
+        withData: withData,
+        withReadStream: withReadStream,
+      );
 
-    if (result == null) {
-      // User canceled the picker
-      return Left(Failure('User canceled the file picker'));
-    }
+      if (result == null) {
+        // User canceled the picker
+        return Left(Failure('User canceled the file picker'));
+      }
 
-    if (allowMultiple) {
-      return Right(handleMultiple(result));
-    } else {
-      return Right(handleSingle(result));
+      if (allowMultiple) {
+        return Right(handleMultiple(result));
+      } else {
+        return Right(handleSingle(result));
+      }
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
     }
+    
   }
 
   List<PlatformFile> handleSingle(FilePickerResult result) {

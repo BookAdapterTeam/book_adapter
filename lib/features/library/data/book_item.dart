@@ -1,40 +1,43 @@
 import 'dart:convert';
 
+import 'package:book_adapter/features/reader/book_reader_view.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'item.dart';
 
 /// A placeholder class that represents a book.
 class Book extends Item {
-  final String title;
   final DateTime addedDate;
-  final String authors;
   final String description;
   final String filename;
-  final String? imageUrl;
   final String genre;
   final String language;
   final DateTime? lastRead;
   final String publisher;
   final int? readingProgress;
   final int? wordCount;
+  final List<String> collectionIds;
 
   const Book({
-    required id,
-    required userId,
-    required this.title,
+    required String id,
+    required String userId,
+    required String title,
     required this.addedDate,
-    this.authors = '',
+    String? subtitle = '',
     this.description = '',
     required this.filename,
-    this.imageUrl,
+    String? imageUrl,
     this.genre = '',
     this.language = '',
     this.lastRead,
     this.publisher = '',
     this.readingProgress,
     this.wordCount,
-  }) : super(id: id, userId: userId);
+    required this.collectionIds,
+  }) : super(id: id, userId: userId, title: title, subtitle: subtitle, imageUrl: imageUrl);
+
+  @override
+  String get routeTo => BookReaderView.routeName;
 
   @override
   Book copyWith({
@@ -42,7 +45,7 @@ class Book extends Item {
     String? userId,
     String? title,
     DateTime? addedDate,
-    String? authors,
+    String? subtitle,
     String? description,
     String? filename,
     String? imageUrl,
@@ -52,13 +55,14 @@ class Book extends Item {
     String? publisher,
     int? readingProgress,
     int? wordCount,
+    List<String>? collectionIds,
   }) {
     return Book(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       title: title ?? this.title,
       addedDate: addedDate ?? this.addedDate,
-      authors: authors ?? this.authors,
+      subtitle: subtitle ?? this.subtitle,
       description: description ?? this.description,
       filename: filename ?? this.filename,
       imageUrl: imageUrl ?? this.imageUrl,
@@ -68,16 +72,18 @@ class Book extends Item {
       publisher: publisher ?? this.publisher,
       readingProgress: readingProgress ?? this.readingProgress,
       wordCount: wordCount ?? this.wordCount,
+      collectionIds: collectionIds ?? this.collectionIds,
     );
   }
 
+  @override
   Map<String, dynamic> toMapSerializable() {
     return {
       'id': id,
       'userId': userId,
       'title': title,
       'addedDate': addedDate.millisecondsSinceEpoch,
-      'authors': authors,
+      'authors': subtitle,
       'description': description,
       'filename': filename,
       'imageUrl': imageUrl,
@@ -87,6 +93,7 @@ class Book extends Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
+      'collectionIds': collectionIds
     };
   }
 
@@ -97,7 +104,7 @@ class Book extends Item {
       userId: map['userId'],
       title: map['title'],
       addedDate: DateTime.fromMillisecondsSinceEpoch(map['addedDate']),
-      authors: map['authors'],
+      subtitle: map['authors'],
       description: map['description'],
       filename: map['filename'],
       imageUrl: map['imageUrl'],
@@ -107,17 +114,18 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
+      collectionIds: map['collectionIds'],
     );
   }
 
   @override
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toMapFirebase() {
     return {
       'id': id,
       'userId': userId,
       'title': title,
       'addedDate': Timestamp.fromDate(addedDate),
-      'authors': authors,
+      'authors': subtitle,
       'description': description,
       'filename': filename,
       'imageUrl': imageUrl,
@@ -127,16 +135,17 @@ class Book extends Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
+      'collectionIds': collectionIds
     };
   }
 
-  factory Book.fromMap(Map<String, dynamic> map) {
+  factory Book.fromMapFirebase(Map<String, dynamic> map) {
     return Book(
       id: map['id'],
       userId: map['userId'],
       title: map['title'],
       addedDate: map['addedDate'].toDate(),
-      authors: map['authors'],
+      subtitle: map['authors'],
       description: map['description'],
       filename: map['filename'],
       imageUrl: map['imageUrl'],
@@ -146,13 +155,14 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
+      collectionIds: List<String>.from(map['collectionIds']),
     );
   }
 
   @override
-  String toJson() => json.encode(toMap());
+  String toJsonFirebase() => json.encode(toMapFirebase());
 
-  factory Book.fromJson(String source) => Book.fromMap(json.decode(source));
+  factory Book.fromJsonFirebase(String source) => Book.fromMapFirebase(json.decode(source));
 
   @override
   bool get stringify => true;
@@ -164,7 +174,7 @@ class Book extends Item {
       userId,
       title,
       addedDate,
-      authors,
+      subtitle ?? 'No subtitle',
       description,
       filename,
       imageUrl ?? 'No image',
@@ -174,6 +184,7 @@ class Book extends Item {
       publisher,
       readingProgress ?? 'Not started reading',
       wordCount ?? 'Unknown word count',
+      collectionIds,
     ];
   }
 }

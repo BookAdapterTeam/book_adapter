@@ -1,6 +1,6 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +8,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final libraryViewController = StateNotifierProvider<LibraryViewController, LibraryViewData>((ref) {
   final bookStreamProvider = ref.watch(firebaseControllerProvider).bookStreamProvider;
+  final collectionsStreamProvider = ref.watch(firebaseControllerProvider).collectionsStreamProvider;
 
   final books = ref.watch(bookStreamProvider);
-  final data = LibraryViewData(books: books.asData?.value);
+  final collections = ref.watch(collectionsStreamProvider);
+
+  final data = LibraryViewData(books: books.asData?.value, collections: collections.asData?.value);
   return LibraryViewController(ref.read, data: data);
 });
 
@@ -49,6 +52,10 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     }
   }
 
+  Future<void> deleteBook(String bookId) {
+    throw UnimplementedError();
+  }
+
   Future<void> signOut() async {
     await _read(firebaseControllerProvider).signOut();
   }
@@ -56,19 +63,19 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
 class LibraryViewData {
   final List<Book>? books;
-  final List<Shelf> shelves;
+  final List<BookCollection>? collections;
   LibraryViewData({
-    this.books = const [],
-    this.shelves = const [],
+    this.books,
+    this.collections,
   });
 
   LibraryViewData copyWith({
     List<Book>? books,
-    List<Shelf>? shelves,
+    List<BookCollection>? collections,
   }) {
     return LibraryViewData(
       books: books ?? this.books,
-      shelves: shelves ?? this.shelves,
+      collections: collections ?? this.collections,
     );
   }
 }
