@@ -197,7 +197,7 @@ class FirebaseService extends BaseFirebaseService {
         yield value.docs.map((e) => e.data()).toList();
       }
     } on FirebaseException catch (_) {
-      
+
     }
     
   });
@@ -273,7 +273,10 @@ class FirebaseService extends BaseFirebaseService {
       }
       final String filename = file.name;
 
-      await uploadFile(userId, bytes, filename, epubContentType);
+      final res = await uploadFile(userId, bytes, filename, epubContentType);
+      if (res != null) {
+        return Left(res);
+      }
       
       return const Right(null);
     } on FirebaseException catch (e) {
@@ -334,28 +337,33 @@ class FirebaseService extends BaseFirebaseService {
       final bytes = img.encodePng(image);
       final String filename = '${file.name}.png';
 
-      await uploadFile(userId, Uint8List.fromList(bytes), filename, imageContentType);
+      final res = await uploadFile(userId, Uint8List.fromList(bytes), filename, imageContentType);
+      if (res != null) {
+        return Left(res);
+      }
       
       return const Right(null);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
     } on Exception catch (e) {
       return Left(Failure(e.toString()));
+    } catch (e) {
+      return Left(Failure(e.toString()));
     }
   }
 
   @override
-  Future<void> uploadFile(String userId, Uint8List bytes, String filename, String contentType) async {
+  Future<Failure?> uploadFile(String userId, Uint8List bytes, String filename, String contentType) async {
     try {
       // Check if file exists, exit if it does
       await _storage.ref('$userId/$filename').getDownloadURL();
-      throw Exception('File already exists');
+      return Failure('File already exists');
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
       await _storage.ref('$userId/$filename').putData(
         bytes, SettableMetadata(contentType: contentType),
       );
-      return;
+      return null;
     }
   }
 
