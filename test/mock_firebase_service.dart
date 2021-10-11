@@ -134,7 +134,7 @@ class MockFirebaseService implements FirebaseService {
   }
   
   @override
-  Future<void> uploadFile(String userId, Uint8List bytes, String filename, String contentType) {
+  Future<Failure?> uploadFile(String userId, Uint8List bytes, String filename, String contentType) {
     // TODO: implement uploadFile
     throw UnimplementedError();
   }
