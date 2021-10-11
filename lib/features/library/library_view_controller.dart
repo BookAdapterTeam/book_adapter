@@ -8,8 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final libraryViewController = StateNotifierProvider<LibraryViewController, LibraryViewData>((ref) {
   final bookStreamProvider = ref.watch(firebaseControllerProvider).bookStreamProvider;
+
   final books = ref.watch(bookStreamProvider);
-  final data = LibraryViewData(books: books.data?.value);
+  final data = LibraryViewData(books: books.asData?.value);
   return LibraryViewController(ref.read, data: data);
 });
 

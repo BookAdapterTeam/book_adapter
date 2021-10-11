@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
@@ -213,8 +214,6 @@ class FirebaseController {
         return await _handleBookUploaded(bytes, file);
       }
     );
-
-    
   }
 
   Future<Either<Failure, Book>> _handleBookUploaded(Uint8List bytes, PlatformFile file) async {
@@ -227,9 +226,13 @@ class FirebaseController {
         return Right(book);
       },
     );
-
-    
   }
 
+
+  /// Get a list of books from the user's database
+  Future<Either<Failure, Shelf>> addShelf(String name) async {
+    // Upload book to storage
+    return await _firebaseService.addShelf(name);
+  }
 
 }

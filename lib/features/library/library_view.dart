@@ -17,7 +17,7 @@ class LibraryView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewData data = ref.watch(libraryViewController);
     final userAsync = ref.watch(authStateChangesProvider);
-    final user = userAsync.data?.value;
+    final user = userAsync.asData?.value;
 
     return Scaffold(
       appBar: AppBar(
