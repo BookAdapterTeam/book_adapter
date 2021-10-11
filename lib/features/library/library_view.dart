@@ -149,9 +149,12 @@ class BookCollectionList extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewData data = ref.watch(libraryViewController);
-    final items = data.books?.where((book) => book.collectionIds.contains(collection.id)).toList() ?? [];
+    final items = data.books?.where((book) => book.collectionIds.contains(collection.id))
+      .toList() ?? [];
+    items.sort((a, b) => a.title.compareTo(b.title));
+
     return ImplicitlyAnimatedList<Item>(
-      padding: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.only(bottom: 16, top: 4),
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       key: ValueKey(collection.id),

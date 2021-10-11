@@ -132,7 +132,7 @@ class MockFirebaseService implements FirebaseService {
   StreamProvider<List<Book>> get bookStreamProvider => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, void>> uploadBook(PlatformFile file, Uint8List bytes) {
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, Uint8List bytes) {
     // TODO: implement uploadBook
     throw UnimplementedError();
   }

@@ -109,7 +109,7 @@ abstract class BaseFirebaseService {
   Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default'});
 
   /// Upload a book to Firebase Storage
-  Future<Either<Failure, void>> uploadBook(PlatformFile file, Uint8List bytes);
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, Uint8List bytes);
 
   /// Upload a book cover photo to Firebase Storage
   Future<Either<Failure, void>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook);

@@ -273,17 +273,35 @@ class FirebaseService extends BaseFirebaseService {
       }
 
       // Create a book object to add to the collection
+      final title = openedBook.Title ?? '';
+      final subtitle = openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
+      final filename = file.name;
       final String id = uuid.v4();
       final book = Book(
         id: id,
         userId: userId,
-        title: openedBook.Title ?? '',
-        subtitle: openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '',
+        title: title,
+        subtitle: subtitle,
         addedDate: DateTime.now().toUtc(),
-        filename: file.name,
+        filename: filename,
         imageUrl: imageUrl,
         collectionIds: ['$userId-Default'],
       );
+
+      // Check books for duplicates, return Failure if any are found
+      final duplicatesQuerySnapshot = await _booksRef
+        .where('userId', isEqualTo: userId)
+        .where('title', isEqualTo: title)
+        .where('filename', isEqualTo: filename)
+        .get();
+
+      final duplicates = duplicatesQuerySnapshot.docs;
+
+      if (duplicates.isNotEmpty) {
+        return Left(Failure('Book has already been uploaded'));
+      }
+
+      // Add book to Firestore
       await _booksRef.doc(id).set(book);
       
       // Return our books to the caller in case they care
@@ -298,7 +316,7 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Upload a book to Firebase Storage
   @override
-  Future<Either<Failure, void>> uploadBook(PlatformFile file, Uint8List bytes) async {
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, Uint8List bytes) async {
     const String epubContentType = 'application/epub+zip';
 
     try {

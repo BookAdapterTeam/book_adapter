@@ -232,34 +232,41 @@ class FirebaseController {
     final stream = http.ByteStream(file.readStream!);
     final bytes = await stream.toBytes();
     
+    // Upload to Firestore
+    final firestoreRes = await _uploadToFirestore(bytes, file);
+    if (firestoreRes.isLeft()) {
+      return Left(firestoreRes.swap().getOrElse(() => Failure('Could not add book to Firestore')));
+    }
+    
     // Upload book to storage
-    final uploadRes = await _firebaseService.uploadBook(file, bytes);
-    return uploadRes.fold(
-      (failure) {
-        return Left(failure);
-      },
-      (_) async {
-        // Add book details to database if upload successful
-        return await _handleBookUploaded(bytes, file);
-      }
-    );
+    final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(file, bytes);
+    if (uploadRes.isLeft()) {
+      return Left(uploadRes.swap().getOrElse(() => Failure('Could not add book to Firebase Storage')));
+    }
+
+    return firestoreRes;
   }
 
-  Future<Either<Failure, Book>> _handleBookUploaded(Uint8List bytes, PlatformFile file) async {
-    final EpubBookRef openedBook = await EpubReader.openBook(bytes);
-    final res = await _firebaseService.uploadCoverPhoto(file, openedBook);
-    final String? imageUrl = res.fold(
-      (failure) => null,
-      (url) => url,
-    );
+  Future<Either<Failure, Book>> _uploadToFirestore(Uint8List bytes, PlatformFile file) async {
+    try {
+      final EpubBookRef openedBook = await EpubReader.openBook(bytes);
 
-    final added = await _firebaseService.addBook(file, openedBook, imageUrl: imageUrl);
-    return added.fold(
-      (failure) => Left(failure),
-      (book) async {
-        return Right(book);
-      },
-    );
+      final res = await _firebaseService.uploadCoverPhoto(file, openedBook);
+      final String? imageUrl = res.fold(
+        (failure) => null,
+        (url) => url,
+      );
+
+      final added = await _firebaseService.addBook(file, openedBook, imageUrl: imageUrl);
+      return added.fold(
+        (failure) => Left(failure),
+        (book) async {
+          return Right(book);
+        },
+      );
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
+    }
   }
 
 
