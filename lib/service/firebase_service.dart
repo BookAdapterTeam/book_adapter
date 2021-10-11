@@ -184,21 +184,48 @@ class FirebaseService extends BaseFirebaseService {
     return true;
   }
 
-  // Database
+  // Database *************************************************************************
 
-  static final CollectionReference<Book> _bookCollection = _firestore.collection('books')
+  static final CollectionReference<BookCollection> _collectionsRef = _firestore.collection('collections').withConverter<BookCollection>(
+    fromFirestore: (doc, _) {
+      final data = doc.data();
+      data!.addAll({'id': doc.id});
+      return BookCollection.fromMap(data);
+    },
+    toFirestore: (collection, _) => collection.toMap(),
+  );
+
+  // Get books stream
+  static Stream<QuerySnapshot<BookCollection>> get collectionsStream {
+    return _collectionsRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
+  }
+
+  // Provide the stream with riverpod for easy access
+  final collectionsStreamProvider = StreamProvider<List<BookCollection>>((ref) async* {
+    // Parse the value received and emit a Message instance
+    try {
+      await for (final value in collectionsStream) {
+        yield value.docs.map((e) => e.data()).toList();
+      }
+    } on FirebaseException catch (_) {
+
+    }
+    
+  });
+
+  static final CollectionReference<Book> _booksRef = _firestore.collection('books')
     .withConverter<Book>(
       fromFirestore: (doc, _) {
         final data = doc.data();
         data!.addAll({'id': doc.id});
-        return Book.fromMap(data);
+        return Book.fromMapFirebase(data);
       },
       toFirestore: (book, _) => book.toMapFirebase(),
     );
 
   // Get books stream
   static Stream<QuerySnapshot<Book>> get booksStream {
-    return _bookCollection.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
+    return _booksRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
   }
 
   // Provide the stream with riverpod for easy access
@@ -223,7 +250,7 @@ class FirebaseService extends BaseFirebaseService {
         return Left(Failure('User not logged in'));
       }
       
-      final bookQuery = await _bookCollection.where('userId', isEqualTo: userId).get();
+      final bookQuery = await _booksRef.where('userId', isEqualTo: userId).get();
       final books = bookQuery.docs.map((doc) => doc.data()).toList();
       
       // Return our books to the caller in case they care
@@ -251,12 +278,12 @@ class FirebaseService extends BaseFirebaseService {
         id: id,
         userId: userId,
         title: openedBook.Title ?? '',
-        subtitle: openedBook.AuthorList?.join(',') ?? '',
+        subtitle: openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '',
         addedDate: DateTime.now().toUtc(),
         filename: file.name,
         imageUrl: imageUrl,
       );
-      await _bookCollection.doc(id).set(book);
+      await _booksRef.doc(id).set(book);
       
       // Return our books to the caller in case they care
       // ignore: prefer_const_constructors
@@ -375,15 +402,6 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
-  static final CollectionReference<BookCollection> bookCollectionsRef = _firestore.collection('collections').withConverter<BookCollection>(
-    fromFirestore: (doc, _) {
-      final data = doc.data();
-      data!.addAll({'id': doc.id});
-      return BookCollection.fromMap(data);
-    },
-    toFirestore: (collection, _) => collection.toMap(),
-  );
-
   /// Create a shelf in firestore
   @override
   Future<Either<Failure, BookCollection>> addCollection(String collectionName) async {
@@ -399,7 +417,7 @@ class FirebaseService extends BaseFirebaseService {
         name: collectionName,
         userId: userId
       );
-      await bookCollectionsRef.doc('$userId-$collectionName').set(bookCollection);
+      await _collectionsRef.doc('$userId-$collectionName').set(bookCollection);
       
       // Return the shelf to the caller in case they care
       return Right(bookCollection);

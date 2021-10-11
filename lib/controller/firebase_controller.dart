@@ -216,6 +216,8 @@ class FirebaseController {
 
   StreamProvider<List<Book>> get bookStreamProvider => _firebaseService.bookStreamProvider;
 
+  StreamProvider<List<BookCollection>> get collectionsStreamProvider => _firebaseService.collectionsStreamProvider;
+
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
     return _firebaseService.getBooks();
