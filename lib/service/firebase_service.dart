@@ -186,7 +186,7 @@ class FirebaseService extends BaseFirebaseService {
 
   // Get books stream
   static Stream<QuerySnapshot<Book>> get booksStream {
-    return _bookCollection.snapshots();
+    return _bookCollection.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
   }
 
   // Provide the stream with riverpod for easy access
@@ -382,13 +382,12 @@ class FirebaseService extends BaseFirebaseService {
       );
 
       // Create a shelf with a custom id so that it can easily be referenced later
-      final String id = uuid.v4();
       final shelf = Shelf(
         id: '$userId-$shelfName',
         name: shelfName,
         userId: userId
       );
-      await shelvesRef.doc(id).set(shelf);
+      await shelvesRef.doc('$userId-$shelfName').set(shelf);
       
       // Return the shelf to the caller in case they care
       return Right(shelf);
