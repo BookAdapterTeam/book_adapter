@@ -148,4 +148,8 @@ class MockFirebaseService implements FirebaseService {
     // TODO: implement uploadFile
     throw UnimplementedError();
   }
+
+  @override
+  // TODO: implement userChanges
+  Stream<User?> get userChanges => throw UnimplementedError();
 }

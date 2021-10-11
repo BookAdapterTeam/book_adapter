@@ -5,9 +5,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final userModelProvider = StateNotifierProvider<UserModelNotifier, UserData>((ref) {
-  final firebaseController = ref.watch(firebaseControllerProvider);
+  final userStreamAsyncValue = ref.watch(userChangesProvider);
+  final user = userStreamAsyncValue.data?.value;
   
-  final userData = UserData(currentUser: firebaseController.currentUser);
+  final userData = UserData(currentUser: user);
 
   return UserModelNotifier(userData);
 });

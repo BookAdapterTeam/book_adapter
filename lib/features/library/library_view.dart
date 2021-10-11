@@ -5,8 +5,10 @@ import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:book_adapter/features/reader/book_reader_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 
 /// Displays a list of BookItems.
 class LibraryView extends ConsumerWidget {
@@ -17,33 +19,13 @@ class LibraryView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewData data = ref.watch(libraryViewController);
-    final userAsync = ref.watch(authStateChangesProvider);
-    final user = userAsync.asData?.value;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Library'.i18n),
-        actions: [
-          const _AddBookButton(),
-          if (user != null) ... [
-            IconButton(
-              key: const ValueKey('profile'),
-              iconSize: 32,
-              icon: user.photoURL != null 
-                ? CircleAvatar(
-                  backgroundImage:
-                    NetworkImage(user.photoURL!),
-                  backgroundColor: Colors.grey,
-                )
-                : const Icon(Icons.account_circle),
-              onPressed: () {
-                // Navigate to the settings page. If the user leaves and returns
-                // to the app after it has been killed while running in the
-                // background, the navigation stack is restored.
-                Navigator.restorablePushNamed(context, ProfileView.routeName);
-              },
-            ),
-          ],
+        actions: const [
+          _AddBookButton(),
+          _ProfileButton(),
         ],
       ),
       body: data.books != null
@@ -64,6 +46,61 @@ class _AddBookButton extends ConsumerWidget {
       iconSize: 36,
       icon: const Icon(Icons.add_rounded)
     );
+  }
+}
+
+class _ProfileButton extends ConsumerWidget {
+  const _ProfileButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final userStreamAsyncValue = ref.watch(userChangesProvider);
+    final log = Logger();
+    return userStreamAsyncValue.when(
+      data: (user) {
+        return IconButton(
+          key: const ValueKey('profile'),
+          icon: user != null
+                ? _userLoggedIn(user)
+                : const Icon(Icons.account_circle),
+          onPressed: () {
+            // Navigate to the settings page. If the user leaves and returns
+            // to the app after it has been killed while running in the
+            // background, the navigation stack is restored.
+            Navigator.restorablePushNamed(context, ProfileView.routeName);
+          },
+        );
+      },
+      loading: (userA) => IconButton(
+          key: const ValueKey('profile'),
+          icon: const Icon(Icons.account_circle),
+          onPressed: () {
+            Navigator.restorablePushNamed(context, ProfileView.routeName);
+          },
+        ),
+      error: (e, st, userA) {
+        log.e('Error getting user data', e, st);
+        return IconButton(
+          key: const ValueKey('profile'),
+          icon: const Icon(Icons.account_circle),
+          onPressed: () {
+            Navigator.restorablePushNamed(context, ProfileView.routeName);
+          },
+        );
+      },
+    );
+  }
+
+  Widget _userLoggedIn(User user) {
+    return user.photoURL != null 
+        ? CircleAvatar(
+          backgroundImage:
+            NetworkImage(user.photoURL!),
+          backgroundColor: Colors.grey,
+        )
+        : const Icon(Icons.account_circle);
   }
 }
 

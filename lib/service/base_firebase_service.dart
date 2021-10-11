@@ -10,15 +10,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 /// A utility class to handle all Firebase calls
 abstract class BaseFirebaseService {
-  BaseFirebaseService(this._firebaseAuth);
-
-  final FirebaseAuth _firebaseAuth;
+  BaseFirebaseService();
 
   // Authentication
 
   /// Notifies about changes to the user's sign-in state (such as sign-in or
   /// sign-out).
-  Stream<User?> get authStateChange => _firebaseAuth.authStateChanges();
+  Stream<User?> get authStateChange;
 
   /// Returns the current [User] if they are currently signed-in, or `null` if
   /// not.
@@ -27,6 +25,17 @@ abstract class BaseFirebaseService {
   /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
   /// subscribe to updates.
   User? get currentUser;
+
+  /// Notifies about changes to any user updates.
+  ///
+  /// This is a superset of both [authStateChanges] and [idTokenChanges]. It
+  /// provides events on all user changes, such as when credentials are linked,
+  /// unlinked and when updates to the user profile are made. The purpose of
+  /// this Stream is for listening to realtime updates to the user state
+  /// (signed-in, signed-out, different user & token refresh) without
+  /// manually having to call [reload] and then rehydrating changes to your
+  /// application.
+  Stream<User?> get userChanges;
 
   /// Attempts to sign in a user with the given email address and password.
   ///

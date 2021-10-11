@@ -23,7 +23,7 @@ final firebaseServiceProvider = Provider<FirebaseService>((ref) {
 
 /// A utility class to handle all Firebase calls
 class FirebaseService extends BaseFirebaseService {
-  FirebaseService() : super(_auth);
+  FirebaseService() : super();
 
   static final FirebaseAuth _auth = FirebaseAuth.instance;
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -36,6 +36,18 @@ class FirebaseService extends BaseFirebaseService {
   /// sign-out).
   @override
   Stream<User?> get authStateChange => _auth.authStateChanges();
+
+  /// Notifies about changes to any user updates.
+  ///
+  /// This is a superset of both [authStateChanges] and [idTokenChanges]. It
+  /// provides events on all user changes, such as when credentials are linked,
+  /// unlinked and when updates to the user profile are made. The purpose of
+  /// this Stream is for listening to realtime updates to the user state
+  /// (signed-in, signed-out, different user & token refresh) without
+  /// manually having to call [reload] and then rehydrating changes to your
+  /// application.
+  @override
+  Stream<User?> get userChanges => _auth.userChanges();
 
   /// Attempts to sign in a user with the given email address and password.
   ///
