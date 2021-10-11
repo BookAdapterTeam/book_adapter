@@ -326,10 +326,10 @@ class FirebaseService extends BaseFirebaseService {
         return Left(Failure('Could not get cover image for upload'));
       }
 
-      final bytes = image.getBytes();
+      final bytes = img.encodePng(image);
       final String filename = '${file.name}.png';
 
-      await uploadFile(userId, bytes, filename, imageContentType);
+      await uploadFile(userId, Uint8List.fromList(bytes), filename, imageContentType);
       
       return const Right(null);
     } on FirebaseException catch (e) {
