@@ -1,8 +1,8 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/features/reader/book_reader_view.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/profile/profile_view.dart';
+import 'package:book_adapter/features/reader/book_reader_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -45,9 +45,9 @@ class LibraryView extends ConsumerWidget {
           ],
         ],
       ),
-      body: !data.isLoading 
-      ? _LibraryListView(books: data.books)
-      : const Center(child: CircularProgressIndicator(key: ValueKey('loading_books'))),
+      body: data.books != null
+        ? _LibraryListView(books: data.books!)
+        : const Center(child: CircularProgressIndicator(key: ValueKey('loading_books'))),
     );
   }
 }
@@ -59,14 +59,7 @@ class _AddBookButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
     return IconButton(
-      onPressed: () async {
-        final message = await viewController.addBooks();
-        // TODO: Show snackbar if a book upload failed. Currently libraryViewController does not return failures for upload fails
-        if (message != null) {
-          final SnackBar snackBar = SnackBar(content: Text(message));
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        }
-      },
+      onPressed: () => viewController.addBooks(context),
       iconSize: 36,
       icon: const Icon(Icons.add_rounded)
     );

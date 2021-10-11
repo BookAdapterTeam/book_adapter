@@ -1,13 +1,15 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/controller/library_controller.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/shelf.dart';
+import 'package:book_adapter/service/storage_service.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final libraryViewController = StateNotifierProvider<LibraryViewController, LibraryViewData>((ref) {
   final bookStreamProvider = ref.watch(firebaseControllerProvider).bookStreamProvider;
   final books = ref.watch(bookStreamProvider);
-  final data = LibraryViewData(books: books.data?.value ?? []);
+  final data = LibraryViewData(books: books.data?.value);
   return LibraryViewController(ref.read, data: data);
 });
 
@@ -17,12 +19,33 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   final Reader _read;
 
-  Future<String?> addBooks() async {
-    final res = await _read(libraryControllerProvider).addBooks();
-    return res.fold(
-      (failure) => failure.message,
-      (_) {}
+  Future<void> addBooks(BuildContext context) async {
+    // Make storage service call to pick books
+    final sRes = await _read(storageServiceProvider).pickFile(
+      type: FileType.custom,
+      allowedExtensions: ['epub'],
+      allowMultiple: true,
+      withReadStream: true,
     );
+
+    if (sRes.isLeft()) {
+      return;
+    }
+
+    final platformFiles = sRes.getOrElse(() => []);
+
+    final uploadedBooks = <Book>[];
+    for (final file in platformFiles) {
+      // Add book to firebase
+      final fRes = await _read(firebaseControllerProvider).addBook(file);
+      fRes.fold(
+        (failure) {
+          final snackBar = SnackBar(content: Text(failure.message), duration: const Duration(seconds: 2),);
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        },
+        (book) => uploadedBooks.add(book)
+      );
+    }
   }
 
   Future<void> signOut() async {
@@ -31,22 +54,18 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 }
 
 class LibraryViewData {
-  final bool isLoading;
-  final List<Book> books;
+  final List<Book>? books;
   final List<Shelf> shelves;
   LibraryViewData({
-    this.isLoading = false,
     this.books = const [],
     this.shelves = const [],
   });
 
   LibraryViewData copyWith({
-    bool? isLoading,
     List<Book>? books,
     List<Shelf>? shelves,
   }) {
     return LibraryViewData(
-      isLoading: isLoading ?? this.isLoading,
       books: books ?? this.books,
       shelves: shelves ?? this.shelves,
     );

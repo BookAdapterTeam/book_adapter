@@ -1,7 +1,9 @@
+import 'dart:typed_data';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
+import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -204,20 +206,26 @@ class FirebaseController {
     final uploadRes = await _firebaseService.uploadBook(file, bytes);
     return uploadRes.fold(
       (failure) {
-        if (failure.message == 'Book already exists') {
-          print(failure.message);
-        }
         return Left(failure);
       },
       (_) async {
         // Add book details to database if upload successful
-        final res = await _firebaseService.addBook(file, bytes);
-
-        return res.fold(
-          (failure) => Left(failure),
-          (book) => Right(book),
-        );
+        return await _handleBookUploaded(bytes, file);
       }
+    );
+
+    
+  }
+
+  Future<Either<Failure, Book>> _handleBookUploaded(Uint8List bytes, PlatformFile file) async {
+    final EpubBookRef openedBook = await EpubReader.openBook(bytes);
+    final added = await _firebaseService.addBook(file, openedBook);
+    return added.fold(
+      (failure) => Left(failure),
+      (book) async {
+        await _firebaseService.uploadCoverPhoto(file, openedBook);
+        return Right(book);
+      },
     );
 
     

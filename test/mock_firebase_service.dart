@@ -6,6 +6,7 @@ import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:epubx/epubx.dart';
 import 'package:file_picker/src/platform_file.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
@@ -121,7 +122,7 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, Book>> addBook(PlatformFile file, Uint8List bytes, {String collection = 'Default'}) {
+  Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default'}) {
     // TODO: implement addBook
     throw UnimplementedError();
   }
@@ -131,8 +132,20 @@ class MockFirebaseService implements FirebaseService {
     // TODO: implement uploadBook
     throw UnimplementedError();
   }
+  
+  @override
+  Future<void> uploadFile(String userId, Uint8List bytes, String filename, String contentType) {
+    // TODO: implement uploadFile
+    throw UnimplementedError();
+  }
 
   @override
   // TODO: implement bookStreamProvider
   StreamProvider<List<Book>> get bookStreamProvider => throw UnimplementedError();
+
+  @override
+  Future<Either<Failure, void>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook) {
+    // TODO: implement uploadCoverPhoto
+    throw UnimplementedError();
+  }
 }

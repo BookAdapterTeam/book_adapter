@@ -11,7 +11,9 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:image/image.dart' as img;
 import 'package:uuid/uuid.dart';
+
 
 /// Provider to easily get access to the [FirebaseService] functions
 final firebaseServiceProvider = Provider<FirebaseService>((ref) {
@@ -123,6 +125,7 @@ class FirebaseService extends BaseFirebaseService {
   /// You should not use this getter to determine the users current state,
   /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
   /// subscribe to updates.
+  @override
   User? get currentUser {
     return _auth.currentUser;
   }
@@ -218,7 +221,7 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Add a book to Firebase Firestore
   @override
-  Future<Either<Failure, Book>> addBook(PlatformFile file, Uint8List bytes, {String collection = 'Default'}) async {
+  Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default'}) async {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
@@ -226,7 +229,6 @@ class FirebaseService extends BaseFirebaseService {
       }
 
       // Create a book object to add to the collection
-      final EpubBookRef openedBook = await EpubReader.openBook(bytes);
       final String id = uuid.v4();
       final book = Book(
         id: id,
@@ -264,24 +266,91 @@ class FirebaseService extends BaseFirebaseService {
       if (filePath == null) {
         return Left(Failure('File path was null'));
       }
-      // Return failed if file already exists
-      try {
-        await _storage.ref('$userId/${file.name}').getDownloadURL();
-        return(Left(Failure('Book already exists')));
-      } on FirebaseException catch (e) {
-        if (e.code == '403') {
-          await _storage.ref('$userId/${file.name}').putData(
-            bytes, SettableMetadata(contentType: epubContentType),
-          );
-        }
-      } on Exception catch (e) {
-        return Left(Failure(e.toString()));
-      }
+      final String filename = file.name;
+
+      await uploadFile(userId, bytes, filename, epubContentType);
+      
       return const Right(null);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
     } on Exception catch (e) {
       return Left(Failure(e.toString()));
+    }
+  }
+
+  /// Upload a book cover photo to Firebase Storage
+  @override
+  Future<Either<Failure, void>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook) async {
+    const imageContentType = 'image/png';
+    try {
+    
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) {
+        return Left(Failure('User not logged in'));
+      }
+
+      final filePath = file.path;
+      if (filePath == null) {
+        return Left(Failure('File path was null'));
+      }
+
+      Image? image = await openBook.readCover();
+
+      if (image == null) {
+        // No cover image, use the first image instead
+        final imagesRef = openBook.Content?.Images;
+
+        if (imagesRef == null) {
+          // images from epub is null
+          return Left(Failure('Book has no images'));
+        }
+
+        // Use the first image that has a height greater than width to avoid using banners and copyright notices
+        for (final imageRef in imagesRef.values) {
+          final imageContent = await imageRef.readContent();
+          final img.Image? cover = img.decodeImage(imageContent);
+          if (cover != null && cover.height > cover.width) {
+            image = cover;
+            break;
+          }
+        }
+
+        // If no applicable image found above, use the first image
+        if (image == null) {
+          final imageContent = await imagesRef.values.first.readContent();
+          image = img.decodeImage(imageContent);
+        }
+      }
+
+      if (image == null) {
+        return Left(Failure('Could not get cover image for upload'));
+      }
+
+      final bytes = image.getBytes();
+      final String filename = '${file.name}.png';
+
+      await uploadFile(userId, bytes, filename, imageContentType);
+      
+      return const Right(null);
+    } on FirebaseException catch (e) {
+      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  @override
+  Future<void> uploadFile(String userId, Uint8List bytes, String filename, String contentType) async {
+    try {
+      // Check if file exists, exit if it does
+      await _storage.ref('$userId/$filename').getDownloadURL();
+      throw Exception('File already exists');
+    } on FirebaseException catch (_) {
+      // File does not exist, continue uploading
+      await _storage.ref('$userId/$filename').putData(
+        bytes, SettableMetadata(contentType: contentType),
+      );
+      return;
     }
   }
 
