@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:book_adapter/data/failure.dart';
@@ -191,16 +192,20 @@ class FirebaseService extends BaseFirebaseService {
   // Provide the stream with riverpod for easy access
   final bookStreamProvider = StreamProvider<List<Book>>((ref) async* {
     // Parse the value received and emit a Message instance
-    await for (final value in booksStream) {
-      yield value.docs.map((e) => e.data()).toList();
+    try {
+      await for (final value in booksStream) {
+        yield value.docs.map((e) => e.data()).toList();
+      }
+    } on FirebaseException catch (_) {
+      
     }
+    
   });
 
   /// Get a list of books from the user's database
   @override
   Future<Either<Failure, List<Book>>> getBooks() async {
     try {
-
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
         return Left(Failure('User not logged in'));
