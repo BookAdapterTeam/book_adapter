@@ -52,6 +52,10 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     }
   }
 
+  Future<void> deleteBook(String bookId) {
+    throw UnimplementedError();
+  }
+
   Future<void> signOut() async {
     await _read(firebaseControllerProvider).signOut();
   }
