@@ -1,7 +1,8 @@
 import 'dart:typed_data';
+
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
@@ -261,9 +262,9 @@ class FirebaseController {
 
 
   /// Get a list of books from the user's database
-  Future<Either<Failure, Shelf>> addShelf(String name) async {
+  Future<Either<Failure, BookCollection>> addCollection(String name) async {
     // Upload book to storage
-    return await _firebaseService.addShelf(name);
+    return await _firebaseService.addCollection(name);
   }
 
 }

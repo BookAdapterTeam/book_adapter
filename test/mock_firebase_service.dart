@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/shelf.dart';
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
@@ -122,7 +122,7 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, Shelf>> addShelf(String shelfName) {
+  Future<Either<Failure, BookCollection>> addCollection(String shelfName) {
     // TODO: implement addShelf
     throw UnimplementedError();
   }

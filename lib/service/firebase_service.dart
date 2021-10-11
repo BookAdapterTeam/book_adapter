@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:book_adapter/data/failure.dart';
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/base_firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
@@ -193,7 +193,7 @@ class FirebaseService extends BaseFirebaseService {
         data!.addAll({'id': doc.id});
         return Book.fromMap(data);
       },
-      toFirestore: (book, _) => book.toMap(),
+      toFirestore: (book, _) => book.toMapFirebase(),
     );
 
   // Get books stream
@@ -251,7 +251,7 @@ class FirebaseService extends BaseFirebaseService {
         id: id,
         userId: userId,
         title: openedBook.Title ?? '',
-        authors: openedBook.AuthorList?.join(',') ?? '',
+        subtitle: openedBook.AuthorList?.join(',') ?? '',
         addedDate: DateTime.now().toUtc(),
         filename: file.name,
         imageUrl: imageUrl,
@@ -375,30 +375,34 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
+  static final CollectionReference<BookCollection> bookCollectionsRef = _firestore.collection('collections').withConverter<BookCollection>(
+    fromFirestore: (doc, _) {
+      final data = doc.data();
+      data!.addAll({'id': doc.id});
+      return BookCollection.fromMap(data);
+    },
+    toFirestore: (shelf, _) => shelf.toMapFirebase(),
+  );
+
   /// Create a shelf in firestore
   @override
-  Future<Either<Failure, Shelf>> addShelf(String shelfName) async {
+  Future<Either<Failure, BookCollection>> addCollection(String collectionName) async {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
         return Left(Failure('User not logged in'));
       }
 
-      final CollectionReference<Shelf> shelvesRef = _firestore.collection('shelves').withConverter<Shelf>(
-        fromFirestore: (snapshot, _) => Shelf.fromMap(snapshot.data()!),
-        toFirestore: (shelf, _) => shelf.toMap(),
-      );
-
       // Create a shelf with a custom id so that it can easily be referenced later
-      final shelf = Shelf(
-        id: '$userId-$shelfName',
-        name: shelfName,
+      final bookCollection = BookCollection(
+        id: '$userId-$collectionName',
+        title: collectionName,
         userId: userId
       );
-      await shelvesRef.doc('$userId-$shelfName').set(shelf);
+      await bookCollectionsRef.doc('$userId-$collectionName').set(bookCollection);
       
       // Return the shelf to the caller in case they care
-      return Right(shelf);
+      return Right(bookCollection);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(e.message ?? e.toString(), e.code));
     } on Exception catch (e) {

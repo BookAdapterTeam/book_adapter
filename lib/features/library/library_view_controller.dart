@@ -1,6 +1,6 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/shelf.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +56,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
 class LibraryViewData {
   final List<Book>? books;
-  final List<Shelf> shelves;
+  final List<BookCollection> shelves;
   LibraryViewData({
     this.books = const [],
     this.shelves = const [],
@@ -64,7 +64,7 @@ class LibraryViewData {
 
   LibraryViewData copyWith({
     List<Book>? books,
-    List<Shelf>? shelves,
+    List<BookCollection>? shelves,
   }) {
     return LibraryViewData(
       books: books ?? this.books,

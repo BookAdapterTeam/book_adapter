@@ -28,6 +28,7 @@ dependencies:
   hooks_riverpod: ^1.0.0-dev.11
   http: ^0.13.4
   i18n_extension: ^4.1.0
+  implicitly_animated_reorderable_list: ^0.4.1
   intl: ^0.17.0
   logger: ^1.1.0
   multi_screen_layout: ^2.0.0
