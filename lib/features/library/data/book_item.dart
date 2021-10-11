@@ -32,7 +32,7 @@ class Book extends Item {
     this.publisher = '',
     this.readingProgress,
     this.wordCount,
-  }) : super(id: id, userId: userId, title: title, imageUrl: imageUrl);
+  }) : super(id: id, userId: userId, title: title, subtitle: subtitle, imageUrl: imageUrl);
 
   @override
   String get routeTo => BookReaderView.routeName;
@@ -132,7 +132,7 @@ class Book extends Item {
     };
   }
 
-  factory Book.fromMap(Map<String, dynamic> map) {
+  factory Book.fromMapFirebase(Map<String, dynamic> map) {
     return Book(
       id: map['id'],
       userId: map['userId'],
@@ -154,7 +154,7 @@ class Book extends Item {
   @override
   String toJsonFirebase() => json.encode(toMapFirebase());
 
-  factory Book.fromJson(String source) => Book.fromMap(json.decode(source));
+  factory Book.fromJsonFirebase(String source) => Book.fromMapFirebase(json.decode(source));
 
   @override
   bool get stringify => true;
