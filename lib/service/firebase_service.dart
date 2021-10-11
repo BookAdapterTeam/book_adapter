@@ -381,7 +381,7 @@ class FirebaseService extends BaseFirebaseService {
       data!.addAll({'id': doc.id});
       return BookCollection.fromMap(data);
     },
-    toFirestore: (shelf, _) => shelf.toMapFirebase(),
+    toFirestore: (collection, _) => collection.toMap(),
   );
 
   /// Create a shelf in firestore
@@ -396,7 +396,7 @@ class FirebaseService extends BaseFirebaseService {
       // Create a shelf with a custom id so that it can easily be referenced later
       final bookCollection = BookCollection(
         id: '$userId-$collectionName',
-        title: collectionName,
+        name: collectionName,
         userId: userId
       );
       await bookCollectionsRef.doc('$userId-$collectionName').set(bookCollection);

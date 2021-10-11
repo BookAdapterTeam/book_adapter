@@ -1,13 +1,15 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/profile/profile_view.dart';
-import 'package:book_adapter/features/reader/book_reader_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
+import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:logger/logger.dart';
 
 /// Displays a list of BookItems.
@@ -114,33 +116,49 @@ class _LibraryListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return books.isNotEmpty 
-      ? ListView.builder(
-        // Providing a restorationId allows the ListView to restore the
-        // scroll position when a user leaves and returns to the app after it
-        // has been killed while running in the background.
-        restorationId: 'bookListView',
-        itemCount: books.length,
-        itemBuilder: (BuildContext context, int index) {
-          final book = books[index];
-          final imageUrl = book.imageUrl;
+      ? ImplicitlyAnimatedList<Item>(
+        items: books,
+        areItemsTheSame: (a, b) => a.id == b.id,
+        itemBuilder: (BuildContext context, Animation<double> animation, Item item, int index) {
+          final imageUrl = item.imageUrl;
+          final subtitle = item.subtitle;
 
-          return ListTile(
-            title: Text(book.title),
-            subtitle: Text(book.authors),
-            leading: imageUrl != null 
-              ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
-              : null,
-            onTap: () {
-              // Navigate to the details page. If the user leaves and returns to
-              // the app after it has been killed while running in the
-              // background, the navigation stack is restored.
-              Navigator.restorablePushNamed(
-                context,
-                BookReaderView.routeName,
-                // Convert the book object to a map so that it can be passed through Navigator
-                arguments: book.toMapSerializable(),
-              );
-            }
+          return SizeFadeTransition(
+            sizeFraction: 0.7,
+            curve: Curves.easeInOut,
+            animation: animation,
+            child: ListTile(
+              title: Text(item.title),
+              subtitle: subtitle != null ? Text(subtitle) : null,
+              leading: imageUrl != null 
+                ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
+                : null,
+              onTap: () {
+                // Navigate to the details page. If the user leaves and returns to
+                // the app after it has been killed while running in the
+                // background, the navigation stack is restored.
+                Navigator.restorablePushNamed(
+                  context,
+                  item.routeTo,
+                  // Convert the book object to a map so that it can be passed through Navigator
+                  arguments: item.toMapSerializable(),
+                );
+              }
+            ),
+          );
+        },
+        removeItemBuilder: (context, animation, oldItem) {
+          final imageUrl = oldItem.imageUrl;
+          final subtitle = oldItem.subtitle;
+          return FadeTransition(
+            opacity: animation,
+            child: ListTile(
+              title: Text(oldItem.title),
+              subtitle: subtitle != null ? Text(subtitle) : null,
+              leading: imageUrl != null 
+                ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
+                : null,
+            )
           );
         },
       )
