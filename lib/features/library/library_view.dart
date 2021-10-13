@@ -13,10 +13,11 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:logger/logger.dart';
 import 'package:sticky_headers/sticky_headers.dart';
+import 'select_grid_page.dart';
 
 /// Displays a list of BookItems.
 class LibraryView extends ConsumerWidget {
-  const LibraryView({ Key? key }) : super(key: key);
+  const LibraryView({Key? key}) : super(key: key);
 
   static const routeName = '/';
 
@@ -33,12 +34,12 @@ class _AddBookButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+    final LibraryViewController viewController =
+        ref.watch(libraryViewController.notifier);
     return IconButton(
-      onPressed: () => viewController.addBooks(context),
-      iconSize: 36,
-      icon: const Icon(Icons.add_rounded)
-    );
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>SelectGridPage())),
+        iconSize: 36,
+        icon: const Icon(Icons.add_rounded));
   }
 }
 
@@ -56,8 +57,8 @@ class _ProfileButton extends ConsumerWidget {
         return IconButton(
           key: const ValueKey('profile'),
           icon: user != null
-                ? _userLoggedIn(user)
-                : const Icon(Icons.account_circle),
+              ? _userLoggedIn(user)
+              : const Icon(Icons.account_circle),
           onPressed: () {
             // Navigate to the settings page. If the user leaves and returns
             // to the app after it has been killed while running in the
@@ -67,12 +68,12 @@ class _ProfileButton extends ConsumerWidget {
         );
       },
       loading: (userA) => IconButton(
-          key: const ValueKey('profile'),
-          icon: const Icon(Icons.account_circle),
-          onPressed: () {
-            Navigator.restorablePushNamed(context, ProfileView.routeName);
-          },
-        ),
+        key: const ValueKey('profile'),
+        icon: const Icon(Icons.account_circle),
+        onPressed: () {
+          Navigator.restorablePushNamed(context, ProfileView.routeName);
+        },
+      ),
       error: (e, st, userA) {
         log.e('Error getting user data', e, st);
         return IconButton(
@@ -87,18 +88,17 @@ class _ProfileButton extends ConsumerWidget {
   }
 
   Widget _userLoggedIn(User user) {
-    return user.photoURL != null 
+    return user.photoURL != null
         ? CircleAvatar(
-          backgroundImage:
-            NetworkImage(user.photoURL!),
-          backgroundColor: Colors.grey,
-        )
+            backgroundImage: NetworkImage(user.photoURL!),
+            backgroundColor: Colors.grey,
+          )
         : const Icon(Icons.account_circle);
   }
 }
 
 class LibraryScrollView extends HookConsumerWidget {
-  const LibraryScrollView({ Key? key }) : super(key: key);
+  const LibraryScrollView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -120,13 +120,16 @@ class LibraryScrollView extends HookConsumerWidget {
         SliverImplicitlyAnimatedList<BookCollection>(
           items: data.collections ?? [],
           areItemsTheSame: (a, b) => a.id == b.id,
-          itemBuilder: (context, animation, collection, index) => collectionsBuilder(context, animation, collection, index, scrollController),
+          itemBuilder: (context, animation, collection, index) =>
+              collectionsBuilder(
+                  context, animation, collection, index, scrollController),
         ),
       ],
     );
   }
 
-  Widget collectionsBuilder(BuildContext context, Animation<double> animation, BookCollection collection, int index, ScrollController controller) {
+  Widget collectionsBuilder(BuildContext context, Animation<double> animation,
+      BookCollection collection, int index, ScrollController controller) {
     return StickyHeader(
       controller: controller,
       header: Container(
@@ -134,7 +137,8 @@ class LibraryScrollView extends HookConsumerWidget {
         color: Colors.blueGrey[700],
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         alignment: Alignment.centerLeft,
-        child: Text(collection.name,
+        child: Text(
+          collection.name,
           style: const TextStyle(color: Colors.white),
         ),
       ),
@@ -144,13 +148,16 @@ class LibraryScrollView extends HookConsumerWidget {
 }
 
 class BookCollectionList extends HookConsumerWidget {
-  const BookCollectionList({ Key? key, required this.collection }) : super(key: key);
+  const BookCollectionList({Key? key, required this.collection})
+      : super(key: key);
   final BookCollection collection;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewData data = ref.watch(libraryViewController);
-    final items = data.books?.where((book) => book.collectionIds.contains(collection.id))
-      .toList() ?? [];
+    final items = data.books
+            ?.where((book) => book.collectionIds.contains(collection.id))
+            .toList() ??
+        [];
     items.sort((a, b) => a.title.compareTo(b.title));
 
     return ImplicitlyAnimatedList<Item>(
@@ -165,23 +172,30 @@ class BookCollectionList extends HookConsumerWidget {
     );
   }
 
-  Widget removeItemBuilder(BuildContext context, Animation<double> animation, Item oldItem) {
+  Widget removeItemBuilder(
+      BuildContext context, Animation<double> animation, Item oldItem) {
     final imageUrl = oldItem.imageUrl;
     final subtitle = oldItem.subtitle;
     return FadeTransition(
-      opacity: animation,
-      child: ListTile(
-        key: ValueKey(collection.id + oldItem.id),
-        title: Text(oldItem.title),
-        subtitle: subtitle != null ? Text(subtitle) : null,
-        leading: imageUrl != null 
-          ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
-          : null,
-      )
-    );
+        opacity: animation,
+        child: ListTile(
+          key: ValueKey(collection.id + oldItem.id),
+          title: Text(oldItem.title),
+          subtitle: subtitle != null ? Text(subtitle) : null,
+          leading: imageUrl != null
+              ? ClipRRect(
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    width: 40,
+                  ),
+                  borderRadius: BorderRadius.circular(4),
+                )
+              : null,
+        ));
   }
 
-  Widget booksBuilder(BuildContext context, Animation<double> animation, Item item, int index) {
+  Widget booksBuilder(
+      BuildContext context, Animation<double> animation, Item item, int index) {
     final imageUrl = item.imageUrl;
     final subtitle = item.subtitle;
     return SizeFadeTransition(
@@ -189,24 +203,29 @@ class BookCollectionList extends HookConsumerWidget {
       curve: Curves.easeInOut,
       animation: animation,
       child: ListTile(
-        key: ValueKey(item.id),
-        title: Text(item.title),
-        subtitle: subtitle != null ? Text(subtitle) : null,
-        leading: imageUrl != null 
-          ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
-          : null,
-        onTap: () {
-          // Navigate to the details page. If the user leaves and returns to
-          // the app after it has been killed while running in the
-          // background, the navigation stack is restored.
-          Navigator.restorablePushNamed(
-            context,
-            item.routeTo,
-            // Convert the book object to a map so that it can be passed through Navigator
-            arguments: item.toMapSerializable(),
-          );
-        }
-      ),
+          key: ValueKey(item.id),
+          title: Text(item.title),
+          subtitle: subtitle != null ? Text(subtitle) : null,
+          leading: imageUrl != null
+              ? ClipRRect(
+                  child: CachedNetworkImage(
+                    imageUrl: imageUrl,
+                    width: 40,
+                  ),
+                  borderRadius: BorderRadius.circular(4),
+                )
+              : null,
+          onTap: () {
+            // Navigate to the details page. If the user leaves and returns to
+            // the app after it has been killed while running in the
+            // background, the navigation stack is restored.
+            Navigator.restorablePushNamed(
+              context,
+              item.routeTo,
+              // Convert the book object to a map so that it can be passed through Navigator
+              arguments: item.toMapSerializable(),
+            );
+          }),
     );
   }
 }
