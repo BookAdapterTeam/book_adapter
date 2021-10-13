@@ -64,6 +64,6 @@ class _SelectableItemWidgetState extends State<SelectableItemWidget>
             child: child,
           ),
         ),
-        child: Image.network(widget.url, fit: BoxFit.cover),
+        child: Card(child: Image.network(widget.url, fit: BoxFit.cover)),
       );
 }
