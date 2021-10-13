@@ -2,9 +2,12 @@ import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
+import 'package:book_adapter/features/library/widget/hooks.dart';
+import 'package:book_adapter/features/library/widget/selectable_item_widget.dart';
 import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:drag_select_grid_view/drag_select_grid_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -24,7 +27,7 @@ class LibraryView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return const Scaffold(
-      body: LibraryScrollView(),
+      body: SafeArea(child: LibraryScrollView()),
     );
   }
 }
@@ -130,6 +133,7 @@ class LibraryScrollView extends HookConsumerWidget {
 
   Widget collectionsBuilder(BuildContext context, Animation<double> animation,
       BookCollection collection, int index, ScrollController controller) {
+
     return StickyHeader(
       controller: controller,
       header: Container(
@@ -142,7 +146,46 @@ class LibraryScrollView extends HookConsumerWidget {
           style: const TextStyle(color: Colors.white),
         ),
       ),
-      content: BookCollectionList(collection: collection),
+      content: BookGridView(collection: collection),
+    );
+      // content: BookCollectionList(collection: collection),
+      // );
+  }
+
+  
+}
+
+class BookGridView extends HookConsumerWidget {
+  const BookGridView({ Key? key, required this.collection }) : super(key: key);
+  final BookCollection collection;
+  final urlImage = 'https://99designs-start-attachments.imgix.net/alchemy-pictures/2016%2F02%2F12%2F00%2F05%2F05%2F910db405-6bd4-4a5d-bce7-c2e3135dc5e6%2F449070_WAntoneta_55908c_killing.png?auto=format&ch=Width%2CDPR&fm=png&w=600&h=600';
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryViewData data = ref.watch(libraryViewController);
+    final items = data.books
+            ?.where((book) => book.collectionIds.contains(collection.id))
+            .toList() ?? [];
+    items.sort((a, b) => a.title.compareTo(b.title));
+
+    final dragSelectController = useDragSelectGridViewController();
+
+    return DragSelectGridView(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridController: dragSelectController,
+      padding: const EdgeInsets.all(8),
+      itemCount: items.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 8,
+        childAspectRatio: 2.8/3.92
+      ),
+      itemBuilder: (context, index, isSelected) => SelectableItemWidget(
+        url: items[index].imageUrl ?? urlImage,
+        isSelected: isSelected,
+      ),
     );
   }
 }
