@@ -25,9 +25,6 @@ class SelectGridPage extends HookWidget {
     'https://99designs-start-attachments.imgix.net/alchemy-pictures/2016%2F02%2F12%2F00%2F05%2F05%2F910db405-6bd4-4a5d-bce7-c2e3135dc5e6%2F449070_WAntoneta_55908c_killing.png?auto=format&ch=Width%2CDPR&fm=png&w=600&h=600',
     'https://99designs-start-attachments.imgix.net/alchemy-pictures/2016%2F02%2F12%2F00%2F05%2F05%2F910db405-6bd4-4a5d-bce7-c2e3135dc5e6%2F449070_WAntoneta_55908c_killing.png?auto=format&ch=Width%2CDPR&fm=png&w=600&h=600',
     'https://99designs-start-attachments.imgix.net/alchemy-pictures/2016%2F02%2F12%2F00%2F05%2F05%2F910db405-6bd4-4a5d-bce7-c2e3135dc5e6%2F449070_WAntoneta_55908c_killing.png?auto=format&ch=Width%2CDPR&fm=png&w=600&h=600',
-    
-    
-    
   ];
 
   const SelectGridPage({Key? key}) : super(key: key);
@@ -42,7 +39,7 @@ class SelectGridPage extends HookWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Images selected'),
-        leading: isSelected ? const CloseButton() : Container(),
+        leading: isSelected ? const CloseButton() : null,
         actions: [
           if (isSelected)
             IconButton(
