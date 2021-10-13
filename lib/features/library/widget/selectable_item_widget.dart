@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class SelectableItemWidget extends StatefulWidget {
@@ -64,6 +65,6 @@ class _SelectableItemWidgetState extends State<SelectableItemWidget>
             child: child,
           ),
         ),
-        child: Card(child: Image.network(widget.url, fit: BoxFit.cover)),
+        child: Card(child: CachedNetworkImage(imageUrl: widget.url, fit: BoxFit.cover)),
       );
 }
