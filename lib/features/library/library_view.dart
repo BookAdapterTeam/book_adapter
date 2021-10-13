@@ -7,6 +7,7 @@ import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
@@ -103,19 +104,44 @@ class LibraryScrollView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
     final scrollController = useScrollController();
+
+    final notSelectingAppBar = SliverAppBar(
+      title: Text('Library'.i18n),
+      floating: true,
+      snap: true,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+      actions: const [
+        _AddBookButton(),
+        _ProfileButton(),
+      ],
+    );
+
+    final isSelectingAppBar = SliverAppBar(
+      title: Text('Selected: ${data.numberSelected}'),
+      floating: true,
+      snap: true,
+      systemOverlayStyle: SystemUiOverlayStyle.light,
+      shadowColor: Colors.white70,
+      leading: BackButton(
+        onPressed: () => viewController.deselectAllItems(),
+      ),
+      actions: [
+        // TODO: Add to Collections Button
+        IconButton(onPressed: () {}, icon: const Icon(Icons.collections_bookmark_rounded),),
+        // TODO: Merge into Series Button
+
+        IconButton(onPressed: () {}, icon: const Icon(Icons.merge_type),),
+      ],
+    );
+
     return CustomScrollView(
       controller: scrollController,
       slivers: [
-        SliverAppBar(
-          title: Text('Library'.i18n),
-          floating: true,
-          snap: true,
-          actions: const [
-            _AddBookButton(),
-            _ProfileButton(),
-          ],
-        ),
+        data.isSelecting
+          ? isSelectingAppBar
+          : notSelectingAppBar,
         // List of collections
         SliverImplicitlyAnimatedList<BookCollection>(
           items: data.collections ?? [],
@@ -149,6 +175,7 @@ class BookCollectionList extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
     final items = data.books?.where((book) => book.collectionIds.contains(collection.id))
       .toList() ?? [];
     items.sort((a, b) => a.title.compareTo(b.title));
@@ -160,14 +187,20 @@ class BookCollectionList extends HookConsumerWidget {
       key: ValueKey(collection.id),
       items: items,
       areItemsTheSame: (a, b) => a.id == b.id,
-      itemBuilder: booksBuilder,
-      removeItemBuilder: removeItemBuilder,
+      itemBuilder: (context, animation, item, index) => booksBuilder(context, animation, item, index, viewController, data),
+      removeItemBuilder: (context, animation, oldItem) => removeItemBuilder(context, animation, oldItem, viewController, data),
     );
   }
 
-  Widget removeItemBuilder(BuildContext context, Animation<double> animation, Item oldItem) {
+  Widget removeItemBuilder(BuildContext context, Animation<double> animation, Item oldItem, LibraryViewController viewController, LibraryViewData data) {
     final imageUrl = oldItem.imageUrl;
     final subtitle = oldItem.subtitle;
+    final isSelected = data.selectedItemIds.contains(oldItem.id);
+
+    if (isSelected) {
+      viewController.deselectItem(oldItem.id);
+    }
+    
     return FadeTransition(
       opacity: animation,
       child: ListTile(
@@ -181,9 +214,10 @@ class BookCollectionList extends HookConsumerWidget {
     );
   }
 
-  Widget booksBuilder(BuildContext context, Animation<double> animation, Item item, int index) {
+  Widget booksBuilder(BuildContext context, Animation<double> animation, Item item, int index, LibraryViewController viewController, LibraryViewData data) {
     final imageUrl = item.imageUrl;
     final subtitle = item.subtitle;
+    final isSelected = data.selectedItemIds.contains(item.id);
     return SizeFadeTransition(
       sizeFraction: 0.7,
       curve: Curves.easeInOut,
@@ -191,22 +225,40 @@ class BookCollectionList extends HookConsumerWidget {
       child: ListTile(
         key: ValueKey(item.id),
         title: Text(item.title),
+        selected: isSelected,
         subtitle: subtitle != null ? Text(subtitle) : null,
         leading: imageUrl != null 
           ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
           : null,
+        onLongPress: () => viewController.selectItem(item.id),
         onTap: () {
-          // Navigate to the details page. If the user leaves and returns to
-          // the app after it has been killed while running in the
-          // background, the navigation stack is restored.
+          if (isSelected) {
+            return viewController.deselectItem(item.id);
+          }
+      
+      
+          if (data.isSelecting) {
+            return viewController.selectItem(item.id);
+          }
+      
+          // Navigate to the reader page or series page depending on item type.
           Navigator.restorablePushNamed(
             context,
             item.routeTo,
-            // Convert the book object to a map so that it can be passed through Navigator
             arguments: item.toMapSerializable(),
           );
-        }
+        },
+        trailing: isSelected ? const Icon(Icons.check_circle_outline_sharp) : SizedBox(width: Theme.of(context).iconTheme.size ?? 24,),
       ),
     );
+  }
+}
+
+class AnimatedSliverAppBar extends HookConsumerWidget {
+  const AnimatedSliverAppBar({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Animated;
   }
 }

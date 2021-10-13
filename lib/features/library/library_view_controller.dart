@@ -56,6 +56,21 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     throw UnimplementedError();
   }
 
+  void selectItem(String id) {
+    final selectedItemIds = <String>{...state.selectedItemIds, id};
+    state = state.copyWith(selectedItemIds: selectedItemIds);
+  }
+
+  void deselectItem(String id) {
+    final selectedItemIds = {...state.selectedItemIds};
+    selectedItemIds.remove(id);
+    state = state.copyWith(selectedItemIds: selectedItemIds);
+  }
+
+  void deselectAllItems() {
+    state = state.copyWith(selectedItemIds: {});
+  }
+
   Future<void> signOut() async {
     await _read(firebaseControllerProvider).signOut();
   }
@@ -64,18 +79,35 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 class LibraryViewData {
   final List<Book>? books;
   final List<BookCollection>? collections;
+
+  /// The ids of all items currently selected. Duplicates are not allowed
+  /// 
+  /// When merging and some items are a series, the app will get the books in
+  /// each series and combine them into a Set.
+  /// 
+  /// When merging selected books or series, the app will create a set of all
+  /// collections each item is in. The created series will be added all of them.
+  final Set<String> selectedItemIds;
+
+  bool get isSelecting => selectedItemIds.isNotEmpty;
+
+  int get numberSelected => selectedItemIds.length;
+
   LibraryViewData({
     this.books,
     this.collections,
+    this.selectedItemIds = const <String>{},
   });
 
   LibraryViewData copyWith({
     List<Book>? books,
     List<BookCollection>? collections,
+    Set<String>? selectedItemIds,
   }) {
     return LibraryViewData(
       books: books ?? this.books,
       collections: collections ?? this.collections,
+      selectedItemIds: selectedItemIds ?? this.selectedItemIds,
     );
   }
 }
