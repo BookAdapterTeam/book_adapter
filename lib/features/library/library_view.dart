@@ -134,20 +134,7 @@ class LibraryScrollView extends HookConsumerWidget {
   Widget collectionsBuilder(BuildContext context, Animation<double> animation,
       BookCollection collection, int index, ScrollController controller) {
 
-    return StickyHeader(
-      controller: controller,
-      header: Container(
-        height: 50.0,
-        color: Colors.blueGrey[700],
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        alignment: Alignment.centerLeft,
-        child: Text(
-          collection.name,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
-      content: BookGridView(collection: collection),
-    );
+    return BookGridView(collection: collection, controller: controller);
       // content: BookCollectionList(collection: collection),
       // );
   }
@@ -156,8 +143,9 @@ class LibraryScrollView extends HookConsumerWidget {
 }
 
 class BookGridView extends HookConsumerWidget {
-  const BookGridView({ Key? key, required this.collection }) : super(key: key);
+  const BookGridView({ Key? key, required this.collection, required this.controller }) : super(key: key);
   final BookCollection collection;
+  final ScrollController controller;
   final urlImage = 'https://99designs-start-attachments.imgix.net/alchemy-pictures/2016%2F02%2F12%2F00%2F05%2F05%2F910db405-6bd4-4a5d-bce7-c2e3135dc5e6%2F449070_WAntoneta_55908c_killing.png?auto=format&ch=Width%2CDPR&fm=png&w=600&h=600';
 
   @override
@@ -170,21 +158,34 @@ class BookGridView extends HookConsumerWidget {
 
     final dragSelectController = useDragSelectGridViewController();
 
-    return DragSelectGridView(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridController: dragSelectController,
-      padding: const EdgeInsets.all(8),
-      itemCount: items.length,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-        childAspectRatio: 2.8/3.92
+    return StickyHeader(
+      controller: controller,
+      header: Container(
+        height: 50.0,
+        color: Colors.blueGrey[700],
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        alignment: Alignment.centerLeft,
+        child: Text(
+          collection.name,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
-      itemBuilder: (context, index, isSelected) => SelectableItemWidget(
-        url: items[index].imageUrl ?? urlImage,
-        isSelected: isSelected,
+      content: DragSelectGridView(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridController: dragSelectController,
+        padding: const EdgeInsets.all(8),
+        itemCount: items.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 8,
+          childAspectRatio: 2.8/3.92
+        ),
+        itemBuilder: (context, index, isSelected) => SelectableItemWidget(
+          url: items[index].imageUrl ?? urlImage,
+          isSelected: isSelected,
+        ),
       ),
     );
   }
