@@ -4,8 +4,11 @@ import 'package:drag_select_grid_view/drag_select_grid_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
-DragSelectGridViewController useDragSelectGridViewController() {
-  return use(const _DragSelectGridViewControllerHook());
+/// Creates a controller for [DragSelectGridView].
+///
+/// The initial selection is [Selection.empty], unless a different one is provided.
+DragSelectGridViewController useDragSelectGridViewController([Selection? selection]) {
+  return use(_DragSelectGridViewControllerHook(selection));
 }
 
 
