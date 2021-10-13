@@ -12,7 +12,7 @@ class ItemPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-          title: Text('Selected Items'),
+          title: const Text('Selected Items'),
           centerTitle: true,
         ),
         body: ListView(

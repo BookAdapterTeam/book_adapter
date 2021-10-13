@@ -37,7 +37,7 @@ class _AddBookButton extends ConsumerWidget {
     final LibraryViewController viewController =
         ref.watch(libraryViewController.notifier);
     return IconButton(
-        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context)=>SelectGridPage())),
+        onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (context) => const SelectGridPage())),
         iconSize: 36,
         icon: const Icon(Icons.add_rounded));
   }
