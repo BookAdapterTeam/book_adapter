@@ -1,20 +1,16 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
 import 'package:book_adapter/features/library/widgets/profile_button.dart';
-import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
-import 'package:logger/logger.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
@@ -60,6 +56,7 @@ class LibraryScrollView extends HookConsumerWidget {
       snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       shadowColor: Colors.white70,
+      elevation: 3.0,
       leading: BackButton(
         onPressed: () => viewController.deselectAllItems(),
       ),
@@ -79,7 +76,7 @@ class LibraryScrollView extends HookConsumerWidget {
           child: data.isSelecting
             ? isSelectingAppBar
             : notSelectingAppBar,
-          duration: const Duration(microseconds: 300),
+          duration: const Duration(microseconds: 15000),
         ),// List of collections
         SliverImplicitlyAnimatedList<BookCollection>(
           items: data.collections ?? [],
@@ -119,13 +116,13 @@ class BookCollectionList extends HookConsumerWidget {
     items.sort((a, b) => a.title.compareTo(b.title));
 
     return ImplicitlyAnimatedList<Item>(
-      padding: const EdgeInsets.only(bottom: 16, top: 4),
+      padding: const EdgeInsets.only(bottom: 16, top: 4, left: 8, right: 8),
       physics: const NeverScrollableScrollPhysics(),
       shrinkWrap: true,
       key: ValueKey(collection.id),
       items: items,
       areItemsTheSame: (a, b) => a.id == b.id,
-      itemBuilder: (context, animation, item, index) => booksBuilder(context, animation, item, index, viewController, data),
+      itemBuilder: booksBuilder,
       removeItemBuilder: (context, animation, oldItem) => removeItemBuilder(context, animation, oldItem, viewController, data),
     );
   }
@@ -152,41 +149,92 @@ class BookCollectionList extends HookConsumerWidget {
     );
   }
 
-  Widget booksBuilder(BuildContext context, Animation<double> animation, Item item, int index, LibraryViewController viewController, LibraryViewData data) {
-    final imageUrl = item.imageUrl;
-    final subtitle = item.subtitle;
-    final isSelected = data.selectedItemIds.contains(item.id);
+  Widget booksBuilder(BuildContext context, Animation<double> animation, Item item, int index) {
     return SizeFadeTransition(
       sizeFraction: 0.7,
       curve: Curves.easeInOut,
       animation: animation,
-      child: ListTile(
-        key: ValueKey(item.id),
-        title: Text(item.title),
-        selected: isSelected,
-        subtitle: subtitle != null ? Text(subtitle) : null,
-        leading: imageUrl != null 
-          ? ClipRRect(child: CachedNetworkImage(imageUrl: imageUrl, width: 40,), borderRadius: BorderRadius.circular(4),)
-          : null,
-        onLongPress: () => viewController.selectItem(item.id),
-        onTap: () {
-          if (isSelected) {
-            return viewController.deselectItem(item.id);
-          }
-      
-      
-          if (data.isSelecting) {
-            return viewController.selectItem(item.id);
-          }
-      
-          // Navigate to the reader page or series page depending on item type.
-          Navigator.restorablePushNamed(
-            context,
-            item.routeTo,
-            arguments: item.toMapSerializable(),
-          );
-        },
-        trailing: isSelected ? const Icon(Icons.check_circle_outline_sharp) : SizedBox(width: Theme.of(context).iconTheme.size ?? 24,),
+      child: ItemListWidget(
+        item: item,
+      ),
+    );
+  }
+}
+
+class ItemListWidget extends ConsumerWidget {
+  const ItemListWidget({
+    Key? key,
+    required this.item,
+  }) : super(key: key);
+
+  final Item item;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+
+    final imageUrl = item.imageUrl;
+    final subtitle = item.subtitle;
+    final isSelected = data.selectedItemIds.contains(item.id);
+
+    final Widget? image = imageUrl != null 
+      ? ClipRRect(
+          child: CachedNetworkImage(
+            imageUrl: imageUrl,
+            width: 40,
+          ),
+          borderRadius: BorderRadius.circular(4),
+        )
+      : null;
+
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 3),
+      child: Card(
+        margin: EdgeInsets.zero,
+        color: isSelected ? Colors.white30 : null,
+        elevation: 0,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              key: ValueKey(item.id),
+              title: Text(item.title),
+              subtitle: subtitle != null ? Text(subtitle) : null,
+              leading: image,
+              onLongPress: () => viewController.selectItem(item.id),
+              onTap: () {
+                if (isSelected) {
+                  return viewController.deselectItem(item.id);
+                }
+            
+            
+                if (data.isSelecting) {
+                  return viewController.selectItem(item.id);
+                }
+            
+                // Navigate to the reader page or series page depending on item type.
+                Navigator.restorablePushNamed(
+                  context,
+                  item.routeTo,
+                  arguments: item.toMapSerializable(),
+                );
+              },
+            ),
+            if (isSelected)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Icon(
+                  Icons.check_circle,
+                  color: Theme.of(context).canvasColor,
+                ),
+              ),
+          ],
+        ),
       ),
     );
   }

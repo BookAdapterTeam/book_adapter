@@ -12,8 +12,8 @@ class AddBookButton extends ConsumerWidget {
     final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
     return IconButton(
       onPressed: () => viewController.addBooks(context),
-      iconSize: 36,
-      icon: const Icon(Icons.add_rounded)
+      iconSize: 28,
+      icon: const Icon(Icons.add)
     );
   }
 }
