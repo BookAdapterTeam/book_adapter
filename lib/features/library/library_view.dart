@@ -2,6 +2,8 @@ import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
+import 'package:book_adapter/features/library/widgets/add_book_button.dart';
+import 'package:book_adapter/features/library/widgets/profile_button.dart';
 import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -13,6 +15,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:logger/logger.dart';
+import 'package:sliver_tools/sliver_tools.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 /// Displays a list of BookItems.
@@ -29,74 +32,7 @@ class LibraryView extends ConsumerWidget {
   }
 }
 
-class _AddBookButton extends ConsumerWidget {
-  const _AddBookButton({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
-    return IconButton(
-      onPressed: () => viewController.addBooks(context),
-      iconSize: 36,
-      icon: const Icon(Icons.add_rounded)
-    );
-  }
-}
-
-class _ProfileButton extends ConsumerWidget {
-  const _ProfileButton({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final userStreamAsyncValue = ref.watch(userChangesProvider);
-    final log = Logger();
-    return userStreamAsyncValue.when(
-      data: (user) {
-        return IconButton(
-          key: const ValueKey('profile'),
-          icon: user != null
-                ? _userLoggedIn(user)
-                : const Icon(Icons.account_circle),
-          onPressed: () {
-            // Navigate to the settings page. If the user leaves and returns
-            // to the app after it has been killed while running in the
-            // background, the navigation stack is restored.
-            Navigator.restorablePushNamed(context, ProfileView.routeName);
-          },
-        );
-      },
-      loading: (userA) => IconButton(
-          key: const ValueKey('profile'),
-          icon: const Icon(Icons.account_circle),
-          onPressed: () {
-            Navigator.restorablePushNamed(context, ProfileView.routeName);
-          },
-        ),
-      error: (e, st, userA) {
-        log.e('Error getting user data', e, st);
-        return IconButton(
-          key: const ValueKey('profile'),
-          icon: const Icon(Icons.account_circle),
-          onPressed: () {
-            Navigator.restorablePushNamed(context, ProfileView.routeName);
-          },
-        );
-      },
-    );
-  }
-
-  Widget _userLoggedIn(User user) {
-    return user.photoURL != null 
-        ? CircleAvatar(
-          backgroundImage:
-            NetworkImage(user.photoURL!),
-          backgroundColor: Colors.grey,
-        )
-        : const Icon(Icons.account_circle);
-  }
-}
 
 class LibraryScrollView extends HookConsumerWidget {
   const LibraryScrollView({ Key? key }) : super(key: key);
@@ -113,8 +49,8 @@ class LibraryScrollView extends HookConsumerWidget {
       snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       actions: const [
-        _AddBookButton(),
-        _ProfileButton(),
+        AddBookButton(),
+        ProfileButton(),
       ],
     );
 
@@ -139,10 +75,12 @@ class LibraryScrollView extends HookConsumerWidget {
     return CustomScrollView(
       controller: scrollController,
       slivers: [
-        data.isSelecting
-          ? isSelectingAppBar
-          : notSelectingAppBar,
-        // List of collections
+        SliverAnimatedSwitcher(
+          child: data.isSelecting
+            ? isSelectingAppBar
+            : notSelectingAppBar,
+          duration: const Duration(microseconds: 300),
+        ),// List of collections
         SliverImplicitlyAnimatedList<BookCollection>(
           items: data.collections ?? [],
           areItemsTheSame: (a, b) => a.id == b.id,
@@ -251,14 +189,5 @@ class BookCollectionList extends HookConsumerWidget {
         trailing: isSelected ? const Icon(Icons.check_circle_outline_sharp) : SizedBox(width: Theme.of(context).iconTheme.size ?? 24,),
       ),
     );
-  }
-}
-
-class AnimatedSliverAppBar extends HookConsumerWidget {
-  const AnimatedSliverAppBar({ Key? key }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Animated;
   }
 }
