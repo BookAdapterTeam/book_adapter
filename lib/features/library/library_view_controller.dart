@@ -9,13 +9,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final libraryViewController = StateNotifierProvider<LibraryViewController, LibraryViewData>((ref) {
-  final bookStreamProvider = ref.watch(firebaseControllerProvider).bookStreamProvider;
-  final collectionsStreamProvider = ref.watch(firebaseControllerProvider).collectionsStreamProvider;
+  final firebaseController = ref.watch(firebaseControllerProvider);
+  final bookStreamProvider = firebaseController.bookStreamProvider;
+  final collectionsStreamProvider = firebaseController.collectionsStreamProvider;
+  final seriesStreamProvider = firebaseController.seriesStreamProvider;
 
   final books = ref.watch(bookStreamProvider);
   final collections = ref.watch(collectionsStreamProvider);
+  final series = ref.watch(seriesStreamProvider);
 
-  final data = LibraryViewData(books: books.asData?.value, collections: collections.asData?.value);
+  final data = LibraryViewData(books: books.asData?.value, collections: collections.asData?.value, series: series.asData?.value);
   return LibraryViewController(ref.read, data: data);
 });
 
@@ -81,7 +84,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 class LibraryViewData {
   final List<Book>? books;
   final List<BookCollection>? collections;
-  final List<Series> series;
+  final List<Series>? series;
 
   /// The ids of all items currently selected. Duplicates are not allowed
   /// 
@@ -100,7 +103,7 @@ class LibraryViewData {
     this.books,
     this.collections,
     this.selectedItems = const <Item>{},
-    this.series = const <Series>[]
+    this.series,
   });
 
   List<Item> getCollectionItems(String collectionId) {
@@ -114,7 +117,9 @@ class LibraryViewData {
       return false;
     });
     // Add series objects to items if it is in this collection
-    items.addAll(series.where((s) => s.collectionIds.contains(collectionId)));
+    if (series != null) {
+      items.addAll(series!.where((s) => s.collectionIds.contains(collectionId)));
+    }
 
     items.sort((a, b) => a.title.compareTo(b.title));
     return items;

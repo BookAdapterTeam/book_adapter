@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
@@ -217,6 +218,8 @@ class FirebaseController {
   StreamProvider<List<Book>> get bookStreamProvider => _firebaseService.bookStreamProvider;
 
   StreamProvider<List<BookCollection>> get collectionsStreamProvider => _firebaseService.collectionsStreamProvider;
+
+  StreamProvider<List<Series>> get seriesStreamProvider => _firebaseService.seriesStreamProvider;
 
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
