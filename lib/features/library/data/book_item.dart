@@ -110,7 +110,7 @@ class Book implements Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
-      'collectionIds': collectionIds,
+      'collectionIds': collectionIds.toList(),
       'seriesId': seriesId,
     };
   }

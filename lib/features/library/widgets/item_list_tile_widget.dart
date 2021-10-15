@@ -100,7 +100,6 @@ class _ItemListTile extends ConsumerWidget {
         
     
         // Navigate to the reader page or series page depending on item type.
-        // TODO: Fix crash when pressed
         Navigator.restorablePushNamed(
           context,
           item.routeTo,

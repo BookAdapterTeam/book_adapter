@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:book_adapter/features/library/series_view.dart';
+
 import 'item.dart';
 
 class Series implements Item {
@@ -28,8 +30,7 @@ class Series implements Item {
   });
 
   @override
-  // TODO: implement routeTo
-  String get routeTo => throw UnimplementedError();
+  String get routeTo => SeriesView.routeName;
 
   @override
   Series copyWith({
