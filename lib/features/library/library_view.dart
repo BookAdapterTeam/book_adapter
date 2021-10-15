@@ -40,6 +40,7 @@ class LibraryScrollView extends HookConsumerWidget {
     final scrollController = useScrollController();
 
     final notSelectingAppBar = SliverAppBar(
+      key: const ValueKey('normal_app_bar'),
       title: Text('Library'.i18n),
       floating: true,
       snap: true,
@@ -51,6 +52,7 @@ class LibraryScrollView extends HookConsumerWidget {
     );
 
     final isSelectingAppBar = SliverAppBar(
+      key: const ValueKey('selecting_app_bar'),
       title: Text('Selected: ${data.numberSelected}'),
       floating: true,
       snap: true,
@@ -69,14 +71,16 @@ class LibraryScrollView extends HookConsumerWidget {
       ],
     );
 
+    final appBar = data.isSelecting
+            ? isSelectingAppBar
+            : notSelectingAppBar;
+
     return CustomScrollView(
       controller: scrollController,
       slivers: [
         SliverAnimatedSwitcher(
-          child: data.isSelecting
-            ? isSelectingAppBar
-            : notSelectingAppBar,
-          duration: const Duration(microseconds: 15000),
+          child: appBar,
+          duration: const Duration(milliseconds: 250),
         ),
         
         // List of collections
