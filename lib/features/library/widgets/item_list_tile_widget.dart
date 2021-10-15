@@ -19,7 +19,7 @@ class ItemListTileWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewData data = ref.watch(libraryViewController);
 
-    final isSelected = data.selectedItemIds.contains(item.id);
+    final isSelected = data.selectedItems.contains(item);
 
 
     return Padding(
@@ -66,7 +66,7 @@ class _ItemListTile extends ConsumerWidget {
     final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
     final imageUrl = item.imageUrl;
     final subtitle = item.subtitle != null ? Text(item.subtitle!) : null;
-    final isSelected = data.selectedItemIds.contains(item.id);
+    final isSelected = data.selectedItems.contains(item);
 
     final Widget? image = imageUrl != null 
       ? ClipRRect(
@@ -84,16 +84,17 @@ class _ItemListTile extends ConsumerWidget {
       key: ValueKey(collection.id + item.id),
       title: Text(item.title),
       subtitle: subtitle,
+      minLeadingWidth: 0,
       leading: image,
-      onLongPress: () => viewController.selectItem(item.id),
+      onLongPress: () => viewController.selectItem(item),
       onTap: () {
         if (isSelected) {
-          return viewController.deselectItem(item.id);
+          return viewController.deselectItem(item);
         }
     
     
         if (data.isSelecting) {
-          return viewController.selectItem(item.id);
+          return viewController.selectItem(item);
         }
     
         // Navigate to the reader page or series page depending on item type.

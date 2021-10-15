@@ -1,6 +1,7 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -56,19 +57,19 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     throw UnimplementedError();
   }
 
-  void selectItem(String id) {
-    final selectedItemIds = <String>{...state.selectedItemIds, id};
-    state = state.copyWith(selectedItemIds: selectedItemIds);
+  void selectItem(Item item) {
+    final selectedItems = <Item>{...state.selectedItems, item};
+    state = state.copyWith(selectedItems: selectedItems);
   }
 
-  void deselectItem(String id) {
-    final selectedItemIds = {...state.selectedItemIds};
-    selectedItemIds.remove(id);
-    state = state.copyWith(selectedItemIds: selectedItemIds);
+  void deselectItem(Item item) {
+    final selectedItems = {...state.selectedItems};
+    selectedItems.remove(item);
+    state = state.copyWith(selectedItems: selectedItems);
   }
 
   void deselectAllItems() {
-    state = state.copyWith(selectedItemIds: {});
+    state = state.copyWith(selectedItems: {});
   }
 
   Future<void> signOut() async {
@@ -87,27 +88,27 @@ class LibraryViewData {
   /// 
   /// When merging selected books or series, the app will create a set of all
   /// collections each item is in. The created series will be added all of them.
-  final Set<String> selectedItemIds;
+  final Set<Item> selectedItems;
 
-  bool get isSelecting => selectedItemIds.isNotEmpty;
+  bool get isSelecting => selectedItems.isNotEmpty;
 
-  int get numberSelected => selectedItemIds.length;
+  int get numberSelected => selectedItems.length;
 
   LibraryViewData({
     this.books,
     this.collections,
-    this.selectedItemIds = const <String>{},
+    this.selectedItems = const <Item>{},
   });
 
   LibraryViewData copyWith({
     List<Book>? books,
     List<BookCollection>? collections,
-    Set<String>? selectedItemIds,
+    Set<Item>? selectedItems,
   }) {
     return LibraryViewData(
       books: books ?? this.books,
       collections: collections ?? this.collections,
-      selectedItemIds: selectedItemIds ?? this.selectedItemIds,
+      selectedItems: selectedItems ?? this.selectedItems,
     );
   }
 }

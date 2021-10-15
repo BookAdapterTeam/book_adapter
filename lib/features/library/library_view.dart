@@ -54,8 +54,8 @@ class LibraryScrollView extends HookConsumerWidget {
       title: Text('Selected: ${data.numberSelected}'),
       floating: true,
       snap: true,
+      backgroundColor: Colors.black12,
       systemOverlayStyle: SystemUiOverlayStyle.light,
-      shadowColor: Colors.white70,
       elevation: 3.0,
       leading: BackButton(
         onPressed: () => viewController.deselectAllItems(),
@@ -137,10 +137,10 @@ class BookCollectionList extends HookConsumerWidget {
   }
 
   Widget removeItemBuilder(BuildContext context, Animation<double> animation, Item oldItem, LibraryViewController viewController, LibraryViewData data) {
-    final isSelected = data.selectedItemIds.contains(oldItem.id);
+    final isSelected = data.selectedItems.contains(oldItem);
 
     if (isSelected) {
-      viewController.deselectItem(oldItem.id);
+      viewController.deselectItem(oldItem);
     }
     
     return FadeTransition(
