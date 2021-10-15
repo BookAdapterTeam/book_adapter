@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
@@ -119,4 +120,7 @@ abstract class BaseFirebaseService {
 
   /// Create a shelf
   Future<Either<Failure, BookCollection>> addCollection(String name);
+
+  /// Create a series
+  Future<Series> addSeries(String name, {String description = '', List<String>? collectionIds});
 }

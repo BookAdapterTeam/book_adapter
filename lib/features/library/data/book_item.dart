@@ -16,7 +16,9 @@ class Book extends Item {
   final String publisher;
   final int? readingProgress;
   final int? wordCount;
-  final List<String> collectionIds;
+  final String? seriesId;
+
+  bool get hasSeries => seriesId != null;
 
   const Book({
     required String id,
@@ -33,8 +35,9 @@ class Book extends Item {
     this.publisher = '',
     this.readingProgress,
     this.wordCount,
-    required this.collectionIds,
-  }) : super(id: id, userId: userId, title: title, subtitle: subtitle, imageUrl: imageUrl);
+    required List<String> collectionIds,
+    this.seriesId,
+  }) : super(id: id, userId: userId, title: title, subtitle: subtitle, imageUrl: imageUrl, collectionIds: collectionIds);
 
   @override
   String get routeTo => BookReaderView.routeName;
@@ -56,6 +59,7 @@ class Book extends Item {
     int? readingProgress,
     int? wordCount,
     List<String>? collectionIds,
+    String? seriesId,
   }) {
     return Book(
       id: id ?? this.id,
@@ -73,6 +77,7 @@ class Book extends Item {
       readingProgress: readingProgress ?? this.readingProgress,
       wordCount: wordCount ?? this.wordCount,
       collectionIds: collectionIds ?? this.collectionIds,
+      seriesId: seriesId ?? this.seriesId,
     );
   }
 
@@ -93,7 +98,8 @@ class Book extends Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
-      'collectionIds': collectionIds
+      'collectionIds': collectionIds,
+      'seriesId': seriesId,
     };
   }
 
@@ -114,7 +120,8 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
-      collectionIds: map['collectionIds'],
+      collectionIds: List<String>.from(map['collectionIds']),
+      seriesId: map['seriesId'],
     );
   }
 
@@ -135,7 +142,8 @@ class Book extends Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
-      'collectionIds': collectionIds
+      'collectionIds': collectionIds,
+      'seriesId': seriesId,
     };
   }
 
@@ -156,6 +164,7 @@ class Book extends Item {
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
       collectionIds: List<String>.from(map['collectionIds']),
+      seriesId: map['seriesId'],
     );
   }
 

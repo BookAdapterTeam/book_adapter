@@ -2,6 +2,7 @@ import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
+import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -80,6 +81,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 class LibraryViewData {
   final List<Book>? books;
   final List<BookCollection>? collections;
+  final List<Series> series;
 
   /// The ids of all items currently selected. Duplicates are not allowed
   /// 
@@ -98,17 +100,20 @@ class LibraryViewData {
     this.books,
     this.collections,
     this.selectedItems = const <Item>{},
+    this.series = const <Series>[]
   });
 
   LibraryViewData copyWith({
     List<Book>? books,
     List<BookCollection>? collections,
     Set<Item>? selectedItems,
+    List<Series>? series,
   }) {
     return LibraryViewData(
       books: books ?? this.books,
       collections: collections ?? this.collections,
       selectedItems: selectedItems ?? this.selectedItems,
+      series: series ?? this.series,
     );
   }
 }

@@ -6,6 +6,7 @@ abstract class Item extends Equatable {
   final String title;
   final String? subtitle;
   final String? imageUrl;
+  final List<String> collectionIds;
 
   String get routeTo;
 
@@ -15,6 +16,7 @@ abstract class Item extends Equatable {
     required this.title,
     this.subtitle,
     this.imageUrl,
+    required this.collectionIds,
   });
 
   Item copyWith();

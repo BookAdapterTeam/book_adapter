@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
@@ -156,4 +157,14 @@ class MockFirebaseService implements FirebaseService {
   @override
   // TODO: implement collectionsStreamProvider
   StreamProvider<List<BookCollection>> get collectionsStreamProvider => throw UnimplementedError();
+
+  @override
+  Future<Series> addSeries(String name, {String description = '', List<String>? collectionIds}) {
+    // TODO: implement addSeries
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement seriesStreamProvider
+  StreamProvider<List<Series>> get seriesStreamProvider => throw UnimplementedError();
 }
