@@ -1,5 +1,4 @@
 import 'package:book_adapter/features/library/data/book_collection.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
@@ -29,7 +28,35 @@ class LibraryView extends StatelessWidget {
   }
 }
 
+class AddToCollectionButton extends ConsumerWidget {
+  const AddToCollectionButton({ Key? key }) : super(key: key);
 
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+    return IconButton(
+      onPressed: () async {
+        // TODO: Show popup for user to choose which collection to move the items to 
+        // await viewController.addToCollection(collections)
+      },
+      icon: const Icon(Icons.collections_bookmark_rounded),
+    );
+  }
+}
+
+class MergeIntoSeriesButton extends ConsumerWidget {
+  const MergeIntoSeriesButton({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+    return IconButton(
+      // TODO: Ask user for series name
+      onPressed: () => viewController.mergeIntoSeries(),
+      icon: const Icon(Icons.merge_type),
+    );
+  }
+}
 
 class LibraryScrollView extends HookConsumerWidget {
   const LibraryScrollView({ Key? key }) : super(key: key);
@@ -63,12 +90,11 @@ class LibraryScrollView extends HookConsumerWidget {
       leading: BackButton(
         onPressed: () => viewController.deselectAllItems(),
       ),
-      actions: [
+      actions: const [
         // TODO: Add to Collections Button
-        IconButton(onPressed: () {}, icon: const Icon(Icons.collections_bookmark_rounded),),
-        // TODO: Merge into Series Button
-
-        IconButton(onPressed: () {}, icon: const Icon(Icons.merge_type),),
+        AddToCollectionButton(),
+        
+        MergeIntoSeriesButton(),
       ],
     );
 
@@ -126,6 +152,7 @@ class BookCollectionList extends HookConsumerWidget {
     final LibraryViewData data = ref.watch(libraryViewController);
     final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
 
+    // Get the  list of books in the collection. It will not show books in a series, only the series itself
     final List<Item> items = data.getCollectionItems(collection.id);
 
     return ImplicitlyAnimatedList<Item>(

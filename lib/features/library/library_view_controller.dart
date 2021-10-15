@@ -1,4 +1,5 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
@@ -79,6 +80,53 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   Future<void> signOut() async {
     await _read(firebaseControllerProvider).signOut();
   }
+
+  Future<bool> mergeIntoSeries([String? name]) async {
+    final firebaseController = _read(firebaseControllerProvider);
+
+    // Get the list of all books selected, including books in a series
+    final items = state.selectedItems;
+
+    final List<Book> mergeBooks = _convertItemsToBooks(items);
+
+    // Put series in collections the book was in
+    // TODO: Get input from user to decide collection
+    mergeBooks.sort((a, b) => a.title.compareTo(b.title));
+    final Set<String> collectionIds = {};
+    for (final book in mergeBooks) {
+      collectionIds.addAll(book.collectionIds);
+    }
+
+
+    try {
+      // Create a new series with the title with the first item in the list
+      const defaultImage = 'https://st4.depositphotos.com/14953852/24787/v/600/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';
+      final series = await firebaseController.addSeries(name: name ?? items.first.title, imageUrl: items.first.imageUrl ?? defaultImage);
+
+      await firebaseController.addBooksToSeries(books: mergeBooks, series: series, collectionIds: collectionIds);
+    } on AppException catch (e) {
+      print('${e.message ?? e.toString()} ${e.code}');
+    } on Exception catch (e) {
+      print(e.toString());
+    }
+
+    return true;
+  }
+
+  List<Book> _convertItemsToBooks(Set<Item> items) {
+    final List<Book> mergeBooks = [];
+    for (final item in items) {
+      if (item is Book) {
+        mergeBooks.add(item);
+      } else if (item is Series) {
+        final books = state.books;
+        if (books == null) break;
+        
+        mergeBooks.addAll(books.where((book) => book.seriesId == item.id).toList());
+      }
+    }
+    return mergeBooks;
+  }
 }
 
 class LibraryViewData {
@@ -116,13 +164,21 @@ class LibraryViewData {
       }
       return false;
     });
-    // Add series objects to items if it is in this collection
-    if (series != null) {
-      items.addAll(series!.where((s) => s.collectionIds.contains(collectionId)));
-    }
 
-    items.sort((a, b) => a.title.compareTo(b.title));
-    return items;
+    // Add series objects to items if it is in this collection
+    final seriesList = series;
+    List<Item> seriesInCollection = [];
+    if (seriesList != null) {
+      seriesInCollection = seriesList.where((s) => s.collectionIds.contains(collectionId)).toList();
+    }
+    final List<Item> allBooks = [
+      ...items,
+      ...seriesInCollection
+    ];
+
+
+    allBooks.sort((a, b) => a.title.compareTo(b.title));
+    return allBooks;
   }
 
   LibraryViewData copyWith({

@@ -2,15 +2,30 @@ import 'dart:convert';
 
 import 'item.dart';
 
-class Series extends Item {
+class Series implements Item {
+  @override
+  final String id;
+  @override
+  final String userId;
+  @override
+  final String title;
+  @override
+  final String? subtitle;
+  @override
+  final String? imageUrl;
+  @override
+  final Set<String> collectionIds;
+
   final String description;
   const Series({
-    required String id,
-    required String userId,
-    required String title,
+    required this.id,
+    required this.userId,
+    required this.title,
+    this.subtitle,
+    this.imageUrl,
     this.description = '',
-    required List<String> collectionIds,
-  }) : super(id: id, userId: userId, title: title, collectionIds: collectionIds);
+    required this.collectionIds,
+  });
 
   @override
   // TODO: implement routeTo
@@ -21,13 +36,17 @@ class Series extends Item {
     String? id,
     String? userId,
     String? title,
+    String? subtitle,
+    String? imageUrl,
     String? description,
-    List<String>? collectionIds,
+    Set<String>? collectionIds,
   }) {
     return Series(
       id: id ?? this.id,
       userId: userId ?? this.userId,
       title: title ?? this.title,
+      subtitle: subtitle ?? this.subtitle,
+      imageUrl: imageUrl ?? this.imageUrl,
       description: description ?? this.description,
       collectionIds: collectionIds ?? this.collectionIds,
     );
@@ -39,8 +58,10 @@ class Series extends Item {
       'id': id,
       'userId': userId,
       'title': title,
+      'subtitle': subtitle,
+      'imageUrl': imageUrl,
       'description': description,
-      'collectionIds': collectionIds
+      'collectionIds': collectionIds.toList()
     };
   }
 
@@ -54,8 +75,10 @@ class Series extends Item {
       id: map['id'],
       userId: map['userId'],
       title: map['title'],
+      subtitle: map['subtitle'],
+      imageUrl: map['imageUrl'],
       description: map['description'],
-      collectionIds: List.from(map['collectionIds']),
+      collectionIds: List<String>.from(map['collectionIds']).toSet(),
     );
   }
 
@@ -68,5 +91,5 @@ class Series extends Item {
   bool get stringify => true;
 
   @override
-  List<Object> get props => [id, userId, title, description, collectionIds];
+  List<Object> get props => [id, userId, title, subtitle ?? 'No subtitle', imageUrl ?? 'No image', description, collectionIds];
 }

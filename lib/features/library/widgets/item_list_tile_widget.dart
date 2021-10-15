@@ -96,8 +96,11 @@ class _ItemListTile extends ConsumerWidget {
         if (data.isSelecting) {
           return viewController.selectItem(item);
         }
+
+        
     
         // Navigate to the reader page or series page depending on item type.
+        // TODO: Fix crash when pressed
         Navigator.restorablePushNamed(
           context,
           item.routeTo,

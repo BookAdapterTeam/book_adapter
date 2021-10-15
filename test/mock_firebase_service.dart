@@ -60,7 +60,7 @@ class MockFirebaseService implements FirebaseService {
 
   @override
   Future<void> signOut() async {
-    firebaseAuth.signOut();
+    await firebaseAuth.signOut();
   }
 
   @override
@@ -159,7 +159,7 @@ class MockFirebaseService implements FirebaseService {
   StreamProvider<List<BookCollection>> get collectionsStreamProvider => throw UnimplementedError();
 
   @override
-  Future<Series> addSeries(String name, {String description = '', List<String>? collectionIds}) {
+  Future<Series> addSeries(String name, {String description = '', Set<String>? collectionIds}) {
     // TODO: implement addSeries
     throw UnimplementedError();
   }
@@ -169,8 +169,15 @@ class MockFirebaseService implements FirebaseService {
   StreamProvider<List<Series>> get seriesStreamProvider => throw UnimplementedError();
 
   @override
-  Future<void> addBookToSeries({required String bookId, required Series seriesId}) {
+  Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds}) {
     // TODO: implement addBookToSeries
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> setBookCollection({required String bookId, required Set<String> collectionIds}) {
+    // TODO: implement setBookCollection
+    throw UnimplementedError();
+  }
+
 }

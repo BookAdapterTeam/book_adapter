@@ -6,7 +6,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'item.dart';
 
 /// A placeholder class that represents a book.
-class Book extends Item {
+class Book implements Item {
+  @override
+  final String id;
+  @override
+  final String userId;
+  @override
+  final String title;
+  @override
+  final String? subtitle;
+  @override
+  final String? imageUrl;
+  @override
+  final Set<String> collectionIds;
   final DateTime addedDate;
   final String description;
   final String filename;
@@ -21,23 +33,23 @@ class Book extends Item {
   bool get hasSeries => seriesId != null;
 
   const Book({
-    required String id,
-    required String userId,
-    required String title,
+    required this.id,
+    required this.userId,
+    required this.title,
     required this.addedDate,
-    String? subtitle = '',
+    this.subtitle = '',
     this.description = '',
     required this.filename,
-    String? imageUrl,
+    this.imageUrl,
     this.genre = '',
     this.language = '',
     this.lastRead,
     this.publisher = '',
     this.readingProgress,
     this.wordCount,
-    required List<String> collectionIds,
+    required this.collectionIds,
     this.seriesId,
-  }) : super(id: id, userId: userId, title: title, subtitle: subtitle, imageUrl: imageUrl, collectionIds: collectionIds);
+  });
 
   @override
   String get routeTo => BookReaderView.routeName;
@@ -58,7 +70,7 @@ class Book extends Item {
     String? publisher,
     int? readingProgress,
     int? wordCount,
-    List<String>? collectionIds,
+    Set<String>? collectionIds,
     String? seriesId,
   }) {
     return Book(
@@ -120,7 +132,7 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
-      collectionIds: List<String>.from(map['collectionIds']),
+      collectionIds: Set<String>.from(map['collectionIds']),
       seriesId: map['seriesId'],
     );
   }
@@ -163,7 +175,7 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
-      collectionIds: List<String>.from(map['collectionIds']),
+      collectionIds: Set<String>.from(map['collectionIds']),
       seriesId: map['seriesId'],
     );
   }

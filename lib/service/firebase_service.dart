@@ -318,7 +318,7 @@ class FirebaseService extends BaseFirebaseService {
         addedDate: DateTime.now().toUtc(),
         filename: filename,
         imageUrl: imageUrl,
-        collectionIds: ['$userId-Default'],
+        collectionIds: {'$userId-Default'},
       );
 
       // Check books for duplicates, return Failure if any are found
@@ -482,6 +482,20 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
+  @override
+  Future<void> setBookCollection({required String bookId, required Set<String> collectionIds}) {
+    try {
+      return _booksRef.doc(bookId).update({'collectionIds': collectionIds});
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
+
   // TODO: Implement add to collection
 
   // Series *********************************************
@@ -490,7 +504,7 @@ class FirebaseService extends BaseFirebaseService {
   /// 
   /// Throws [AppException] if it fails.
   @override
-  Future<Series> addSeries(String name, {String description = '', List<String>? collectionIds}) async {
+  Future<Series> addSeries(String name, {String description = '', Set<String>? collectionIds}) async {
     
     try {
       final userId = _auth.currentUser?.uid;
@@ -505,7 +519,7 @@ class FirebaseService extends BaseFirebaseService {
         userId: userId,
         title: name,
         description: description,
-        collectionIds: collectionIds ?? ['$userId-Default']
+        collectionIds: collectionIds ?? {'$userId-Default'}
       );
       await _seriesRef.doc(id).set(series);
       
@@ -525,9 +539,9 @@ class FirebaseService extends BaseFirebaseService {
   /// 
   /// Takes a book and adds the series id to it
   @override
-  Future<void> addBookToSeries({required String bookId, required Series seriesId}) async {
+  Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds}) async {
     try {
-      await _booksRef.doc(bookId).update({'seriesId': seriesId});
+      await _booksRef.doc(bookId).update({'seriesId': seriesId, 'collectionIds': collectionIds.toList()});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {

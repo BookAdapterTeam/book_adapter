@@ -121,9 +121,12 @@ abstract class BaseFirebaseService {
   /// Create a shelf
   Future<Either<Failure, BookCollection>> addCollection(String name);
 
+  /// Change a book's collections
+  Future<void> setBookCollection({required String bookId, required Set<String> collectionIds});
+
   /// Create a series
-  Future<Series> addSeries(String name, {String description = '', List<String>? collectionIds});
+  Future<Series> addSeries(String name, {String description = '', Set<String>? collectionIds});
 
   /// Add book to series
-  Future<void> addBookToSeries({required String bookId, required Series seriesId});
+  Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds});
 }
