@@ -123,4 +123,7 @@ abstract class BaseFirebaseService {
 
   /// Create a series
   Future<Series> addSeries(String name, {String description = '', List<String>? collectionIds});
+
+  /// Add book to series
+  Future<void> addBookToSeries({required String bookId, required Series seriesId});
 }

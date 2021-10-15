@@ -521,7 +521,22 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
-  // TODO: Implement add to series. Takes a book and adds the series id to it
+  /// Add book to series
+  /// 
+  /// Takes a book and adds the series id to it
+  @override
+  Future<void> addBookToSeries({required String bookId, required Series seriesId}) async {
+    try {
+      await _booksRef.doc(bookId).update({'seriesId': seriesId});
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
 }
 
 

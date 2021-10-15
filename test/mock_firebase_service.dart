@@ -167,4 +167,10 @@ class MockFirebaseService implements FirebaseService {
   @override
   // TODO: implement seriesStreamProvider
   StreamProvider<List<Series>> get seriesStreamProvider => throw UnimplementedError();
+
+  @override
+  Future<void> addBookToSeries({required String bookId, required Series seriesId}) {
+    // TODO: implement addBookToSeries
+    throw UnimplementedError();
+  }
 }
