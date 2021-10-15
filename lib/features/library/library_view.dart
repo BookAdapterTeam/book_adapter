@@ -1,4 +1,5 @@
 import 'package:book_adapter/features/library/data/book_collection.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
@@ -125,9 +126,7 @@ class BookCollectionList extends HookConsumerWidget {
     final LibraryViewData data = ref.watch(libraryViewController);
     final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
 
-    final items = data.books?.where((book) => book.collectionIds.contains(collection.id))
-      .toList() ?? [];
-    items.sort((a, b) => a.title.compareTo(b.title));
+    final List<Item> items = data.getCollectionItems(collection.id);
 
     return ImplicitlyAnimatedList<Item>(
       padding: const EdgeInsets.only(bottom: 16, top: 4, left: 8, right: 8),

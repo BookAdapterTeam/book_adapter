@@ -103,6 +103,23 @@ class LibraryViewData {
     this.series = const <Series>[]
   });
 
+  List<Item> getCollectionItems(String collectionId) {
+    final List<Item> items = books?.where((book) => book.collectionIds.contains(collectionId))
+      .toList() ?? [];
+    // Remove books with a seriesId
+    items.removeWhere((item) {
+      if (item is Book) {
+        return item.hasSeries;
+      }
+      return false;
+    });
+    // Add series objects to items if it is in this collection
+    items.addAll(series.where((s) => s.collectionIds.contains(collectionId)));
+
+    items.sort((a, b) => a.title.compareTo(b.title));
+    return items;
+  }
+
   LibraryViewData copyWith({
     List<Book>? books,
     List<BookCollection>? collections,
