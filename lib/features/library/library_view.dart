@@ -33,7 +33,7 @@ class AddToCollectionButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+    // final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
     return IconButton(
       onPressed: () async {
         // TODO: Show popup for user to choose which collection to move the items to 
