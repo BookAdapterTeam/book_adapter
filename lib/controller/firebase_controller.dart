@@ -274,13 +274,34 @@ class FirebaseController {
   }
 
 
-  /// Get a list of books from the user's database
+  /// Create a collection
   Future<Either<Failure, BookCollection>> addCollection(String name) async {
     // Upload book to storage
     return await _firebaseService.addCollection(name);
   }
 
+  /// Add a list of books to a collection
+  /// 
+  /// Throws [AppException] if theres an exception
+  Future<void> setBooksCollections({required List<Book> books, required Set<String> collectionIds}) async {
+    try {
+      for (final book in books) {
+        await _firebaseService.setBookCollections(bookId: book.id, collectionIds: collectionIds);
+      }
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
+  
+
   /// Add a list of books to a series
+  /// 
+  /// Throws [AppException] if theres an exception
   Future<void> addBooksToSeries({required List<Book> books, required Series series, required Set<String> collectionIds}) async {
     try {
       //
@@ -317,6 +338,8 @@ class FirebaseController {
   /// Add book to series
   /// 
   /// Takes a book and adds the series id to it
+  /// 
+  /// Throws [AppException] if it fails.
   Future<void> addSingleBookToSeries({required Book book, required Series series}) async {
     final collectionIds = series.collectionIds;
     collectionIds.addAll(book.collectionIds);
@@ -334,6 +357,8 @@ class FirebaseController {
   }
 
   /// Change a book's collections
+  /// 
+  /// Throws [AppException] if it fails.
   Future<void> setBookCollection({required Book book, required Set<String> collectionIds}) async {
     try {
       return await _firebaseService.setBookCollection(bookId: book.id, collectionIds: collectionIds);

@@ -186,4 +186,10 @@ class MockFirebaseService implements FirebaseService {
     throw UnimplementedError();
   }
 
+  @override
+  Future<void> setBookCollections({required String bookId, required Set<String> collectionIds}) {
+    // TODO: implement addBookToCollections
+    throw UnimplementedError();
+  }
+
 }

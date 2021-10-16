@@ -496,7 +496,23 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
-  // TODO: Implement add to collection
+  /// Add book to collections
+  /// 
+  /// Takes a book and adds the series id to it
+  @override
+  Future<void> setBookCollections({required String bookId, required Set<String> collectionIds}) async {
+    try {
+      await _booksRef.doc(bookId).update({'collectionIds': collectionIds.toList()});
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
+
 
   // Series *********************************************
 
