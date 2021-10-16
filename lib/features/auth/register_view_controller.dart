@@ -63,7 +63,7 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
     state = state.copyWith(isLoading: false);
 
     // Create default shelf
-    _read(firebaseControllerProvider).addCollection('Default');
+    await _read(firebaseControllerProvider).addCollection('Default');
     
     if (res.isRight()) {
       state = const RegisterViewData();

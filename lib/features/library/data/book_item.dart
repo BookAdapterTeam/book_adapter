@@ -6,7 +6,19 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'item.dart';
 
 /// A placeholder class that represents a book.
-class Book extends Item {
+class Book implements Item {
+  @override
+  final String id;
+  @override
+  final String userId;
+  @override
+  final String title;
+  @override
+  final String? subtitle;
+  @override
+  final String? imageUrl;
+  @override
+  final Set<String> collectionIds;
   final DateTime addedDate;
   final String description;
   final String filename;
@@ -16,17 +28,19 @@ class Book extends Item {
   final String publisher;
   final int? readingProgress;
   final int? wordCount;
-  final List<String> collectionIds;
+  final String? seriesId;
+
+  bool get hasSeries => seriesId != null;
 
   const Book({
-    required String id,
-    required String userId,
-    required String title,
+    required this.id,
+    required this.userId,
+    required this.title,
     required this.addedDate,
-    String? subtitle = '',
+    this.subtitle = '',
     this.description = '',
     required this.filename,
-    String? imageUrl,
+    this.imageUrl,
     this.genre = '',
     this.language = '',
     this.lastRead,
@@ -34,7 +48,8 @@ class Book extends Item {
     this.readingProgress,
     this.wordCount,
     required this.collectionIds,
-  }) : super(id: id, userId: userId, title: title, subtitle: subtitle, imageUrl: imageUrl);
+    this.seriesId,
+  });
 
   @override
   String get routeTo => BookReaderView.routeName;
@@ -55,7 +70,8 @@ class Book extends Item {
     String? publisher,
     int? readingProgress,
     int? wordCount,
-    List<String>? collectionIds,
+    Set<String>? collectionIds,
+    String? seriesId,
   }) {
     return Book(
       id: id ?? this.id,
@@ -73,6 +89,7 @@ class Book extends Item {
       readingProgress: readingProgress ?? this.readingProgress,
       wordCount: wordCount ?? this.wordCount,
       collectionIds: collectionIds ?? this.collectionIds,
+      seriesId: seriesId ?? this.seriesId,
     );
   }
 
@@ -93,7 +110,8 @@ class Book extends Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
-      'collectionIds': collectionIds
+      'collectionIds': collectionIds.toList(),
+      'seriesId': seriesId,
     };
   }
 
@@ -114,7 +132,8 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
-      collectionIds: map['collectionIds'],
+      collectionIds: Set<String>.from(map['collectionIds']),
+      seriesId: map['seriesId'],
     );
   }
 
@@ -135,7 +154,8 @@ class Book extends Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
-      'collectionIds': collectionIds
+      'collectionIds': collectionIds.toList(),
+      'seriesId': seriesId,
     };
   }
 
@@ -155,7 +175,8 @@ class Book extends Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
-      collectionIds: List<String>.from(map['collectionIds']),
+      collectionIds: List<String>.from(map['collectionIds']).toSet(),
+      seriesId: map['seriesId'],
     );
   }
 

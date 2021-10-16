@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/service/base_firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
@@ -186,6 +188,7 @@ class FirebaseService extends BaseFirebaseService {
 
   // Database *************************************************************************
 
+  // Firestore BookCollections reference
   static final CollectionReference<BookCollection> _collectionsRef = _firestore.collection('collections').withConverter<BookCollection>(
     fromFirestore: (doc, _) {
       final data = doc.data();
@@ -195,7 +198,7 @@ class FirebaseService extends BaseFirebaseService {
     toFirestore: (collection, _) => collection.toMap(),
   );
 
-  // Get books stream
+  // Get book collections stream
   static Stream<QuerySnapshot<BookCollection>> get collectionsStream {
     return _collectionsRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
   }
@@ -213,6 +216,7 @@ class FirebaseService extends BaseFirebaseService {
     
   });
 
+  // Firestore BookCollections reference
   static final CollectionReference<Book> _booksRef = _firestore.collection('books')
     .withConverter<Book>(
       fromFirestore: (doc, _) {
@@ -238,8 +242,37 @@ class FirebaseService extends BaseFirebaseService {
     } on FirebaseException catch (_) {
 
     }
-    
   });
+
+  // Firestore BookCollections reference
+  static final CollectionReference<Series> _seriesRef = _firestore.collection('series')
+    .withConverter<Series>(
+      fromFirestore: (doc, _) {
+        final data = doc.data();
+        data!.addAll({'id': doc.id});
+        return Series.fromMapFirebase(data);
+      },
+      toFirestore: (series, _) => series.toMapFirebase(),
+    );
+
+  // Get series stream
+  static Stream<QuerySnapshot<Series>> get seriesStream {
+    return _seriesRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
+  }
+
+  // Provide the stream with riverpod for easy access
+  final seriesStreamProvider = StreamProvider<List<Series>>((ref) async* {
+    // Parse the value received and emit a Message instance
+    try {
+      await for (final value in seriesStream) {
+        yield value.docs.map((e) => e.data()).toList();
+      }
+    } on FirebaseException catch (_) {
+
+    }
+  });
+
+  // Books **************************************************
 
   /// Get a list of books from the user's database
   @override
@@ -285,7 +318,7 @@ class FirebaseService extends BaseFirebaseService {
         addedDate: DateTime.now().toUtc(),
         filename: filename,
         imageUrl: imageUrl,
-        collectionIds: ['$userId-Default'],
+        collectionIds: {'$userId-Default'},
       );
 
       // Check books for duplicates, return Failure if any are found
@@ -421,6 +454,8 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
+  // BookCollections ****************************************************
+
   /// Create a shelf in firestore
   @override
   Future<Either<Failure, BookCollection>> addCollection(String collectionName) async {
@@ -446,4 +481,95 @@ class FirebaseService extends BaseFirebaseService {
       return Left(Failure(e.toString()));
     }
   }
+
+  @override
+  Future<void> setBookCollection({required String bookId, required Set<String> collectionIds}) {
+    try {
+      return _booksRef.doc(bookId).update({'collectionIds': collectionIds});
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
+
+  // TODO: Implement add to collection
+
+  // Series *********************************************
+
+  /// Method to add series to firebase firestore, returns a [Series] object
+  /// 
+  /// Throws [AppException] if it fails.
+  @override
+  Future<Series> addSeries(String name, {required String imageUrl, String description = '', Set<String>? collectionIds}) async {
+    
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) {
+        throw AppException('user-null');
+      }
+
+      // Create a shelf with a custom id so that it can easily be referenced later
+      final String id = uuid.v4();
+      final series = Series(
+        id: id,
+        userId: userId,
+        title: name,
+        description: description,
+        imageUrl: imageUrl,
+        collectionIds: collectionIds ?? {'$userId-Default'}
+      );
+      await _seriesRef.doc(id).set(series);
+      
+      // Return the shelf to the caller in case they care
+      return series;
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
+
+  /// Add book to series
+  /// 
+  /// Takes a book and adds the series id to it
+  @override
+  Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds}) async {
+    try {
+      await _booksRef.doc(bookId).update({'seriesId': seriesId, 'collectionIds': collectionIds.toList()});
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
+
+  /// Remove series
+  /// 
+  /// This invokes a firebase function to remove all references to the series.
+  /// This does not delete the books.
+  Future<void> removeSeries(String seriesId) {
+    try {
+      // TODO: Implement removeSeries cloud function
+      throw UnimplementedError();
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
 }
+
+

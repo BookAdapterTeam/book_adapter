@@ -1,5 +1,6 @@
 import 'package:book_adapter/features/auth/auth_checker.dart';
 import 'package:book_adapter/features/library/library_view.dart';
+import 'package:book_adapter/features/library/series_view.dart';
 import 'package:book_adapter/features/profile/change_password_view.dart';
 import 'package:book_adapter/features/profile/edit_profile_view.dart';
 import 'package:book_adapter/features/profile/profile_view.dart';
@@ -62,6 +63,9 @@ class _MyAppState extends ConsumerState<MyApp> {
                 break;
               case BookReaderView.routeName:
                 page = const BookReaderView(key: ValueKey('book_item_details'));
+                break;
+              case SeriesView.routeName:
+                page = const SeriesView(key: ValueKey('series_view'));
                 break;
               case LibraryView.routeName:
               default:

@@ -28,7 +28,35 @@ class LibraryView extends StatelessWidget {
   }
 }
 
+class AddToCollectionButton extends ConsumerWidget {
+  const AddToCollectionButton({ Key? key }) : super(key: key);
 
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    // final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+    return IconButton(
+      onPressed: () async {
+        // TODO: Show popup for user to choose which collection to move the items to 
+        // await viewController.addToCollection(collections)
+      },
+      icon: const Icon(Icons.collections_bookmark_rounded),
+    );
+  }
+}
+
+class MergeIntoSeriesButton extends ConsumerWidget {
+  const MergeIntoSeriesButton({ Key? key }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+    return IconButton(
+      // TODO: Ask user for series name
+      onPressed: () => viewController.mergeIntoSeries(),
+      icon: const Icon(Icons.merge_type),
+    );
+  }
+}
 
 class LibraryScrollView extends HookConsumerWidget {
   const LibraryScrollView({ Key? key }) : super(key: key);
@@ -40,6 +68,7 @@ class LibraryScrollView extends HookConsumerWidget {
     final scrollController = useScrollController();
 
     final notSelectingAppBar = SliverAppBar(
+      key: const ValueKey('normal_app_bar'),
       title: Text('Library'.i18n),
       floating: true,
       snap: true,
@@ -51,6 +80,7 @@ class LibraryScrollView extends HookConsumerWidget {
     );
 
     final isSelectingAppBar = SliverAppBar(
+      key: const ValueKey('selecting_app_bar'),
       title: Text('Selected: ${data.numberSelected}'),
       floating: true,
       snap: true,
@@ -62,21 +92,26 @@ class LibraryScrollView extends HookConsumerWidget {
       ),
       actions: [
         // TODO: Add to Collections Button
-        IconButton(onPressed: () {}, icon: const Icon(Icons.collections_bookmark_rounded),),
-        // TODO: Merge into Series Button
+        const AddToCollectionButton(),
+        
+        // TODO: Disable button until remove series cloud function is implemented, delete old series
+        if (!data.hasSeries)
+          const MergeIntoSeriesButton(),
 
-        IconButton(onPressed: () {}, icon: const Icon(Icons.merge_type),),
+        // DeleteButton(),
       ],
     );
+
+    final appBar = data.isSelecting
+            ? isSelectingAppBar
+            : notSelectingAppBar;
 
     return CustomScrollView(
       controller: scrollController,
       slivers: [
         SliverAnimatedSwitcher(
-          child: data.isSelecting
-            ? isSelectingAppBar
-            : notSelectingAppBar,
-          duration: const Duration(microseconds: 15000),
+          child: appBar,
+          duration: const Duration(milliseconds: 250),
         ),
         
         // List of collections
@@ -121,9 +156,8 @@ class BookCollectionList extends HookConsumerWidget {
     final LibraryViewData data = ref.watch(libraryViewController);
     final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
 
-    final items = data.books?.where((book) => book.collectionIds.contains(collection.id))
-      .toList() ?? [];
-    items.sort((a, b) => a.title.compareTo(b.title));
+    // Get the  list of books in the collection. It will not show books in a series, only the series itself
+    final List<Item> items = data.getCollectionItems(collection.id);
 
     return ImplicitlyAnimatedList<Item>(
       padding: const EdgeInsets.only(bottom: 16, top: 4, left: 8, right: 8),
