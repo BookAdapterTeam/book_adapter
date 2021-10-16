@@ -183,7 +183,6 @@ class BookCollectionList extends HookConsumerWidget {
       child: ItemListTileWidget(
         key: ValueKey(collection.id + oldItem.id + 'ItemListWidget'),
         item: oldItem,
-        collection: collection,
       ),
     );
   }
@@ -196,7 +195,6 @@ class BookCollectionList extends HookConsumerWidget {
       child: ItemListTileWidget(
         key: ValueKey(collection.id + item.id + 'ItemListWidget'),
         item: item,
-        collection: collection,
       ),
     );
   }

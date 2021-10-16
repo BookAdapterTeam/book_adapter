@@ -1,4 +1,3 @@
-import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
@@ -10,11 +9,9 @@ class ItemListTileWidget extends ConsumerWidget {
   const ItemListTileWidget({
     Key? key,
     required this.item,
-    required this.collection,
   }) : super(key: key);
 
   final Item item;
-  final BookCollection collection;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,10 +20,10 @@ class ItemListTileWidget extends ConsumerWidget {
     final isSelected = data.selectedItems.contains(item);
 
     final tile = item is Book 
-      ? _ItemListTile(collection: collection, item: item)
+      ? _ItemListTile(item: item)
       : Stack(
           children: [
-            _ItemListTile(collection: collection, item: item),
+            _ItemListTile(item: item),
             const Positioned(
               left: 0,
               bottom: 0,
@@ -65,11 +62,9 @@ class ItemListTileWidget extends ConsumerWidget {
 class _ItemListTile extends ConsumerWidget {
   const _ItemListTile({
     Key? key,
-    required this.collection,
     required this.item,
   }) : super(key: key);
 
-  final BookCollection collection;
   final Item item;
 
   @override
