@@ -87,6 +87,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     // Get the list of all books selected, including books in a series
     final items = state.selectedItems;
 
+    // final selectedSeries = state.selectedSeries;
+
     final List<Book> mergeBooks = _convertItemsToBooks(items);
 
     // Put series in collections the book was in
@@ -104,7 +106,11 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       final series = await firebaseController.addSeries(name: name ?? items.first.title, imageUrl: items.first.imageUrl ?? defaultImage);
 
       await firebaseController.addBooksToSeries(books: mergeBooks, series: series, collectionIds: collectionIds);
-      // TODO: Delete old series items
+      // TODO: Delete old series items. For now, merging series is disabled
+
+      // for (final collectionId in collectionIds) {
+      //   await firebaseController.removeSeries(collectionId);
+      // }
     } on AppException catch (e) {
       debugPrint('${e.message ?? e.toString()} ${e.code}');
     } on Exception catch (e) {
@@ -143,6 +149,12 @@ class LibraryViewData {
   /// When merging selected books or series, the app will create a set of all
   /// collections each item is in. The created series will be added all of them.
   final Set<Item> selectedItems;
+
+  /// True if the user has selected a series
+  bool get hasSeries => selectedSeries.isNotEmpty;
+
+  /// Set of series that are selected by the user
+  Set<Series> get selectedSeries => selectedItems.whereType<Series>().toSet();
 
   bool get isSelecting => selectedItems.isNotEmpty;
 

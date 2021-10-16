@@ -90,11 +90,12 @@ class LibraryScrollView extends HookConsumerWidget {
       leading: BackButton(
         onPressed: () => viewController.deselectAllItems(),
       ),
-      actions: const [
+      actions: [
         // TODO: Add to Collections Button
-        AddToCollectionButton(),
+        const AddToCollectionButton(),
         
-        MergeIntoSeriesButton(),
+        if (!data.hasSeries)
+          const MergeIntoSeriesButton(),
 
         // DeleteButton(),
       ],

@@ -552,6 +552,24 @@ class FirebaseService extends BaseFirebaseService {
       throw AppException (e.toString());
     }
   }
+
+  /// Remove series
+  /// 
+  /// This invokes a firebase function to remove all references to the series.
+  /// This does not delete the books.
+  Future<void> removeSeries(String seriesId) {
+    try {
+      // TODO: Implement removeSeries cloud function
+      throw UnimplementedError();
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException (e.toString());
+    }
+  }
 }
 
 
