@@ -180,4 +180,10 @@ class MockFirebaseService implements FirebaseService {
     throw UnimplementedError();
   }
 
+  @override
+  Future<void> removeSeries(String seriesId) {
+    // TODO: implement removeSeries
+    throw UnimplementedError();
+  }
+
 }
