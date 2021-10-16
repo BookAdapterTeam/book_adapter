@@ -125,7 +125,7 @@ abstract class BaseFirebaseService {
   Future<void> setBookCollection({required String bookId, required Set<String> collectionIds});
 
   /// Create a series
-  Future<Series> addSeries(String name, {String description = '', Set<String>? collectionIds});
+  Future<Series> addSeries(String name, {required String imageUrl, String description = '', Set<String>? collectionIds});
 
   /// Add book to series
   Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds});

@@ -159,7 +159,7 @@ class MockFirebaseService implements FirebaseService {
   StreamProvider<List<BookCollection>> get collectionsStreamProvider => throw UnimplementedError();
 
   @override
-  Future<Series> addSeries(String name, {String description = '', Set<String>? collectionIds}) {
+  Future<Series> addSeries(String name, {required String imageUrl, String description = '', Set<String>? collectionIds}) {
     // TODO: implement addSeries
     throw UnimplementedError();
   }

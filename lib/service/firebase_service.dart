@@ -504,7 +504,7 @@ class FirebaseService extends BaseFirebaseService {
   /// 
   /// Throws [AppException] if it fails.
   @override
-  Future<Series> addSeries(String name, {String description = '', Set<String>? collectionIds}) async {
+  Future<Series> addSeries(String name, {required String imageUrl, String description = '', Set<String>? collectionIds}) async {
     
     try {
       final userId = _auth.currentUser?.uid;
@@ -519,6 +519,7 @@ class FirebaseService extends BaseFirebaseService {
         userId: userId,
         title: name,
         description: description,
+        imageUrl: imageUrl,
         collectionIds: collectionIds ?? {'$userId-Default'}
       );
       await _seriesRef.doc(id).set(series);

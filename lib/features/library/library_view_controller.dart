@@ -104,6 +104,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       final series = await firebaseController.addSeries(name: name ?? items.first.title, imageUrl: items.first.imageUrl ?? defaultImage);
 
       await firebaseController.addBooksToSeries(books: mergeBooks, series: series, collectionIds: collectionIds);
+      deselectAllItems();
     } on AppException catch (e) {
       print('${e.message ?? e.toString()} ${e.code}');
     } on Exception catch (e) {

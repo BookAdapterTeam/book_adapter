@@ -1,4 +1,5 @@
 import 'package:book_adapter/features/library/data/book_collection.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -21,6 +22,17 @@ class ItemListTileWidget extends ConsumerWidget {
 
     final isSelected = data.selectedItems.contains(item);
 
+    final tile = item is Book 
+      ? _ItemListTile(collection: collection, item: item)
+      : Stack(
+          children: [
+            _ItemListTile(collection: collection, item: item),
+            const Positioned(
+              left: 0,
+              bottom: 0,
+              child: Icon(Icons.collections_bookmark)),
+          ],
+        );
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 3),
@@ -32,7 +44,7 @@ class ItemListTileWidget extends ConsumerWidget {
           child: Stack(
             alignment: Alignment.center,
             children: [
-              _ItemListTile(collection: collection, item: item),
+              tile,
               if (isSelected)
                 Positioned(
                   top: 8,
@@ -81,8 +93,7 @@ class _ItemListTile extends ConsumerWidget {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-      key: ValueKey(collection.id + item.id),
-      title: Text(item.title),
+      title: Text(item.title, maxLines: subtitle == null ? 3 : 2, style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),),
       subtitle: subtitle,
       minLeadingWidth: 0,
       leading: image,

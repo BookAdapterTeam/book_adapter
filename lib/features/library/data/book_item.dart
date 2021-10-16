@@ -154,7 +154,7 @@ class Book implements Item {
       'publisher': publisher,
       'readingProgress': readingProgress,
       'wordCount': wordCount,
-      'collectionIds': collectionIds,
+      'collectionIds': collectionIds.toList(),
       'seriesId': seriesId,
     };
   }
@@ -175,7 +175,7 @@ class Book implements Item {
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
-      collectionIds: Set<String>.from(map['collectionIds']),
+      collectionIds: List<String>.from(map['collectionIds']).toSet(),
       seriesId: map['seriesId'],
     );
   }

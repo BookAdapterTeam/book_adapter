@@ -303,7 +303,7 @@ class FirebaseController {
   Future<Series> addSeries({required String name, required String imageUrl, String description = '', List<String>? collectionIds}) async {
     
     try {
-      return await _firebaseService.addSeries(name);
+      return await _firebaseService.addSeries(name, imageUrl: imageUrl, description: description);
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {

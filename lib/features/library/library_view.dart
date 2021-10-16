@@ -95,6 +95,8 @@ class LibraryScrollView extends HookConsumerWidget {
         AddToCollectionButton(),
         
         MergeIntoSeriesButton(),
+
+        // DeleteButton(),
       ],
     );
 
