@@ -96,7 +96,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     for (final book in mergeBooks) {
       collectionIds.addAll(book.collectionIds);
     }
-
+    deselectAllItems();
 
     try {
       // Create a new series with the title with the first item in the list
@@ -104,7 +104,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       final series = await firebaseController.addSeries(name: name ?? items.first.title, imageUrl: items.first.imageUrl ?? defaultImage);
 
       await firebaseController.addBooksToSeries(books: mergeBooks, series: series, collectionIds: collectionIds);
-      deselectAllItems();
+      // TODO: Delete old series items
     } on AppException catch (e) {
       debugPrint('${e.message ?? e.toString()} ${e.code}');
     } on Exception catch (e) {
