@@ -20,11 +20,9 @@ class SeriesView extends ConsumerWidget {
     final series = Series.fromMapFirebase(bookMap);
     final data = ref.watch(libraryViewController);
 
-    // TODO: TEMP
-    final books = data.books;
-    // final books = data.books?.where((book) {
-    //   return series.id == book.seriesId;
-    // }).toList();
+    final books = data.books?.where((book) {
+      return series.id == book.seriesId;
+    }).toList();
     books?.sort((a, b) => a.title.compareTo(b.title));
 
     final imageUrl = series.imageUrl;
