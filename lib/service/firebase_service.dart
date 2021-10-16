@@ -318,7 +318,7 @@ class FirebaseService extends BaseFirebaseService {
         addedDate: DateTime.now().toUtc(),
         filename: filename,
         imageUrl: imageUrl,
-        collectionIds: {'$userId-Default'},
+        collectionIds: {'$userId-$collection'},
       );
 
       // Check books for duplicates, return Failure if any are found
