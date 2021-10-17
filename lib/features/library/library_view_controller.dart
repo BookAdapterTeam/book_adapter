@@ -143,6 +143,11 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       collectionIds: collectionIds.toSet()
     );
   }
+
+  Future<void> addNewCollection(String name) async {
+    final firebaseController = _read(firebaseControllerProvider);
+    await firebaseController.addCollection(name);
+  }
 }
 
 class LibraryViewData {

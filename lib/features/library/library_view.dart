@@ -61,9 +61,20 @@ class LibraryScrollView extends HookConsumerWidget {
       floating: true,
       snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
-      actions: const [
-        AddBookButton(),
-        ProfileButton(),
+      actions: [
+        const AddBookButton(),
+        IconButton(
+          onPressed: () async {
+            await showDialog<String>(
+              context: context,
+              builder: (context) {
+                return const AddNewCollectionDialog();
+              }
+            );
+          },
+          icon: const Icon(Icons.bookmark_add),
+        ),
+        const ProfileButton(),
       ],
     );
 

@@ -13,7 +13,7 @@ class AddBookButton extends ConsumerWidget {
     return IconButton(
       onPressed: () => viewController.addBooks(context),
       iconSize: 28,
-      icon: const Icon(Icons.add)
+      icon: const Icon(Icons.add),
     );
   }
 }
