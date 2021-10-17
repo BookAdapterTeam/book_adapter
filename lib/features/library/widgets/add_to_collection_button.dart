@@ -25,7 +25,7 @@ class AddToCollectionButton extends ConsumerWidget {
                 return const ChooseCollectionsBottomSheet();
               },
             );
-            if (collectionIds == null) return;
+            if (collectionIds == null || collectionIds.isEmpty) return;
             await viewController.moveItemsToCollections(collectionIds);
           },
           icon: const Icon(Icons.collections_bookmark_rounded),
