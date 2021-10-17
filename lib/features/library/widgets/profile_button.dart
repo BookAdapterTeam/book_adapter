@@ -17,6 +17,7 @@ class ProfileButton extends ConsumerWidget {
     return userStreamAsyncValue.when(
       data: (user) {
         return IconButton(
+          tooltip: 'Account Details',
           key: const ValueKey('profile'),
           icon: user != null
                 ? _userLoggedIn(user)

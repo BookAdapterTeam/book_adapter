@@ -64,6 +64,7 @@ class LibraryScrollView extends HookConsumerWidget {
       actions: [
         const AddBookButton(),
         IconButton(
+          tooltip: 'Add a new collection',
           onPressed: () async {
             await showDialog<String>(
               context: context,
