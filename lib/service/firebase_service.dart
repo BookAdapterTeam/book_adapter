@@ -482,10 +482,15 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
+  /// Add book to collections
+  /// 
+  /// Takes a book and adds the series id to it
+  /// 
+  /// Throws [AppException] if it fails.
   @override
-  Future<void> setBookCollection({required String bookId, required Set<String> collectionIds}) {
+  Future<void> setBookCollections({required String bookId, required Set<String> collectionIds}) async {
     try {
-      return _booksRef.doc(bookId).update({'collectionIds': collectionIds});
+      await _booksRef.doc(bookId).update({'collectionIds': collectionIds.toList()});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -496,13 +501,15 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
-  /// Add book to collections
+  /// Add series to collections
   /// 
-  /// Takes a book and adds the series id to it
+  /// Takes a series and adds the series id to it
+  /// 
+  /// Throws [AppException] if it fails.
   @override
-  Future<void> setBookCollections({required String bookId, required Set<String> collectionIds}) async {
+  Future<void> setSeriesCollections({required String seriesId, required Set<String> collectionIds}) async {
     try {
-      await _booksRef.doc(bookId).update({'collectionIds': collectionIds.toList()});
+      await _seriesRef.doc(seriesId).update({'collectionIds': collectionIds.toList()});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {

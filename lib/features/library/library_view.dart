@@ -28,18 +28,104 @@ class LibraryView extends StatelessWidget {
   }
 }
 
+
 class AddToCollectionButton extends ConsumerWidget {
-  const AddToCollectionButton({ Key? key }) : super(key: key);
+  const AddToCollectionButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
-    return IconButton(
-      onPressed: () async {
-        // TODO: Show popup for user to choose which collection to move the items to 
-        // await viewController.addToCollection(collections)
-      },
-      icon: const Icon(Icons.collections_bookmark_rounded),
+    final viewController = ref.watch(libraryViewController.notifier);
+    return Builder(
+      builder: (context) {
+        return IconButton(
+          onPressed: () async {
+            // TODO: Show popup for user to choose which collection to move the items to
+            final List<String>? collectionIds = await showModalBottomSheet<List<String>?>(
+              context: context,
+              builder: (context) {
+                // Using Wrap makes the bottom sheet height the height of the content.
+                // Otherwise, the height will be half the height of the screen.
+                return const ChooseCollectionsBottomSheet();
+              },
+            );
+            print(collectionIds);
+            if (collectionIds == null) return;
+            await viewController.moveItemsToCollections(collectionIds);
+            // await viewController.addToCollection(collections)
+          },
+          icon: const Icon(Icons.collections_bookmark_rounded),
+        );
+      }
+    );
+  }
+}
+
+final chosenCollectionsProvider = StateProvider.autoDispose<List<String>>((ref) {
+  return [];
+});
+
+class ChooseCollectionsBottomSheet extends ConsumerStatefulWidget {
+  const ChooseCollectionsBottomSheet({ Key? key }) : super(key: key);
+
+  @override
+  _ChooseCollectionsBottomSheetState createState() => _ChooseCollectionsBottomSheetState();
+}
+
+class _ChooseCollectionsBottomSheetState extends ConsumerState<ChooseCollectionsBottomSheet> {
+  final List<String> chosenCollections = [];
+
+  @override
+  Widget build(BuildContext context) {
+    final data = ref.watch(libraryViewController);
+    final collectionList = data.collections;
+    return Wrap(
+      children: [
+        // Current collections
+        for (final collection in collectionList ?? <BookCollection>[]) ... [
+          CheckboxListTile(
+            title: Text(collection.name),
+            onChanged: (bool? checked) {
+              if (checked == null) return;
+
+              if (checked) {
+                chosenCollections.add(collection.id);
+              } else {
+                chosenCollections.remove(collection.id);
+              }
+              setState(() {});
+            },
+            value: chosenCollections.contains(collection.id),
+            activeColor: Theme.of(context).buttonTheme.colorScheme?.primary,
+          ),
+          
+        ],
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('CANCEL'),
+                ),
+              ),
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(chosenCollections);
+                  },
+                  child: const Text('MOVE'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -70,8 +156,9 @@ class LibraryScrollView extends HookConsumerWidget {
     final notSelectingAppBar = SliverAppBar(
       key: const ValueKey('normal_app_bar'),
       title: Text('Library'.i18n),
-      floating: true,
-      snap: true,
+      pinned: true,
+      // floating: true,
+      // snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       actions: const [
         AddBookButton(),
@@ -82,8 +169,9 @@ class LibraryScrollView extends HookConsumerWidget {
     final isSelectingAppBar = SliverAppBar(
       key: const ValueKey('selecting_app_bar'),
       title: Text('Selected: ${data.numberSelected}'),
-      floating: true,
-      snap: true,
+      pinned: true,
+      // floating: true,
+      // snap: true,
       backgroundColor: Colors.black12,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       elevation: 3.0,
@@ -91,7 +179,6 @@ class LibraryScrollView extends HookConsumerWidget {
         onPressed: () => viewController.deselectAllItems(),
       ),
       actions: [
-        // TODO: Add to Collections Button
         const AddToCollectionButton(),
         
         // TODO: Disable button until remove series cloud function is implemented, delete old series
