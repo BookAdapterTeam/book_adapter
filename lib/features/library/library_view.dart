@@ -156,9 +156,9 @@ class LibraryScrollView extends HookConsumerWidget {
     final notSelectingAppBar = SliverAppBar(
       key: const ValueKey('normal_app_bar'),
       title: Text('Library'.i18n),
-      pinned: true,
-      // floating: true,
-      // snap: true,
+      // pinned: true,
+      floating: true,
+      snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       actions: const [
         AddBookButton(),
@@ -169,9 +169,9 @@ class LibraryScrollView extends HookConsumerWidget {
     final isSelectingAppBar = SliverAppBar(
       key: const ValueKey('selecting_app_bar'),
       title: Text('Selected: ${data.numberSelected}'),
-      pinned: true,
-      // floating: true,
-      // snap: true,
+      // pinned: true,
+      floating: true,
+      snap: true,
       backgroundColor: Colors.black12,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       elevation: 3.0,
@@ -213,6 +213,7 @@ class LibraryScrollView extends HookConsumerWidget {
   }
 
   Widget collectionsBuilder(BuildContext context, Animation<double> animation, BookCollection collection, int index, ScrollController controller) {
+    // TODO: replace with sticky_and_expandable_list
     return StickyHeader(
       key: ValueKey(collection.id),
       controller: controller,
