@@ -175,12 +175,6 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<void> setBookCollection({required String bookId, required Set<String> collectionIds}) {
-    // TODO: implement setBookCollection
-    throw UnimplementedError();
-  }
-
-  @override
   Future<void> removeSeries(String seriesId) {
     // TODO: implement removeSeries
     throw UnimplementedError();
