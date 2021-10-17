@@ -9,9 +9,11 @@ class ItemListTileWidget extends ConsumerWidget {
   const ItemListTileWidget({
     Key? key,
     required this.item,
+    this.disableSelect = false,
   }) : super(key: key);
 
   final Item item;
+  final bool disableSelect;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,10 +22,10 @@ class ItemListTileWidget extends ConsumerWidget {
     final isSelected = data.selectedItems.contains(item);
 
     final tile = item is Book 
-      ? _ItemListTile(item: item)
+      ? _ItemListTile(item: item, disableSelect: disableSelect,)
       : Stack(
           children: [
-            _ItemListTile(item: item),
+            _ItemListTile(item: item, disableSelect: disableSelect,),
             const Positioned(
               left: 0,
               bottom: 0,
@@ -63,9 +65,11 @@ class _ItemListTile extends ConsumerWidget {
   const _ItemListTile({
     Key? key,
     required this.item,
+    required this.disableSelect,
   }) : super(key: key);
 
   final Item item;
+  final bool disableSelect;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -92,14 +96,18 @@ class _ItemListTile extends ConsumerWidget {
       subtitle: subtitle,
       minLeadingWidth: 0,
       leading: image,
-      onLongPress: () => viewController.selectItem(item),
+      onLongPress: () {
+        if (disableSelect) return;
+
+        viewController.selectItem(item);
+      },
       onTap: () {
         if (isSelected) {
           return viewController.deselectItem(item);
         }
     
     
-        if (data.isSelecting) {
+        if (data.isSelecting && !disableSelect) {
           return viewController.selectItem(item);
         }
 

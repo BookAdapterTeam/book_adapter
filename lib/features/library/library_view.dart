@@ -2,6 +2,7 @@ import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
+import 'package:book_adapter/features/library/widgets/add_to_collection_button.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
 import 'package:book_adapter/features/library/widgets/profile_button.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
@@ -28,21 +29,7 @@ class LibraryView extends StatelessWidget {
   }
 }
 
-class AddToCollectionButton extends ConsumerWidget {
-  const AddToCollectionButton({ Key? key }) : super(key: key);
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    // final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
-    return IconButton(
-      onPressed: () async {
-        // TODO: Show popup for user to choose which collection to move the items to 
-        // await viewController.addToCollection(collections)
-      },
-      icon: const Icon(Icons.collections_bookmark_rounded),
-    );
-  }
-}
 
 class MergeIntoSeriesButton extends ConsumerWidget {
   const MergeIntoSeriesButton({ Key? key }) : super(key: key);
@@ -70,18 +57,32 @@ class LibraryScrollView extends HookConsumerWidget {
     final notSelectingAppBar = SliverAppBar(
       key: const ValueKey('normal_app_bar'),
       title: Text('Library'.i18n),
+      // pinned: true,
       floating: true,
       snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
-      actions: const [
-        AddBookButton(),
-        ProfileButton(),
+      actions: [
+        const AddBookButton(),
+        IconButton(
+          tooltip: 'Add a new collection',
+          onPressed: () async {
+            await showDialog<String>(
+              context: context,
+              builder: (context) {
+                return const AddNewCollectionDialog();
+              }
+            );
+          },
+          icon: const Icon(Icons.bookmark_add),
+        ),
+        const ProfileButton(),
       ],
     );
 
     final isSelectingAppBar = SliverAppBar(
       key: const ValueKey('selecting_app_bar'),
       title: Text('Selected: ${data.numberSelected}'),
+      // pinned: true,
       floating: true,
       snap: true,
       backgroundColor: Colors.black12,
@@ -91,7 +92,6 @@ class LibraryScrollView extends HookConsumerWidget {
         onPressed: () => viewController.deselectAllItems(),
       ),
       actions: [
-        // TODO: Add to Collections Button
         const AddToCollectionButton(),
         
         // TODO: Disable button until remove series cloud function is implemented, delete old series
@@ -126,6 +126,7 @@ class LibraryScrollView extends HookConsumerWidget {
   }
 
   Widget collectionsBuilder(BuildContext context, Animation<double> animation, BookCollection collection, int index, ScrollController controller) {
+    // TODO: replace with sticky_and_expandable_list
     return StickyHeader(
       key: ValueKey(collection.id),
       controller: controller,

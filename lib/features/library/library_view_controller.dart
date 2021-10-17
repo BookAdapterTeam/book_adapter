@@ -134,6 +134,20 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     }
     return mergeBooks;
   }
+
+  Future<void> moveItemsToCollections(List<String> collectionIds) async {
+    final firebaseController = _read(firebaseControllerProvider);
+    final items = state.selectedItems;
+    await firebaseController.setItemsCollections(
+      items: items.toList(),
+      collectionIds: collectionIds.toSet()
+    );
+  }
+
+  Future<void> addNewCollection(String name) async {
+    final firebaseController = _read(firebaseControllerProvider);
+    await firebaseController.addCollection(name);
+  }
 }
 
 class LibraryViewData {

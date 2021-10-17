@@ -121,12 +121,21 @@ abstract class BaseFirebaseService {
   /// Create a shelf
   Future<Either<Failure, BookCollection>> addCollection(String name);
 
-  /// Change a book's collections
-  Future<void> setBookCollection({required String bookId, required Set<String> collectionIds});
-
   /// Create a series
   Future<Series> addSeries(String name, {required String imageUrl, String description = '', Set<String>? collectionIds});
 
   /// Add book to series
   Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds});
+
+  /// Add book to collections
+  /// 
+  /// Takes a book and adds the series id to it
+  Future<void> setBookCollections({required String bookId, required Set<String> collectionIds});
+
+  /// Add series to collections
+  /// 
+  /// Takes a series and adds the series id to it
+  /// 
+  /// Throws [AppException] if it fails.
+  Future<void> setSeriesCollections({required String seriesId, required Set<String> collectionIds});
 }
