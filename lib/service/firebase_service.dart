@@ -440,35 +440,37 @@ class FirebaseService extends BaseFirebaseService {
 
   @override
   Future<Either<Failure, String>> uploadBytes({required String userId, required Uint8List bytes, required String filename, required String contentType, required String title, required String authors}) async {
+    final path = '$userId/$title-$authors-$filename';
     try {
       // Check if file exists, exit if it does
-      await _storage.ref('$userId/$filename').getDownloadURL();
+      await _storage.ref(path).getDownloadURL();
       return Left(Failure('File already exists'));
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
-      await _storage.ref('$userId/$filename').putData(
+      await _storage.ref(path).putData(
         bytes, SettableMetadata(contentType: contentType),
       );
-      final url = await _storage.ref('$userId/$filename').getDownloadURL();
+      final url = await _storage.ref(path).getDownloadURL();
       return Right(url);
     }
   }
 
   @override
   Future<Either<Failure, String>> uploadFile({required String userId, required PlatformFile file, required String contentType, required String title, required String authors}) async {
+    final path = '$userId/$title-$authors-${file.name}';
     try {
       // Check if file exists, exit if it does
-      await _storage.ref('$userId/${file.name}').getDownloadURL();
+      await _storage.ref(path).getDownloadURL();
       return Left(Failure('File already exists'));
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
       final filepath = file.path;
       if (filepath == null) return Left(Failure('file.path was null'));
 
-      await _storage.ref('$userId/${file.name}').putFile(
+      await _storage.ref(path).putFile(
         io.File(filepath), SettableMetadata(contentType: contentType),
       );
-      final url = await _storage.ref('$userId/${file.name}').getDownloadURL();
+      final url = await _storage.ref(path).getDownloadURL();
       return Right(url);
     }
   }
