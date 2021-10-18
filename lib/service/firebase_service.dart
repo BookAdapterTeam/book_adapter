@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:book_adapter/data/app_exception.dart';
@@ -298,7 +299,7 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Add a book to Firebase Firestore
   @override
-  Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl}) async {
+  Future<Either<Failure, Book>> addBookToFirestore(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl}) async {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
@@ -349,7 +350,7 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Upload a book to Firebase Storage
   @override
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, Uint8List bytes) async {
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, {required String title, required String authors}) async {
     const String epubContentType = 'application/epub+zip';
 
     try {
@@ -363,9 +364,8 @@ class FirebaseService extends BaseFirebaseService {
       if (filePath == null) {
         return Left(Failure('File path was null'));
       }
-      final String filename = file.name;
 
-      final res = await uploadFile(userId, bytes, filename, epubContentType);
+      final res = await uploadFile(userId: userId, file: file, contentType: epubContentType, title: title, authors: authors);
       
       return res;
     } on FirebaseException catch (e) {
@@ -377,8 +377,8 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Upload a book cover photo to Firebase Storage
   @override
-  Future<Either<Failure, String>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook) async {
-    const imageContentType = 'image/png';
+  Future<Either<Failure, String>> uploadCoverPhoto({required PlatformFile file, required EpubBookRef openedBook, required String title, required String authors}) async {
+    const imageContentType = 'image/jpeg';
     try {
     
       final userId = _auth.currentUser?.uid;
@@ -391,11 +391,11 @@ class FirebaseService extends BaseFirebaseService {
         return Left(Failure('File path was null'));
       }
 
-      Image? image = await openBook.readCover();
+      Image? image = await openedBook.readCover();
 
       if (image == null) {
         // No cover image, use the first image instead
-        final imagesRef = openBook.Content?.Images;
+        final imagesRef = openedBook.Content?.Images;
 
         if (imagesRef == null) {
           // images from epub is null
@@ -423,10 +423,10 @@ class FirebaseService extends BaseFirebaseService {
         return Left(Failure('Could not get cover image for upload'));
       }
 
-      final bytes = img.encodePng(image);
-      final String filename = '${file.name}.png';
+      final bytes = img.encodeJpg(image);
+      final String filename = '${file.name}.jpg';
 
-      final res = await uploadFile(userId, Uint8List.fromList(bytes), filename, imageContentType);
+      final res = await uploadBytes(userId: userId, bytes: Uint8List.fromList(bytes), filename: filename, contentType: imageContentType, title: title, authors: authors);
       
       return res;
     } on FirebaseException catch (e) {
@@ -439,7 +439,7 @@ class FirebaseService extends BaseFirebaseService {
   }
 
   @override
-  Future<Either<Failure, String>> uploadFile(String userId, Uint8List bytes, String filename, String contentType) async {
+  Future<Either<Failure, String>> uploadBytes({required String userId, required Uint8List bytes, required String filename, required String contentType, required String title, required String authors}) async {
     try {
       // Check if file exists, exit if it does
       await _storage.ref('$userId/$filename').getDownloadURL();
@@ -450,6 +450,25 @@ class FirebaseService extends BaseFirebaseService {
         bytes, SettableMetadata(contentType: contentType),
       );
       final url = await _storage.ref('$userId/$filename').getDownloadURL();
+      return Right(url);
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadFile({required String userId, required PlatformFile file, required String contentType, required String title, required String authors}) async {
+    try {
+      // Check if file exists, exit if it does
+      await _storage.ref('$userId/${file.name}').getDownloadURL();
+      return Left(Failure('File already exists'));
+    } on FirebaseException catch (_) {
+      // File does not exist, continue uploading
+      final filepath = file.path;
+      if (filepath == null) return Left(Failure('file.path was null'));
+
+      await _storage.ref('$userId/${file.name}').putFile(
+        io.File(filepath), SettableMetadata(contentType: contentType),
+      );
+      final url = await _storage.ref('$userId/${file.name}').getDownloadURL();
       return Right(url);
     }
   }

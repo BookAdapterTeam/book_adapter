@@ -117,7 +117,7 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl}) {
+  Future<Either<Failure, Book>> addBookToFirestore(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl}) {
     // TODO: implement addBook
     throw UnimplementedError();
   }
@@ -133,19 +133,27 @@ class MockFirebaseService implements FirebaseService {
   StreamProvider<List<Book>> get bookStreamProvider => throw UnimplementedError();
 
   @override
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, Uint8List bytes) {
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, {required String title, required String authors}) {
     // TODO: implement uploadBook
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, String>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook) {
+  Future<Either<Failure, String>> uploadCoverPhoto({required PlatformFile file, required EpubBookRef openedBook, required String title, required String authors}) {
     // TODO: implement uploadCoverPhoto
     throw UnimplementedError();
   }
 
+  
+
   @override
-  Future<Either<Failure, String>> uploadFile(String userId, Uint8List bytes, String filename, String contentType) {
+  Future<Either<Failure, String>> uploadBytes({required String userId, required Uint8List bytes, required String filename, required String contentType, required String title, required String authors}) {
+    // TODO: implement uploadBytes
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadFile({required String userId, required PlatformFile file, required String contentType, required String title, required String authors}) {
     // TODO: implement uploadFile
     throw UnimplementedError();
   }
