@@ -107,16 +107,19 @@ abstract class BaseFirebaseService {
   Future<Either<Failure, List<Book>>> getBooks();
 
   /// Add a book to Firebase Database
-  Future<Either<Failure, Book>> addBook(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default'});
+  Future<Either<Failure, Book>> addBookToFirestore(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default'});
 
   /// Upload a book to Firebase Storage
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, Uint8List bytes);
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, {required String title, required String authors});
 
   /// Upload a book cover photo to Firebase Storage
-  Future<Either<Failure, void>> uploadCoverPhoto(PlatformFile file, EpubBookRef openBook);
+  Future<Either<Failure, void>> uploadCoverPhoto({required PlatformFile file, required EpubBookRef openedBook, required String title, required String authors});
+
+  /// Upload bytes to Firebase Storage
+  Future<Either<Failure, String>> uploadBytes({required String userId, required Uint8List bytes, required String filename, required String contentType, required String title, required String authors});
 
   /// Upload a file to Firebase Storage
-  Future<void> uploadFile(String userId, Uint8List bytes, String filename, String contentType);
+  Future<void> uploadFile({required String userId, required PlatformFile file, required String contentType, required String title, required String authors});
 
   /// Create a shelf
   Future<Either<Failure, BookCollection>> addCollection(String name);

@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
@@ -11,6 +9,7 @@ import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 
@@ -230,45 +229,43 @@ class FirebaseController {
 
   /// Get a list of books from the user's database
   Future<Either<Failure, Book>> addBook(PlatformFile file) async {
-    if (file.readStream == null) {
-      return Left(Failure('File readStream was null'));
-    }
-    // Get the book data into memory for upload
-    final stream = http.ByteStream(file.readStream!);
-    final bytes = await stream.toBytes();
-    
-    // Upload to Firestore
-    final firestoreRes = await _uploadToFirestore(bytes, file);
-    if (firestoreRes.isLeft()) {
-      return Left(firestoreRes.swap().getOrElse(() => Failure('Could not add book to Firestore')));
-    }
-    
-    // Upload book to storage
-    final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(file, bytes);
-    if (uploadRes.isLeft()) {
-      return Left(uploadRes.swap().getOrElse(() => Failure('Could not add book to Firebase Storage')));
-    }
-
-    return firestoreRes;
-  }
-
-  Future<Either<Failure, Book>> _uploadToFirestore(Uint8List bytes, PlatformFile file) async {
     try {
-      final EpubBookRef openedBook = await EpubReader.openBook(bytes);
 
-      final res = await _firebaseService.uploadCoverPhoto(file, openedBook);
+      if (file.readStream == null) {
+        return Left(Failure('File readStream was null'));
+      }
+      // Get the book stream into memory for upload
+      final stream = http.ByteStream(file.readStream!);
+      
+      // Open book takes a future so it does not block the UI loading all the data
+      final EpubBookRef openedBook = await EpubReader.openBook(stream.toBytes());
+
+      final title = openedBook.Title ?? '';
+      final authors = openedBook.AuthorList?.join(',') ?? '';
+
+      // Upload cover image to storage
+      final res = await _firebaseService.uploadCoverPhoto(file: file, openedBook: openedBook, title: title, authors: authors);
       final String? imageUrl = res.fold(
-        (failure) => null,
+        (failure) {
+          debugPrint('Could not upload cover photo');
+          return;
+        },
         (url) => url,
       );
+      
+      // Upload to Firestore
+      final firestoreRes = await _firebaseService.addBookToFirestore(file, openedBook, imageUrl: imageUrl);
+      if (firestoreRes.isLeft()) {
+        return Left(firestoreRes.swap().getOrElse(() => Failure('Could not add book to Firestore')));
+      }
+      
+      // Upload book to storage
+      final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(file, title: title, authors: authors);
+      if (uploadRes.isLeft()) {
+        return Left(uploadRes.swap().getOrElse(() => Failure('Could not add book to Firebase Storage')));
+      }
 
-      final added = await _firebaseService.addBook(file, openedBook, imageUrl: imageUrl);
-      return added.fold(
-        (failure) => Left(failure),
-        (book) async {
-          return Right(book);
-        },
-      );
+      return firestoreRes;
     } on Exception catch (e) {
       return Left(Failure(e.toString()));
     }
