@@ -440,7 +440,7 @@ class FirebaseService extends BaseFirebaseService {
 
   @override
   Future<Either<Failure, String>> uploadBytes({required String userId, required Uint8List bytes, required String filename, required String contentType, required String title, required String authors}) async {
-    final path = '$userId/$title-$authors-$filename';
+    final path = '$userId/$title-$authors-$filename'.replaceAll('/', '');
     try {
       // Check if file exists, exit if it does
       await _storage.ref(path).getDownloadURL();
@@ -457,7 +457,7 @@ class FirebaseService extends BaseFirebaseService {
 
   @override
   Future<Either<Failure, String>> uploadFile({required String userId, required PlatformFile file, required String contentType, required String title, required String authors}) async {
-    final path = '$userId/$title-$authors-${file.name}';
+    final path = '$userId/$title-$authors-${file.name}'.replaceAll('/', '');
     try {
       // Check if file exists, exit if it does
       await _storage.ref(path).getDownloadURL();
