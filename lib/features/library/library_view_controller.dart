@@ -93,7 +93,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
     // Put series in collections the book was in
     // TODO: Get input from user to decide collection
-    mergeBooks.sort((a, b) => a.title.compareTo(b.title));
+    mergeBooks.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     final Set<String> collectionIds = {};
     for (final book in mergeBooks) {
       collectionIds.addAll(book.collectionIds);
@@ -204,7 +204,7 @@ class LibraryViewData {
     ];
 
 
-    allBooks.sort((a, b) => a.title.compareTo(b.title));
+    allBooks.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return allBooks;
   }
 
