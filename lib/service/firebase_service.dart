@@ -20,7 +20,7 @@ import 'package:uuid/uuid.dart';
 
 
 /// Provider to easily get access to the [FirebaseService] functions
-final firebaseServiceProvider = Provider<FirebaseService>((ref) {
+final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {
   return FirebaseService();
 });
 

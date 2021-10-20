@@ -13,13 +13,13 @@ import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 
-final firebaseControllerProvider = Provider<FirebaseController>((ref) {
+final firebaseControllerProvider = Provider.autoDispose<FirebaseController>((ref) {
   final firebaseService = ref.watch(firebaseServiceProvider);
   return FirebaseController(firebaseService);
 });
 
 /// Provider to easily get access to the user stream from [FirebaseService]
-final authStateChangesProvider = StreamProvider<User?>((ref) async* {
+final authStateChangesProvider = StreamProvider.autoDispose<User?>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
 
   final authStates = firebaseController.authStateChange;
@@ -30,7 +30,7 @@ final authStateChangesProvider = StreamProvider<User?>((ref) async* {
 });
 
 /// Provider to get access to stream of user changes
-final userChangesProvider = StreamProvider<User?>((ref) async* {
+final userChangesProvider = StreamProvider.autoDispose<User?>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
   final userChanges = firebaseController.userChanges;
 

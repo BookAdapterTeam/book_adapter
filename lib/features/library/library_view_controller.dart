@@ -9,7 +9,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final libraryViewController = StateNotifierProvider<LibraryViewController, LibraryViewData>((ref) {
+final libraryViewController = StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>((ref) {
   final firebaseController = ref.watch(firebaseControllerProvider);
   final bookStreamProvider = firebaseController.bookStreamProvider;
   final collectionsStreamProvider = firebaseController.collectionsStreamProvider;
