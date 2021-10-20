@@ -10,8 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final libraryViewController = StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>((ref) {
-  final firebaseController = ref.watch(firebaseControllerProvider);
-
   final books = ref.watch(bookStreamProvider);
   final collections = ref.watch(collectionsStreamProvider);
   final series = ref.watch(seriesStreamProvider);

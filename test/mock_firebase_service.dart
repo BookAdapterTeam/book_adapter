@@ -129,10 +129,6 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  // TODO: implement bookStreamProvider
-  StreamProvider<List<Book>> get bookStreamProvider => throw UnimplementedError();
-
-  @override
   Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, {required String title, required String authors}) {
     // TODO: implement uploadBook
     throw UnimplementedError();
@@ -163,18 +159,10 @@ class MockFirebaseService implements FirebaseService {
   Stream<User?> get userChanges => throw UnimplementedError();
 
   @override
-  // TODO: implement collectionsStreamProvider
-  StreamProvider<List<BookCollection>> get collectionsStreamProvider => throw UnimplementedError();
-
-  @override
   Future<Series> addSeries(String name, {required String imageUrl, String description = '', Set<String>? collectionIds}) {
     // TODO: implement addSeries
     throw UnimplementedError();
   }
-
-  @override
-  // TODO: implement seriesStreamProvider
-  StreamProvider<List<Series>> get seriesStreamProvider => throw UnimplementedError();
 
   @override
   Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds}) {
