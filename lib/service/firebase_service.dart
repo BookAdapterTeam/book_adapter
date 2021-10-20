@@ -28,9 +28,9 @@ final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {
 class FirebaseService extends BaseFirebaseService {
   FirebaseService() : super();
 
-  static final FirebaseAuth _auth = FirebaseAuth.instance;
-  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
   static const uuid = Uuid();
 
   // Authentication
@@ -190,7 +190,7 @@ class FirebaseService extends BaseFirebaseService {
   // Database *************************************************************************
 
   // Firestore BookCollections reference
-  static final CollectionReference<BookCollection> _collectionsRef = _firestore.collection('collections').withConverter<BookCollection>(
+  CollectionReference<BookCollection> get _collectionsRef => _firestore.collection('collections').withConverter<BookCollection>(
     fromFirestore: (doc, _) {
       final data = doc.data();
       data!.addAll({'id': doc.id});
@@ -200,25 +200,12 @@ class FirebaseService extends BaseFirebaseService {
   );
 
   // Get book collections stream
-  static Stream<QuerySnapshot<BookCollection>> get collectionsStream {
+  Stream<QuerySnapshot<BookCollection>> get collectionsStream {
     return _collectionsRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
   }
 
-  // Provide the stream with riverpod for easy access
-  final collectionsStreamProvider = StreamProvider<List<BookCollection>>((ref) async* {
-    // Parse the value received and emit a Message instance
-    try {
-      await for (final value in collectionsStream) {
-        yield value.docs.map((e) => e.data()).toList();
-      }
-    } on FirebaseException catch (_) {
-
-    }
-    
-  });
-
   // Firestore BookCollections reference
-  static final CollectionReference<Book> _booksRef = _firestore.collection('books')
+  CollectionReference<Book> get _booksRef => _firestore.collection('books')
     .withConverter<Book>(
       fromFirestore: (doc, _) {
         final data = doc.data();
@@ -229,24 +216,12 @@ class FirebaseService extends BaseFirebaseService {
     );
 
   // Get books stream
-  static Stream<QuerySnapshot<Book>> get booksStream {
+  Stream<QuerySnapshot<Book>> get booksStream {
     return _booksRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
   }
 
-  // Provide the stream with riverpod for easy access
-  final bookStreamProvider = StreamProvider<List<Book>>((ref) async* {
-    // Parse the value received and emit a Message instance
-    try {
-      await for (final value in booksStream) {
-        yield value.docs.map((e) => e.data()).toList();
-      }
-    } on FirebaseException catch (_) {
-
-    }
-  });
-
   // Firestore BookCollections reference
-  static final CollectionReference<Series> _seriesRef = _firestore.collection('series')
+  CollectionReference<Series> get _seriesRef => _firestore.collection('series')
     .withConverter<Series>(
       fromFirestore: (doc, _) {
         final data = doc.data();
@@ -257,21 +232,9 @@ class FirebaseService extends BaseFirebaseService {
     );
 
   // Get series stream
-  static Stream<QuerySnapshot<Series>> get seriesStream {
+  Stream<QuerySnapshot<Series>> get seriesStream {
     return _seriesRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
   }
-
-  // Provide the stream with riverpod for easy access
-  final seriesStreamProvider = StreamProvider<List<Series>>((ref) async* {
-    // Parse the value received and emit a Message instance
-    try {
-      await for (final value in seriesStream) {
-        yield value.docs.map((e) => e.data()).toList();
-      }
-    } on FirebaseException catch (_) {
-
-    }
-  });
 
   // Books **************************************************
 

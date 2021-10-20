@@ -200,4 +200,16 @@ class MockFirebaseService implements FirebaseService {
     throw UnimplementedError();
   }
 
+  @override
+  // TODO: implement booksStream
+  Stream<QuerySnapshot<Book>> get booksStream => throw UnimplementedError();
+
+  @override
+  // TODO: implement collectionsStream
+  Stream<QuerySnapshot<BookCollection>> get collectionsStream => throw UnimplementedError();
+
+  @override
+  // TODO: implement seriesStream
+  Stream<QuerySnapshot<Series>> get seriesStream => throw UnimplementedError();
+
 }
