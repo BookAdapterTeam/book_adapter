@@ -5,6 +5,7 @@ import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/service/firebase_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
@@ -13,13 +14,8 @@ import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
 
-final firebaseControllerProvider = Provider<FirebaseController>((ref) {
-  final firebaseService = ref.watch(firebaseServiceProvider);
-  return FirebaseController(firebaseService);
-});
-
 /// Provider to easily get access to the user stream from [FirebaseService]
-final authStateChangesProvider = StreamProvider<User?>((ref) async* {
+final authStateChangesProvider = StreamProvider.autoDispose<User?>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
 
   final authStates = firebaseController.authStateChange;
@@ -30,13 +26,59 @@ final authStateChangesProvider = StreamProvider<User?>((ref) async* {
 });
 
 /// Provider to get access to stream of user changes
-final userChangesProvider = StreamProvider<User?>((ref) async* {
+final userChangesProvider = StreamProvider.autoDispose<User?>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
   final userChanges = firebaseController.userChanges;
 
   await for (final user in userChanges) {
     yield user;
   }
+});
+
+
+// Provide the stream with riverpod for easy access
+final collectionsStreamProvider = StreamProvider.autoDispose<List<BookCollection>>((ref) async* {
+  final firebaseController = ref.watch(firebaseControllerProvider);
+  // Parse the value received and emit a Message instance
+  try {
+    await for (final value in firebaseController.collectionsStream) {
+      yield value.docs.map((e) => e.data()).toList();
+    }
+  } on FirebaseException catch (_) {
+
+  }
+  
+});
+
+// Provide the stream with riverpod for easy access
+final bookStreamProvider = StreamProvider.autoDispose<List<Book>>((ref) async* {
+  final firebaseController = ref.watch(firebaseControllerProvider);
+  // Parse the value received and emit a Message instance
+  try {
+    await for (final value in firebaseController.booksStream) {
+      yield value.docs.map((e) => e.data()).toList();
+    }
+  } on FirebaseException catch (_) {
+
+  }
+});
+
+// Provide the stream with riverpod for easy access
+final seriesStreamProvider = StreamProvider.autoDispose<List<Series>>((ref) async* {
+  final firebaseController = ref.watch(firebaseServiceProvider);
+  // Parse the value received and emit a Message instance
+  try {
+    await for (final value in firebaseController.seriesStream) {
+      yield value.docs.map((e) => e.data()).toList();
+    }
+  } on FirebaseException catch (_) {
+
+  }
+});
+
+final firebaseControllerProvider = Provider.autoDispose<FirebaseController>((ref) {
+  final firebaseService = ref.watch(firebaseServiceProvider);
+  return FirebaseController(firebaseService);
 });
 
 class FirebaseController {
@@ -215,12 +257,9 @@ class FirebaseController {
   }
 
   // Database
-
-  StreamProvider<List<Book>> get bookStreamProvider => _firebaseService.bookStreamProvider;
-
-  StreamProvider<List<BookCollection>> get collectionsStreamProvider => _firebaseService.collectionsStreamProvider;
-
-  StreamProvider<List<Series>> get seriesStreamProvider => _firebaseService.seriesStreamProvider;
+  Stream<QuerySnapshot<Book>> get booksStream => _firebaseService.booksStream;
+  Stream<QuerySnapshot<BookCollection>> get collectionsStream => _firebaseService.collectionsStream;
+  Stream<QuerySnapshot<Series>> get seriesStream => _firebaseService.seriesStream;
 
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
