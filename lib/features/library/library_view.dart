@@ -103,6 +103,8 @@ class LibraryScrollView extends HookConsumerWidget {
     final appBar = data.isSelecting
             ? isSelectingAppBar
             : notSelectingAppBar;
+    
+    final collections = (data.collections ?? [])..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
     return CustomScrollView(
       controller: scrollController,
@@ -114,7 +116,7 @@ class LibraryScrollView extends HookConsumerWidget {
         
         // List of collections
         SliverImplicitlyAnimatedList<BookCollection>(
-          items: data.collections ?? [],
+          items: collections,
           areItemsTheSame: (a, b) => a.id == b.id,
           itemBuilder: (context, animation, collection, index) 
               => collectionsBuilder(context, animation, collection, index, scrollController),
