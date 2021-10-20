@@ -82,9 +82,7 @@ class LibraryScrollView extends HookConsumerWidget {
     final isSelectingAppBar = SliverAppBar(
       key: const ValueKey('selecting_app_bar'),
       title: Text('Selected: ${data.numberSelected}'),
-      // pinned: true,
-      floating: true,
-      snap: true,
+      pinned: true,
       backgroundColor: Colors.black12,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       elevation: 3.0,
