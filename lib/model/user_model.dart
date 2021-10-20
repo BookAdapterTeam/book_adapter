@@ -4,7 +4,7 @@ import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final userModelProvider = StateNotifierProvider<UserModelNotifier, UserData>((ref) {
+final userModelProvider = StateNotifierProvider.autoDispose<UserModelNotifier, UserData>((ref) {
   final userStreamAsyncValue = ref.watch(userChangesProvider);
   final user = userStreamAsyncValue.asData?.value;
   

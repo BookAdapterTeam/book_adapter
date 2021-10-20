@@ -14,9 +14,14 @@ class AuthChecker extends ConsumerWidget {
 
     return AsyncValueWidget<User?>(
       value: userStreamAsyncValue,
-      data: (data) => data == null
-        ? LoginView()
-        : child,
+      data: (data) => AnimatedSwitcher(
+        switchInCurve: Curves.easeInCubic,
+        switchOutCurve: Curves.easeOutCubic,
+        duration: const Duration(milliseconds: 500),
+        child: data == null
+        ? LoginView(key: const ValueKey('login'),)
+        : child,  
+      ),
     );
   }
 }
