@@ -1,9 +1,8 @@
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
@@ -17,7 +16,7 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 class StorageService {
   StorageService();
 
-  late final Directory appDocumentsDir;
+  late final io.Directory appDocumentsDir;
 
   late final String appPath;
 
@@ -163,18 +162,18 @@ class StorageService {
 
   /// Converts a [PlatformFile] object to dart io [File], returns either
   /// left `Failure` or right `File`
-  Either<Failure, File> convertPlatformFileToIOFile(PlatformFile file) {
+  Either<Failure, io.File> convertPlatformFileToIOFile(PlatformFile file) {
     final String? path = file.path;
     if (path == null) {
       return Left(Failure("File's path was null"));
     }
-    return Right(File(path));
+    return Right(io.File(path));
   }
 
   /// Check if a file exists on the device given the filename
   Future<bool> fileExists(String filename) async {
     final String syncPath = '$appPath/$filename';
-    if (await File(syncPath).exists()) {
+    if (await io.File(syncPath).exists()) {
       return true;
     }
     return false;
