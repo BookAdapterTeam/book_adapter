@@ -159,7 +159,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   /// Get the current status of a book to determine what icon to show on the book tile
   ///
-  /// TODO: Determine if the book is downloading, uploading, or an error downloading/uploading
+  /// TODO: Determine if the book is uploading, or an error downloading/uploading
   Future<BookStatus> getBookStatus(Book book) async {
     final storageService = _read(storageServiceProvider);
 
