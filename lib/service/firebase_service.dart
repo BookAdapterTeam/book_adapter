@@ -632,6 +632,9 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
+  /// Upload a file to FirebaseStorage
+  ///
+  /// Thorws `AppException` if it fails
   @override
   Future<Either<Failure, String>> uploadFile({
     required String userId,
@@ -659,6 +662,9 @@ class FirebaseService extends BaseFirebaseService {
     }
   }
 
+  /// Download a file to memory
+  ///
+  /// Thorws `AppException` if it fails
   @override
   Future<Uint8List?> downloadFile(String filename) async {
     final userId = _auth.currentUser?.uid;
