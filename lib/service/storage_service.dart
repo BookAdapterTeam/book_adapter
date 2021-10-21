@@ -1,5 +1,7 @@
 import 'dart:io' as io;
+import 'dart:typed_data';
 
+import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
@@ -176,10 +178,30 @@ class StorageService {
 
   /// Check if a file exists on the device given the filename
   Future<bool> fileExists(String filename) async {
-    final String syncPath = '$appPath/$filename';
-    if (await io.File(syncPath).exists()) {
+    final String path = '$appPath/$filename';
+    if (await io.File(path).exists()) {
       return true;
     }
     return false;
+  }
+
+  Future<io.File> writeMemoryToFile({
+    required Uint8List data,
+    required String filename,
+    bool overwrite = false,
+  }) async {
+    try {
+      final String path = '$appPath/$filename';
+      final fileRef = io.File(path);
+
+      if (overwrite == false && await fileRef.exists()) {
+        throw AppException('File already exists');
+      }
+
+      return await fileRef.writeAsBytes(List<int>.from(data));
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
+      throw AppException(e.toString());
+    }
   }
 }
