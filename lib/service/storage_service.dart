@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -19,12 +21,18 @@ class StorageService {
 
   late final String appPath;
 
-  /// Initilize the class 
+  final log = Logger();
+
+  /// Initilize the class
   ///
   /// Throws a `MissingPlatformDirectoryException` if the system is unable to provide the directory.
   Future<void> init() async {
-    appDocumentsDir = await getApplicationDocumentsDirectory();
-    appPath = '${appDocumentsDir.path}/BookAdapt';
+    try {
+      appDocumentsDir = await getApplicationDocumentsDirectory();
+      appPath = '${appDocumentsDir.path}/BookAdapt';
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
+    }
   }
 
   /// Selects a directory and returns its absolute path.
