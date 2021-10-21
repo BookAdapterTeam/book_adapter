@@ -298,7 +298,8 @@ class FirebaseController {
 
       final title = openedBook.Title ?? '';
       final authors = openedBook.AuthorList?.join(',') ?? '';
-      final subtitle = openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
+      final subtitle =
+          openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
 
       // Upload cover image to storage
       final res = await _firebaseService.uploadCoverPhoto(
