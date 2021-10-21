@@ -20,7 +20,6 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -57,10 +56,12 @@ class _MyAppState extends ConsumerState<MyApp> {
                 page = const ProfileView(key: ValueKey('profile_view'));
                 break;
               case EditProfileView.routeName:
-                page = const EditProfileView(key: ValueKey('edit_profile_view'));
+                page =
+                    const EditProfileView(key: ValueKey('edit_profile_view'));
                 break;
               case ChangePasswordView.routeName:
-                page = const ChangePasswordView(key: ValueKey('change_password_view'));
+                page = const ChangePasswordView(
+                    key: ValueKey('change_password_view'));
                 break;
               case BookReaderView.routeName:
                 page = const BookReaderView(key: ValueKey('book_item_details'));
@@ -74,13 +75,17 @@ class _MyAppState extends ConsumerState<MyApp> {
             }
 
             return I18n(
-              child: InitWidget(
-                child: AuthChecker(
-                  key: const ValueKey('auth_checker'),
-                  child: page,
-                ),
-              )
-            );
+                key: const ValueKey('I18n Initialization'),
+                child: InitFirebase(
+                  key: const ValueKey('Initialize Firebase App'),
+                  child: InitStorageService(
+                    key: const ValueKey('Initialize Storage Service'),
+                    child: AuthChecker(
+                      key: const ValueKey('Auth Checker'),
+                      child: page,
+                    ),
+                  ),
+                ));
           },
         );
       },

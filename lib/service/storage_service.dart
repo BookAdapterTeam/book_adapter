@@ -4,15 +4,28 @@ import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
 final storageServiceProvider = Provider<StorageService>((ref) {
-  return const StorageService();
+  return StorageService();
 });
 
 /// A utility class to handle all Firebase calls
 class StorageService {
-  const StorageService();
+  StorageService();
+
+  late final Directory appDocumentsDir;
+
+  late final String appPath;
+
+  /// Initilize the class 
+  ///
+  /// Throws a `MissingPlatformDirectoryException` if the system is unable to provide the directory.
+  Future<void> init() async {
+    appDocumentsDir = await getApplicationDocumentsDirectory();
+    appPath = '${appDocumentsDir.path}/BookAdapt';
+  }
 
   /// Selects a directory and returns its absolute path.
   ///
@@ -23,10 +36,12 @@ class StorageService {
   ///
   /// Note: Some Android paths are protected, hence can't be accessed and will return `/` instead.
   Future<Either<Failure, String>> pickDirectory({String? dialogTitle}) async {
-    final String? selectedDirectory = await FilePicker.platform.getDirectoryPath(dialogTitle: dialogTitle);
+    final String? selectedDirectory =
+        await FilePicker.platform.getDirectoryPath(dialogTitle: dialogTitle);
 
     if (selectedDirectory == null) {
-      return Left(Failure('User canceled the directory picker or Android SDK not 21 or above'));
+      return Left(Failure(
+          'User canceled the directory picker or Android SDK not 21 or above'));
     }
 
     return Right(selectedDirectory);
@@ -91,7 +106,6 @@ class StorageService {
     } on Exception catch (e) {
       return Left(Failure(e.toString()));
     }
-    
   }
 
   List<PlatformFile> handleSingle(FilePickerResult result) {
@@ -149,4 +163,12 @@ class StorageService {
     return Right(File(path));
   }
 
+  /// Check if a file exists on the device given the filename
+  Future<bool> fileExists(String filename) async {
+    final String syncPath = '$appPath/$filename';
+    if (await File(syncPath).exists()) {
+      return true;
+    }
+    return false;
+  }
 }
