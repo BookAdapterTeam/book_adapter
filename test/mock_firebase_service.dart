@@ -12,6 +12,7 @@ import 'package:file_picker/src/platform_file.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final fakeFirebaseServiceProvider = Provider<MockFirebaseService>((ref) {
@@ -234,7 +235,7 @@ class MockFirebaseService implements FirebaseService {
   Stream<QuerySnapshot<Series>> get seriesStream => throw UnimplementedError();
 
   @override
-  Future<Uint8List?> downloadFile(String filename) {
+  DownloadTask downloadFile(String filename, String filePath) {
     // TODO: implement downloadFile
     throw UnimplementedError();
   }

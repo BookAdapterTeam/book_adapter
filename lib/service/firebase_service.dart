@@ -653,10 +653,14 @@ class FirebaseService extends BaseFirebaseService {
       final filepath = file.path;
       if (filepath == null) return Left(Failure('file.path was null'));
 
-      await _firebaseStorage.ref(path).putFile(
+      final UploadTask task = _firebaseStorage.ref(path).putFile(
             io.File(filepath),
             SettableMetadata(contentType: contentType),
           );
+
+      // TODO: Somehow expose this to UI for upload progress
+      final TaskSnapshot snapshot = await task;
+
       final url = await _firebaseStorage.ref(path).getDownloadURL();
       return Right(url);
     }
@@ -666,15 +670,17 @@ class FirebaseService extends BaseFirebaseService {
   ///
   /// Thorws `AppException` if it fails
   @override
-  Future<Uint8List?> downloadFile(String filename) async {
+  DownloadTask downloadFile(String filename, String filePath) {
     final userId = _auth.currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
     }
 
+    final io.File downloadToFile = io.File(filePath);
+
     try {
       final fileRef = _firebaseStorage.ref('$userId/$filename');
-      return await fileRef.getData();
+      return fileRef.writeToFile(downloadToFile);
     } on FirebaseException catch (e, _) {
       throw AppException(e.message, e.code);
     }

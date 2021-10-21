@@ -8,6 +8,7 @@ import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 /// A utility class to handle all Firebase calls
 abstract class BaseFirebaseService {
@@ -171,5 +172,5 @@ abstract class BaseFirebaseService {
       {required String seriesId, required Set<String> collectionIds});
 
   /// Download a file into memory
-  Future<Uint8List?> downloadFile(String filename);
+  DownloadTask downloadFile(String filename, String filePath);
 }

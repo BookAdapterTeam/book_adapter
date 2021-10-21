@@ -12,6 +12,7 @@ import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -437,16 +438,11 @@ class FirebaseController {
   /// Download a file and copy it to documents
   ///
   /// Thorws `AppException` if it fails
-  Future<io.File> downloadFile(String filename) async {
+  Future<DownloadTask> downloadFile(String filename) async {
     try {
-      final data = await _firebaseService.downloadFile(filename);
-      if (data == null) {
-        throw AppException('Could not download file');
-      }
-
-      return await _storageService.writeMemoryToFile(
-        data: data,
-        filename: filename,
+      return _firebaseService.downloadFile(
+        filename,
+        _storageService.appPath!,
       );
     } on AppException catch (_) {
       rethrow;
