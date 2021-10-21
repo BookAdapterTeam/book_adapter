@@ -8,7 +8,7 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
-final storageServiceProvider = Provider<StorageService>((ref) {
+final storageServiceProvider = Provider.autoDispose<StorageService>((ref) {
   return StorageService();
 });
 
