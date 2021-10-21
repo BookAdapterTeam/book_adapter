@@ -155,6 +155,14 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 }
 
+enum bookStatus {
+  downloaded,
+  downloading,
+  uploading,
+  error,
+  notDownloaded,
+}
+
 class LibraryViewData {
   final List<Book>? books;
   final List<BookCollection>? collections;
