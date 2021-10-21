@@ -659,7 +659,7 @@ class FirebaseService extends BaseFirebaseService {
           );
 
       // TODO: Somehow expose this to UI for upload progress
-      final TaskSnapshot snapshot = await task;
+      /*final TaskSnapshot snapshot = */await task;
 
       final url = await _firebaseStorage.ref(path).getDownloadURL();
       return Right(url);
