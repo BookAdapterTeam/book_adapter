@@ -9,18 +9,24 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final libraryViewController = StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>((ref) {
+final libraryViewController =
+    StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>(
+        (ref) {
   final books = ref.watch(bookStreamProvider);
   final collections = ref.watch(collectionsStreamProvider);
   final series = ref.watch(seriesStreamProvider);
 
-  final data = LibraryViewData(books: books.asData?.value, collections: collections.asData?.value, series: series.asData?.value);
+  final data = LibraryViewData(
+      books: books.asData?.value,
+      collections: collections.asData?.value,
+      series: series.asData?.value);
   return LibraryViewController(ref.read, data: data);
 });
 
 // State is if the view is loading
 class LibraryViewController extends StateNotifier<LibraryViewData> {
-  LibraryViewController(this._read, {required LibraryViewData data}) : super(data);
+  LibraryViewController(this._read, {required LibraryViewData data})
+      : super(data);
 
   final Reader _read;
 
@@ -43,13 +49,13 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     for (final file in platformFiles) {
       // Add book to firebase
       final fRes = await _read(firebaseControllerProvider).addBook(file);
-      fRes.fold(
-        (failure) {
-          final snackBar = SnackBar(content: Text(failure.message), duration: const Duration(seconds: 2),);
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-        },
-        (book) => uploadedBooks.add(book)
-      );
+      fRes.fold((failure) {
+        final snackBar = SnackBar(
+          content: Text(failure.message),
+          duration: const Duration(seconds: 2),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      }, (book) => uploadedBooks.add(book));
     }
   }
 
@@ -88,7 +94,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
     // Put series in collections the book was in
     // TODO: Get input from user to decide collection
-    mergeBooks.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    mergeBooks
+        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     final Set<String> collectionIds = {};
     for (final book in mergeBooks) {
       collectionIds.addAll(book.collectionIds);
@@ -97,10 +104,14 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
     try {
       // Create a new series with the title with the first item in the list
-      const defaultImage = 'https://st4.depositphotos.com/14953852/24787/v/600/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';
-      final series = await firebaseController.addSeries(name: name ?? items.first.title, imageUrl: items.first.imageUrl ?? defaultImage);
+      const defaultImage =
+          'https://st4.depositphotos.com/14953852/24787/v/600/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';
+      final series = await firebaseController.addSeries(
+          name: name ?? items.first.title,
+          imageUrl: items.first.imageUrl ?? defaultImage);
 
-      await firebaseController.addBooksToSeries(books: mergeBooks, series: series, collectionIds: collectionIds);
+      await firebaseController.addBooksToSeries(
+          books: mergeBooks, series: series, collectionIds: collectionIds);
       // TODO: Delete old series items. For now, merging series is disabled
 
       // for (final collectionId in collectionIds) {
@@ -123,8 +134,9 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       } else if (item is Series) {
         final books = state.books;
         if (books == null) break;
-        
-        mergeBooks.addAll(books.where((book) => book.seriesId == item.id).toList());
+
+        mergeBooks
+            .addAll(books.where((book) => book.seriesId == item.id).toList());
       }
     }
     return mergeBooks;
@@ -134,9 +146,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     final firebaseController = _read(firebaseControllerProvider);
     final items = state.selectedItems;
     await firebaseController.setItemsCollections(
-      items: items.toList(),
-      collectionIds: collectionIds.toSet()
-    );
+        items: items.toList(), collectionIds: collectionIds.toSet());
   }
 
   Future<void> addNewCollection(String name) async {
@@ -151,10 +161,10 @@ class LibraryViewData {
   final List<Series>? series;
 
   /// The ids of all items currently selected. Duplicates are not allowed
-  /// 
+  ///
   /// When merging and some items are a series, the app will get the books in
   /// each series and combine them into a Set.
-  /// 
+  ///
   /// When merging selected books or series, the app will create a set of all
   /// collections each item is in. The created series will be added all of them.
   final Set<Item> selectedItems;
@@ -177,8 +187,10 @@ class LibraryViewData {
   });
 
   List<Item> getCollectionItems(String collectionId) {
-    final List<Item> items = books?.where((book) => book.collectionIds.contains(collectionId))
-      .toList() ?? [];
+    final List<Item> items = books
+            ?.where((book) => book.collectionIds.contains(collectionId))
+            .toList() ??
+        [];
     // Remove books with a seriesId
     items.removeWhere((item) {
       if (item is Book) {
@@ -191,15 +203,14 @@ class LibraryViewData {
     final seriesList = series;
     List<Item> seriesInCollection = [];
     if (seriesList != null) {
-      seriesInCollection = seriesList.where((s) => s.collectionIds.contains(collectionId)).toList();
+      seriesInCollection = seriesList
+          .where((s) => s.collectionIds.contains(collectionId))
+          .toList();
     }
-    final List<Item> allBooks = [
-      ...items,
-      ...seriesInCollection
-    ];
+    final List<Item> allBooks = [...items, ...seriesInCollection];
 
-
-    allBooks.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    allBooks
+        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return allBooks;
   }
 
