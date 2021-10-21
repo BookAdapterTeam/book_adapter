@@ -8,6 +8,7 @@ import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/service/base_firebase_service.dart';
+import 'package:book_adapter/service/storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
@@ -17,7 +18,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image/image.dart' as img;
 import 'package:uuid/uuid.dart';
-
 
 /// Provider to easily get access to the [FirebaseService] functions
 final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {
@@ -30,7 +30,7 @@ class FirebaseService extends BaseFirebaseService {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   static const uuid = Uuid();
 
   // Authentication
@@ -61,9 +61,9 @@ class FirebaseService extends BaseFirebaseService {
   /// section of the Firebase console before being able to use them.
   ///
   /// Returns an [Either]
-  /// 
+  ///
   /// Right [UserCredential] is returned if successful
-  /// 
+  ///
   /// Left [FirebaseFailure] maybe returned with the following error code:
   /// - **invalid-email**:
   ///  - Returned if the email address is not valid.
@@ -74,10 +74,13 @@ class FirebaseService extends BaseFirebaseService {
   /// - **wrong-password**:
   ///  - Returned if the password is invalid for the given email, or the account
   ///    corresponding to the email does not have a password set.
-  /// 
+  ///
   /// Left [Failure] returned for any other exception
   @override
-  Future<Either<Failure, UserCredential>> signIn({required String email, required String password}) async {
+  Future<Either<Failure, UserCredential>> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
@@ -96,9 +99,9 @@ class FirebaseService extends BaseFirebaseService {
   /// password.
   ///
   /// Returns an [Either]
-  /// 
+  ///
   /// Right [UserCredential] is returned if successful
-  /// 
+  ///
   /// Left [FirebaseFailure] maybe returned with the following error code:
   /// - **email-already-in-use**:
   ///  - Returned if there already exists an account with the given email address.
@@ -109,10 +112,13 @@ class FirebaseService extends BaseFirebaseService {
   ///    email/password accounts in the Firebase Console, under the Auth tab.
   /// - **weak-password**:
   ///  - Returned if the password is not strong enough.
-  /// 
+  ///
   /// Left [Failure] returned for any other exception
   @override
-  Future<Either<Failure, UserCredential>> signUp({required String email, required String password}) async {
+  Future<Either<Failure, UserCredential>> signUp({
+    required String email,
+    required String password,
+  }) async {
     try {
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -121,7 +127,8 @@ class FirebaseService extends BaseFirebaseService {
       // Return the data incase the caller needs it
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Signup Not Successful', e.code));
+      return Left(
+          FirebaseFailure(e.message ?? 'Signup Not Successful', e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not SignUp'));
     }
@@ -153,14 +160,16 @@ class FirebaseService extends BaseFirebaseService {
       await _auth.sendPasswordResetEmail(email: email);
       return const Right(null);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email', e.code));
+      return Left(FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email',
+          e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Send Reset Email'));
     }
   }
 
   /// Set display name
-  /// 
+  ///
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   @override
@@ -174,7 +183,7 @@ class FirebaseService extends BaseFirebaseService {
   }
 
   /// Set profile photo
-  /// 
+  ///
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   @override
@@ -187,56 +196,63 @@ class FirebaseService extends BaseFirebaseService {
     return true;
   }
 
-  // Database *************************************************************************
+  // Database ************************************************************************************************
 
   // Firestore BookCollections reference
-  CollectionReference<BookCollection> get _collectionsRef => _firestore.collection('collections').withConverter<BookCollection>(
-    fromFirestore: (doc, _) {
-      final data = doc.data();
-      data!.addAll({'id': doc.id});
-      return BookCollection.fromMap(data);
-    },
-    toFirestore: (collection, _) => collection.toMap(),
-  );
+  CollectionReference<BookCollection> get _collectionsRef =>
+      _firestore.collection('collections').withConverter<BookCollection>(
+            fromFirestore: (doc, _) {
+              final data = doc.data();
+              data!.addAll({'id': doc.id});
+              return BookCollection.fromMap(data);
+            },
+            toFirestore: (collection, _) => collection.toMap(),
+          );
 
   // Get book collections stream
   Stream<QuerySnapshot<BookCollection>> get collectionsStream {
-    return _collectionsRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
+    return _collectionsRef
+        .where('userId', isEqualTo: _auth.currentUser?.uid)
+        .snapshots();
   }
 
   // Firestore BookCollections reference
-  CollectionReference<Book> get _booksRef => _firestore.collection('books')
-    .withConverter<Book>(
-      fromFirestore: (doc, _) {
-        final data = doc.data();
-        data!.addAll({'id': doc.id});
-        return Book.fromMapFirebase(data);
-      },
-      toFirestore: (book, _) => book.toMapFirebase(),
-    );
+  CollectionReference<Book> get _booksRef =>
+      _firestore.collection('books').withConverter<Book>(
+            fromFirestore: (doc, _) {
+              final data = doc.data();
+              data!.addAll({'id': doc.id});
+              return Book.fromMapFirebase(data);
+            },
+            toFirestore: (book, _) => book.toMapFirebase(),
+          );
 
   // Get books stream
   Stream<QuerySnapshot<Book>> get booksStream {
-    return _booksRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
+    return _booksRef
+        .where('userId', isEqualTo: _auth.currentUser?.uid)
+        .snapshots();
   }
 
   // Firestore BookCollections reference
-  CollectionReference<Series> get _seriesRef => _firestore.collection('series')
-    .withConverter<Series>(
-      fromFirestore: (doc, _) {
-        final data = doc.data();
-        data!.addAll({'id': doc.id});
-        return Series.fromMapFirebase(data);
-      },
-      toFirestore: (series, _) => series.toMapFirebase(),
-    );
+  CollectionReference<Series> get _seriesRef =>
+      _firestore.collection('series').withConverter<Series>(
+            fromFirestore: (doc, _) {
+              final data = doc.data();
+              data!.addAll({'id': doc.id});
+              return Series.fromMapFirebase(data);
+            },
+            toFirestore: (series, _) => series.toMapFirebase(),
+          );
 
   // Get series stream
   Stream<QuerySnapshot<Series>> get seriesStream {
-    return _seriesRef.where('userId', isEqualTo: _auth.currentUser?.uid).snapshots();
+    return _seriesRef
+        .where('userId', isEqualTo: _auth.currentUser?.uid)
+        .snapshots();
   }
 
-  // Books **************************************************
+  // Books *****************************************************************************************************
 
   /// Get a list of books from the user's database
   @override
@@ -246,15 +262,18 @@ class FirebaseService extends BaseFirebaseService {
       if (userId == null) {
         return Left(Failure('User not logged in'));
       }
-      
-      final bookQuery = await _booksRef.where('userId', isEqualTo: userId).get();
+
+      final bookQuery =
+          await _booksRef.where('userId', isEqualTo: userId).get();
       final books = bookQuery.docs.map((doc) => doc.data()).toList();
-      
+
       // Return our books to the caller in case they care
       // ignore: prefer_const_constructors
       return Right(books);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books', e.code));
+      return Left(FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books',
+          e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Refresh Books'));
     }
@@ -262,7 +281,12 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Add a book to Firebase Firestore
   @override
-  Future<Either<Failure, Book>> addBookToFirestore(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl}) async {
+  Future<Either<Failure, Book>> addBookToFirestore(
+    PlatformFile file,
+    EpubBookRef openedBook, {
+    String collection = 'Default',
+    String? imageUrl,
+  }) async {
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
@@ -271,7 +295,8 @@ class FirebaseService extends BaseFirebaseService {
 
       // Create a book object to add to the collection
       final title = openedBook.Title ?? '';
-      final subtitle = openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
+      final subtitle =
+          openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
       final filename = file.name;
       final String id = uuid.v4();
       final book = Book(
@@ -287,10 +312,10 @@ class FirebaseService extends BaseFirebaseService {
 
       // Check books for duplicates, return Failure if any are found
       final duplicatesQuerySnapshot = await _booksRef
-        .where('userId', isEqualTo: userId)
-        .where('title', isEqualTo: title)
-        .where('filename', isEqualTo: filename)
-        .get();
+          .where('userId', isEqualTo: userId)
+          .where('title', isEqualTo: title)
+          .where('filename', isEqualTo: filename)
+          .get();
 
       final duplicates = duplicatesQuerySnapshot.docs;
 
@@ -300,24 +325,187 @@ class FirebaseService extends BaseFirebaseService {
 
       // Add book to Firestore
       await _booksRef.doc(id).set(book);
-      
+
       // Return our books to the caller in case they care
       // ignore: prefer_const_constructors
       return Right(book);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
+      return Left(FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Upload Book',
+          e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Upload Book'));
     }
   }
 
+  // BookCollections ********************************************************************************************
+
+  /// Create a shelf in firestore
+  @override
+  Future<Either<Failure, BookCollection>> addCollection(
+    String collectionName,
+  ) async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) {
+        return Left(Failure('User not logged in'));
+      }
+
+      // Create a shelf with a custom id so that it can easily be referenced later
+      final bookCollection = BookCollection(
+          id: '$userId-$collectionName', name: collectionName, userId: userId);
+      await _collectionsRef.doc('$userId-$collectionName').set(bookCollection);
+
+      // Return the shelf to the caller in case they care
+      return Right(bookCollection);
+    } on FirebaseException catch (e) {
+      return Left(FirebaseFailure(e.message ?? e.toString(), e.code));
+    } on Exception catch (e) {
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  /// Add book to collections
+  ///
+  /// Takes a book and adds the series id to it
+  ///
+  /// Throws [AppException] if it fails.
+  @override
+  Future<void> setBookCollections({
+    required String bookId,
+    required Set<String> collectionIds,
+  }) async {
+    try {
+      await _booksRef
+          .doc(bookId)
+          .update({'collectionIds': collectionIds.toList()});
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
+  /// Add series to collections
+  ///
+  /// Takes a series and adds the series id to it
+  ///
+  /// Throws [AppException] if it fails.
+  @override
+  Future<void> setSeriesCollections({
+    required String seriesId,
+    required Set<String> collectionIds,
+  }) async {
+    try {
+      await _seriesRef
+          .doc(seriesId)
+          .update({'collectionIds': collectionIds.toList()});
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
+  // Series *********************************************
+
+  /// Method to add series to firebase firestore, returns a [Series] object
+  ///
+  /// Throws [AppException] if it fails.
+  @override
+  Future<Series> addSeries(
+    String name, {
+    required String imageUrl,
+    String description = '',
+    Set<String>? collectionIds,
+  }) async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) {
+        throw AppException('user-null');
+      }
+
+      // Create a shelf with a custom id so that it can easily be referenced later
+      final String id = uuid.v4();
+      final series = Series(
+          id: id,
+          userId: userId,
+          title: name,
+          description: description,
+          imageUrl: imageUrl,
+          collectionIds: collectionIds ?? {'$userId-Default'});
+      await _seriesRef.doc(id).set(series);
+
+      // Return the shelf to the caller in case they care
+      return series;
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
+  /// Add book to series
+  ///
+  /// Takes a book and adds the series id to it
+  @override
+  Future<void> addBookToSeries({
+    required String bookId,
+    required String seriesId,
+    required Set<String> collectionIds,
+  }) async {
+    try {
+      await _booksRef.doc(bookId).update(
+          {'seriesId': seriesId, 'collectionIds': collectionIds.toList()});
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
+  /// Remove series
+  ///
+  /// This invokes a firebase function to remove all references to the series.
+  /// This does not delete the books.
+  Future<void> removeSeries(String seriesId) {
+    try {
+      // TODO: Implement removeSeries cloud function
+      throw UnimplementedError();
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
+  // Storage *****************************************************************************************
+
   /// Upload a book to Firebase Storage
   @override
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, {required String title, required String authors}) async {
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(
+    PlatformFile file, {
+    required String title,
+    required String authors,
+  }) async {
     const String epubContentType = 'application/epub+zip';
 
     try {
-    
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
         return Left(Failure('User not logged in'));
@@ -328,11 +516,18 @@ class FirebaseService extends BaseFirebaseService {
         return Left(Failure('File path was null'));
       }
 
-      final res = await uploadFile(userId: userId, file: file, contentType: epubContentType, title: title, authors: authors);
-      
+      final res = await uploadFile(
+          userId: userId,
+          file: file,
+          contentType: epubContentType,
+          title: title,
+          authors: authors);
+
       return res;
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
+      return Left(FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Upload Book',
+          e.code));
     } on Exception catch (e) {
       return Left(Failure(e.toString()));
     }
@@ -340,10 +535,14 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Upload a book cover photo to Firebase Storage
   @override
-  Future<Either<Failure, String>> uploadCoverPhoto({required PlatformFile file, required EpubBookRef openedBook, required String title, required String authors}) async {
+  Future<Either<Failure, String>> uploadCoverPhoto({
+    required PlatformFile file,
+    required EpubBookRef openedBook,
+    required String title,
+    required String authors,
+  }) async {
     const imageContentType = 'image/jpeg';
     try {
-    
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
         return Left(Failure('User not logged in'));
@@ -389,11 +588,19 @@ class FirebaseService extends BaseFirebaseService {
       final bytes = img.encodeJpg(image);
       final String filename = '${file.name}.jpg';
 
-      final res = await uploadBytes(userId: userId, bytes: Uint8List.fromList(bytes), filename: filename, contentType: imageContentType, title: title, authors: authors);
-      
+      final res = await uploadBytes(
+          userId: userId,
+          bytes: Uint8List.fromList(bytes),
+          filename: filename,
+          contentType: imageContentType,
+          title: title,
+          authors: authors);
+
       return res;
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Upload Book', e.code));
+      return Left(FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Upload Book',
+          e.code));
     } on Exception catch (e) {
       return Left(Failure(e.toString()));
     } catch (e) {
@@ -402,181 +609,69 @@ class FirebaseService extends BaseFirebaseService {
   }
 
   @override
-  Future<Either<Failure, String>> uploadBytes({required String userId, required Uint8List bytes, required String filename, required String contentType, required String title, required String authors}) async {
+  Future<Either<Failure, String>> uploadBytes({
+    required String userId,
+    required Uint8List bytes,
+    required String filename,
+    required String contentType,
+    required String title,
+    required String authors,
+  }) async {
     final path = '$userId/$title-$authors-$filename'.replaceAll('/', '');
     try {
       // Check if file exists, exit if it does
-      await _storage.ref(path).getDownloadURL();
+      await _firebaseStorage.ref(path).getDownloadURL();
       return Left(Failure('File already exists'));
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
-      await _storage.ref(path).putData(
-        bytes, SettableMetadata(contentType: contentType),
-      );
-      final url = await _storage.ref(path).getDownloadURL();
+      await _firebaseStorage.ref(path).putData(
+            bytes,
+            SettableMetadata(contentType: contentType),
+          );
+      final url = await _firebaseStorage.ref(path).getDownloadURL();
       return Right(url);
     }
   }
 
   @override
-  Future<Either<Failure, String>> uploadFile({required String userId, required PlatformFile file, required String contentType, required String title, required String authors}) async {
+  Future<Either<Failure, String>> uploadFile({
+    required String userId,
+    required PlatformFile file,
+    required String contentType,
+    required String title,
+    required String authors,
+  }) async {
     final path = '$userId/$title-$authors-${file.name}'.replaceAll('/', '');
     try {
       // Check if file exists, exit if it does
-      await _storage.ref(path).getDownloadURL();
+      await _firebaseStorage.ref(path).getDownloadURL();
       return Left(Failure('File already exists'));
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
       final filepath = file.path;
       if (filepath == null) return Left(Failure('file.path was null'));
 
-      await _storage.ref(path).putFile(
-        io.File(filepath), SettableMetadata(contentType: contentType),
-      );
-      final url = await _storage.ref(path).getDownloadURL();
+      await _firebaseStorage.ref(path).putFile(
+            io.File(filepath),
+            SettableMetadata(contentType: contentType),
+          );
+      final url = await _firebaseStorage.ref(path).getDownloadURL();
       return Right(url);
     }
   }
 
-  // BookCollections ****************************************************
-
-  /// Create a shelf in firestore
   @override
-  Future<Either<Failure, BookCollection>> addCollection(String collectionName) async {
-    try {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) {
-        return Left(Failure('User not logged in'));
-      }
-
-      // Create a shelf with a custom id so that it can easily be referenced later
-      final bookCollection = BookCollection(
-        id: '$userId-$collectionName',
-        name: collectionName,
-        userId: userId
-      );
-      await _collectionsRef.doc('$userId-$collectionName').set(bookCollection);
-      
-      // Return the shelf to the caller in case they care
-      return Right(bookCollection);
-    } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(e.message ?? e.toString(), e.code));
-    } on Exception catch (e) {
-      return Left(Failure(e.toString()));
+  Future<Uint8List?> downloadFile(String filename) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
     }
-  }
 
-  /// Add book to collections
-  /// 
-  /// Takes a book and adds the series id to it
-  /// 
-  /// Throws [AppException] if it fails.
-  @override
-  Future<void> setBookCollections({required String bookId, required Set<String> collectionIds}) async {
     try {
-      await _booksRef.doc(bookId).update({'collectionIds': collectionIds.toList()});
-    } on FirebaseException catch (e) {
-      throw AppException(e.message ?? e.toString(), e.code);
-    } on Exception catch (e) {
-      if (e is AppException) {
-        rethrow;
-      }
-      throw AppException (e.toString());
-    }
-  }
-
-  /// Add series to collections
-  /// 
-  /// Takes a series and adds the series id to it
-  /// 
-  /// Throws [AppException] if it fails.
-  @override
-  Future<void> setSeriesCollections({required String seriesId, required Set<String> collectionIds}) async {
-    try {
-      await _seriesRef.doc(seriesId).update({'collectionIds': collectionIds.toList()});
-    } on FirebaseException catch (e) {
-      throw AppException(e.message ?? e.toString(), e.code);
-    } on Exception catch (e) {
-      if (e is AppException) {
-        rethrow;
-      }
-      throw AppException (e.toString());
-    }
-  }
-
-
-  // Series *********************************************
-
-  /// Method to add series to firebase firestore, returns a [Series] object
-  /// 
-  /// Throws [AppException] if it fails.
-  @override
-  Future<Series> addSeries(String name, {required String imageUrl, String description = '', Set<String>? collectionIds}) async {
-    
-    try {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) {
-        throw AppException('user-null');
-      }
-
-      // Create a shelf with a custom id so that it can easily be referenced later
-      final String id = uuid.v4();
-      final series = Series(
-        id: id,
-        userId: userId,
-        title: name,
-        description: description,
-        imageUrl: imageUrl,
-        collectionIds: collectionIds ?? {'$userId-Default'}
-      );
-      await _seriesRef.doc(id).set(series);
-      
-      // Return the shelf to the caller in case they care
-      return series;
-    } on FirebaseException catch (e) {
-      throw AppException(e.message ?? e.toString(), e.code);
-    } on Exception catch (e) {
-      if (e is AppException) {
-        rethrow;
-      }
-      throw AppException (e.toString());
-    }
-  }
-
-  /// Add book to series
-  /// 
-  /// Takes a book and adds the series id to it
-  @override
-  Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds}) async {
-    try {
-      await _booksRef.doc(bookId).update({'seriesId': seriesId, 'collectionIds': collectionIds.toList()});
-    } on FirebaseException catch (e) {
-      throw AppException(e.message ?? e.toString(), e.code);
-    } on Exception catch (e) {
-      if (e is AppException) {
-        rethrow;
-      }
-      throw AppException (e.toString());
-    }
-  }
-
-  /// Remove series
-  /// 
-  /// This invokes a firebase function to remove all references to the series.
-  /// This does not delete the books.
-  Future<void> removeSeries(String seriesId) {
-    try {
-      // TODO: Implement removeSeries cloud function
-      throw UnimplementedError();
-    } on FirebaseException catch (e) {
-      throw AppException(e.message ?? e.toString(), e.code);
-    } on Exception catch (e) {
-      if (e is AppException) {
-        rethrow;
-      }
-      throw AppException (e.toString());
+      final fileRef = _firebaseStorage.ref('$userId/$filename');
+      return await fileRef.getData();
+    } on FirebaseException catch (e, _) {
+      throw AppException(e.message, e.code);
     }
   }
 }
-
-

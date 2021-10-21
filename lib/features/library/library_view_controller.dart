@@ -160,13 +160,17 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   Future<BookStatus> getBookStatus(Book book) async {
     final storageService = _read(storageServiceProvider);
 
-    final exists = await storageService.fileExists(book.filename);
+    final bool exists = await storageService.fileExists(book.filename);
 
     if (exists) {
       return BookStatus.downloaded;
     }
 
     return BookStatus.notDownloaded;
+  }
+
+  Future<void> downloadBook(Book book) async {
+
   }
 }
 

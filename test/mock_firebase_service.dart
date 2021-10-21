@@ -34,21 +34,25 @@ class MockFirebaseService implements FirebaseService {
         // Book(title: 'Book 1', id: '1'),
         // Book(title: 'Book 2', id: '2'),
       ];
-      
+
       // Return our books to the caller in case they care
       // ignore: prefer_const_constructors
       return Right(books);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books', e.code));
+      return Left(FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books',
+          e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Refresh Books'));
     }
   }
 
   @override
-  Future<Either<Failure, UserCredential>> signIn({required String email, required String password}) async {
+  Future<Either<Failure, UserCredential>> signIn(
+      {required String email, required String password}) async {
     try {
-      final userCredential = await firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
+      final userCredential = await firebaseAuth.signInWithEmailAndPassword(
+          email: email, password: password);
       // Return the data incase the caller needs it
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
@@ -64,7 +68,8 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, UserCredential>> signUp({required String email, required String password}) async {
+  Future<Either<Failure, UserCredential>> signUp(
+      {required String email, required String password}) async {
     try {
       final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
         email: email,
@@ -73,7 +78,8 @@ class MockFirebaseService implements FirebaseService {
       // Return the data incase the caller needs it
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Signup Not Successful', e.code));
+      return Left(
+          FirebaseFailure(e.message ?? 'Signup Not Successful', e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not SignUp'));
     }
@@ -90,7 +96,9 @@ class MockFirebaseService implements FirebaseService {
       await firebaseAuth.sendPasswordResetEmail(email: email);
       return const Right(null);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email', e.code));
+      return Left(FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email',
+          e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Send Reset Email'));
     }
@@ -117,7 +125,9 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, Book>> addBookToFirestore(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl}) {
+  Future<Either<Failure, Book>> addBookToFirestore(
+      PlatformFile file, EpubBookRef openedBook,
+      {String collection = 'Default', String? imageUrl}) {
     // TODO: implement addBook
     throw UnimplementedError();
   }
@@ -129,27 +139,41 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, {required String title, required String authors}) {
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file,
+      {required String title, required String authors}) {
     // TODO: implement uploadBook
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, String>> uploadCoverPhoto({required PlatformFile file, required EpubBookRef openedBook, required String title, required String authors}) {
+  Future<Either<Failure, String>> uploadCoverPhoto(
+      {required PlatformFile file,
+      required EpubBookRef openedBook,
+      required String title,
+      required String authors}) {
     // TODO: implement uploadCoverPhoto
     throw UnimplementedError();
   }
 
-  
-
   @override
-  Future<Either<Failure, String>> uploadBytes({required String userId, required Uint8List bytes, required String filename, required String contentType, required String title, required String authors}) {
+  Future<Either<Failure, String>> uploadBytes(
+      {required String userId,
+      required Uint8List bytes,
+      required String filename,
+      required String contentType,
+      required String title,
+      required String authors}) {
     // TODO: implement uploadBytes
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, String>> uploadFile({required String userId, required PlatformFile file, required String contentType, required String title, required String authors}) {
+  Future<Either<Failure, String>> uploadFile(
+      {required String userId,
+      required PlatformFile file,
+      required String contentType,
+      required String title,
+      required String authors}) {
     // TODO: implement uploadFile
     throw UnimplementedError();
   }
@@ -159,13 +183,19 @@ class MockFirebaseService implements FirebaseService {
   Stream<User?> get userChanges => throw UnimplementedError();
 
   @override
-  Future<Series> addSeries(String name, {required String imageUrl, String description = '', Set<String>? collectionIds}) {
+  Future<Series> addSeries(String name,
+      {required String imageUrl,
+      String description = '',
+      Set<String>? collectionIds}) {
     // TODO: implement addSeries
     throw UnimplementedError();
   }
 
   @override
-  Future<void> addBookToSeries({required String bookId, required String seriesId, required Set<String> collectionIds}) {
+  Future<void> addBookToSeries(
+      {required String bookId,
+      required String seriesId,
+      required Set<String> collectionIds}) {
     // TODO: implement addBookToSeries
     throw UnimplementedError();
   }
@@ -177,13 +207,15 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<void> setBookCollections({required String bookId, required Set<String> collectionIds}) {
+  Future<void> setBookCollections(
+      {required String bookId, required Set<String> collectionIds}) {
     // TODO: implement addBookToCollections
     throw UnimplementedError();
   }
 
   @override
-  Future<void> setSeriesCollections({required String seriesId, required Set<String> collectionIds}) {
+  Future<void> setSeriesCollections(
+      {required String seriesId, required Set<String> collectionIds}) {
     // TODO: implement setSeriesCollections
     throw UnimplementedError();
   }
@@ -194,10 +226,16 @@ class MockFirebaseService implements FirebaseService {
 
   @override
   // TODO: implement collectionsStream
-  Stream<QuerySnapshot<BookCollection>> get collectionsStream => throw UnimplementedError();
+  Stream<QuerySnapshot<BookCollection>> get collectionsStream =>
+      throw UnimplementedError();
 
   @override
   // TODO: implement seriesStream
   Stream<QuerySnapshot<Series>> get seriesStream => throw UnimplementedError();
 
+  @override
+  Future<Uint8List?> downloadFile(String filename) {
+    // TODO: implement downloadFile
+    throw UnimplementedError();
+  }
 }
