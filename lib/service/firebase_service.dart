@@ -285,6 +285,9 @@ class FirebaseService extends BaseFirebaseService {
     EpubBookRef openedBook, {
     String collection = 'Default',
     String? imageUrl,
+    required String title,
+    required String authors,
+    required String subtitle,
   }) async {
     try {
       final userId = _auth.currentUser?.uid;
@@ -292,10 +295,7 @@ class FirebaseService extends BaseFirebaseService {
         return Left(Failure('User not logged in'));
       }
 
-      // Create a book object to add to the collection
-      final title = openedBook.Title ?? '';
-      final subtitle =
-          openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
+      // Create a book object to add to the collectionle
       final filename = file.name;
       final String id = uuid.v4();
       final book = Book(
@@ -304,7 +304,7 @@ class FirebaseService extends BaseFirebaseService {
         title: title,
         subtitle: subtitle,
         addedDate: DateTime.now().toUtc(),
-        filename: filename,
+        filename: '$userId/$title-$authors-$filename',
         imageUrl: imageUrl,
         collectionIds: {'$userId-$collection'},
       );
@@ -659,7 +659,7 @@ class FirebaseService extends BaseFirebaseService {
           );
 
       // TODO: Somehow expose this to UI for upload progress
-      /*final TaskSnapshot snapshot = */await task;
+      /*final TaskSnapshot snapshot = */ await task;
 
       final url = await _firebaseStorage.ref(path).getDownloadURL();
       return Right(url);
@@ -679,6 +679,7 @@ class FirebaseService extends BaseFirebaseService {
     final io.File downloadToFile = io.File(filePath);
 
     try {
+      print('$userId/$filename');
       final fileRef = _firebaseStorage.ref('$userId/$filename');
       return fileRef.writeToFile(downloadToFile);
     } on FirebaseException catch (e, _) {

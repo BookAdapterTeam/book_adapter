@@ -298,10 +298,15 @@ class FirebaseController {
 
       final title = openedBook.Title ?? '';
       final authors = openedBook.AuthorList?.join(',') ?? '';
+      final subtitle = openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
 
       // Upload cover image to storage
       final res = await _firebaseService.uploadCoverPhoto(
-          file: file, openedBook: openedBook, title: title, authors: authors);
+        file: file,
+        openedBook: openedBook,
+        title: title,
+        authors: authors,
+      );
       final String? imageUrl = res.fold(
         (failure) {
           debugPrint('Could not upload cover photo');
@@ -311,8 +316,14 @@ class FirebaseController {
       );
 
       // Upload to Firestore
-      final firestoreRes = await _firebaseService
-          .addBookToFirestore(file, openedBook, imageUrl: imageUrl);
+      final firestoreRes = await _firebaseService.addBookToFirestore(
+        file,
+        openedBook,
+        imageUrl: imageUrl,
+        title: title,
+        authors: authors,
+        subtitle: subtitle,
+      );
       if (firestoreRes.isLeft()) {
         return Left(firestoreRes
             .swap()
@@ -342,8 +353,10 @@ class FirebaseController {
   /// Add a list of books to a collection
   ///
   /// Throws [AppException] if theres an exception
-  Future<void> setItemsCollections(
-      {required List<Item> items, required Set<String> collectionIds}) async {
+  Future<void> setItemsCollections({
+    required List<Item> items,
+    required Set<String> collectionIds,
+  }) async {
     try {
       for (final item in items) {
         if (item is Book) {

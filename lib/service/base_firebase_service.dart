@@ -61,8 +61,10 @@ abstract class BaseFirebaseService {
   /// - **wrong-password**:
   ///  - Returned if the password is invalid for the given email, or the account
   ///    corresponding to the email does not have a password set.
-  Future<Either<Failure, UserCredential>> signIn(
-      {required String email, required String password});
+  Future<Either<Failure, UserCredential>> signIn({
+    required String email,
+    required String password,
+  });
 
   /// Tries to create a new user account with the given email address and
   /// password.
@@ -81,8 +83,10 @@ abstract class BaseFirebaseService {
   ///    email/password accounts in the Firebase Console, under the Auth tab.
   /// - **weak-password**:
   ///  - Returned if the password is not strong enough.
-  Future<Either<Failure, UserCredential>> signUp(
-      {required String email, required String password});
+  Future<Either<Failure, UserCredential>> signUp({
+    required String email,
+    required String password,
+  });
 
   /// Signs out the current user.
   ///
@@ -111,66 +115,88 @@ abstract class BaseFirebaseService {
 
   /// Add a book to Firebase Database
   Future<Either<Failure, Book>> addBookToFirestore(
-      PlatformFile file, EpubBookRef openedBook,
-      {String collection = 'Default'});
+    PlatformFile file,
+    EpubBookRef openedBook, {
+    String collection = 'Default',
+    String? imageUrl,
+    required String title,
+    required String authors,
+    required String subtitle,
+  });
 
   /// Upload a book to Firebase Storage
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file,
-      {required String title, required String authors});
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(
+    PlatformFile file, {
+    required String title,
+    required String authors,
+  });
 
   /// Upload a book cover photo to Firebase Storage
-  Future<Either<Failure, void>> uploadCoverPhoto(
-      {required PlatformFile file,
-      required EpubBookRef openedBook,
-      required String title,
-      required String authors});
+  Future<Either<Failure, void>> uploadCoverPhoto({
+    required PlatformFile file,
+    required EpubBookRef openedBook,
+    required String title,
+    required String authors,
+  });
 
   /// Upload bytes to Firebase Storage
-  Future<Either<Failure, String>> uploadBytes(
-      {required String userId,
-      required Uint8List bytes,
-      required String filename,
-      required String contentType,
-      required String title,
-      required String authors});
+  Future<Either<Failure, String>> uploadBytes({
+    required String userId,
+    required Uint8List bytes,
+    required String filename,
+    required String contentType,
+    required String title,
+    required String authors,
+  });
 
   /// Upload a file to Firebase Storage
-  Future<void> uploadFile(
-      {required String userId,
-      required PlatformFile file,
-      required String contentType,
-      required String title,
-      required String authors});
+  Future<void> uploadFile({
+    required String userId,
+    required PlatformFile file,
+    required String contentType,
+    required String title,
+    required String authors,
+  });
 
   /// Create a shelf
   Future<Either<Failure, BookCollection>> addCollection(String name);
 
   /// Create a series
-  Future<Series> addSeries(String name,
-      {required String imageUrl,
-      String description = '',
-      Set<String>? collectionIds});
+  Future<Series> addSeries(
+    String name, {
+    required String imageUrl,
+    String description = '',
+    Set<String>? collectionIds,
+  });
 
   /// Add book to series
-  Future<void> addBookToSeries(
-      {required String bookId,
-      required String seriesId,
-      required Set<String> collectionIds});
+  Future<void> addBookToSeries({
+    required String bookId,
+    required String seriesId,
+    required Set<String> collectionIds,
+  });
 
   /// Add book to collections
   ///
   /// Takes a book and adds the series id to it
-  Future<void> setBookCollections(
-      {required String bookId, required Set<String> collectionIds});
+  Future<void> setBookCollections({
+    required String bookId,
+    required Set<String> collectionIds,
+  });
 
   /// Add series to collections
   ///
   /// Takes a series and adds the series id to it
   ///
   /// Throws [AppException] if it fails.
-  Future<void> setSeriesCollections(
-      {required String seriesId, required Set<String> collectionIds});
+  Future<void> setSeriesCollections({
+    required String seriesId,
+    required Set<String> collectionIds,
+  });
 
   /// Download a file into memory
-  DownloadTask downloadFile(String filename, String filePath);
+  DownloadTask downloadFile(
+    String filename,
+    String filePath,
+  );
 }
