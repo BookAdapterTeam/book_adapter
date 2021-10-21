@@ -99,7 +99,8 @@ class _ItemListTile extends ConsumerWidget {
         : null;
 
     if (item is Book) {
-      final statusFtr = viewController.getBookStatus(item as Book);
+      final book = item as Book;
+      final statusFtr = viewController.getBookStatus(book);
       return FutureBuilder<BookStatus>(
         future: statusFtr,
         initialData: BookStatus.unknown,
@@ -134,9 +135,7 @@ class _ItemListTile extends ConsumerWidget {
                 break;
               case BookStatus.notDownloaded:
                 icon = const Icon(Icons.download);
-                onPressed = () {
-                  // TODO: Make firebase call to download book
-                };
+                onPressed = () => viewController.downloadBook(book);
                 break;
               case BookStatus.errorUploading:
                 icon = const Icon(
@@ -183,6 +182,10 @@ class _ItemListTile extends ConsumerWidget {
               item: item,
               subtitle: subtitle,
               leading: image,
+              trailing: IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.circle),
+              ),
               disableSelect: disableSelect,
               isSelected: isSelected);
         },
