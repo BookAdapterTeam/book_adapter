@@ -133,7 +133,7 @@ class _ItemListTile extends ConsumerWidget {
                 onPressed = null;
                 break;
               case BookStatus.notDownloaded:
-                icon = const Icon(Icons.download_for_offline_rounded);
+                icon = const Icon(Icons.download);
                 onPressed = () {
                   // TODO: Make firebase call to download book
                 };
