@@ -437,7 +437,7 @@ class FirebaseController {
   /// Download a file and copy it to documents
   ///
   /// Thorws `AppException` if it fails
-  Future<DownloadTask> downloadFile(String filename) async {
+  DownloadTask downloadFile(String filename) {
     try {
       return _firebaseService.downloadFile(
         filename,

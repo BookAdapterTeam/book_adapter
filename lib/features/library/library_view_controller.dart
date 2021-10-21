@@ -6,8 +6,10 @@ import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 
 final libraryViewController =
     StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>(
@@ -29,6 +31,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       : super(data);
 
   final Reader _read;
+  final log = Logger();
 
   Future<void> addBooks(BuildContext context) async {
     // Make storage service call to pick books
@@ -155,10 +158,14 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   /// Get the current status of a book to determine what icon to show on the book tile
-  /// 
+  ///
   /// TODO: Determine if the book is downloading, uploading, or an error downloading/uploading
   Future<BookStatus> getBookStatus(Book book) async {
     final storageService = _read(storageServiceProvider);
+
+    if (state.downloadingBooks?.containsKey(book.id) ?? false) {
+      return BookStatus.downloading;
+    }
 
     final bool exists = await storageService.fileExists(book.filename);
 
@@ -169,8 +176,32 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     return BookStatus.notDownloaded;
   }
 
-  Future<void> downloadBook(Book book) async {
+  void addDownloadTask(DownloadTask task, String bookId) {
+    state = state.copyWith(downloadingBooks: {
+      ...?state.downloadingBooks,
+      bookId: task,
+    });
+  }
 
+  void removeDownloadTask(DownloadTask task, String bookId) {
+    final downloadingBooks = {...?state.downloadingBooks};
+    downloadingBooks.remove({bookId: task});
+    state = state.copyWith(downloadingBooks: downloadingBooks);
+  }
+
+  Future<DownloadTask?> downloadBook(Book book) async {
+    final firebaseController = _read(firebaseControllerProvider);
+    try {
+      final task = firebaseController.downloadFile(book.filename);
+      addDownloadTask(task, book.id);
+      // ignore: unawaited_futures
+      task.whenComplete(() {
+        removeDownloadTask(task, book.id);
+      });
+    } on AppException catch (e) {
+      log.e(e.toString());
+      return null;
+    }
   }
 }
 
@@ -186,6 +217,7 @@ enum BookStatus {
 
 class LibraryViewData {
   final List<Book>? books;
+  final Map<String, DownloadTask>? downloadingBooks;
   final List<BookCollection>? collections;
   final List<Series>? series;
 
@@ -210,6 +242,7 @@ class LibraryViewData {
 
   LibraryViewData({
     this.books,
+    this.downloadingBooks,
     this.collections,
     this.selectedItems = const <Item>{},
     this.series,
@@ -245,12 +278,14 @@ class LibraryViewData {
 
   LibraryViewData copyWith({
     List<Book>? books,
+    Map<String, DownloadTask>? downloadingBooks,
     List<BookCollection>? collections,
     Set<Item>? selectedItems,
     List<Series>? series,
   }) {
     return LibraryViewData(
       books: books ?? this.books,
+      downloadingBooks: downloadingBooks ?? this.downloadingBooks,
       collections: collections ?? this.collections,
       selectedItems: selectedItems ?? this.selectedItems,
       series: series ?? this.series,
