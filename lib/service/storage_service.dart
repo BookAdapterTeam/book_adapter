@@ -16,9 +16,9 @@ final storageServiceProvider = Provider.autoDispose<StorageService>((ref) {
 class StorageService {
   StorageService();
 
-  late final io.Directory appDocumentsDir;
+  io.Directory? appDocumentsDir;
 
-  late final String appPath;
+  String? appPath;
 
   final log = Logger();
 
@@ -28,7 +28,11 @@ class StorageService {
   Future<void> init() async {
     try {
       appDocumentsDir = await getApplicationDocumentsDirectory();
-      appPath = '${appDocumentsDir.path}/BookAdapt';
+      if (appDocumentsDir == null) {
+        appPath = null;
+      } else {
+        appPath = '${appDocumentsDir!.path}/BookAdapt';
+      }
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
     }

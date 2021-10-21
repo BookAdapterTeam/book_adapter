@@ -153,14 +153,31 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     final firebaseController = _read(firebaseControllerProvider);
     await firebaseController.addCollection(name);
   }
+
+  /// Get the current status of a book to determine what icon to show on the book tile
+  /// 
+  /// TODO: Determine if the book is downloading, uploading, or an error downloading/uploading
+  Future<BookStatus> getBookStatus(Book book) async {
+    final storageService = _read(storageServiceProvider);
+
+    final exists = await storageService.fileExists(book.filename);
+
+    if (exists) {
+      return BookStatus.downloaded;
+    }
+
+    return BookStatus.notDownloaded;
+  }
 }
 
-enum bookStatus {
+enum BookStatus {
   downloaded,
   downloading,
   uploading,
-  error,
   notDownloaded,
+  errorUploading,
+  errorDownloading,
+  unknown,
 }
 
 class LibraryViewData {
