@@ -20,6 +20,8 @@ class StorageService {
 
   io.Directory? appDocumentsDir;
 
+  io.Directory? bookAdaptDirectory;
+
   String? appPath;
 
   final log = Logger();
@@ -30,12 +32,12 @@ class StorageService {
   Future<void> init() async {
     try {
       appDocumentsDir = await getApplicationDocumentsDirectory();
-      if (appDocumentsDir == null) {
-        appPath = null;
-      } else {
-        appPath = '${appDocumentsDir!.path}/BookAdapt';
-      }
+      appPath = '${appDocumentsDir!.path}/BookAdapt';
+      bookAdaptDirectory = io.Directory(appPath!);
     } on Exception catch (e, st) {
+      appPath = null;
+      appDocumentsDir = null;
+      bookAdaptDirectory = null;
       log.e(e.toString(), e, st);
     }
   }
@@ -58,6 +60,39 @@ class StorageService {
     }
 
     return Right(selectedDirectory);
+  }
+
+  /// Check if files exist on device on app start, then check for a book if it exists before opening it
+  ///
+  /// Returns a list of the filenames
+  Future<List<io.FileSystemEntity>> listFiles(
+      {bool recursive = false, bool followLinks = true}) {
+    assert(bookAdaptDirectory != null);
+
+    try {
+      final files = bookAdaptDirectory!.list(
+        recursive: recursive,
+        followLinks: followLinks,
+      );
+      return files.toList();
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
+      throw AppException(e.toString());
+    }
+  }
+
+  /// Deletes a given File
+  ///
+  /// Returns a list of the filenames
+  Future<io.FileSystemEntity> deleteFile(String filename) async {
+    assert(appPath != null);
+    try {
+      final file = io.File('$appPath/$filename');
+      return await file.delete();
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
+      rethrow;
+    }
   }
 
   /// Retrieves the file(s) from the underlying platform

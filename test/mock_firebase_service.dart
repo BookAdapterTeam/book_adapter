@@ -126,14 +126,6 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, Book>> addBookToFirestore(
-      PlatformFile file, EpubBookRef openedBook,
-      {String collection = 'Default', String? imageUrl}) {
-    // TODO: implement addBook
-    throw UnimplementedError();
-  }
-
-  @override
   Future<Either<Failure, BookCollection>> addCollection(String shelfName) {
     // TODO: implement addShelf
     throw UnimplementedError();
@@ -237,6 +229,12 @@ class MockFirebaseService implements FirebaseService {
   @override
   DownloadTask downloadFile(String filename, String filePath) {
     // TODO: implement downloadFile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Book>> addBookToFirestore(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl, required String title, required String authors, required String subtitle}) {
+    // TODO: implement addBookToFirestore
     throw UnimplementedError();
   }
 }

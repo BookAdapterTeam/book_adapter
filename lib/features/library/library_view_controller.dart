@@ -1,9 +1,11 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
+import 'package:book_adapter/data/user_data.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
+import 'package:book_adapter/model/user_model.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -17,11 +19,14 @@ final libraryViewController =
   final books = ref.watch(bookStreamProvider);
   final collections = ref.watch(collectionsStreamProvider);
   final series = ref.watch(seriesStreamProvider);
+  final userData = ref.watch(userModelProvider);
 
   final data = LibraryViewData(
-      books: books.asData?.value,
-      collections: collections.asData?.value,
-      series: series.asData?.value);
+    books: books.asData?.value,
+    collections: collections.asData?.value,
+    series: series.asData?.value,
+    userData: userData,
+  );
   return LibraryViewController(ref.read, data: data);
 });
 
@@ -160,14 +165,12 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   /// Get the current status of a book to determine what icon to show on the book tile
   ///
   /// TODO: Determine if the book is uploading, or an error downloading/uploading
-  Future<BookStatus> getBookStatus(Book book) async {
-    final storageService = _read(storageServiceProvider);
-
+  BookStatus getBookStatus(Book book) {
     if (state.downloadingBooks?.containsKey(book.id) ?? false) {
       return BookStatus.downloading;
     }
 
-    final bool exists = await storageService.fileExists(book.filename);
+    final bool exists = state.userData.downloadedFiles?.contains(book.filename) ?? false;
 
     if (exists) {
       return BookStatus.downloaded;
@@ -221,6 +224,8 @@ class LibraryViewData {
   final List<BookCollection>? collections;
   final List<Series>? series;
 
+  final UserData userData;
+
   /// The ids of all items currently selected. Duplicates are not allowed
   ///
   /// When merging and some items are a series, the app will get the books in
@@ -246,6 +251,7 @@ class LibraryViewData {
     this.collections,
     this.selectedItems = const <Item>{},
     this.series,
+    required this.userData,
   });
 
   List<Item> getCollectionItems(String collectionId) {
@@ -282,6 +288,7 @@ class LibraryViewData {
     List<BookCollection>? collections,
     Set<Item>? selectedItems,
     List<Series>? series,
+    UserData? userData,
   }) {
     return LibraryViewData(
       books: books ?? this.books,
@@ -289,6 +296,7 @@ class LibraryViewData {
       collections: collections ?? this.collections,
       selectedItems: selectedItems ?? this.selectedItems,
       series: series ?? this.series,
+      userData: userData ?? this.userData,
     );
   }
 }
