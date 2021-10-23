@@ -17,6 +17,7 @@ class UserData extends Equatable {
   UserData copyWith({
     List<Book>? books,
     List<String>? downloadedFiles,
+    Set<String>? downloadingFiles,
   }) {
     return UserData(
       books: books ?? this.books,
@@ -28,5 +29,8 @@ class UserData extends Equatable {
   bool get stringify => true;
 
   @override
-  List<Object> get props => [books ?? 'No books set', downloadedFiles ?? 'No files set'];
+  List<Object> get props => [
+        books ?? 'No books set',
+        downloadedFiles ?? 'No files set',
+      ];
 }

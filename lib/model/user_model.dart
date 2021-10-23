@@ -1,12 +1,13 @@
-import 'dart:io';
-
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/user_data.dart';
-import 'package:book_adapter/service/storage_service.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/model/queue_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final userModelProvider = StateNotifierProvider<UserModel, UserData>((ref) {
+final userModelProvider =
+    StateNotifierProvider.autoDispose<UserModel, UserData>((ref) {
   const userData = UserData();
 
   return UserModel(ref.read, userData);
@@ -17,45 +18,32 @@ class UserModel extends StateNotifier<UserData> {
 
   final Reader _read;
 
-  // Update UserData with new list of books
-  // void setBooks(List<Book> books) {
-  //   state = state.copyWith(books: books);
-  // }
+  /// Qeue a new book download
+  void queueDownload(Book book) {
+    final downloadQueueNotifier = _read(queueBookProvider.notifier);
+    // Queue download
+    downloadQueueNotifier.addToQueue(book);
+  }
 
-  // // Update UserData with new book
-  // void addBook(Book book) {
-  //   state = state.copyWith(books: [...?state.books, book]);
-  // }
 
-  // // Update UserData with new book
-  // void deleteBook(Book book) {
-  //   state = state.copyWith(books: [
-  //     for (final loopBook in state.books ?? [])
-  //      if (book != loopBook) loopBook,
-  //   ]);
-  // }
+  List<Book> get downloadQueue {
+    return _read(queueBookProvider).queueListItems;
+  }
 
-  Future<void> setDownloadedFiles() async {
+  Future<void> setDownloadedFilenames() async {
     final firebaseController = _read(firebaseControllerProvider);
-    final storageService = _read(storageServiceProvider);
+    final storageController = _read(storageControllerProvider);
 
     final String? userId = firebaseController.currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
     }
-
-    try {
-      final filesPaths = storageService.listFiles(userId: userId);
-      final filenames = filesPaths.map((file) {
-        return file.path.split('/').last;
-      }).toList();
-      state = state.copyWith(downloadedFiles: filenames);
-    } on FileSystemException catch (e, _) {
-      state = state.copyWith(downloadedFiles: []);
-    }
+    state = state.copyWith(
+      downloadedFiles: storageController.getDownloadedFilenames(),
+    );
   }
 
-  void addDownloadedFile(String filename) {
+  void addDownloadedFilename(String filename) {
     state = state.copyWith(downloadedFiles: [
       ...?state.downloadedFiles,
       filename,

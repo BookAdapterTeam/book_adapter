@@ -6,11 +6,11 @@ import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
+import 'package:book_adapter/model/queue_model.dart';
 import 'package:book_adapter/model/user_model.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -22,12 +22,14 @@ final libraryViewController =
   final collections = ref.watch(collectionsStreamProvider);
   final series = ref.watch(seriesStreamProvider);
   final userData = ref.watch(userModelProvider);
+  final queueData = ref.watch(queueBookProvider);
 
   final data = LibraryViewData(
     books: books.asData?.value,
     collections: collections.asData?.value,
     series: series.asData?.value,
     userData: userData,
+    queueListItems: queueData.queueListItems,
   );
   return LibraryViewController(ref.read, data: data);
 });
@@ -164,43 +166,19 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     await firebaseController.addCollection(name);
   }
 
-  void addDownload(String bookId) {
-    state = state.copyWith(downloadingBooks: [
-      ...?state.downloadingBooks,
-      bookId,
-    ]);
-  }
-
-  void removeDownload(String bookId) {
-    final downloadingBooks = [...?state.downloadingBooks];
-    downloadingBooks.remove(bookId);
-    state = state.copyWith(downloadingBooks: downloadingBooks);
-  }
-
-  Future<Either<Failure, DownloadTask>> downloadBook(Book book) async {
-    // TODO: Refactor this into a provider called StorageController
-
+  Future<Either<Failure, void>> downloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
     final firebaseController = _read(firebaseControllerProvider);
-    final storageService = _read(storageServiceProvider);
     final userModel = _read(userModelProvider.notifier);
+
     try {
       // Check if file exists on server before downloading
       final bool exists = await firebaseController.fileExists(book.filepath);
 
       if (!exists) return Left(Failure('Could not find file on server'));
 
-      final appBookAdaptPath = storageService.appBookAdaptPath;
-      final task = firebaseController.downloadFile(
-          book.filepath, '$appBookAdaptPath/${book.filepath}');
-      addDownload(book.id);
-      // ignore: unawaited_futures
-      task.whenComplete(() {
-        removeDownload(book.id);
-        userModel.addDownloadedFile(book.filename);
-      });
-
-      return Right(task);
+      userModel.queueDownload(book);
+      return const Right(null);
     } on AppException catch (e) {
       log.e(e.toString());
       return Left(Failure(e.message ?? e.toString()));
@@ -210,28 +188,29 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   /// Get the current status of a book to determine what icon to show on the book tile
   ///
   /// TODO: Determine if the book is uploading, or an error downloading/uploading
-  BookStatus getBookStatus(Book book) {
-    final BookStatus status;
-    if (state.downloadingBooks?.contains(book.id) ?? false) {
-      status = BookStatus.downloading;
-    } else {
-      final bool exists = state.userData.downloadedFiles
-              ?.contains(book.filepath.split('/').last) ??
-          false;
+  // BookStatus getBookStatus(Book book) {
+  //   final BookStatus status;
+  //   if (state.queueData.queueListItems.contains(book)) {
+  //     status = BookStatus.downloading;
+  //   } else {
+  //     final bool exists = state.userData.downloadedFiles
+  //             ?.contains(book.filepath.split('/').last) ??
+  //         false;
 
-      if (exists) {
-        status = BookStatus.downloaded;
-      } else {
-        status = BookStatus.notDownloaded;
-      }
-    }
-    return status;
-  }
+  //     if (exists) {
+  //       status = BookStatus.downloaded;
+  //     } else {
+  //       status = BookStatus.notDownloaded;
+  //     }
+  //   }
+  //   return status;
+  // }
 }
 
 enum BookStatus {
   downloaded,
   downloading,
+  waiting,
   uploading,
   notDownloaded,
   errorUploading,
@@ -244,6 +223,7 @@ class LibraryViewData {
   final List<String>? downloadingBooks;
   final List<BookCollection>? collections;
   final List<Series>? series;
+  final List<Book> queueListItems;
 
   final UserData userData;
 
@@ -273,7 +253,47 @@ class LibraryViewData {
     this.selectedItems = const <Item>{},
     this.series,
     required this.userData,
+    required this.queueListItems,
   });
+
+  LibraryViewData copyWith({
+    List<Book>? books,
+    List<BookCollection>? collections,
+    Set<Item>? selectedItems,
+    List<Series>? series,
+    UserData? userData,
+    List<Book>? queueListItems,
+  }) {
+    return LibraryViewData(
+      books: books ?? this.books,
+      collections: collections ?? this.collections,
+      selectedItems: selectedItems ?? this.selectedItems,
+      series: series ?? this.series,
+      userData: userData ?? this.userData,
+      queueListItems: queueListItems ?? this.queueListItems,
+    );
+  }
+  
+  /// Get the current status of a book to determine what icon to show on the book tile
+  ///
+  /// TODO: Determine if the book is uploading, or an error downloading/uploading
+  BookStatus getBookStatus(Book book) {
+    final BookStatus status;
+    if (queueListItems.contains(book)) {
+      status = BookStatus.downloading;
+    } else {
+      final bool exists = userData.downloadedFiles
+              ?.contains(book.filepath.split('/').last) ??
+          false;
+
+      if (exists) {
+        status = BookStatus.downloaded;
+      } else {
+        status = BookStatus.notDownloaded;
+      }
+    }
+    return status;
+  }
 
   List<Item> getCollectionItems(String collectionId) {
     final List<Item> items = books
@@ -301,23 +321,5 @@ class LibraryViewData {
     allBooks
         .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return allBooks;
-  }
-
-  LibraryViewData copyWith({
-    List<Book>? books,
-    List<String>? downloadingBooks,
-    List<BookCollection>? collections,
-    Set<Item>? selectedItems,
-    List<Series>? series,
-    UserData? userData,
-  }) {
-    return LibraryViewData(
-      books: books ?? this.books,
-      downloadingBooks: downloadingBooks ?? this.downloadingBooks,
-      collections: collections ?? this.collections,
-      selectedItems: selectedItems ?? this.selectedItems,
-      series: series ?? this.series,
-      userData: userData ?? this.userData,
-    );
   }
 }

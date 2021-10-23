@@ -24,12 +24,14 @@ class LibraryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userModel = ref.watch(userModelProvider.notifier);
     return FutureBuilder<void>(
-        future: ref.read(userModelProvider.notifier).setDownloadedFiles(),
+        future: userModel.setDownloadedFilenames(),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Center(
-              child: Text('Error occurred when listing files on the device\n + ${snapshot.error.toString()}'),
+              child: Text(
+                  'Error occurred when listing files on the device\n + ${snapshot.error.toString()}'),
             );
           }
 

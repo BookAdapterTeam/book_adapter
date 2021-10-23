@@ -122,7 +122,7 @@ class _ItemListTile extends ConsumerWidget {
 
     if (item is Book) {
       final book = item as Book;
-      final BookStatus bookStatus = viewController.getBookStatus(book);
+      final BookStatus bookStatus = data.getBookStatus(book);
       final Widget? trailing; 
       final Widget? icon;
       final VoidCallback? onPressed;
@@ -135,7 +135,9 @@ class _ItemListTile extends ConsumerWidget {
           break;
         case BookStatus.downloading:
           icon = const Icon(Icons.downloading_outlined);
-          onPressed = null;
+          onPressed = () {
+            // TODO: Cancel download after download starts
+          };
           break;
         case BookStatus.uploading:
           // Upside down downloading icon because I can't find own for uploading
@@ -157,7 +159,7 @@ class _ItemListTile extends ConsumerWidget {
                   );
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
                 },
-                (downloadTask) => null,
+                (r) => null,
               );
             } on Exception catch (e) {
               final SnackBar snackBar = SnackBar(
@@ -183,6 +185,14 @@ class _ItemListTile extends ConsumerWidget {
           );
           onPressed = () {
             // TODO: Make firebase call to try download book again. Delete file if it exists (could be corrupt or partial)
+          };
+          break;
+        case BookStatus.waiting:
+          icon = const Icon(
+            Icons.stop_circle,
+          );
+          onPressed = () {
+            // TODO: Cancel download before download starts
           };
           break;
         case BookStatus.unknown:
