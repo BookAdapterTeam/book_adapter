@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/user_data.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -34,16 +36,29 @@ class UserModel extends StateNotifier<UserData> {
   // }
 
   Future<void> setDownloadedFiles() async {
+    final firebaseController = _read(firebaseControllerProvider);
     final storageService = _read(storageServiceProvider);
+
+    final String? userId = firebaseController.currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
+
     try {
-      final files = await storageService.listFiles();
-      final filenames = files.map((e) {
-        final pathItems = e.path.split('/');
-        return pathItems.last;
+      final filesPaths = storageService.listFiles(userId: userId);
+      final filenames = filesPaths.map((file) {
+        return file.path.split('/').last;
       }).toList();
       state = state.copyWith(downloadedFiles: filenames);
     } on FileSystemException catch (e, _) {
       state = state.copyWith(downloadedFiles: []);
     }
+  }
+
+  void addDownloadedFile(String filename) {
+    state = state.copyWith(downloadedFiles: [
+      ...?state.downloadedFiles,
+      filename,
+    ]);
   }
 }

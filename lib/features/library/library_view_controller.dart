@@ -1,5 +1,6 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
+import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/data/user_data.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
@@ -7,6 +8,7 @@ import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/model/user_model.dart';
 import 'package:book_adapter/service/storage_service.dart';
+import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -162,49 +164,68 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     await firebaseController.addCollection(name);
   }
 
+  void addDownload(String bookId) {
+    state = state.copyWith(downloadingBooks: [
+      ...?state.downloadingBooks,
+      bookId,
+    ]);
+  }
+
+  void removeDownload(String bookId) {
+    final downloadingBooks = [...?state.downloadingBooks];
+    downloadingBooks.remove(bookId);
+    state = state.copyWith(downloadingBooks: downloadingBooks);
+  }
+
+  Future<Either<Failure, DownloadTask>> downloadBook(Book book) async {
+    // TODO: Refactor this into a provider called StorageController
+
+    // TODO: Fix only able to download one book at a time
+    final firebaseController = _read(firebaseControllerProvider);
+    final storageService = _read(storageServiceProvider);
+    final userModel = _read(userModelProvider.notifier);
+    try {
+      // Check if file exists on server before downloading
+      final bool exists = await firebaseController.fileExists(book.filepath);
+
+      if (!exists) return Left(Failure('Could not find file on server'));
+
+      final appBookAdaptPath = storageService.appBookAdaptPath;
+      final task = firebaseController.downloadFile(
+          book.filepath, '$appBookAdaptPath/${book.filepath}');
+      addDownload(book.id);
+      // ignore: unawaited_futures
+      task.whenComplete(() {
+        removeDownload(book.id);
+        userModel.addDownloadedFile(book.filename);
+      });
+
+      return Right(task);
+    } on AppException catch (e) {
+      log.e(e.toString());
+      return Left(Failure(e.message ?? e.toString()));
+    }
+  }
+
   /// Get the current status of a book to determine what icon to show on the book tile
   ///
   /// TODO: Determine if the book is uploading, or an error downloading/uploading
   BookStatus getBookStatus(Book book) {
-    if (state.downloadingBooks?.containsKey(book.id) ?? false) {
-      return BookStatus.downloading;
+    final BookStatus status;
+    if (state.downloadingBooks?.contains(book.id) ?? false) {
+      status = BookStatus.downloading;
+    } else {
+      final bool exists = state.userData.downloadedFiles
+              ?.contains(book.filepath.split('/').last) ??
+          false;
+
+      if (exists) {
+        status = BookStatus.downloaded;
+      } else {
+        status = BookStatus.notDownloaded;
+      }
     }
-
-    final bool exists = state.userData.downloadedFiles?.contains(book.filename) ?? false;
-
-    if (exists) {
-      return BookStatus.downloaded;
-    }
-
-    return BookStatus.notDownloaded;
-  }
-
-  void addDownloadTask(DownloadTask task, String bookId) {
-    state = state.copyWith(downloadingBooks: {
-      ...?state.downloadingBooks,
-      bookId: task,
-    });
-  }
-
-  void removeDownloadTask(DownloadTask task, String bookId) {
-    final downloadingBooks = {...?state.downloadingBooks};
-    downloadingBooks.remove({bookId: task});
-    state = state.copyWith(downloadingBooks: downloadingBooks);
-  }
-
-  Future<DownloadTask?> downloadBook(Book book) async {
-    final firebaseController = _read(firebaseControllerProvider);
-    try {
-      final task = firebaseController.downloadFile(book.filename);
-      addDownloadTask(task, book.id);
-      // ignore: unawaited_futures
-      task.whenComplete(() {
-        removeDownloadTask(task, book.id);
-      });
-    } on AppException catch (e) {
-      log.e(e.toString());
-      return null;
-    }
+    return status;
   }
 }
 
@@ -220,7 +241,7 @@ enum BookStatus {
 
 class LibraryViewData {
   final List<Book>? books;
-  final Map<String, DownloadTask>? downloadingBooks;
+  final List<String>? downloadingBooks;
   final List<BookCollection>? collections;
   final List<Series>? series;
 
@@ -284,7 +305,7 @@ class LibraryViewData {
 
   LibraryViewData copyWith({
     List<Book>? books,
-    Map<String, DownloadTask>? downloadingBooks,
+    List<String>? downloadingBooks,
     List<BookCollection>? collections,
     Set<Item>? selectedItems,
     List<Series>? series,

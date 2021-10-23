@@ -195,8 +195,10 @@ abstract class BaseFirebaseService {
   });
 
   /// Download a file into memory
-  DownloadTask downloadFile(
-    String filename,
-    String filePath,
-  );
+  DownloadTask downloadFile({
+    required String firebaseFilePath,
+    required String downloadToLocation,
+  });
+
+  Future<bool> fileExists(String filename);
 }

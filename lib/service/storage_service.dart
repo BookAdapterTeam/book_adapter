@@ -10,7 +10,7 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
-final storageServiceProvider = Provider.autoDispose<StorageService>((ref) {
+final storageServiceProvider = Provider<StorageService>((ref) {
   return StorageService();
 });
 
@@ -18,11 +18,11 @@ final storageServiceProvider = Provider.autoDispose<StorageService>((ref) {
 class StorageService {
   StorageService();
 
-  io.Directory? appDocumentsDir;
+  io.Directory? appDir;
 
-  io.Directory? bookAdaptDirectory;
+  io.Directory? appBookAdaptDirectory;
 
-  String? appPath;
+  String? appBookAdaptPath;
 
   final log = Logger();
 
@@ -31,15 +31,55 @@ class StorageService {
   /// Throws a `MissingPlatformDirectoryException` if the system is unable to provide the directory.
   Future<void> init() async {
     try {
-      appDocumentsDir = await getApplicationDocumentsDirectory();
-      appPath = '${appDocumentsDir!.path}/BookAdapt';
-      bookAdaptDirectory = io.Directory(appPath!);
+      appDir = await _getAppDirectory();
+      appBookAdaptPath = '${appDir!.path}/BookAdapt';
+      appBookAdaptDirectory = io.Directory(appBookAdaptPath!);
+      await appBookAdaptDirectory!.create();
     } on Exception catch (e, st) {
-      appPath = null;
-      appDocumentsDir = null;
-      bookAdaptDirectory = null;
+      appBookAdaptPath = null;
+      appDir = null;
+      appBookAdaptDirectory = null;
       log.e(e.toString(), e, st);
+      rethrow;
     }
+  }
+
+  /// Method to create a directory for the user when they login
+  Future<io.Directory> createUserDirectory(String userId) async {
+    try {
+      return await io.Directory('$appBookAdaptPath/$userId').create();
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
+      rethrow;
+    }
+  }
+
+  /// Utility method to get the directory for the app to store documents
+  static Future<io.Directory> _getAppDirectory() async {
+    io.Directory dir;
+    if (io.Platform.isAndroid) {
+      dir = (await getExternalStorageDirectory()) ??
+          await getApplicationSupportDirectory();
+    } else {
+      dir = await getApplicationDocumentsDirectory();
+    }
+
+    // Any OS
+    // getApplicationDocumentsDirectory();
+
+    // Use for cover images
+    // getApplicationSupportDirectory();
+
+    // No android support
+    // getLibraryDirectory();
+
+    // Android only
+    // getExternalStorageDirectory();
+    // TODO: Use below to ask user preffered location. Books will need to be moved.
+    // getExternalStorageDirectories(type: StorageDirectory.documents);
+    // getExternalCacheDirectories();
+
+    return dir;
   }
 
   /// Selects a directory and returns its absolute path.
@@ -65,16 +105,20 @@ class StorageService {
   /// Check if files exist on device on app start, then check for a book if it exists before opening it
   ///
   /// Returns a list of the filenames
-  Future<List<io.FileSystemEntity>> listFiles(
-      {bool recursive = false, bool followLinks = true}) {
-    assert(bookAdaptDirectory != null);
+  List<io.FileSystemEntity> listFiles({
+    required String userId,
+    bool recursive = false,
+    bool followLinks = true,
+  }) {
+    assert(appBookAdaptDirectory != null);
 
     try {
-      final files = bookAdaptDirectory!.list(
+      final userDirectory = io.Directory('$appBookAdaptPath/$userId');
+      final files = userDirectory.listSync(
         recursive: recursive,
         followLinks: followLinks,
       );
-      return files.toList();
+      return files;
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
       throw AppException(e.toString());
@@ -85,9 +129,9 @@ class StorageService {
   ///
   /// Returns a list of the filenames
   Future<io.FileSystemEntity> deleteFile(String filename) async {
-    assert(appPath != null);
+    assert(appBookAdaptPath != null);
     try {
-      final file = io.File('$appPath/$filename');
+      final file = io.File('$appBookAdaptPath/$filename');
       return await file.delete();
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
@@ -213,7 +257,7 @@ class StorageService {
 
   /// Check if a file exists on the device given the filename
   Future<bool> fileExists(String filename) async {
-    final String path = '$appPath/$filename';
+    final String path = '$appBookAdaptPath/$filename';
     if (await io.File(path).exists()) {
       return true;
     }
@@ -226,7 +270,7 @@ class StorageService {
     bool overwrite = false,
   }) async {
     try {
-      final String path = '$appPath/$filename';
+      final String path = '$appBookAdaptPath/$filename';
       final fileRef = io.File(path);
 
       if (overwrite == false && await fileRef.exists()) {

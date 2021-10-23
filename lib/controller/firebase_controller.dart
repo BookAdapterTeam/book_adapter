@@ -170,13 +170,14 @@ class FirebaseController {
 
     // If sign in failed, return the failure object
     // If sign in is successful, return the user object in case the caller cares
-    return res.fold(
+    return await res.fold(
       (failure) => Left(failure),
-      (userCred) {
+      (userCred) async {
         final User? user = userCred.user;
         if (user == null) {
           return Left(Failure('Sign In Failed, User is NULL'));
         }
+        await _storageService.createUserDirectory(user.uid);
         return Right(user);
       },
     );
@@ -226,9 +227,9 @@ class FirebaseController {
 
     // If sign up failed, return the failure object
     // If sign up is successful, return the user object, update the username
-    return res.fold(
+    return await res.fold(
       (failure) => Left(failure),
-      (userCred) {
+      (userCred) async {
         final User? user = userCred.user;
         if (user == null) {
           return Left(Failure('Sign Up Failed, User is NULL'));
@@ -236,8 +237,9 @@ class FirebaseController {
 
         // Set username
         if (username != null) {
-          setDisplayName(username);
+          await setDisplayName(username);
         }
+        await _storageService.createUserDirectory(user.uid);
         return Right(user);
       },
     );
@@ -332,8 +334,11 @@ class FirebaseController {
       }
 
       // Upload book to storage
-      final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(file,
-          title: title, authors: authors);
+      final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(
+        file,
+        title: title,
+        authors: authors,
+      );
       if (uploadRes.isLeft()) {
         return Left(uploadRes.swap().getOrElse(
             () => Failure('Could not add book to Firebase Storage')));
@@ -362,10 +367,14 @@ class FirebaseController {
       for (final item in items) {
         if (item is Book) {
           await _firebaseService.setBookCollections(
-              bookId: item.id, collectionIds: collectionIds);
+            bookId: item.id,
+            collectionIds: collectionIds,
+          );
         } else if (item is Series) {
           await _firebaseService.setSeriesCollections(
-              seriesId: item.id, collectionIds: collectionIds);
+            seriesId: item.id,
+            collectionIds: collectionIds,
+          );
         }
       }
     } on FirebaseException catch (e) {
@@ -390,7 +399,10 @@ class FirebaseController {
       //
       for (final book in books) {
         await _firebaseService.addBookToSeries(
-            bookId: book.id, seriesId: series.id, collectionIds: collectionIds);
+          bookId: book.id,
+          seriesId: series.id,
+          collectionIds: collectionIds,
+        );
       }
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -405,14 +417,18 @@ class FirebaseController {
   /// Method to add series to firebase firestore, returns a [Series] object
   ///
   /// Throws [AppException] if it fails.
-  Future<Series> addSeries(
-      {required String name,
-      required String imageUrl,
-      String description = '',
-      List<String>? collectionIds}) async {
+  Future<Series> addSeries({
+    required String name,
+    required String imageUrl,
+    String description = '',
+    List<String>? collectionIds,
+  }) async {
     try {
-      return await _firebaseService.addSeries(name,
-          imageUrl: imageUrl, description: description);
+      return await _firebaseService.addSeries(
+        name,
+        imageUrl: imageUrl,
+        description: description,
+      );
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -437,7 +453,10 @@ class FirebaseController {
 
     try {
       await _firebaseService.addBookToSeries(
-          bookId: book.id, seriesId: series.id, collectionIds: collectionIds);
+        bookId: book.id,
+        seriesId: series.id,
+        collectionIds: collectionIds,
+      );
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -451,11 +470,11 @@ class FirebaseController {
   /// Download a file and copy it to documents
   ///
   /// Thorws `AppException` if it fails
-  DownloadTask downloadFile(String filename) {
+  DownloadTask downloadFile(String filepath, String downloadToLocation) {
     try {
       return _firebaseService.downloadFile(
-        filename,
-        _storageService.appPath!,
+        firebaseFilePath: filepath,
+        downloadToLocation: downloadToLocation,
       );
     } on AppException catch (_) {
       rethrow;
@@ -463,5 +482,12 @@ class FirebaseController {
       log.e(e.toString(), e, st);
       throw AppException(e.toString());
     }
+  }
+
+  /// Check if a file exists on the server
+  ///
+  /// Throws `AppException` if user is not logged in
+  Future<bool> fileExists(String filename) async {
+    return await _firebaseService.fileExists(filename);
   }
 }

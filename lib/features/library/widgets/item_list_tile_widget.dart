@@ -122,85 +122,98 @@ class _ItemListTile extends ConsumerWidget {
 
     if (item is Book) {
       final book = item as Book;
-      return Builder(
-        builder: (BuildContext context) {
-          final bookStatus = viewController.getBookStatus(book);
-          final Widget? trailing;
-          final Widget? icon;
-          final VoidCallback? onPressed;
-          final isSelecting = data.isSelecting;
+      final BookStatus bookStatus = viewController.getBookStatus(book);
+      final Widget? trailing; 
+      final Widget? icon;
+      final VoidCallback? onPressed;
+      final isSelecting = data.isSelecting;
 
-          switch (bookStatus) {
-            case BookStatus.downloaded:
-              icon = const Icon(Icons.download_done_outlined);
-              onPressed = null;
-              break;
-            case BookStatus.downloading:
-              icon = const Icon(Icons.downloading_outlined);
-              onPressed = null;
-              break;
-            case BookStatus.uploading:
-              // Upside down downloading icon because I can't find own for uploading
-              icon = Transform.rotate(
-                angle: 180,
-                child: const Icon(Icons.downloading_outlined),
-              );
-              onPressed = null;
-              break;
-            case BookStatus.notDownloaded:
-              icon = const Icon(Icons.download);
-              onPressed = () => viewController.downloadBook(book);
-              break;
-            case BookStatus.errorUploading:
-              icon = const Icon(
-                Icons.replay,
-                color: Colors.red,
-              );
-              onPressed = () {
-                // TODO: Make firebase call to try upload book again
-              };
-              break;
-            case BookStatus.errorDownloading:
-              icon = const Icon(
-                Icons.replay,
-                color: Colors.red,
-              );
-              onPressed = () {
-                // TODO: Make firebase call to try download book again. Delete file if it exists (could be corrupt or partial)
-              };
-              break;
-            case BookStatus.unknown:
-              icon = null;
-              onPressed = null;
-              break;
-          }
-          trailing = icon != null
-              ? IconButton(
-                  key: ValueKey('ListTile Button' +
-                      book.id +
-                      isSelected.toString() +
-                      bookStatus.toString() +
-                      icon.toString()),
-                  onPressed: isSelecting ? null : onPressed,
-                  icon: icon,
-                )
-              : null;
-
-          // Return done getting book status
-          return _CustomListTileWidget(
-            item: item,
-            subtitle: subtitle,
-            leading: image,
-            trailing: AnimatedSwitcher(
-              switchInCurve: Curves.easeInCubic,
-              switchOutCurve: Curves.easeOutCubic,
-              duration: const Duration(milliseconds: 250),
-              child: trailing,
-            ),
-            disableSelect: disableSelect,
-            isSelected: isSelected,
+      switch (bookStatus) {
+        case BookStatus.downloaded:
+          icon = const Icon(Icons.download_done_outlined);
+          onPressed = null;
+          break;
+        case BookStatus.downloading:
+          icon = const Icon(Icons.downloading_outlined);
+          onPressed = null;
+          break;
+        case BookStatus.uploading:
+          // Upside down downloading icon because I can't find own for uploading
+          icon = Transform.rotate(
+            angle: 180,
+            child: const Icon(Icons.downloading_outlined),
           );
-        },
+          onPressed = null;
+          break;
+        case BookStatus.notDownloaded:
+          icon = const Icon(Icons.download);
+          onPressed = () async {
+            try {
+              final res = await viewController.downloadBook(book);
+              res.fold(
+                (failure) {
+                  final SnackBar snackBar = SnackBar(
+                    content: Text(failure.message),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                },
+                (downloadTask) => null,
+              );
+            } on Exception catch (e) {
+              final SnackBar snackBar = SnackBar(
+                content: Text(e.toString()),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
+          };
+          break;
+        case BookStatus.errorUploading:
+          icon = const Icon(
+            Icons.replay,
+            color: Colors.red,
+          );
+          onPressed = () {
+            // TODO: Make firebase call to try upload book again
+          };
+          break;
+        case BookStatus.errorDownloading:
+          icon = const Icon(
+            Icons.replay,
+            color: Colors.red,
+          );
+          onPressed = () {
+            // TODO: Make firebase call to try download book again. Delete file if it exists (could be corrupt or partial)
+          };
+          break;
+        case BookStatus.unknown:
+          icon = null;
+          onPressed = null;
+          break;
+      }
+      trailing = icon != null
+          ? IconButton(
+              key: ValueKey('ListTile Button' +
+                  book.id +
+                  isSelected.toString() +
+                  bookStatus.toString() +
+                  icon.toString()),
+              onPressed: isSelecting ? null : onPressed,
+              icon: icon,
+            )
+          : null;
+
+      return _CustomListTileWidget(
+        item: item,
+        subtitle: subtitle,
+        leading: image,
+        trailing: AnimatedSwitcher(
+          switchInCurve: Curves.easeInCubic,
+          switchOutCurve: Curves.easeOutCubic,
+          duration: const Duration(milliseconds: 250),
+          child: trailing,
+        ),
+        disableSelect: disableSelect,
+        isSelected: isSelected,
       );
     }
 

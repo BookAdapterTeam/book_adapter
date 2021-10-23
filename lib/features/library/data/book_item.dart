@@ -21,7 +21,7 @@ class Book implements Item {
   final Set<String> collectionIds;
   final DateTime addedDate;
   final String description;
-  final String filename;
+  final String filepath;
   final String genre;
   final String language;
   final DateTime? lastRead;
@@ -32,6 +32,10 @@ class Book implements Item {
 
   bool get hasSeries => seriesId != null;
 
+  String get filename => filepath.split('/').last;
+
+  String get filetype => filepath.split('.').last;
+
   const Book({
     required this.id,
     required this.userId,
@@ -39,7 +43,7 @@ class Book implements Item {
     required this.addedDate,
     this.subtitle = '',
     this.description = '',
-    required this.filename,
+    required this.filepath,
     this.imageUrl,
     this.genre = '',
     this.language = '',
@@ -62,7 +66,7 @@ class Book implements Item {
     DateTime? addedDate,
     String? subtitle,
     String? description,
-    String? filename,
+    String? filepath,
     String? imageUrl,
     String? genre,
     String? language,
@@ -80,7 +84,7 @@ class Book implements Item {
       addedDate: addedDate ?? this.addedDate,
       subtitle: subtitle ?? this.subtitle,
       description: description ?? this.description,
-      filename: filename ?? this.filename,
+      filepath: filepath ?? this.filepath,
       imageUrl: imageUrl ?? this.imageUrl,
       genre: genre ?? this.genre,
       language: language ?? this.language,
@@ -102,7 +106,7 @@ class Book implements Item {
       'addedDate': addedDate.millisecondsSinceEpoch,
       'authors': subtitle,
       'description': description,
-      'filename': filename,
+      'filepath': filepath,
       'imageUrl': imageUrl,
       'genre': genre,
       'language': language,
@@ -124,11 +128,13 @@ class Book implements Item {
       addedDate: DateTime.fromMillisecondsSinceEpoch(map['addedDate']),
       subtitle: map['authors'],
       description: map['description'],
-      filename: map['filename'],
+      filepath: map['filepath'],
       imageUrl: map['imageUrl'],
       genre: map['genre'],
       language: map['language'],
-      lastRead: lastRead != null ? DateTime.fromMillisecondsSinceEpoch(lastRead) : null,
+      lastRead: lastRead != null
+          ? DateTime.fromMillisecondsSinceEpoch(lastRead)
+          : null,
       publisher: map['publisher'],
       readingProgress: map['readingProgress'],
       wordCount: map['wordCount'],
@@ -146,7 +152,7 @@ class Book implements Item {
       'addedDate': Timestamp.fromDate(addedDate),
       'authors': subtitle,
       'description': description,
-      'filename': filename,
+      'filepath': filepath,
       'imageUrl': imageUrl,
       'genre': genre,
       'language': language,
@@ -167,7 +173,7 @@ class Book implements Item {
       addedDate: map['addedDate'].toDate(),
       subtitle: map['authors'],
       description: map['description'],
-      filename: map['filename'],
+      filepath: map['filepath'],
       imageUrl: map['imageUrl'],
       genre: map['genre'],
       language: map['language'],
@@ -183,7 +189,8 @@ class Book implements Item {
   @override
   String toJsonFirebase() => json.encode(toMapFirebase());
 
-  factory Book.fromJsonFirebase(String source) => Book.fromMapFirebase(json.decode(source));
+  factory Book.fromJsonFirebase(String source) =>
+      Book.fromMapFirebase(json.decode(source));
 
   @override
   bool get stringify => true;
@@ -197,7 +204,7 @@ class Book implements Item {
       addedDate,
       subtitle ?? 'No subtitle',
       description,
-      filename,
+      filepath,
       imageUrl ?? 'No image',
       genre,
       language,

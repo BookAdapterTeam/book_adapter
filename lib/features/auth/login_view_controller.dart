@@ -6,7 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final loginViewController = StateNotifierProvider<LoginViewController, LoginViewData>((ref) {
+final loginViewController =
+    StateNotifierProvider<LoginViewController, LoginViewData>((ref) {
   return LoginViewController(ref.read);
 });
 
@@ -23,7 +24,8 @@ class LoginViewController extends StateNotifier<LoginViewData> {
   Future<Either<Failure, User>> login() async {
     state = state.copyWith(isLoading: true);
     final res = await _read(firebaseControllerProvider).signIn(
-      email: state.email, password: state.password,
+      email: state.email,
+      password: state.password,
     );
 
     if (res.isRight()) {

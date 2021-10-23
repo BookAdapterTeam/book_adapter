@@ -14,6 +14,7 @@ import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image/image.dart' as img;
 import 'package:uuid/uuid.dart';
@@ -304,7 +305,7 @@ class FirebaseService extends BaseFirebaseService {
         title: title,
         subtitle: subtitle,
         addedDate: DateTime.now().toUtc(),
-        filename: '$userId/$title-$authors-$filename',
+        filepath: '$userId/$title-$authors-$filename',
         imageUrl: imageUrl,
         collectionIds: {'$userId-$collection'},
       );
@@ -616,7 +617,8 @@ class FirebaseService extends BaseFirebaseService {
     required String title,
     required String authors,
   }) async {
-    final path = '$userId/$title-$authors-$filename'.replaceAll('/', '');
+    final name = '$title-$authors-$filename'.replaceAll('/', '');
+    final path = '$userId/$name';
     try {
       // Check if file exists, exit if it does
       await _firebaseStorage.ref(path).getDownloadURL();
@@ -643,7 +645,9 @@ class FirebaseService extends BaseFirebaseService {
     required String title,
     required String authors,
   }) async {
-    final path = '$userId/$title-$authors-${file.name}'.replaceAll('/', '');
+    final filename = file.name;
+    final name = '$title-$authors-$filename'.replaceAll('/', '');
+    final path = '$userId/$name';
     try {
       // Check if file exists, exit if it does
       await _firebaseStorage.ref(path).getDownloadURL();
@@ -670,20 +674,31 @@ class FirebaseService extends BaseFirebaseService {
   ///
   /// Thorws `AppException` if it fails
   @override
-  DownloadTask downloadFile(String filename, String filePath) {
-    final userId = _auth.currentUser?.uid;
-    if (userId == null) {
-      throw AppException('User not logged in');
-    }
-
-    final io.File downloadToFile = io.File(filePath);
+  DownloadTask downloadFile({
+    required String firebaseFilePath,
+    required String downloadToLocation,
+  }) {
+    debugPrint(firebaseFilePath);
+    final io.File downloadToFile = io.File(downloadToLocation);
 
     try {
-      print('$userId/$filename');
-      final fileRef = _firebaseStorage.ref('$userId/$filename');
-      return fileRef.writeToFile(downloadToFile);
+      final fileRef = _firebaseStorage.ref(firebaseFilePath);
+      final DownloadTask task = fileRef.writeToFile(downloadToFile);
+      return task;
     } on FirebaseException catch (e, _) {
+      debugPrint(e.toString());
       throw AppException(e.message, e.code);
+    }
+  }
+
+  /// Check if a file exists on the server
+  @override
+  Future<bool> fileExists(String firebaseFilePath) async {
+    try {
+      await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
+      return true;
+    } on FirebaseException catch (e, _) {
+      return false;
     }
   }
 }
