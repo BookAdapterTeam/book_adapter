@@ -65,7 +65,7 @@ class QueueNotifier<T> extends StateNotifier<QueueNotifierData<T>> {
       final item = state.queue.removeFirst();
       log.i('Processing ${T.toString()}: ${item.toString()}');
       await processItem(item);
-
+      
       // Remove from the list after processing
       state.queueListItems.remove(item);
     }
@@ -82,4 +82,14 @@ class QueueNotifierData<T> {
   final List<T> queueListItems;
 
   QueueNotifierData({required this.queue, required this.queueListItems});
+
+  QueueNotifierData<T> copyWith({
+    Queue<T>? queue,
+    List<T>? queueListItems,
+  }) {
+    return QueueNotifierData<T>(
+      queue: queue ?? this.queue,
+      queueListItems: queueListItems ?? this.queueListItems,
+    );
+  }
 }

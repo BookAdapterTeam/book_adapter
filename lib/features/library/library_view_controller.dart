@@ -29,7 +29,7 @@ final libraryViewController =
     collections: collections.asData?.value,
     series: series.asData?.value,
     userData: userData,
-    queueListItems: queueData.queueListItems,
+    queueData: queueData,
   );
   return LibraryViewController(ref.read, data: data);
 });
@@ -223,7 +223,7 @@ class LibraryViewData {
   final List<String>? downloadingBooks;
   final List<BookCollection>? collections;
   final List<Series>? series;
-  final List<Book> queueListItems;
+  final QueueNotifierData<Book> queueData;
 
   final UserData userData;
 
@@ -253,7 +253,7 @@ class LibraryViewData {
     this.selectedItems = const <Item>{},
     this.series,
     required this.userData,
-    required this.queueListItems,
+    required this.queueData,
   });
 
   LibraryViewData copyWith({
@@ -262,7 +262,7 @@ class LibraryViewData {
     Set<Item>? selectedItems,
     List<Series>? series,
     UserData? userData,
-    List<Book>? queueListItems,
+    QueueNotifierData<Book>? queueData,
   }) {
     return LibraryViewData(
       books: books ?? this.books,
@@ -270,7 +270,7 @@ class LibraryViewData {
       selectedItems: selectedItems ?? this.selectedItems,
       series: series ?? this.series,
       userData: userData ?? this.userData,
-      queueListItems: queueListItems ?? this.queueListItems,
+      queueData: queueData ?? this.queueData,
     );
   }
   
@@ -279,8 +279,12 @@ class LibraryViewData {
   /// TODO: Determine if the book is uploading, or an error downloading/uploading
   BookStatus getBookStatus(Book book) {
     final BookStatus status;
-    if (queueListItems.contains(book)) {
+    if (queueData.queue.toSet().difference(queueData.queueListItems.toSet()).contains(book)) {
+      // TODO: Fix, this function doesn't get called when queueData gets updated
       status = BookStatus.downloading;
+    } else if (queueData.queueListItems.toSet().difference(queueData.queue.toSet()).contains(book)) {
+      // TODO: Fix, this function doesn't get called when queueData gets updated
+      status = BookStatus.waiting;
     } else {
       final bool exists = userData.downloadedFiles
               ?.contains(book.filepath.split('/').last) ??
