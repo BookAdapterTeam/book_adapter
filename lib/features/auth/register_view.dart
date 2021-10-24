@@ -132,7 +132,7 @@ class _VerifyPasswordTextField extends StatelessWidget {
           return null;
         }
         if (verifyPassword.isEmpty) {
-          return "Verify password field is empty";
+          return 'Verify password field is empty';
         }
         if (verifyPassword != data.password) {
           return 'Passwords are not the same';
