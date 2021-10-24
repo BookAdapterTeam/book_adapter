@@ -300,7 +300,7 @@ class FirebaseService extends BaseFirebaseService {
       // Create a book object to add to the collectionle
       final filename = file.name;
       final String id = uuid.v4();
-      final filepath = '$userId/$title-$authors-$filename-$filesize';
+      final filepath = '$userId/$title-$authors-$filesize-$filename';
       final book = Book(
         id: id,
         userId: userId,
