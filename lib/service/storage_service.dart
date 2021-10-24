@@ -174,6 +174,12 @@ class StorageService {
     bool withReadStream = false,
   }) async {
     try {
+      if (io.Platform.isIOS || io.Platform.isAndroid) {
+        // Should be fine to ignore unawaited_futures because its only a cache
+        // ignore: unawaited_futures
+        await FilePicker.platform.clearTemporaryFiles();
+      }
+
       final FilePickerResult? result = await FilePicker.platform.pickFiles(
         dialogTitle: dialogTitle,
         type: type,
@@ -188,12 +194,6 @@ class StorageService {
       if (result == null) {
         // User canceled the picker
         return Left(Failure('User canceled the file picker'));
-      }
-
-      if (io.Platform.isIOS || io.Platform.isAndroid) {
-        // Should be fine to ignore unawaited_futures because its only a cache
-        // ignore: unawaited_futures
-        FilePicker.platform.clearTemporaryFiles();
       }
 
       if (allowMultiple) {
