@@ -3,6 +3,7 @@ import 'package:book_adapter/features/auth/register_view_controller.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 
 class RegisterView extends ConsumerWidget {
   RegisterView({Key? key}) : super(key: key);
@@ -69,6 +70,7 @@ class _RegisterButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final log = Logger();
     return ElevatedButton(
       child: const Text('Register', style: TextStyle(fontSize: 20.0)),
       style: !data.isButtonEnabled ? ButtonStyle(
@@ -82,6 +84,7 @@ class _RegisterButton extends StatelessWidget {
         final res = await viewController.register();
         return res.fold(
           (failure) {
+            log.e(failure.message);
             final snackBar = SnackBar(
               content: Text(
                 failure is FirebaseFailure

@@ -4,6 +4,7 @@ import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 
 class ItemListTileWidget extends ConsumerWidget {
   const ItemListTileWidget({
@@ -103,6 +104,7 @@ class _ItemListTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final log = Logger();
     final LibraryViewData data = ref.watch(libraryViewController);
     final LibraryViewController viewController =
         ref.watch(libraryViewController.notifier);
@@ -123,7 +125,7 @@ class _ItemListTile extends ConsumerWidget {
     if (item is Book) {
       final book = item as Book;
       final BookStatus bookStatus = data.getBookStatus(book);
-      final Widget? trailing; 
+      final Widget? trailing;
       final Widget? icon;
       final VoidCallback? onPressed;
       final isSelecting = data.isSelecting;
@@ -154,6 +156,7 @@ class _ItemListTile extends ConsumerWidget {
               final res = await viewController.downloadBook(book);
               res.fold(
                 (failure) {
+                  log.e(failure.message);
                   final SnackBar snackBar = SnackBar(
                     content: Text(failure.message),
                   );
@@ -162,6 +165,7 @@ class _ItemListTile extends ConsumerWidget {
                 (r) => null,
               );
             } on Exception catch (e) {
+              log.e(e.toString());
               final SnackBar snackBar = SnackBar(
                 content: Text(e.toString()),
               );

@@ -190,6 +190,12 @@ class StorageService {
         return Left(Failure('User canceled the file picker'));
       }
 
+      if (io.Platform.isIOS || io.Platform.isAndroid) {
+        // Should be fine to ignore unawaited_futures because its only a cache
+        // ignore: unawaited_futures
+        FilePicker.platform.clearTemporaryFiles();
+      }
+
       if (allowMultiple) {
         return Right(handleMultiple(result));
       } else {

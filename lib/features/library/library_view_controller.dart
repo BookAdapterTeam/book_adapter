@@ -66,6 +66,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
           content: Text(failure.message),
           duration: const Duration(seconds: 2),
         );
+        log.e(failure.message);
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }, (book) => uploadedBooks.add(book));
     }
@@ -273,22 +274,28 @@ class LibraryViewData {
       queueData: queueData ?? this.queueData,
     );
   }
-  
+
   /// Get the current status of a book to determine what icon to show on the book tile
   ///
   /// TODO: Determine if the book is uploading, or an error downloading/uploading
   BookStatus getBookStatus(Book book) {
     final BookStatus status;
-    if (queueData.queue.toSet().difference(queueData.queueListItems.toSet()).contains(book)) {
+    if (queueData.queue
+        .toSet()
+        .difference(queueData.queueListItems.toSet())
+        .contains(book)) {
       // TODO: Fix, this function doesn't get called when queueData gets updated
       status = BookStatus.downloading;
-    } else if (queueData.queueListItems.toSet().difference(queueData.queue.toSet()).contains(book)) {
+    } else if (queueData.queueListItems
+        .toSet()
+        .difference(queueData.queue.toSet())
+        .contains(book)) {
       // TODO: Fix, this function doesn't get called when queueData gets updated
       status = BookStatus.waiting;
     } else {
-      final bool exists = userData.downloadedFiles
-              ?.contains(book.filepath.split('/').last) ??
-          false;
+      final bool exists =
+          userData.downloadedFiles?.contains(book.filepath.split('/').last) ??
+              false;
 
       if (exists) {
         status = BookStatus.downloaded;
