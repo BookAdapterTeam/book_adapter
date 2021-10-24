@@ -10,51 +10,61 @@ class RegisterView extends ConsumerWidget {
 
   final _formKey = GlobalKey<FormState>();
 
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final RegisterViewData data = ref.watch(registerViewController);
-    final RegisterViewController viewController = ref.watch(registerViewController.notifier);
+    final RegisterViewController viewController =
+        ref.watch(registerViewController.notifier);
 
     return Scaffold(
-     appBar: AppBar(title: const Text('Register Account'),),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(25.0),
-          child: Form(
-            autovalidateMode: AutovalidateMode.always,
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                SizedBox(height: MediaQuery.of(context).size.height * 1/9,),
-                // TODO: Add image picker for profile image, upload to Firebase Storage
-
-                // Enter username
-                _UsernameTextField(data: data, viewController: viewController),
-                const SizedBox(height: 8,),
-                
-                // Enter email
-                _EmailTextField(data: data, viewController: viewController),
-                const SizedBox(height: 8,),
-                
-                // Enter password
-                _PasswordTextField(data: data, viewController: viewController),
-                const SizedBox(height: 8,),
-                
-                // Enter password again
-                _VerifyPasswordTextField(data: data, viewController: viewController),
-                
-                // Submit
-                _RegisterButton(data: data, viewController: viewController)
-              ],
-            ),
-      
-          )
+        appBar: AppBar(
+          title: const Text('Register Account'),
         ),
-      )
-    );
+        body: SingleChildScrollView(
+          child: Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: Form(
+                autovalidateMode: AutovalidateMode.always,
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 1 / 9,
+                    ),
+                    // TODO: Add image picker for profile image, upload to Firebase Storage
+
+                    // Enter username
+                    _UsernameTextField(
+                        data: data, viewController: viewController),
+                    const SizedBox(
+                      height: 8,
+                    ),
+
+                    // Enter email
+                    _EmailTextField(data: data, viewController: viewController),
+                    const SizedBox(
+                      height: 8,
+                    ),
+
+                    // Enter password
+                    _PasswordTextField(
+                        data: data, viewController: viewController),
+                    const SizedBox(
+                      height: 8,
+                    ),
+
+                    // Enter password again
+                    _VerifyPasswordTextField(
+                        data: data, viewController: viewController),
+
+                    // Submit
+                    _RegisterButton(data: data, viewController: viewController)
+                  ],
+                ),
+              )),
+        ));
   }
 }
 
@@ -73,25 +83,23 @@ class _RegisterButton extends StatelessWidget {
     final log = Logger();
     return ElevatedButton(
       child: const Text('Register', style: TextStyle(fontSize: 20.0)),
-      style: !data.isButtonEnabled ? ButtonStyle(
-        backgroundColor: MaterialStateProperty.all<Color>(Colors.black38)
-      ) : null,
+      style: !data.isButtonEnabled
+          ? ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.black38))
+          : null,
       onPressed: () async {
         if (!data.isButtonEnabled) {
           return;
         }
-      
+
         final res = await viewController.register();
         return res.fold(
           (failure) {
             log.e(failure.message);
             final snackBar = SnackBar(
-              content: Text(
-                failure is FirebaseFailure
-                  ? '${failure.code}: ${failure.message}'
-                  : failure.message
-              )
-            );
+                content: Text(failure is FirebaseFailure
+                    ? '${failure.code}: ${failure.message}'
+                    : failure.message));
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
           (user) => Navigator.of(context).pop(),
@@ -116,17 +124,20 @@ class _VerifyPasswordTextField extends StatelessWidget {
     return TextFormField(
       initialValue: data.verifyPassword,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Re-enter Password'),
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(), labelText: 'Re-enter Password'),
       obscureText: true,
-      // Validator is kinda broken for this one when stopping typing even though it matches
-      // validator: (verifyPassword) {
-      //   if (verifyPassword == null) {
-      //     return null;
-      //   }
-      //   if (verifyPassword != data.verifyPassword) {
-      //     return 'Passwords are not the same';
-      //   }
-      // },
+      validator: (verifyPassword) {
+        if (verifyPassword == null) {
+          return null;
+        }
+        if (verifyPassword.isEmpty) {
+          return 'Verify password field is empty';
+        }
+        if (verifyPassword != data.password) {
+          return 'Passwords are not the same';
+        }
+      },
       onChanged: (verifyPasswordValue) {
         viewController.updateData(verifyPassword: verifyPasswordValue);
       },
@@ -150,16 +161,17 @@ class _PasswordTextField extends StatelessWidget {
     return TextFormField(
       initialValue: data.password,
       keyboardType: TextInputType.text,
-      decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Enter Password'),
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(), labelText: 'Enter Password'),
       obscureText: true,
-      validator: (passwordValue){
+      validator: (passwordValue) {
         if (passwordValue == null) {
           return null;
         }
         if (passwordValue.isEmpty) {
           return 'Password cannot be empty';
         }
-      
+
         if (passwordValue.length < 6) {
           return 'Password must be 6 or more characters';
         }
@@ -187,7 +199,8 @@ class _EmailTextField extends StatelessWidget {
     return TextFormField(
       initialValue: data.email,
       keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Email' ),
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(), labelText: 'Email'),
       validator: (email) {
         if (email == null) {
           return null;
@@ -222,11 +235,13 @@ class _UsernameTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       initialValue: data.username,
-      decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Username' ),
-      onChanged: (usernameValue){
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(), labelText: 'Username'),
+      onChanged: (usernameValue) {
         viewController.updateData(username: usernameValue);
       },
-      validator: (username) => viewController.validate(string: username, message: "Username can't be empty"),
+      validator: (username) => viewController.validate(
+          string: username, message: "Username can't be empty"),
       autofillHints: const [AutofillHints.username],
     );
   }
