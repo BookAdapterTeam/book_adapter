@@ -289,6 +289,7 @@ class FirebaseService extends BaseFirebaseService {
     required String title,
     required String authors,
     required String subtitle,
+    required int filesize,
   }) async {
     try {
       final userId = _auth.currentUser?.uid;
@@ -299,13 +300,15 @@ class FirebaseService extends BaseFirebaseService {
       // Create a book object to add to the collectionle
       final filename = file.name;
       final String id = uuid.v4();
+      final filepath = '$userId/$title-$authors-$filename-$filesize';
       final book = Book(
         id: id,
         userId: userId,
         title: title,
         subtitle: subtitle,
         addedDate: DateTime.now().toUtc(),
-        filepath: '$userId/$title-$authors-$filename',
+        filepath: filepath,
+        filesize: filesize,
         imageUrl: imageUrl,
         collectionIds: {'$userId-$collection'},
       );
@@ -314,7 +317,8 @@ class FirebaseService extends BaseFirebaseService {
       final duplicatesQuerySnapshot = await _booksRef
           .where('userId', isEqualTo: userId)
           .where('title', isEqualTo: title)
-          .where('filename', isEqualTo: filename)
+          .where('filepath', isEqualTo: filepath)
+          .where('filesize', isEqualTo: filesize)
           .get();
 
       final duplicates = duplicatesQuerySnapshot.docs;
@@ -502,6 +506,7 @@ class FirebaseService extends BaseFirebaseService {
     PlatformFile file, {
     required String title,
     required String authors,
+    required int filesize,
   }) async {
     const String epubContentType = 'application/epub+zip';
 
@@ -517,11 +522,13 @@ class FirebaseService extends BaseFirebaseService {
       }
 
       final res = await uploadFile(
-          userId: userId,
-          file: file,
-          contentType: epubContentType,
-          title: title,
-          authors: authors);
+        userId: userId,
+        file: file,
+        contentType: epubContentType,
+        title: title,
+        authors: authors,
+        filesize: filesize,
+      );
 
       return res;
     } on FirebaseException catch (e) {
@@ -540,6 +547,7 @@ class FirebaseService extends BaseFirebaseService {
     required EpubBookRef openedBook,
     required String title,
     required String authors,
+    required int filesize,
   }) async {
     const imageContentType = 'image/jpeg';
     try {
@@ -589,12 +597,14 @@ class FirebaseService extends BaseFirebaseService {
       final String filename = '${file.name}.jpg';
 
       final res = await uploadBytes(
-          userId: userId,
-          bytes: Uint8List.fromList(bytes),
-          filename: filename,
-          contentType: imageContentType,
-          title: title,
-          authors: authors);
+        userId: userId,
+        bytes: Uint8List.fromList(bytes),
+        filename: filename,
+        contentType: imageContentType,
+        title: title,
+        authors: authors,
+        filesize: filesize,
+      );
 
       return res;
     } on FirebaseException catch (e) {
@@ -616,8 +626,9 @@ class FirebaseService extends BaseFirebaseService {
     required String contentType,
     required String title,
     required String authors,
+    required int filesize,
   }) async {
-    final name = '$title-$authors-$filename'.replaceAll('/', '');
+    final name = '$title-$authors-$filesize-$filename'.replaceAll('/', '');
     final path = '$userId/$name';
     try {
       // Check if file exists, exit if it does
@@ -644,9 +655,10 @@ class FirebaseService extends BaseFirebaseService {
     required String contentType,
     required String title,
     required String authors,
+    required int filesize,
   }) async {
     final filename = file.name;
-    final name = '$title-$authors-$filename'.replaceAll('/', '');
+    final name = '$title-$authors-$filesize-$filename'.replaceAll('/', '');
     final path = '$userId/$name';
     try {
       // Check if file exists, exit if it does

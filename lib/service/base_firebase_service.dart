@@ -122,6 +122,7 @@ abstract class BaseFirebaseService {
     required String title,
     required String authors,
     required String subtitle,
+    required int filesize,
   });
 
   /// Upload a book to Firebase Storage
@@ -129,6 +130,7 @@ abstract class BaseFirebaseService {
     PlatformFile file, {
     required String title,
     required String authors,
+    required int filesize,
   });
 
   /// Upload a book cover photo to Firebase Storage
@@ -137,6 +139,7 @@ abstract class BaseFirebaseService {
     required EpubBookRef openedBook,
     required String title,
     required String authors,
+    required int filesize,
   });
 
   /// Upload bytes to Firebase Storage
@@ -147,6 +150,7 @@ abstract class BaseFirebaseService {
     required String contentType,
     required String title,
     required String authors,
+    required int filesize,
   });
 
   /// Upload a file to Firebase Storage
@@ -156,6 +160,7 @@ abstract class BaseFirebaseService {
     required String contentType,
     required String title,
     required String authors,
+    required int filesize,
   });
 
   /// Create a shelf

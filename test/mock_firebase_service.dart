@@ -132,46 +132,6 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file,
-      {required String title, required String authors}) {
-    // TODO: implement uploadBook
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, String>> uploadCoverPhoto(
-      {required PlatformFile file,
-      required EpubBookRef openedBook,
-      required String title,
-      required String authors}) {
-    // TODO: implement uploadCoverPhoto
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, String>> uploadBytes(
-      {required String userId,
-      required Uint8List bytes,
-      required String filename,
-      required String contentType,
-      required String title,
-      required String authors}) {
-    // TODO: implement uploadBytes
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, String>> uploadFile(
-      {required String userId,
-      required PlatformFile file,
-      required String contentType,
-      required String title,
-      required String authors}) {
-    // TODO: implement uploadFile
-    throw UnimplementedError();
-  }
-
-  @override
   // TODO: implement userChanges
   Stream<User?> get userChanges => throw UnimplementedError();
 
@@ -228,12 +188,6 @@ class MockFirebaseService implements FirebaseService {
 
 
   @override
-  Future<Either<Failure, Book>> addBookToFirestore(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl, required String title, required String authors, required String subtitle}) {
-    // TODO: implement addBookToFirestore
-    throw UnimplementedError();
-  }
-
-  @override
   Future<bool> fileExists(String firebaseFilePath) {
     // TODO: implement fileExists
     throw UnimplementedError();
@@ -242,6 +196,36 @@ class MockFirebaseService implements FirebaseService {
   @override
   DownloadTask downloadFile({required String firebaseFilePath, required String downloadToLocation}) {
     // TODO: implement downloadFile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, Book>> addBookToFirestore(PlatformFile file, EpubBookRef openedBook, {String collection = 'Default', String? imageUrl, required String title, required String authors, required String subtitle, required int filesize}) {
+    // TODO: implement addBookToFirestore
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, void>> uploadBookToFirebaseStorage(PlatformFile file, {required String title, required String authors, required int filesize}) {
+    // TODO: implement uploadBookToFirebaseStorage
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadBytes({required String userId, required Uint8List bytes, required String filename, required String contentType, required String title, required String authors, required int filesize}) {
+    // TODO: implement uploadBytes
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadCoverPhoto({required PlatformFile file, required EpubBookRef openedBook, required String title, required String authors, required int filesize}) {
+    // TODO: implement uploadCoverPhoto
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadFile({required String userId, required PlatformFile file, required String contentType, required String title, required String authors, required int filesize}) {
+    // TODO: implement uploadFile
     throw UnimplementedError();
   }
 }

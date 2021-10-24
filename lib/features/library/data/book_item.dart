@@ -22,6 +22,7 @@ class Book implements Item {
   final DateTime addedDate;
   final String description;
   final String filepath;
+  final int filesize;
   final String genre;
   final String language;
   final DateTime? lastRead;
@@ -44,6 +45,7 @@ class Book implements Item {
     this.subtitle = '',
     this.description = '',
     required this.filepath,
+    required this.filesize,
     this.imageUrl,
     this.genre = '',
     this.language = '',
@@ -67,6 +69,7 @@ class Book implements Item {
     String? subtitle,
     String? description,
     String? filepath,
+    int? filesize,
     String? imageUrl,
     String? genre,
     String? language,
@@ -85,6 +88,7 @@ class Book implements Item {
       subtitle: subtitle ?? this.subtitle,
       description: description ?? this.description,
       filepath: filepath ?? this.filepath,
+      filesize: filesize ?? this.filesize,
       imageUrl: imageUrl ?? this.imageUrl,
       genre: genre ?? this.genre,
       language: language ?? this.language,
@@ -107,6 +111,7 @@ class Book implements Item {
       'authors': subtitle,
       'description': description,
       'filepath': filepath,
+      'filesize': filesize,
       'imageUrl': imageUrl,
       'genre': genre,
       'language': language,
@@ -129,6 +134,7 @@ class Book implements Item {
       subtitle: map['authors'],
       description: map['description'],
       filepath: map['filepath'],
+      filesize: map['filesize'],
       imageUrl: map['imageUrl'],
       genre: map['genre'],
       language: map['language'],
@@ -153,6 +159,7 @@ class Book implements Item {
       'authors': subtitle,
       'description': description,
       'filepath': filepath,
+      'filesize': filesize,
       'imageUrl': imageUrl,
       'genre': genre,
       'language': language,
@@ -174,6 +181,7 @@ class Book implements Item {
       subtitle: map['authors'],
       description: map['description'],
       filepath: map['filepath'],
+      filesize: map['filesize'],
       imageUrl: map['imageUrl'],
       genre: map['genre'],
       language: map['language'],
@@ -205,6 +213,7 @@ class Book implements Item {
       subtitle ?? 'No subtitle',
       description,
       filepath,
+      filesize,
       imageUrl ?? 'No image',
       genre,
       language,

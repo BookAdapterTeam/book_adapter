@@ -302,6 +302,9 @@ class FirebaseController {
       final authors = openedBook.AuthorList?.join(',') ?? '';
       final subtitle =
           openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
+      final filesize = file.size;
+
+      // TODO: Check for duplicates first (already checking in _firebaseService.addBookToFirestore())
 
       // Upload cover image to storage
       final res = await _firebaseService.uploadCoverPhoto(
@@ -309,6 +312,7 @@ class FirebaseController {
         openedBook: openedBook,
         title: title,
         authors: authors,
+        filesize: filesize,
       );
       final String? imageUrl = res.fold(
         (failure) {
@@ -326,6 +330,7 @@ class FirebaseController {
         title: title,
         authors: authors,
         subtitle: subtitle,
+        filesize: filesize,
       );
       if (firestoreRes.isLeft()) {
         return Left(firestoreRes
@@ -338,6 +343,7 @@ class FirebaseController {
         file,
         title: title,
         authors: authors,
+        filesize: filesize,
       );
       if (uploadRes.isLeft()) {
         return Left(uploadRes.swap().getOrElse(
