@@ -1,48 +1,52 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/controller/storage_controller.dart';
+import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/user_data.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:book_adapter/model/queue_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final userModelProvider = StateNotifierProvider.autoDispose<UserModelNotifier, UserData>((ref) {
-  final userStreamAsyncValue = ref.watch(userChangesProvider);
-  final user = userStreamAsyncValue.asData?.value;
-  
-  final userData = UserData(currentUser: user);
+final userModelProvider =
+    StateNotifierProvider.autoDispose<UserModel, UserData>((ref) {
+  const userData = UserData();
 
-  return UserModelNotifier(userData);
+  return UserModel(ref.read, userData);
 });
 
-class UserModelNotifier extends StateNotifier<UserData> {
-  UserModelNotifier(UserData data) : super(data);
+class UserModel extends StateNotifier<UserData> {
+  UserModel(this._read, UserData data) : super(data);
 
-  // Put functions here using copyWith to change data
+  final Reader _read;
 
-  /// Returns the current [User] if they are currently signed-in, or `null` if
-  /// not.
-  ///
-  /// You should not use this getter to determine the users current state,
-  /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
-  /// subscribe to updates.
-  User? get currentUser {
-    return state.currentUser;
+  /// Qeue a new book download
+  void queueDownload(Book book) {
+    final downloadQueueNotifier = _read(queueBookProvider.notifier);
+    // Queue download
+    downloadQueueNotifier.addToQueue(book);
   }
 
-  // Update UserData with new list of books
-  void setBooks(List<Book> books) {
-    state = state.copyWith(books: books);
+
+  List<Book> get downloadQueue {
+    return _read(queueBookProvider).queueListItems;
   }
 
-  // Update UserData with new book
-  void addBook(Book book) {
-    state = state.copyWith(books: [...state.books, book]);
+  Future<void> setDownloadedFilenames() async {
+    final firebaseController = _read(firebaseControllerProvider);
+    final storageController = _read(storageControllerProvider);
+
+    final String? userId = firebaseController.currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
+    state = state.copyWith(
+      downloadedFiles: storageController.getDownloadedFilenames(),
+    );
   }
 
-  // Update UserData with new book
-  void deleteBook(Book book) {
-    state = state.copyWith(books: [
-      for (final loopBook in state.books)
-       if (book != loopBook) loopBook,
+  void addDownloadedFilename(String filename) {
+    state = state.copyWith(downloadedFiles: [
+      ...?state.downloadedFiles,
+      filename,
     ]);
   }
 }

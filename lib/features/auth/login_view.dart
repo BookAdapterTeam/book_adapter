@@ -5,6 +5,7 @@ import 'package:book_adapter/features/auth/reset_password_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 
 
 class LoginView extends ConsumerWidget {
@@ -123,12 +124,14 @@ class _LoginButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final log = Logger();
     return ElevatedButton(
       child: const Text('Login', style: TextStyle(fontSize: 20.0), ),
       onPressed: () async {
         final res = await viewController.login();
         res.fold(
           (failure) {
+            log.e(failure.message);
             final snackBar = SnackBar(
               content: Text(
                 failure is FirebaseFailure
