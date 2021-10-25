@@ -11,35 +11,34 @@ class AddToCollectionButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final viewController = ref.watch(libraryViewController.notifier);
-    return Builder(
-      builder: (context) {
-        return IconButton(
-          onPressed: () async {
-            // Show popup for user to choose which collection to move the items to
-            final List<String>? collectionIds = await showModalBottomSheet<List<String>?>(
-              isScrollControlled: true,
-              context: context,
-              builder: (context) {
-                // Using Wrap makes the bottom sheet height the height of the content.
-                // Otherwise, the height will be half the height of the screen.
-                return const ChooseCollectionsBottomSheet();
-              },
-            );
-            if (collectionIds == null || collectionIds.isEmpty) return;
-            await viewController.moveItemsToCollections(collectionIds);
-          },
-          icon: const Icon(Icons.collections_bookmark_rounded),
-        );
-      }
-    );
+    return Builder(builder: (context) {
+      return IconButton(
+        onPressed: () async {
+          // Show popup for user to choose which collection to move the items to
+          final List<String>? collectionIds =
+              await showModalBottomSheet<List<String>?>(
+            isScrollControlled: true,
+            context: context,
+            builder: (context) {
+              // Using Wrap makes the bottom sheet height the height of the content.
+              // Otherwise, the height will be half the height of the screen.
+              return const ChooseCollectionsBottomSheet();
+            },
+          );
+          if (collectionIds == null || collectionIds.isEmpty) return;
+          await viewController.moveItemsToCollections(collectionIds);
+        },
+        icon: const Icon(Icons.collections_bookmark_rounded),
+      );
+    });
   }
 }
 
-class AddNewCollectionDialog extends HookConsumerWidget {
-  const AddNewCollectionDialog({ Key? key }) : super(key: key);
+class AddNewCollectionDialog extends HookWidget {
+  const AddNewCollectionDialog({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final textController = useTextEditingController();
     return AlertDialog(
       title: const Text('Create New Collection'),
@@ -64,15 +63,12 @@ class AddNewCollectionDialog extends HookConsumerWidget {
             TextButton(
               onPressed: () async {
                 final collectionName = textController.text;
-                final firebaseController = ref.read(firebaseControllerProvider);
-                await firebaseController.addCollection(collectionName);
-                Navigator.of(context).pop();
+                Navigator.of(context).pop(collectionName);
               },
               child: const Text('CREATE'),
             ),
           ],
         ),
-
       ],
     );
   }
@@ -83,13 +79,15 @@ final chosenCollectionsProvider = StateProvider<List<String>>((ref) {
 });
 
 class ChooseCollectionsBottomSheet extends ConsumerStatefulWidget {
-  const ChooseCollectionsBottomSheet({ Key? key }) : super(key: key);
+  const ChooseCollectionsBottomSheet({Key? key}) : super(key: key);
 
   @override
-  _ChooseCollectionsBottomSheetState createState() => _ChooseCollectionsBottomSheetState();
+  _ChooseCollectionsBottomSheetState createState() =>
+      _ChooseCollectionsBottomSheetState();
 }
 
-class _ChooseCollectionsBottomSheetState extends ConsumerState<ChooseCollectionsBottomSheet> {
+class _ChooseCollectionsBottomSheetState
+    extends ConsumerState<ChooseCollectionsBottomSheet> {
   final List<String> chosenCollections = [];
 
   @override
@@ -103,11 +101,17 @@ class _ChooseCollectionsBottomSheetState extends ConsumerState<ChooseCollections
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 8.0, top: 16, bottom: 16),
-            child: Text('Move to Collection...',
-              style: Theme.of(context).textTheme.subtitle1?.copyWith(fontWeight: FontWeight.bold),
+            child: Text(
+              'Move to Collection...',
+              style: Theme.of(context)
+                  .textTheme
+                  .subtitle1
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
           ),
-          const Divider(height: 2,),
+          const Divider(
+            height: 2,
+          ),
           /*TextButton(
             onPressed: () async {
               await showDialog<String>(
@@ -120,7 +124,7 @@ class _ChooseCollectionsBottomSheetState extends ConsumerState<ChooseCollections
             child: const Text('+ NEW COLLECTION'),
           ),*/
           // Current collections
-          for (final collection in collectionList ?? <BookCollection>[]) ... [
+          for (final collection in collectionList ?? <BookCollection>[]) ...[
             CheckboxListTile(
               title: Text(collection.name),
               onChanged: (bool? checked) {
@@ -136,7 +140,6 @@ class _ChooseCollectionsBottomSheetState extends ConsumerState<ChooseCollections
               value: chosenCollections.contains(collection.id),
               activeColor: Theme.of(context).buttonTheme.colorScheme?.primary,
             ),
-
           ],
 
           Padding(

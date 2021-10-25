@@ -167,7 +167,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   Future<void> addNewCollection(String name) async {
     final firebaseController = _read(firebaseControllerProvider);
-     await firebaseController.addCollection(name);
+    await firebaseController.addCollection(name);
   }
 
   Future<Either<Failure, void>> downloadBook(Book book) async {
