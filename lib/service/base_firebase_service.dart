@@ -4,9 +4,9 @@ import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -94,7 +94,7 @@ abstract class BaseFirebaseService {
   Future<void> signOut();
 
   /// Send reset password email
-  Future<void> resetPassword(String email);
+  Future<Either<Failure, void>> resetPassword(String email);
 
   /// Set display name
   ///
@@ -110,76 +110,18 @@ abstract class BaseFirebaseService {
 
   // Database
 
+  Stream<QuerySnapshot<BookCollection>> get collectionsStream;
+  Stream<QuerySnapshot<Book>> get booksStream;
+  Stream<QuerySnapshot<Series>> get seriesStream;
+
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks();
 
   /// Add a book to Firebase Database
-  Future<Either<Failure, Book>> addBookToFirestore(
-    PlatformFile file,
-    EpubBookRef openedBook, {
-    String collection = 'Default',
-    String? imageUrl,
-    required String title,
-    required String authors,
-    required String subtitle,
-    required int filesize,
-  });
-
-  /// Upload a book to Firebase Storage
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(
-    PlatformFile file, {
-    required String title,
-    required String authors,
-    required int filesize,
-  });
-
-  /// Upload a book cover photo to Firebase Storage
-  Future<Either<Failure, void>> uploadCoverPhoto({
-    required PlatformFile file,
-    required EpubBookRef openedBook,
-    required String title,
-    required String authors,
-    required int filesize,
-  });
-
-  /// Upload bytes to Firebase Storage
-  Future<Either<Failure, String>> uploadBytes({
-    required String userId,
-    required Uint8List bytes,
-    required String filename,
-    required String contentType,
-    required String title,
-    required String authors,
-    required int filesize,
-  });
-
-  /// Upload a file to Firebase Storage
-  Future<void> uploadFile({
-    required String userId,
-    required PlatformFile file,
-    required String contentType,
-    required String title,
-    required String authors,
-    required int filesize,
-  });
+  Future<Either<Failure, Book>> addBookToFirestore({required Book book});
 
   /// Create a shelf
   Future<Either<Failure, BookCollection>> addCollection(String name);
-
-  /// Create a series
-  Future<Series> addSeries(
-    String name, {
-    required String imageUrl,
-    String description = '',
-    Set<String>? collectionIds,
-  });
-
-  /// Add book to series
-  Future<void> addBookToSeries({
-    required String bookId,
-    required String seriesId,
-    required Set<String> collectionIds,
-  });
 
   /// Add book to collections
   ///
@@ -198,6 +140,52 @@ abstract class BaseFirebaseService {
     required String seriesId,
     required Set<String> collectionIds,
   });
+
+  /// Create a series
+  Future<Series> addSeries(
+    String name, {
+    required String imageUrl,
+    String description = '',
+    Set<String>? collectionIds,
+  });
+
+  /// Add book to series
+  Future<void> addBookToSeries({
+    required String bookId,
+    required String seriesId,
+    required Set<String> collectionIds,
+  });
+
+  /// Remove series
+  ///
+  /// This invokes a firebase function to remove all references to the series.
+  /// This does not delete the books.
+  Future<void> removeSeries(String seriesId);
+
+  /// Upload a book to Firebase Storage
+  Future<Either<Failure, String>> uploadBookToFirebaseStorage({
+    required String firebaseFilePath,
+    required String localFilePath,
+  });
+
+  /// Upload a book cover photo to Firebase Storage
+  Future<Either<Failure, String>> uploadCoverPhoto({
+    required EpubBookRef openedBook,
+    required String uploadToPath,
+  });
+
+  /// Upload bytes to Firebase Storage
+  Future<Either<Failure, String>> uploadBytes({
+    required String contentType,
+    required String firebaseFilePath,
+    required Uint8List bytes,
+  });
+
+  /// Upload a file to Firebase Storage
+  Future<Either<Failure, String>> uploadFile(
+      {required String contentType,
+      required String firebaseFilePath,
+      required String localFilePath});
 
   /// Download a file into memory
   DownloadTask downloadFile({

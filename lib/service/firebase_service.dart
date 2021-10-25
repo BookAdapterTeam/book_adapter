@@ -11,12 +11,12 @@ import 'package:book_adapter/service/base_firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image/image.dart' as img;
+import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -25,13 +25,14 @@ final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {
 });
 
 /// A utility class to handle all Firebase calls
-class FirebaseService extends BaseFirebaseService {
+class FirebaseService implements BaseFirebaseService {
   FirebaseService() : super();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   static const uuid = Uuid();
+  final log = Logger();
 
   // Authentication
 
@@ -210,6 +211,7 @@ class FirebaseService extends BaseFirebaseService {
           );
 
   // Get book collections stream
+  @override
   Stream<QuerySnapshot<BookCollection>> get collectionsStream {
     return _collectionsRef
         .where('userId', isEqualTo: _auth.currentUser?.uid)
@@ -228,6 +230,7 @@ class FirebaseService extends BaseFirebaseService {
           );
 
   // Get books stream
+  @override
   Stream<QuerySnapshot<Book>> get booksStream {
     return _booksRef
         .where('userId', isEqualTo: _auth.currentUser?.uid)
@@ -246,6 +249,7 @@ class FirebaseService extends BaseFirebaseService {
           );
 
   // Get series stream
+  @override
   Stream<QuerySnapshot<Series>> get seriesStream {
     return _seriesRef
         .where('userId', isEqualTo: _auth.currentUser?.uid)
@@ -281,44 +285,14 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Add a book to Firebase Firestore
   @override
-  Future<Either<Failure, Book>> addBookToFirestore(
-    PlatformFile file,
-    EpubBookRef openedBook, {
-    String collection = 'Default',
-    String? imageUrl,
-    required String title,
-    required String authors,
-    required String subtitle,
-    required int filesize,
-  }) async {
+  Future<Either<Failure, Book>> addBookToFirestore({required Book book}) async {
     try {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) {
-        return Left(Failure('User not logged in'));
-      }
-
-      // Create a book object to add to the collectionle
-      final filename = file.name;
-      final String id = uuid.v4();
-      final filepath = '$userId/$title-$authors-$filesize-$filename';
-      final book = Book(
-        id: id,
-        userId: userId,
-        title: title,
-        subtitle: subtitle,
-        addedDate: DateTime.now().toUtc(),
-        filepath: filepath,
-        filesize: filesize,
-        imageUrl: imageUrl,
-        collectionIds: {'$userId-$collection'},
-      );
-
       // Check books for duplicates, return Failure if any are found
       final duplicatesQuerySnapshot = await _booksRef
-          .where('userId', isEqualTo: userId)
-          .where('title', isEqualTo: title)
-          .where('filepath', isEqualTo: filepath)
-          .where('filesize', isEqualTo: filesize)
+          .where('userId', isEqualTo: book.userId)
+          .where('title', isEqualTo: book.title)
+          .where('filepath', isEqualTo: book.filepath)
+          .where('filesize', isEqualTo: book.filesize)
           .get();
 
       final duplicates = duplicatesQuerySnapshot.docs;
@@ -328,7 +302,7 @@ class FirebaseService extends BaseFirebaseService {
       }
 
       // Add book to Firestore
-      await _booksRef.doc(id).set(book);
+      await _booksRef.doc(book.id).set(book);
 
       // Return our books to the caller in case they care
       // ignore: prefer_const_constructors
@@ -484,6 +458,7 @@ class FirebaseService extends BaseFirebaseService {
   ///
   /// This invokes a firebase function to remove all references to the series.
   /// This does not delete the books.
+  @override
   Future<void> removeSeries(String seriesId) {
     try {
       // TODO: Implement removeSeries cloud function
@@ -502,32 +477,17 @@ class FirebaseService extends BaseFirebaseService {
 
   /// Upload a book to Firebase Storage
   @override
-  Future<Either<Failure, void>> uploadBookToFirebaseStorage(
-    PlatformFile file, {
-    required String title,
-    required String authors,
-    required int filesize,
+  Future<Either<Failure, String>> uploadBookToFirebaseStorage({
+    required String firebaseFilePath,
+    required String localFilePath,
   }) async {
     const String epubContentType = 'application/epub+zip';
 
     try {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) {
-        return Left(Failure('User not logged in'));
-      }
-
-      final filePath = file.path;
-      if (filePath == null) {
-        return Left(Failure('File path was null'));
-      }
-
       final res = await uploadFile(
-        userId: userId,
-        file: file,
         contentType: epubContentType,
-        title: title,
-        authors: authors,
-        filesize: filesize,
+        firebaseFilePath: firebaseFilePath,
+        localFilePath: localFilePath,
       );
 
       return res;
@@ -543,24 +503,11 @@ class FirebaseService extends BaseFirebaseService {
   /// Upload a book cover photo to Firebase Storage
   @override
   Future<Either<Failure, String>> uploadCoverPhoto({
-    required PlatformFile file,
     required EpubBookRef openedBook,
-    required String title,
-    required String authors,
-    required int filesize,
+    required String uploadToPath,
   }) async {
     const imageContentType = 'image/jpeg';
     try {
-      final userId = _auth.currentUser?.uid;
-      if (userId == null) {
-        return Left(Failure('User not logged in'));
-      }
-
-      final filePath = file.path;
-      if (filePath == null) {
-        return Left(Failure('File path was null'));
-      }
-
       Image? image = await openedBook.readCover();
 
       if (image == null) {
@@ -594,16 +541,11 @@ class FirebaseService extends BaseFirebaseService {
       }
 
       final bytes = img.encodeJpg(image);
-      final String filename = '${file.name}.jpg';
 
       final res = await uploadBytes(
-        userId: userId,
         bytes: Uint8List.fromList(bytes),
-        filename: filename,
         contentType: imageContentType,
-        title: title,
-        authors: authors,
-        filesize: filesize,
+        firebaseFilePath: uploadToPath,
       );
 
       return res;
@@ -620,27 +562,21 @@ class FirebaseService extends BaseFirebaseService {
 
   @override
   Future<Either<Failure, String>> uploadBytes({
-    required String userId,
-    required Uint8List bytes,
-    required String filename,
     required String contentType,
-    required String title,
-    required String authors,
-    required int filesize,
+    required String firebaseFilePath,
+    required Uint8List bytes,
   }) async {
-    final name = '$title-$authors-$filesize-$filename'.replaceAll('/', '');
-    final path = '$userId/$name';
     try {
       // Check if file exists, exit if it does
-      await _firebaseStorage.ref(path).getDownloadURL();
+      await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return Left(Failure('File already exists'));
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
-      await _firebaseStorage.ref(path).putData(
+      await _firebaseStorage.ref(firebaseFilePath).putData(
             bytes,
             SettableMetadata(contentType: contentType),
           );
-      final url = await _firebaseStorage.ref(path).getDownloadURL();
+      final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return Right(url);
     }
   }
@@ -649,35 +585,25 @@ class FirebaseService extends BaseFirebaseService {
   ///
   /// Thorws `AppException` if it fails
   @override
-  Future<Either<Failure, String>> uploadFile({
-    required String userId,
-    required PlatformFile file,
-    required String contentType,
-    required String title,
-    required String authors,
-    required int filesize,
-  }) async {
-    final filename = file.name;
-    final name = '$title-$authors-$filesize-$filename'.replaceAll('/', '');
-    final path = '$userId/$name';
+  Future<Either<Failure, String>> uploadFile(
+      {required String contentType,
+      required String firebaseFilePath,
+      required String localFilePath}) async {
     try {
       // Check if file exists, exit if it does
-      await _firebaseStorage.ref(path).getDownloadURL();
+      await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return Left(Failure('File already exists'));
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
-      final filepath = file.path;
-      if (filepath == null) return Left(Failure('file.path was null'));
-
-      final UploadTask task = _firebaseStorage.ref(path).putFile(
-            io.File(filepath),
+      final UploadTask task = _firebaseStorage.ref(firebaseFilePath).putFile(
+            io.File(localFilePath),
             SettableMetadata(contentType: contentType),
           );
 
       // TODO: Somehow expose this to UI for upload progress
       /*final TaskSnapshot snapshot = */ await task;
 
-      final url = await _firebaseStorage.ref(path).getDownloadURL();
+      final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return Right(url);
     }
   }
@@ -690,15 +616,14 @@ class FirebaseService extends BaseFirebaseService {
     required String firebaseFilePath,
     required String downloadToLocation,
   }) {
-    debugPrint(firebaseFilePath);
     final io.File downloadToFile = io.File(downloadToLocation);
 
     try {
       final fileRef = _firebaseStorage.ref(firebaseFilePath);
       final DownloadTask task = fileRef.writeToFile(downloadToFile);
       return task;
-    } on FirebaseException catch (e, _) {
-      debugPrint(e.toString());
+    } on FirebaseException catch (e, st) {
+      log.e(e.message, e, st);
       throw AppException(e.message, e.code);
     }
   }
