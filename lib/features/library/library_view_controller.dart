@@ -98,7 +98,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     await _read(firebaseControllerProvider).signOut();
   }
 
-  Future<bool> mergeIntoSeries([String? name]) async {
+  Future<Either<Failure, void>> mergeIntoSeries([String? name]) async {
     final firebaseController = _read(firebaseControllerProvider);
 
     // Get the list of all books selected, including books in a series
@@ -133,13 +133,15 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       // for (final collectionId in collectionIds) {
       //   await firebaseController.removeSeries(collectionId);
       // }
+
+      return const Right(null);
     } on AppException catch (e) {
       debugPrint('${e.message ?? e.toString()} ${e.code}');
+      return Left(Failure(e.message ?? e.toString()));
     } on Exception catch (e) {
       debugPrint(e.toString());
+      return Left(Failure(e.toString()));
     }
-
-    return true;
   }
 
   List<Book> _convertItemsToBooks(Set<Item> items) {
