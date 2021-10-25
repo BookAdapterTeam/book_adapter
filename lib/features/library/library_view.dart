@@ -1,3 +1,4 @@
+import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
@@ -13,6 +14,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
+import 'package:logger/logger.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
@@ -72,6 +74,7 @@ class LibraryScrollView extends HookConsumerWidget {
     final LibraryViewController viewController =
         ref.watch(libraryViewController.notifier);
     final scrollController = useScrollController();
+    final log = Logger();
 
     final notSelectingAppBar = SliverAppBar(
       key: const ValueKey('normal_app_bar'),
@@ -85,11 +88,26 @@ class LibraryScrollView extends HookConsumerWidget {
         IconButton(
           tooltip: 'Add a new collection',
           onPressed: () async {
-            await showDialog<String>(
+            final collectionName = await showDialog<String>(
                 context: context,
                 builder: (context) {
                   return const AddNewCollectionDialog();
                 });
+            if (collectionName == null) return;
+
+            final firebaseController = ref.read(firebaseControllerProvider);
+            final res = await firebaseController.addCollection(collectionName);
+            res.fold(
+              (failure) {
+                final snackBar = SnackBar(
+                  content: Text(failure.message),
+                  duration: const Duration(seconds: 2),
+                );
+                log.e(failure.message);
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+              (collection) => null,
+            );
           },
           icon: const Icon(Icons.bookmark_add),
         ),
