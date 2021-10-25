@@ -133,10 +133,10 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       // for (final collectionId in collectionIds) {
       //   await firebaseController.removeSeries(collectionId);
       // }
-    } on AppException catch (e) {
-      debugPrint('${e.message ?? e.toString()} ${e.code}');
-    } on Exception catch (e) {
-      debugPrint(e.toString());
+    } on AppException catch (e, st) {
+      log.e('${e.message ?? e.toString()} ${e.code}', e, st);
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
     }
 
     return true;
