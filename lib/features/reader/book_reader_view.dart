@@ -53,8 +53,10 @@ class BookReaderView extends HookConsumerWidget {
     );
   }
 
-  void _showCurrentEpubCfi(
-      {required BuildContext context, required EpubController controller}) {
+  void _showCurrentEpubCfi({
+    required BuildContext context,
+    required EpubController controller,
+  }) {
     final cfi = controller.generateEpubCfi();
 
     if (cfi != null) {
