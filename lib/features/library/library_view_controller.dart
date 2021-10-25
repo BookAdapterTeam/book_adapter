@@ -61,14 +61,17 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     for (final file in platformFiles) {
       // Add book to firebase
       final fRes = await _read(firebaseControllerProvider).addBook(file);
-      fRes.fold((failure) {
-        final snackBar = SnackBar(
-          content: Text(failure.message),
-          duration: const Duration(seconds: 2),
-        );
-        log.e(failure.message);
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      }, (book) => uploadedBooks.add(book));
+      fRes.fold(
+        (failure) {
+          final snackBar = SnackBar(
+            content: Text(failure.message),
+            duration: const Duration(seconds: 2),
+          );
+          log.e(failure.message);
+          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        },
+        (book) => uploadedBooks.add(book),
+      );
     }
   }
 
