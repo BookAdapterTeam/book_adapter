@@ -317,14 +317,22 @@ class _CustomListTileWidget extends ConsumerWidget {
                 );
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
-              (r) => null,
+              (_) {
+                Navigator.restorablePushNamed(
+                  context,
+                  item.routeTo,
+                  arguments: item.toMapSerializable(),
+                );
+              },
             );
+            return;
           } on Exception catch (e) {
             log.e(e.toString());
             final SnackBar snackBar = SnackBar(
               content: Text(e.toString()),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            return;
           }
         }
         
