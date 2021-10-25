@@ -263,6 +263,7 @@ class _CustomListTileWidget extends ConsumerWidget {
   final bool disableSelect;
   final bool isSelected;
   final BookStatus? status;
+  final log = Logger();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -308,7 +309,7 @@ class _CustomListTileWidget extends ConsumerWidget {
         
         if (status == BookStatus.notDownloaded) {
           try {
-            final res = await viewController.downloadBook(book);
+            final res = await viewController.downloadBook(item);
             res.fold(
               (failure) {
                 log.e(failure.message);
