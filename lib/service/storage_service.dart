@@ -9,6 +9,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
+final storageInitProvider = FutureProvider<void>((ref) async {
+  return ref.watch(storageServiceProvider).init();
+});
+
 /// Provider to easily get access to the [FirebaseService] functions
 final storageServiceProvider = Provider<StorageService>((ref) {
   return StorageService();

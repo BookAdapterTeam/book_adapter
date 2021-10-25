@@ -1,23 +1,24 @@
+import 'package:book_adapter/features/widgets/async_value_widget.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class InitFirebase extends StatelessWidget {
-  const InitFirebase({Key? key, required this.child}) : super(key: key);
+class InitFirebaseWidget extends ConsumerWidget {
+  const InitFirebaseWidget({Key? key, required this.child}) : super(key: key);
 
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final Future<FirebaseApp> _initialization = Firebase.initializeApp();
     return FutureBuilder(
       future: _initialization,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         if (snapshot.hasError) {
-          return const Scaffold(
+          return Scaffold(
             body: Center(
-              child: Text('Firebase Initialization Failed'),
+              child: Text('Firebase Initialization Failed: ${snapshot.error}'),
             ),
           );
         }
@@ -35,30 +36,33 @@ class InitFirebase extends StatelessWidget {
   }
 }
 
-class InitStorageService extends ConsumerWidget {
-  const InitStorageService({Key? key, required this.child}) : super(key: key);
+class InitStorageWidget extends ConsumerWidget {
+  const InitStorageWidget({Key? key, required this.child}) : super(key: key);
 
   final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FutureBuilder(
-      future: ref.read(storageServiceProvider).init(),
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        if (snapshot.hasError) {
-          return const Scaffold(
-            body: Center(
-              child: Text('Storage Initialization Failed'),
-            ),
-          );
-        }
-        if (snapshot.connectionState == ConnectionState.done) {
-          return child;
-        }
+    final asyncValue = ref.watch(storageInitProvider);
 
-        return const Scaffold(
+    return AsyncValueWidget(
+      value: asyncValue,
+      data: (_) => child,
+      loading: (data) => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (e, st, data) {
+        return Scaffold(
           body: Center(
-            child: CircularProgressIndicator(),
+            child: Text(
+              e.toString(),
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Colors.red),
+            ),
           ),
         );
       },

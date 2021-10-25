@@ -76,9 +76,9 @@ class _MyAppState extends ConsumerState<MyApp> {
 
             return I18n(
                 key: const ValueKey('I18n Initialization'),
-                child: InitFirebase(
+                child: InitFirebaseWidget(
                   key: const ValueKey('Initialize Firebase App'),
-                  child: InitStorageService(
+                  child: InitStorageWidget(
                     key: const ValueKey('Initialize Storage Service'),
                     child: AuthChecker(
                       key: const ValueKey('Auth Checker'),
