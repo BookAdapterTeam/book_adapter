@@ -69,8 +69,8 @@ class MergeIntoSeriesButton extends ConsumerWidget {
               return const AddNewSeriesDialog();
             });
         if (seriesnameName == null) return;
-        await viewController.mergeIntoSeries(seriesnameName);
-        /*
+        final rest =await viewController.mergeIntoSeries(seriesnameName);
+
         rest.fold(
               (failure) {
             final snackBar = SnackBar(
@@ -80,8 +80,8 @@ class MergeIntoSeriesButton extends ConsumerWidget {
             log.e(failure.message);
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
-              (Series) => null,
-        ); */
+              (series) => null,
+        );
       },
      // onPressed: () => viewController.mergeIntoSeries(),
       icon: const Icon(Icons.merge_type),
