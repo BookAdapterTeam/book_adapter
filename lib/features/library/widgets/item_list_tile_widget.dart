@@ -305,6 +305,29 @@ class _CustomListTileWidget extends ConsumerWidget {
           );
           return;
         }
+        
+        if (status == BookStatus.notDownloaded) {
+          try {
+            final res = await viewController.downloadBook(book);
+            res.fold(
+              (failure) {
+                log.e(failure.message);
+                final SnackBar snackBar = SnackBar(
+                  content: Text(failure.message),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+              (r) => null,
+            );
+          } on Exception catch (e) {
+            log.e(e.toString());
+            final SnackBar snackBar = SnackBar(
+              content: Text(e.toString()),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
+        }
+        
       },
     );
   }
