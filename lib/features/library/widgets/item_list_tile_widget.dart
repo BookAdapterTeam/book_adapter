@@ -289,7 +289,7 @@ class _CustomListTileWidget extends ConsumerWidget {
 
         viewController.selectItem(item);
       },
-      onTap: () {
+      onTap: () async {
         if (isSelected) {
           return viewController.deselectItem(item);
         }
