@@ -508,10 +508,10 @@ class FirebaseController {
   /// Download a file and copy it to documents
   ///
   /// Thorws `AppException` if it fails
-  DownloadTask downloadFile(String filepath, String downloadToLocation) {
+  DownloadTask downloadFile(String firebaseStorageFilePath, String downloadToLocation) {
     try {
       return _firebaseService.downloadFile(
-        firebaseFilePath: filepath,
+        firebaseFilePath: firebaseStorageFilePath,
         downloadToLocation: downloadToLocation,
       );
     } on AppException catch (_) {
@@ -525,7 +525,7 @@ class FirebaseController {
   /// Check if a file exists on the server
   ///
   /// Throws `AppException` if user is not logged in
-  Future<bool> fileExists(String filename) async {
-    return await _firebaseService.fileExists(filename);
+  Future<bool> fileExists(String firebaseFilePath) async {
+    return await _firebaseService.fileExists(firebaseFilePath);
   }
 }

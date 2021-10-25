@@ -13,7 +13,6 @@ import 'package:dartz/dartz.dart';
 import 'package:epubx/epubx.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
