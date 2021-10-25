@@ -1,4 +1,3 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:flutter/material.dart';
