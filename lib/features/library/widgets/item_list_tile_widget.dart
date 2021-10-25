@@ -1,5 +1,6 @@
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
+import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -228,16 +229,18 @@ class _ItemListTile extends ConsumerWidget {
         ),
         disableSelect: disableSelect,
         isSelected: isSelected,
+        status: bookStatus,
       );
     }
 
     // Return when tile is not a book (its a series)
     return _CustomListTileWidget(
-        item: item,
-        subtitle: subtitle,
-        leading: image,
-        disableSelect: disableSelect,
-        isSelected: isSelected);
+      item: item,
+      subtitle: subtitle,
+      leading: image,
+      disableSelect: disableSelect,
+      isSelected: isSelected,
+    );
   }
 }
 
@@ -250,6 +253,7 @@ class _CustomListTileWidget extends ConsumerWidget {
     this.trailing,
     required this.disableSelect,
     required this.isSelected,
+    this.status,
   }) : super(key: key);
 
   final Item item;
@@ -258,6 +262,7 @@ class _CustomListTileWidget extends ConsumerWidget {
   final Widget? trailing;
   final bool disableSelect;
   final bool isSelected;
+  final BookStatus? status;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -292,12 +297,14 @@ class _CustomListTileWidget extends ConsumerWidget {
           return viewController.selectItem(item);
         }
 
-        // Navigate to the reader page or series page depending on item type.
-        Navigator.restorablePushNamed(
-          context,
-          item.routeTo,
-          arguments: item.toMapSerializable(),
-        );
+        if (status == BookStatus.downloaded || item is Series) {
+          Navigator.restorablePushNamed(
+            context,
+            item.routeTo,
+            arguments: item.toMapSerializable(),
+          );
+          return;
+        }
       },
     );
   }
