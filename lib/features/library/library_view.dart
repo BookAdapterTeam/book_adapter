@@ -5,6 +5,7 @@ import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
 import 'package:book_adapter/features/library/widgets/add_to_collection_button.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
+import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
 import 'package:book_adapter/features/library/widgets/profile_button.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:book_adapter/model/user_model.dart';
@@ -57,9 +58,32 @@ class MergeIntoSeriesButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewController viewController =
         ref.watch(libraryViewController.notifier);
+    final log= Logger();
     return IconButton(
       // TODO: Ask user for series name
-      onPressed: () => viewController.mergeIntoSeries(),
+      tooltip: 'Merge to series',
+      onPressed: () async {
+        final seriesnameName = await showDialog<String>(
+            context: context,
+            builder: (context) {
+              return const AddNewSeriesDialog();
+            });
+        if (seriesnameName == null) return;
+        await viewController.mergeIntoSeries(seriesnameName);
+        /*
+        rest.fold(
+              (failure) {
+            final snackBar = SnackBar(
+              content: Text(failure.message),
+              duration: const Duration(seconds: 2),
+            );
+            log.e(failure.message);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          },
+              (Series) => null,
+        ); */
+      },
+     // onPressed: () => viewController.mergeIntoSeries(),
       icon: const Icon(Icons.merge_type),
     );
   }
