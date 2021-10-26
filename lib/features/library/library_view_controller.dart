@@ -170,7 +170,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     await firebaseController.addCollection(name);
   }
 
-  Future<Either<Failure, void>> downloadBook(Book book) async {
+  Future<Either<Failure, void>> queueDownloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
     final firebaseController = _read(firebaseControllerProvider);
     final userModel = _read(userModelProvider.notifier);
