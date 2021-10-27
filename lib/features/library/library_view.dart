@@ -57,15 +57,25 @@ class MergeIntoSeriesButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewController viewController =
         ref.watch(libraryViewController.notifier);
+    final selectedItems =
+        ref.watch(libraryViewController.select((data) => data.selectedItems));
     final log = Logger();
+
     return IconButton(
-      // TODO: Ask user for series name
       tooltip: 'Merge to series',
       onPressed: () async {
         final seriesName = await showDialog<String>(
             context: context,
             builder: (context) {
-              return const AddNewSeriesDialog();
+              // Could sort the list before using choosig the title.
+              // Without soring, it will use the title of the first book selected.
+              // final selectedItemsList = selectedItems.toList()
+              //   ..sort((a, b) => a.title.compareTo(b.title));
+              // final initialText = selectedItemsList.first.title;
+              final initialText = selectedItems.first.title;
+              return AddNewSeriesDialog(
+                initialText: initialText,
+              );
             });
         if (seriesName == null) return;
         final res = await viewController.mergeIntoSeries(seriesName);
