@@ -1,4 +1,4 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
+
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
@@ -119,8 +119,8 @@ class LibraryScrollView extends HookConsumerWidget {
                 });
             if (collectionName == null) return;
 
-            final firebaseController = ref.read(firebaseControllerProvider);
-            final res = await firebaseController.addCollection(collectionName);
+            final viewController = ref.read(libraryViewController.notifier);
+            final res = await viewController.addNewCollection(collectionName);
             res.fold(
               (failure) {
                 final snackBar = SnackBar(

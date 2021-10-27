@@ -167,18 +167,23 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         items: items.toList(), collectionIds: collectionIds.toSet());
   }
 
-  Future<void> addNewCollection(String name) async {
+  Future <Either<Failure, BookCollection>> addNewCollection(String name) async {
     final bool foundCollection= collectionExist(name);
-    if(!foundCollection) {
-      final firebaseController = _read(firebaseControllerProvider);
-      await firebaseController.addCollection(name);
+    if(foundCollection) {
+      return Left(Failure('Collection Already Exists'));
     }
+    final firebaseController = _read(firebaseControllerProvider);
+    await firebaseController.addCollection(name);
+    return await
+    firebaseController.addCollection(name);
+
   }
 
   bool collectionExist(String name){
     final collections = state.collections;
     final names = collections!.map((collection) => collection.name);
     return names.contains(name);
+
   }
 
 
