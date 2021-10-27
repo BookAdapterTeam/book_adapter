@@ -172,10 +172,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     if(!foundCollection) {
       final firebaseController = _read(firebaseControllerProvider);
       await firebaseController.addCollection(name);
-    }else
-      {
-
-      }
+    }
   }
 
   bool collectionExist(String name){
