@@ -62,15 +62,15 @@ class MergeIntoSeriesButton extends ConsumerWidget {
       // TODO: Ask user for series name
       tooltip: 'Merge to series',
       onPressed: () async {
-        final seriesnameName = await showDialog<String>(
+        final seriesName = await showDialog<String>(
             context: context,
             builder: (context) {
               return const AddNewSeriesDialog();
             });
-        if (seriesnameName == null) return;
-        final rest = await viewController.mergeIntoSeries(seriesnameName);
+        if (seriesName == null) return;
+        final res = await viewController.mergeIntoSeries(seriesName);
 
-        rest.fold(
+        res.fold(
           (failure) {
             final snackBar = SnackBar(
               content: Text(failure.message),
@@ -79,7 +79,7 @@ class MergeIntoSeriesButton extends ConsumerWidget {
             log.e(failure.message);
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
-          (series) => null,
+          (_) => null,
         );
       },
       // onPressed: () => viewController.mergeIntoSeries(),
