@@ -130,7 +130,14 @@ class LibraryScrollView extends HookConsumerWidget {
                 log.e(failure.message);
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
-              (collection) => null,
+              (collection) {
+                final snackBar = SnackBar(
+                  content: Text('Successfully created ${collection.name }'),
+                  duration: const Duration(seconds: 2),
+                );
+                log.i('Successfully created ${collection.name }');
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
             );
           },
           icon: const Icon(Icons.bookmark_add),
