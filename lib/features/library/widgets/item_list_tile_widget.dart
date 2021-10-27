@@ -154,7 +154,7 @@ class _ItemListTile extends ConsumerWidget {
           icon = const Icon(Icons.download);
           onPressed = () async {
             try {
-              final res = await viewController.downloadBook(book);
+              final res = await viewController.queueDownloadBook(book);
               res.fold(
                 (failure) {
                   log.e(failure.message);
@@ -309,7 +309,7 @@ class _CustomListTileWidget extends ConsumerWidget {
         
         if (status == BookStatus.notDownloaded && item is Book) {
           try {
-            final res = await viewController.downloadBook(item as Book);
+            final res = await viewController.queueDownloadBook(item as Book);
             res.fold(
               (failure) {
                 log.e(failure.message);
@@ -318,13 +318,7 @@ class _CustomListTileWidget extends ConsumerWidget {
                 );
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
-              (_) {
-                Navigator.restorablePushNamed(
-                  context,
-                  item.routeTo,
-                  arguments: item.toMapSerializable(),
-                );
-              },
+              (_) => null,
             );
             return;
           } on Exception catch (e) {
