@@ -168,8 +168,10 @@ class LibraryScrollView extends HookConsumerWidget {
       actions: [
         const AddToCollectionButton(),
 
-        // TODO: Disable button until remove series cloud function is implemented, delete old series
-        if (!data.hasSeries) const MergeIntoSeriesButton(),
+        // TODO: Button is disabled a series is selected until remove series cloud function is implemented, delete old series
+        // Disable button until more than one book selected so that the user does not create series with only one book in it
+        if (!data.hasSeries && data.selectedItems.length > 1)
+          const MergeIntoSeriesButton(),
 
         // DeleteButton(),
       ],
