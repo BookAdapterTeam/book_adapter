@@ -1,10 +1,10 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
 import 'package:book_adapter/features/library/widgets/add_to_collection_button.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
+import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
 import 'package:book_adapter/features/library/widgets/profile_button.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:book_adapter/model/user_model.dart';
@@ -57,9 +57,42 @@ class MergeIntoSeriesButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewController viewController =
         ref.watch(libraryViewController.notifier);
+    final selectedItems =
+        ref.watch(libraryViewController.select((data) => data.selectedItems));
+    final log = Logger();
+
     return IconButton(
-      // TODO: Ask user for series name
-      onPressed: () => viewController.mergeIntoSeries(),
+      tooltip: 'Merge to series',
+      onPressed: () async {
+        final seriesName = await showDialog<String>(
+            context: context,
+            builder: (context) {
+              // Could sort the list before using choosig the title.
+              // Without soring, it will use the title of the first book selected.
+              // final selectedItemsList = selectedItems.toList()
+              //   ..sort((a, b) => a.title.compareTo(b.title));
+              // final initialText = selectedItemsList.first.title;
+              final initialText = selectedItems.first.title;
+              return AddNewSeriesDialog(
+                initialText: initialText,
+              );
+            });
+        if (seriesName == null) return;
+        final res = await viewController.mergeIntoSeries(seriesName);
+
+        res.fold(
+          (failure) {
+            final snackBar = SnackBar(
+              content: Text(failure.message),
+              duration: const Duration(seconds: 2),
+            );
+            log.e(failure.message);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          },
+          (_) => null,
+        );
+      },
+      // onPressed: () => viewController.mergeIntoSeries(),
       icon: const Icon(Icons.merge_type),
     );
   }
@@ -95,8 +128,8 @@ class LibraryScrollView extends HookConsumerWidget {
                 });
             if (collectionName == null) return;
 
-            final firebaseController = ref.read(firebaseControllerProvider);
-            final res = await firebaseController.addCollection(collectionName);
+            final viewController = ref.read(libraryViewController.notifier);
+            final res = await viewController.addNewCollection(collectionName);
             res.fold(
               (failure) {
                 final snackBar = SnackBar(
@@ -106,7 +139,14 @@ class LibraryScrollView extends HookConsumerWidget {
                 log.e(failure.message);
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
-              (collection) => null,
+              (collection) {
+                final snackBar = SnackBar(
+                  content: Text('Successfully created ${collection.name}'),
+                  duration: const Duration(seconds: 2),
+                );
+                log.i('Successfully created ${collection.name}');
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
             );
           },
           icon: const Icon(Icons.bookmark_add),
@@ -128,8 +168,10 @@ class LibraryScrollView extends HookConsumerWidget {
       actions: [
         const AddToCollectionButton(),
 
-        // TODO: Disable button until remove series cloud function is implemented, delete old series
-        if (!data.hasSeries) const MergeIntoSeriesButton(),
+        // TODO: Button is disabled a series is selected until remove series cloud function is implemented, delete old series
+        // Disable button until more than one book selected so that the user does not create series with only one book in it
+        if (!data.hasSeries && data.selectedItems.length > 1)
+          const MergeIntoSeriesButton(),
 
         // DeleteButton(),
       ],

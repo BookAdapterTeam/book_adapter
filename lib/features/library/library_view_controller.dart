@@ -98,7 +98,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     await _read(firebaseControllerProvider).signOut();
   }
 
-  Future<bool> mergeIntoSeries([String? name]) async {
+  Future<Either<Failure, void>> mergeIntoSeries([String? name]) async {
     final firebaseController = _read(firebaseControllerProvider);
 
     // Get the list of all books selected, including books in a series
@@ -133,13 +133,14 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       // for (final collectionId in collectionIds) {
       //   await firebaseController.removeSeries(collectionId);
       // }
+      return const Right(null);
     } on AppException catch (e, st) {
       log.e('${e.message ?? e.toString()} ${e.code}', e, st);
+      return Left(Failure(e.message ?? e.toString()));
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
+      return Left(Failure(e.toString()));
     }
-
-    return true;
   }
 
   List<Book> _convertItemsToBooks(Set<Item> items) {
@@ -165,9 +166,20 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         items: items.toList(), collectionIds: collectionIds.toSet());
   }
 
-  Future<void> addNewCollection(String name) async {
+  Future<Either<Failure, BookCollection>> addNewCollection(String name) async {
+    final bool foundCollection = collectionExist(name);
+    if (foundCollection) {
+      return Left(Failure('Collection Already Exists'));
+    }
     final firebaseController = _read(firebaseControllerProvider);
     await firebaseController.addCollection(name);
+    return await firebaseController.addCollection(name);
+  }
+
+  bool collectionExist(String name) {
+    final collections = state.collections;
+    final names = collections!.map((collection) => collection.name);
+    return names.contains(name);
   }
 
   Future<Either<Failure, void>> queueDownloadBook(Book book) async {
