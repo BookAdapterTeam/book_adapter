@@ -168,9 +168,22 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   Future<void> addNewCollection(String name) async {
-    final firebaseController = _read(firebaseControllerProvider);
-    await firebaseController.addCollection(name);
+    final bool foundCollection= collectionExist(name);
+    if(!foundCollection) {
+      final firebaseController = _read(firebaseControllerProvider);
+      await firebaseController.addCollection(name);
+    }else
+      {
+
+      }
   }
+
+  bool collectionExist(String name){
+    final collections = state.collections;
+    final names = collections!.map((collection) => collection.name);
+    return names.contains(name);
+  }
+
 
   Future<Either<Failure, void>> downloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
