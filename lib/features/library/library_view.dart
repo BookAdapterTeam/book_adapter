@@ -1,4 +1,3 @@
-
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
@@ -58,7 +57,7 @@ class MergeIntoSeriesButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewController viewController =
         ref.watch(libraryViewController.notifier);
-    final log= Logger();
+    final log = Logger();
     return IconButton(
       // TODO: Ask user for series name
       tooltip: 'Merge to series',
@@ -69,10 +68,10 @@ class MergeIntoSeriesButton extends ConsumerWidget {
               return const AddNewSeriesDialog();
             });
         if (seriesnameName == null) return;
-        final rest =await viewController.mergeIntoSeries(seriesnameName);
+        final rest = await viewController.mergeIntoSeries(seriesnameName);
 
         rest.fold(
-              (failure) {
+          (failure) {
             final snackBar = SnackBar(
               content: Text(failure.message),
               duration: const Duration(seconds: 2),
@@ -80,10 +79,10 @@ class MergeIntoSeriesButton extends ConsumerWidget {
             log.e(failure.message);
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
-              (series) => null,
+          (series) => null,
         );
       },
-     // onPressed: () => viewController.mergeIntoSeries(),
+      // onPressed: () => viewController.mergeIntoSeries(),
       icon: const Icon(Icons.merge_type),
     );
   }
@@ -132,10 +131,10 @@ class LibraryScrollView extends HookConsumerWidget {
               },
               (collection) {
                 final snackBar = SnackBar(
-                  content: Text('Successfully created ${collection.name }'),
+                  content: Text('Successfully created ${collection.name}'),
                   duration: const Duration(seconds: 2),
                 );
-                log.i('Successfully created ${collection.name }');
+                log.i('Successfully created ${collection.name}');
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
               },
             );
