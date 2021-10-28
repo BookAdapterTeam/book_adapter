@@ -3,7 +3,6 @@ import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/reader/epub_controller.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
