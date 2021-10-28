@@ -43,6 +43,7 @@ dependencies:
   sticky_headers: ^0.2.0
   flutter_hooks: ^0.18.0
   sliver_tools: ^0.2.5
+  flutter_html: ^2.1.5
 
 dev_dependencies:
   build_runner: ^2.1.2

@@ -481,7 +481,7 @@ packages:
     source: hosted
     version: "0.18.0"
   flutter_html:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_html
       url: "https://pub.dartlang.org"

@@ -3,6 +3,7 @@ import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/reader/epub_controller.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -22,6 +23,7 @@ class BookReaderView extends HookConsumerWidget {
     final epubReaderController = useEpubController(
         document: EpubReader.readBook(storageController.getBookData(book)));
     final log = Logger();
+
     return Scaffold(
       appBar: AppBar(
         title: EpubActualChapter(
@@ -48,7 +50,31 @@ class BookReaderView extends HookConsumerWidget {
         onDocumentLoaded: (document) {
           log.i('isLoaded: $document');
         },
-        dividerBuilder: (_) => const Divider(),
+        onExternalLinkPressed: (link) {
+          // TODO: Implement url_launcher package
+          // print(link);
+        },
+        // itemBuilder: (context, chapters, paragraphs, paragraphIndex) {
+        //   if (paragraphs.isEmpty) {
+        //     return Container();
+        //   }
+
+        //   return Html(
+        //     data: paragraphs[paragraphIndex].element.outerHtml,
+        //     onLinkTap: ,
+        //   );
+
+        //   // return Column(
+        //   //   children: [
+        //   //     // if (paragraphs[paragraphIndex].chapterIndex >= 0 && )
+        //   //     //   ChapterDivider(chapter: chapters[paragraphIndex],),
+        //   //     SelectableText('''
+        //   //         ${paragraphs[paragraphIndex].chapterIndex}
+        //   //         ${paragraphs[paragraphIndex].element.outerHtml}
+        //   //         '''),
+        //   //   ],
+        //   // );
+        // },
       ),
     );
   }
