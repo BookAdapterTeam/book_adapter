@@ -62,12 +62,12 @@ jobs:
           cd Payload
           ln -s ../Runner.app
           cd ..
-          zip -r app.ipa Payload
+          zip -r bookadapt_unsigned.ipa Payload
       - name: Upload IPA
         uses: actions/upload-artifact@v2
         with:
-          name: ios_ipa
-          path: build/ios/iphoneos/
+          name: bookadapt_unsigned.ipa
+          path: build/ios/iphoneos/*.ipa
   
   # build_ios_with_signing:
   #   name: Build Flutter (iOS) and Sign
