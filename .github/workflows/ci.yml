@@ -25,8 +25,8 @@ jobs:
       - run: flutter analyze
       # - run: flutter test
   
-  build_ios:
-    name: Build Flutter (iOS)
+  build_ios_without_signing:
+    name: Build Flutter (iOS) Without Signing
     needs: [flutter_test]
     runs-on: macos-latest
     steps:
