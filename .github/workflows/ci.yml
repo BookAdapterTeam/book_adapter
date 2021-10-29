@@ -40,7 +40,7 @@ jobs:
           # create variables
           SERVICES_PATH=ios/Runner/GoogleService-Info.plist
 
-          import google services from secrets
+          # import google services from secrets
           echo -n "$APPLE_GOOGLE_SERVICES_BASE64" | base64 --decode --output $SERVICES_PATH
       - name: Setup Java
         uses: actions/setup-java@v1
