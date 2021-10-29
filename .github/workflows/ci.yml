@@ -25,6 +25,50 @@ jobs:
       - run: flutter analyze
       # - run: flutter test
   
+  build_ios:
+    name: Build Flutter (iOS)
+    needs: [flutter_test]
+    runs-on: macos-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        # From github documentation
+      - name: Install Firebase google services
+        env:
+          APPLE_GOOGLE_SERVICES_BASE64: ${{ secrets.APPLE_GOOGLE_SERVICES_BASE64 }}
+        run: |
+          # create variables
+          SERVICES_PATH=ios/Runner/GoogleService-Info.plist
+
+          import google services from secrets
+          echo -n "$APPLE_GOOGLE_SERVICES_BASE64" | base64 --decode --output $SERVICES_PATH
+      - name: Setup Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: "12.x"
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          channel: "stable"
+      - run: flutter pub get
+      - run: flutter clean
+      # Zip into IPA from here:
+      # https://gist.github.com/devhammed/617d920b7ee886591a46c22633ab0093
+      - name: Build Flutter IPA
+        run: |
+          flutter build ios --release --no-codesign
+          cd build/ios/iphoneos
+          mkdir Payload
+          cd Payload
+          ln -s ../Runner.app
+          cd ..
+          zip -r app.ipa Payload
+      - name: Upload IPA
+        uses: actions/upload-artifact@v2
+        with:
+          name: ios_ipa
+          path: build/ios/iphoneos/
+  
   # build_ios_with_signing:
   #   name: Build Flutter (iOS) and Sign
   #   needs: [flutter_test]
