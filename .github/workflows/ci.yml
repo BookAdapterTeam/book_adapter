@@ -138,7 +138,7 @@ jobs:
   #         path: build/ios/iphoneos/
 
   build_appbundle:
-    name: Build Flutter (Android)
+    name: Build Flutter (Android Appbundle)
     needs: [flutter_test]
     runs-on: ubuntu-latest
     steps:
