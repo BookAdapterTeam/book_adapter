@@ -549,6 +549,12 @@ PODS:
     - Flutter
     - FMDB (>= 2.7.5)
   - SwiftyGif (5.4.0)
+  - video_player (0.0.1):
+    - Flutter
+  - wakelock (0.0.1):
+    - Flutter
+  - webview_flutter_wkwebview (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
@@ -561,6 +567,9 @@ DEPENDENCIES:
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
   - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
+  - video_player (from `.symlinks/plugins/video_player/ios`)
+  - wakelock (from `.symlinks/plugins/wakelock/ios`)
+  - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
 SPEC REPOS:
   trunk:
@@ -610,6 +619,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/shared_preferences/ios"
   sqflite:
     :path: ".symlinks/plugins/sqflite/ios"
+  video_player:
+    :path: ".symlinks/plugins/video_player/ios"
+  wakelock:
+    :path: ".symlinks/plugins/wakelock/ios"
+  webview_flutter_wkwebview:
+    :path: ".symlinks/plugins/webview_flutter_wkwebview/ios"
 
 SPEC CHECKSUMS:
   abseil: 6c8eb7892aefa08d929b39f9bb108e5367e3228f
@@ -646,7 +661,10 @@ SPEC CHECKSUMS:
   shared_preferences: 5033afbb22d372e15aff8ff766df9021b845f273
   sqflite: 6d358c025f5b867b29ed92fc697fd34924e11904
   SwiftyGif: 5d4af95df24caf1c570dbbcb32a3b8a0763bc6d7
+  video_player: ecd305f42e9044793efd34846e1ce64c31ea6fcb
+  wakelock: d0fc7c864128eac40eba1617cb5264d9c940b46f
+  webview_flutter_wkwebview: 44aa025fbcf6730d808f1e0d86a5af5ac25fa8de
 
-PODFILE CHECKSUM: fe0e1ee7f3d1f7d00b11b474b62dd62134535aea
+PODFILE CHECKSUM: de2120689bd64c50778c43ebcd6de450aa1587e0
 
 COCOAPODS: 1.10.2
