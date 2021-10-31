@@ -52,9 +52,40 @@ linter:
 
     unawaited_futures: true
 
+    avoid_dynamic_calls: true
+
+    avoid_returning_null_for_future: true
+
+    avoid_type_to_string: true
+
+    cancel_subscriptions: true
+
+    close_sinks: true
+
+    # comment_references: true
+
+    # Note: This rule is currently experimental.
+    invariant_booleans: true
+
+    literal_only_boolean_expressions: true
+
+    # AVOID throwing exceptions in finally blocks.
+    throw_in_finally: true
+
+    unnecessary_statements: true
+
+    use_build_context_synchronously: true
+
+    always_declare_return_types: true
+
+    flutter_style_todos: false
+
+    todo: false
+
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
 
+# Restart your IDE after changing any of these
 dart_code_metrics:
   anti-patterns:
     - long-method
@@ -68,9 +99,14 @@ dart_code_metrics:
     - test/**
     - test_driver/**
   rules:
-    - newline-before-return
+    # - newline-before-return
     - no-boolean-literal-compare
     - no-empty-block
-    - prefer-trailing-comma
+    # - prefer-trailing-comma
     - prefer-conditional-expressions
     - no-equal-then-else
+    - avoid-ignoring-return-values
+    - avoid-non-null-assertion
+    - avoid-unused-parameters
+    - no-magic-number
+    - no-object-declaration
