@@ -34,7 +34,7 @@ linter:
     # Single quotes are easier to type and don't compromise on readability.
     prefer_single_quotes: true
 
-    # Type annotations are sometimes neccessary for readability
+    # Type annotations are sometimes necessary for readability
     omit_local_variable_types: false
 
     # Better to declare variables as final
