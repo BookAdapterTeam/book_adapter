@@ -232,4 +232,10 @@ class MockFirebaseService implements FirebaseService {
   @override
   // TODO: implement log
   Logger get log => throw UnimplementedError();
+
+  @override
+  Future<void> saveLastReadCfiLocation({required String lastReadCfiLocation, required String bookId}) {
+    // TODO: implement saveLastReadCfiLocation
+    throw UnimplementedError();
+  }
 }
