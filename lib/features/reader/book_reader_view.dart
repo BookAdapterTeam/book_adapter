@@ -53,27 +53,9 @@ class BookReaderView extends HookConsumerWidget {
           // TODO: Implement url_launcher package
           // print(link);
         },
-        // itemBuilder: (context, chapters, paragraphs, paragraphIndex) {
-        //   if (paragraphs.isEmpty) {
-        //     return Container();
-        //   }
-
-        //   return Html(
-        //     data: paragraphs[paragraphIndex].element.outerHtml,
-        //     onLinkTap: ,
-        //   );
-
-        //   // return Column(
-        //   //   children: [
-        //   //     // if (paragraphs[paragraphIndex].chapterIndex >= 0 && )
-        //   //     //   ChapterDivider(chapter: chapters[paragraphIndex],),
-        //   //     SelectableText('''
-        //   //         ${paragraphs[paragraphIndex].chapterIndex}
-        //   //         ${paragraphs[paragraphIndex].element.outerHtml}
-        //   //         '''),
-        //   //   ],
-        //   // );
-        // },
+        onChange: ((_) {
+          // print('change');
+        }),
       ),
     );
   }
