@@ -114,6 +114,11 @@ abstract class BaseFirebaseService {
   Stream<QuerySnapshot<Book>> get booksStream;
   Stream<QuerySnapshot<Series>> get seriesStream;
 
+  Future<void> saveLastReadCfiLocation({
+    required String lastReadCfiLocation,
+    required String bookId,
+  });
+
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks();
 

@@ -257,6 +257,28 @@ class FirebaseService implements BaseFirebaseService {
 
   // Books *****************************************************************************************************
 
+  @override
+  Future<void> saveLastReadCfiLocation({
+    required String lastReadCfiLocation,
+    required String bookId,
+  }) async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) {
+        throw AppException('user-null');
+      }
+
+      await _booksRef
+          .doc(bookId)
+          .update({'lastReadCfiLocation': lastReadCfiLocation});
+    } catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      rethrow;
+    }
+  }
+
   /// Get a list of books from the user's database
   @override
   Future<Either<Failure, List<Book>>> getBooks() async {
@@ -584,10 +606,11 @@ class FirebaseService implements BaseFirebaseService {
   ///
   /// Thorws `AppException` if it fails
   @override
-  Future<Either<Failure, String>> uploadFile(
-      {required String contentType,
-      required String firebaseFilePath,
-      required String localFilePath}) async {
+  Future<Either<Failure, String>> uploadFile({
+    required String contentType,
+    required String firebaseFilePath,
+    required String localFilePath,
+  }) async {
     try {
       // Check if file exists, exit if it does
       await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();

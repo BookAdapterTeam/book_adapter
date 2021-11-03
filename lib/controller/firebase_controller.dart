@@ -282,9 +282,20 @@ class FirebaseController {
   Stream<QuerySnapshot<Series>> get seriesStream =>
       _firebaseService.seriesStream;
 
+  /// Save the last read cfi location in firebase
+  Future<void> saveLastCfiLocation({
+    required String cfi,
+    required String bookId,
+  }) async {
+    return await _firebaseService.saveLastReadCfiLocation(
+      lastReadCfiLocation: cfi,
+      bookId: bookId,
+    );
+  }
+
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
-    return _firebaseService.getBooks();
+    return await _firebaseService.getBooks();
   }
 
   /// Get a list of books from the user's database
@@ -373,12 +384,12 @@ class FirebaseController {
       );
       if (uploadRes.isLeft()) {
         return uploadRes.fold(
-          (failure) => Left(
-              Failure('Could not add book to Firebase Storage: ${failure.message}')),
+          (failure) => Left(Failure(
+              'Could not add book to Firebase Storage: ${failure.message}')),
           (right) => Left(Failure('')), // Wont ever be returned
         );
       }
-      
+
       // TODO: Add bookUrl to firebase book document
       // final String? bookUrl = res.getOrElse(() => '');
 
@@ -508,7 +519,8 @@ class FirebaseController {
   /// Download a file and copy it to documents
   ///
   /// Thorws `AppException` if it fails
-  DownloadTask downloadFile(String firebaseStorageFilePath, String downloadToLocation) {
+  DownloadTask downloadFile(
+      String firebaseStorageFilePath, String downloadToLocation) {
     try {
       return _firebaseService.downloadFile(
         firebaseFilePath: firebaseStorageFilePath,
