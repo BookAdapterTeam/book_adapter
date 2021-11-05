@@ -1,10 +1,12 @@
 import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/reader/book_reader_view_controller.dart';
 import 'package:book_adapter/features/reader/epub_controller.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:responsive_builder/responsive_builder.dart';
 
 /// Displays detailed information about a BookItem.
 class BookReaderView extends HookConsumerWidget {
@@ -51,10 +53,36 @@ class BookReaderView extends HookConsumerWidget {
         },
         onExternalLinkPressed: (link) {
           // TODO: Implement url_launcher package
-          // print(link);
+          print(link);
         },
-        onChange: ((_) {
+        onChange: ((epubChapterViewValue) async {
           // print('change');
+          if (epubChapterViewValue == null) return;
+
+          final paragraphNum = epubChapterViewValue.paragraphNumber;
+
+          // Only update the firebase last read cfi location every few paragraphs
+          final updateFrequency = getValueForScreenType<int>(
+            context: context,
+            mobile: 3,
+            tablet: 5,
+            desktop: 7,
+            watch: 1,
+          );
+          if (paragraphNum % updateFrequency == 0) {
+            final cfi = epubReaderController.generateEpubCfi();
+            if (cfi == null) return;
+            final fail = await ref
+                .read(readerViewControllerProvider.notifier)
+                .saveLastReadLocation(cfi, bookId: book.id);
+
+            // Show snackbar with error if there is an error
+            if (fail == null) return;
+            final snackBar = SnackBar(
+              content: Text(fail.message),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
         }),
       ),
     );
