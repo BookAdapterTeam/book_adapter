@@ -17,14 +17,17 @@ class BookReaderView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final log = Logger();
     // Convert the passed in book back to a book object
     final Map<String, dynamic> bookMap =
         ModalRoute.of(context)!.settings.arguments! as Map<String, dynamic>;
     final storageController = ref.watch(storageControllerProvider);
     final book = Book.fromMapSerializable(bookMap);
+    log.i(book.lastReadCfiLocation);
     final epubReaderController = useEpubController(
-        document: EpubReader.readBook(storageController.getBookData(book)));
-    final log = Logger();
+      document: EpubReader.readBook(storageController.getBookData(book)),
+      epubCfi: book.lastReadCfiLocation,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -58,37 +61,50 @@ class BookReaderView extends HookConsumerWidget {
           await launch(link);
           log.i('Launched link: ' + link);
         },
-        onChange: ((epubChapterViewValue) async {
-          // print('change');
-          if (epubChapterViewValue == null) return;
-
-          final paragraphNum = epubChapterViewValue.paragraphNumber;
-
-          // Only update the firebase last read cfi location every few paragraphs
-          final updateFrequency = getValueForScreenType<int>(
-            context: context,
-            mobile: 3,
-            tablet: 5,
-            desktop: 7,
-            watch: 1,
-          );
-          if (paragraphNum % updateFrequency == 0) {
-            final cfi = epubReaderController.generateEpubCfi();
-            if (cfi == null) return;
-            final fail = await ref
-                .read(readerViewControllerProvider.notifier)
-                .saveLastReadLocation(cfi, bookId: book.id);
-
-            // Show snackbar with error if there is an error
-            if (fail == null) return;
-            final snackBar = SnackBar(
-              content: Text(fail.message),
-            );
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }
-        }),
+        onChange: (value) => onChange(
+          context,
+          epubChapterViewValue: value,
+          bookId: book.id,
+          epubReaderController: epubReaderController,
+          read: ref.read,
+        ),
       ),
     );
+  }
+
+  Future<void> onChange(
+    BuildContext context, {
+    EpubChapterViewValue? epubChapterViewValue,
+    required String bookId,
+    required EpubController epubReaderController,
+    required Reader read,
+  }) async {
+    // print('change');
+    if (epubChapterViewValue == null) return;
+
+    final paragraphNum = epubChapterViewValue.paragraphNumber;
+
+    // Only update the firebase last read cfi location every few paragraphs
+    final updateFrequency = getValueForScreenType<int>(
+      context: context,
+      mobile: 3,
+      tablet: 5,
+      desktop: 7,
+      watch: 1,
+    );
+    if (paragraphNum % updateFrequency == 0) {
+      final cfi = epubReaderController.generateEpubCfi();
+      if (cfi == null) return;
+      final fail = await read(readerViewControllerProvider.notifier)
+          .saveLastReadLocation(cfi, bookId: bookId);
+
+      // Show snackbar with error if there is an error
+      if (fail == null) return;
+      final snackBar = SnackBar(
+        content: Text(fail.message),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    }
   }
 
   void _showCurrentEpubCfi({
