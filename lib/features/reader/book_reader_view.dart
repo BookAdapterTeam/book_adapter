@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// Displays detailed information about a BookItem.
 class BookReaderView extends HookConsumerWidget {
@@ -51,9 +52,11 @@ class BookReaderView extends HookConsumerWidget {
         onDocumentLoaded: (document) {
           log.i('isLoaded: $document');
         },
-        onExternalLinkPressed: (link) {
-          // TODO: Implement url_launcher package
-          print(link);
+        onExternalLinkPressed: (link) async {
+          log.i('Attempting to open link: ' + link);
+
+          await launch(link);
+          log.i('Launched link: ' + link);
         },
         onChange: ((epubChapterViewValue) async {
           // print('change');

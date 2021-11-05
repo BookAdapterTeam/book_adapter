@@ -157,7 +157,7 @@ class Book implements Item {
       collectionIds: Set<String>.from(map['collectionIds']),
       seriesId: map['seriesId'],
       lastCfiLocation: map['lastCfiLocation'],
-      finished: map['finished'],
+      finished: map['finished'] ?? false,
     );
   }
 
@@ -204,7 +204,7 @@ class Book implements Item {
       wordCount: map['wordCount'],
       collectionIds: List<String>.from(map['collectionIds']).toSet(),
       seriesId: map['seriesId'],
-      finished: map['finished'],
+      finished: map['finished'] ?? false,
     );
   }
 
