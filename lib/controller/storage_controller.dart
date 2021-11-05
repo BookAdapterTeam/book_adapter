@@ -32,7 +32,7 @@ class StorageController {
 
   void downloadFile(Book book,
       {required FutureOr<void> Function(String) whenDone}) {
-    final appBookAdaptPath = _storageService.appBookAdaptPath;
+    final appBookAdaptPath = _storageService.appBookAdaptDirectory.path;
     final task = _firebaseController.downloadFile(
         book.filepath, '$appBookAdaptPath/${book.filepath}');
     // ignore: unawaited_futures
@@ -57,5 +57,11 @@ class StorageController {
       log.e(e.toString(), e, st);
       return [];
     }
+  }
+
+  Future<List<int>> getBookData(Book book) {
+    final bookPath = _storageService.getAppFilePath(book.filepath);
+
+    return _storageService.getFileInMemory(bookPath);
   }
 }

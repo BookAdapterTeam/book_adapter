@@ -9,7 +9,7 @@ class AddBookButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewController viewController = ref.watch(libraryViewController.notifier);
+    final LibraryViewController viewController = ref.watch(libraryViewControllerProvider.notifier);
     return IconButton(
       tooltip: 'Add a book',
       onPressed: () => viewController.addBooks(context),

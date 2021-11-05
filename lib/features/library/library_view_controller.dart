@@ -15,7 +15,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
-final libraryViewController =
+final libraryViewControllerProvider =
     StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>(
         (ref) {
   final books = ref.watch(bookStreamProvider);
@@ -133,13 +133,12 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       // for (final collectionId in collectionIds) {
       //   await firebaseController.removeSeries(collectionId);
       // }
-
       return const Right(null);
-    } on AppException catch (e) {
-      debugPrint('${e.message ?? e.toString()} ${e.code}');
+    } on AppException catch (e, st) {
+      log.e('${e.message ?? e.toString()} ${e.code}', e, st);
       return Left(Failure(e.message ?? e.toString()));
-    } on Exception catch (e) {
-      debugPrint(e.toString());
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
       return Left(Failure(e.toString()));
     }
   }
@@ -183,7 +182,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     return names.contains(name);
   }
 
-  Future<Either<Failure, void>> downloadBook(Book book) async {
+  Future<Either<Failure, void>> queueDownloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
     final firebaseController = _read(firebaseControllerProvider);
     final userModel = _read(userModelProvider.notifier);

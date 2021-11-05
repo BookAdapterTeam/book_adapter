@@ -56,9 +56,9 @@ class MergeIntoSeriesButton extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewController viewController =
-        ref.watch(libraryViewController.notifier);
+        ref.watch(libraryViewControllerProvider.notifier);
     final selectedItems =
-        ref.watch(libraryViewController.select((data) => data.selectedItems));
+        ref.watch(libraryViewControllerProvider.select((data) => data.selectedItems));
     final log = Logger();
 
     return IconButton(
@@ -103,9 +103,9 @@ class LibraryScrollView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
-        ref.watch(libraryViewController.notifier);
+        ref.watch(libraryViewControllerProvider.notifier);
     final scrollController = useScrollController();
     final log = Logger();
 
@@ -128,7 +128,7 @@ class LibraryScrollView extends HookConsumerWidget {
                 });
             if (collectionName == null) return;
 
-            final viewController = ref.read(libraryViewController.notifier);
+            final viewController = ref.read(libraryViewControllerProvider.notifier);
             final res = await viewController.addNewCollection(collectionName);
             res.fold(
               (failure) {
@@ -234,9 +234,9 @@ class BookCollectionList extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
-        ref.watch(libraryViewController.notifier);
+        ref.watch(libraryViewControllerProvider.notifier);
 
     // Get the  list of books in the collection. It will not show books in a series, only the series itself
     final List<Item> items = data.getCollectionItems(collection.id);

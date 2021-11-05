@@ -9,7 +9,7 @@ class AddToCollectionButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewController = ref.watch(libraryViewController.notifier);
+    final viewController = ref.watch(libraryViewControllerProvider.notifier);
     return Builder(builder: (context) {
       return IconButton(
         onPressed: () async {
@@ -91,7 +91,7 @@ class _ChooseCollectionsBottomSheetState
 
   @override
   Widget build(BuildContext context) {
-    final data = ref.watch(libraryViewController);
+    final data = ref.watch(libraryViewControllerProvider);
     final collectionList = data.collections;
 
     return SingleChildScrollView(

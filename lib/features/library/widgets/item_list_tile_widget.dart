@@ -1,6 +1,8 @@
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
+import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
+import 'package:book_adapter/features/reader/current_book.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -18,7 +20,7 @@ class ItemListTileWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
 
     final isSelected = data.selectedItems.contains(item);
 
@@ -105,9 +107,9 @@ class _ItemListTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
-    final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
-        ref.watch(libraryViewController.notifier);
+        ref.watch(libraryViewControllerProvider.notifier);
     final imageUrl = item.imageUrl;
     final subtitle = item.subtitle != null ? Text(item.subtitle!) : null;
     final isSelected = data.selectedItems.contains(item);
@@ -153,7 +155,7 @@ class _ItemListTile extends ConsumerWidget {
           icon = const Icon(Icons.download);
           onPressed = () async {
             try {
-              final res = await viewController.downloadBook(book);
+              final res = await viewController.queueDownloadBook(book);
               res.fold(
                 (failure) {
                   log.e(failure.message);
@@ -228,16 +230,18 @@ class _ItemListTile extends ConsumerWidget {
         ),
         disableSelect: disableSelect,
         isSelected: isSelected,
+        status: bookStatus,
       );
     }
 
     // Return when tile is not a book (its a series)
     return _CustomListTileWidget(
-        item: item,
-        subtitle: subtitle,
-        leading: image,
-        disableSelect: disableSelect,
-        isSelected: isSelected);
+      item: item,
+      subtitle: subtitle,
+      leading: image,
+      disableSelect: disableSelect,
+      isSelected: isSelected,
+    );
   }
 }
 
@@ -250,6 +254,7 @@ class _CustomListTileWidget extends ConsumerWidget {
     this.trailing,
     required this.disableSelect,
     required this.isSelected,
+    this.status,
   }) : super(key: key);
 
   final Item item;
@@ -258,12 +263,14 @@ class _CustomListTileWidget extends ConsumerWidget {
   final Widget? trailing;
   final bool disableSelect;
   final bool isSelected;
+  final BookStatus? status;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewData data = ref.watch(libraryViewController);
+    final log = Logger();
+    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
-        ref.watch(libraryViewController.notifier);
+        ref.watch(libraryViewControllerProvider.notifier);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -283,7 +290,7 @@ class _CustomListTileWidget extends ConsumerWidget {
 
         viewController.selectItem(item);
       },
-      onTap: () {
+      onTap: () async {
         if (isSelected) {
           return viewController.deselectItem(item);
         }
@@ -292,12 +299,48 @@ class _CustomListTileWidget extends ConsumerWidget {
           return viewController.selectItem(item);
         }
 
-        // Navigate to the reader page or series page depending on item type.
-        Navigator.restorablePushNamed(
-          context,
-          item.routeTo,
-          arguments: item.toMapSerializable(),
-        );
+        if (item is Series) {
+          Navigator.restorablePushNamed(
+            context,
+            item.routeTo,
+            arguments: item.toMapSerializable(),
+          );
+          return;
+        }
+
+        if (item is Book && status == BookStatus.downloaded) {
+          final controller = ref.read(currentBookProvider.state);
+          controller.state = item as Book;
+          Navigator.restorablePushNamed(
+            context,
+            item.routeTo,
+          );
+          return;
+        }
+
+        if (item is Book && status == BookStatus.notDownloaded) {
+          try {
+            final res = await viewController.queueDownloadBook(item as Book);
+            res.fold(
+              (failure) {
+                log.e(failure.message);
+                final SnackBar snackBar = SnackBar(
+                  content: Text(failure.message),
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+              (_) => null,
+            );
+            return;
+          } on Exception catch (e) {
+            log.e(e.toString());
+            final SnackBar snackBar = SnackBar(
+              content: Text(e.toString()),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            return;
+          }
+        }
       },
     );
   }

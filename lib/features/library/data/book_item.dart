@@ -30,6 +30,8 @@ class Book implements Item {
   final int? readingProgress;
   final int? wordCount;
   final String? seriesId;
+  final String? lastReadCfiLocation;
+  final bool finished;
 
   bool get hasSeries => seriesId != null;
 
@@ -55,6 +57,8 @@ class Book implements Item {
     this.wordCount,
     required this.collectionIds,
     this.seriesId,
+    this.lastReadCfiLocation,
+    this.finished = false,
   });
 
   @override
@@ -79,6 +83,8 @@ class Book implements Item {
     int? wordCount,
     Set<String>? collectionIds,
     String? seriesId,
+    String? lastReadCfiLocation,
+    bool? finished,
   }) {
     return Book(
       id: id ?? this.id,
@@ -98,6 +104,8 @@ class Book implements Item {
       wordCount: wordCount ?? this.wordCount,
       collectionIds: collectionIds ?? this.collectionIds,
       seriesId: seriesId ?? this.seriesId,
+      lastReadCfiLocation: lastReadCfiLocation ?? this.lastReadCfiLocation,
+      finished: finished ?? this.finished,
     );
   }
 
@@ -121,6 +129,8 @@ class Book implements Item {
       'wordCount': wordCount,
       'collectionIds': collectionIds.toList(),
       'seriesId': seriesId,
+      'lastReadCfiLocation': lastReadCfiLocation,
+      'finished': finished,
     };
   }
 
@@ -146,6 +156,8 @@ class Book implements Item {
       wordCount: map['wordCount'],
       collectionIds: Set<String>.from(map['collectionIds']),
       seriesId: map['seriesId'],
+      lastReadCfiLocation: map['lastReadCfiLocation'],
+      finished: map['finished'] ?? false,
     );
   }
 
@@ -169,6 +181,8 @@ class Book implements Item {
       'wordCount': wordCount,
       'collectionIds': collectionIds.toList(),
       'seriesId': seriesId,
+      'lastReadCfiLocation': lastReadCfiLocation,
+      'finished': finished,
     };
   }
 
@@ -177,7 +191,7 @@ class Book implements Item {
       id: map['id'],
       userId: map['userId'],
       title: map['title'],
-      addedDate: map['addedDate'].toDate(),
+      addedDate: map['addedDate']?.toDate(),
       subtitle: map['authors'],
       description: map['description'],
       filepath: map['filepath'],
@@ -191,6 +205,8 @@ class Book implements Item {
       wordCount: map['wordCount'],
       collectionIds: List<String>.from(map['collectionIds']).toSet(),
       seriesId: map['seriesId'],
+      lastReadCfiLocation: map['lastReadCfiLocation'],
+      finished: map['finished'] ?? false,
     );
   }
 
@@ -222,6 +238,8 @@ class Book implements Item {
       readingProgress ?? 'Not started reading',
       wordCount ?? 'Unknown word count',
       collectionIds,
+      lastReadCfiLocation ?? 'No last read CFI location',
+      finished,
     ];
   }
 }

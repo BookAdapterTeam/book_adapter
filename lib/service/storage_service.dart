@@ -22,11 +22,9 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 class StorageService {
   StorageService();
 
-  io.Directory? appDir;
+  late io.Directory appDir;
 
-  io.Directory? appBookAdaptDirectory;
-
-  String? appBookAdaptPath;
+  late io.Directory appBookAdaptDirectory;
 
   final log = Logger();
 
@@ -36,22 +34,20 @@ class StorageService {
   Future<void> init() async {
     try {
       appDir = await _getAppDirectory();
-      appBookAdaptPath = '${appDir!.path}/BookAdapt';
-      appBookAdaptDirectory = io.Directory(appBookAdaptPath!);
-      await appBookAdaptDirectory!.create();
+      appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
+      await appBookAdaptDirectory.create();
     } on Exception catch (e, st) {
-      appBookAdaptPath = null;
-      appDir = null;
-      appBookAdaptDirectory = null;
       log.e(e.toString(), e, st);
       rethrow;
     }
   }
 
+  String getAppFilePath(filepath) => appBookAdaptDirectory.path + '/' + filepath;
+
   /// Method to create a directory for the user when they login
   Future<io.Directory> createUserDirectory(String userId) async {
     try {
-      return await io.Directory('$appBookAdaptPath/$userId').create();
+      return await io.Directory('${appBookAdaptDirectory.path}/$userId').create();
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
       rethrow;
@@ -114,10 +110,9 @@ class StorageService {
     bool recursive = false,
     bool followLinks = true,
   }) {
-    assert(appBookAdaptDirectory != null);
 
     try {
-      final userDirectory = io.Directory('$appBookAdaptPath/$userId');
+      final userDirectory = io.Directory('${appBookAdaptDirectory.path}/$userId');
       final files = userDirectory.listSync(
         recursive: recursive,
         followLinks: followLinks,
@@ -132,10 +127,9 @@ class StorageService {
   /// Deletes a given File
   ///
   /// Returns a list of the filenames
-  Future<io.FileSystemEntity> deleteFile(String filename) async {
-    assert(appBookAdaptPath != null);
+  Future<io.FileSystemEntity> deleteFile(String filepath) async {
     try {
-      final file = io.File('$appBookAdaptPath/$filename');
+      final file = io.File(getAppFilePath(filepath));
       return await file.delete();
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
@@ -266,8 +260,8 @@ class StorageService {
   }
 
   /// Check if a file exists on the device given the filename
-  Future<bool> fileExists(String filename) async {
-    final String path = '$appBookAdaptPath/$filename';
+  Future<bool> fileExists(String filepath) async {
+    final String path = getAppFilePath(filepath);
     if (await io.File(path).exists()) {
       return true;
     }
@@ -276,11 +270,11 @@ class StorageService {
 
   Future<io.File> writeMemoryToFile({
     required Uint8List data,
-    required String filename,
+    required String filepath,
     bool overwrite = false,
   }) async {
     try {
-      final String path = '$appBookAdaptPath/$filename';
+      final String path = getAppFilePath(filepath);
       final fileRef = io.File(path);
 
       if (overwrite == false && await fileRef.exists()) {
@@ -292,5 +286,10 @@ class StorageService {
       log.e(e.toString(), e, st);
       throw AppException(e.toString());
     }
+  }
+
+  Future<Uint8List> getFileInMemory(String filepath) {
+    final file = io.File(filepath);
+    return file.readAsBytes();
   }
 }

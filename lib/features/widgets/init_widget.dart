@@ -48,12 +48,12 @@ class InitStorageWidget extends ConsumerWidget {
     return AsyncValueWidget(
       value: asyncValue,
       data: (_) => child,
-      loading: (data) => const Scaffold(
+      loading: () => const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
         ),
       ),
-      error: (e, st, data) {
+      error: (e, st) {
         return Scaffold(
           body: Center(
             child: Text(
