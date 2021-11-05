@@ -30,14 +30,14 @@ class ProfileButton extends ConsumerWidget {
           },
         );
       },
-      loading: (userA) => IconButton(
+      loading: () => IconButton(
           key: const ValueKey('profile'),
           icon: const Icon(Icons.account_circle),
           onPressed: () {
             Navigator.restorablePushNamed(context, ProfileView.routeName);
           },
         ),
-      error: (e, st, userA) {
+      error: (e, st) {
         log.e('Error getting user data', e, st);
         return IconButton(
           key: const ValueKey('profile'),

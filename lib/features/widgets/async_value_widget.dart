@@ -15,21 +15,21 @@ class AsyncValueWidget<T> extends StatelessWidget {
   final AsyncValue<T> value;
   // output builder function
   final Widget Function(T) data;
-  final Widget Function(AsyncValue<T>?)? loading;
-  final Widget Function(Object, StackTrace?, AsyncData<T>?)? error;
+  final Widget Function()? loading;
+  final Widget Function(Object, StackTrace?)? error;
 
   @override
   Widget build(BuildContext context) {
     return value.when(
       data: data,
       loading: loading ??
-          (data) {
+          () {
             return const Center(
               child: CircularProgressIndicator(),
             );
           },
       error: error ??
-          (e, st, data) {
+          (e, st) {
             return Center(
               child: Text(
                 e.toString(),
