@@ -19,7 +19,7 @@ class SeriesView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final Map<String, dynamic> bookMap = ModalRoute.of(context)!.settings.arguments! as Map<String, dynamic>;
     final series = Series.fromMapFirebase(bookMap);
-    final data = ref.watch(libraryViewController);
+    final data = ref.watch(libraryViewControllerProvider);
 
     final books = data.books?.where((book) {
       return series.id == book.seriesId;

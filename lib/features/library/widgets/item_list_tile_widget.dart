@@ -19,7 +19,7 @@ class ItemListTileWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
 
     final isSelected = data.selectedItems.contains(item);
 
@@ -106,9 +106,9 @@ class _ItemListTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
-    final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
-        ref.watch(libraryViewController.notifier);
+        ref.watch(libraryViewControllerProvider.notifier);
     final imageUrl = item.imageUrl;
     final subtitle = item.subtitle != null ? Text(item.subtitle!) : null;
     final isSelected = data.selectedItems.contains(item);
@@ -267,9 +267,9 @@ class _CustomListTileWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
-    final LibraryViewData data = ref.watch(libraryViewController);
+    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
-        ref.watch(libraryViewController.notifier);
+        ref.watch(libraryViewControllerProvider.notifier);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
