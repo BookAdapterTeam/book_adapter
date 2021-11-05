@@ -1,6 +1,7 @@
 import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/reader/book_reader_view_controller.dart';
+import 'package:book_adapter/features/reader/current_book.dart';
 import 'package:book_adapter/features/reader/epub_controller.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +19,18 @@ class BookReaderView extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
-    // Convert the passed in book back to a book object
-    final Map<String, dynamic> bookMap =
-        ModalRoute.of(context)!.settings.arguments! as Map<String, dynamic>;
-    final storageController = ref.watch(storageControllerProvider);
-    final book = Book.fromMapSerializable(bookMap);
+    final Book? book = ref.read(currentBookProvider);
+
+    if (book == null) {
+      return const Scaffold(
+        body: Center(
+          child: Text('Error: No book has been chosen'),
+        ),
+      );
+    }
+
     log.i(book.lastReadCfiLocation);
+    final storageController = ref.watch(storageControllerProvider);
     final epubReaderController = useEpubController(
       document: EpubReader.readBook(storageController.getBookData(book)),
       epubCfi: book.lastReadCfiLocation,
@@ -64,7 +71,6 @@ class BookReaderView extends HookConsumerWidget {
         onChange: (value) => onChange(
           context,
           epubChapterViewValue: value,
-          bookId: book.id,
           epubReaderController: epubReaderController,
           read: ref.read,
         ),
@@ -72,13 +78,13 @@ class BookReaderView extends HookConsumerWidget {
     );
   }
 
-  Future<void> onChange(
+  void onChange(
     BuildContext context, {
     EpubChapterViewValue? epubChapterViewValue,
-    required String bookId,
     required EpubController epubReaderController,
     required Reader read,
   }) async {
+    final log = Logger();
     // print('change');
     if (epubChapterViewValue == null) return;
 
@@ -95,15 +101,27 @@ class BookReaderView extends HookConsumerWidget {
     if (paragraphNum % updateFrequency == 0) {
       final cfi = epubReaderController.generateEpubCfi();
       if (cfi == null) return;
-      final fail = await read(readerViewControllerProvider.notifier)
-          .saveLastReadLocation(cfi, bookId: bookId);
 
-      // Show snackbar with error if there is an error
-      if (fail == null) return;
-      final snackBar = SnackBar(
-        content: Text(fail.message),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      final bookController = read(currentBookProvider.state);
+      final book = bookController.state;
+      if (book == null) return;
+
+      if (book.lastReadCfiLocation == cfi) return;
+      bookController.state = book.copyWith(lastReadCfiLocation: cfi);
+
+      // ignore: unawaited_futures
+      read(readerViewControllerProvider.notifier)
+          .saveLastReadLocation(cfi, bookId: book.id)
+          .then((fail) {
+        log.i('Saved last read cfi location: ' + cfi);
+
+        // Show snackbar with error if there is an error
+        if (fail == null) return;
+        final snackBar = SnackBar(
+          content: Text(fail.message),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      });
     }
   }
 

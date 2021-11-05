@@ -2,6 +2,7 @@ import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
+import 'package:book_adapter/features/reader/current_book.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -298,7 +299,7 @@ class _CustomListTileWidget extends ConsumerWidget {
           return viewController.selectItem(item);
         }
 
-        if (status == BookStatus.downloaded || item is Series) {
+        if (item is Series) {
           Navigator.restorablePushNamed(
             context,
             item.routeTo,
@@ -306,8 +307,18 @@ class _CustomListTileWidget extends ConsumerWidget {
           );
           return;
         }
-        
-        if (status == BookStatus.notDownloaded && item is Book) {
+
+        if (item is Book && status == BookStatus.downloaded) {
+          final controller = ref.read(currentBookProvider.state);
+          controller.state = item as Book;
+          Navigator.restorablePushNamed(
+            context,
+            item.routeTo,
+          );
+          return;
+        }
+
+        if (item is Book && status == BookStatus.notDownloaded) {
           try {
             final res = await viewController.queueDownloadBook(item as Book);
             res.fold(
@@ -330,7 +341,6 @@ class _CustomListTileWidget extends ConsumerWidget {
             return;
           }
         }
-        
       },
     );
   }
