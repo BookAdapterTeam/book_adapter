@@ -31,6 +31,7 @@ class Book implements Item {
   final int? wordCount;
   final String? seriesId;
   final String? lastCfiLocation;
+  final bool finished;
 
   bool get hasSeries => seriesId != null;
 
@@ -57,6 +58,7 @@ class Book implements Item {
     required this.collectionIds,
     this.seriesId,
     this.lastCfiLocation,
+    this.finished = false,
   });
 
   @override
@@ -82,6 +84,7 @@ class Book implements Item {
     Set<String>? collectionIds,
     String? seriesId,
     String? lastCfiLocation,
+    bool? finished,
   }) {
     return Book(
       id: id ?? this.id,
@@ -102,6 +105,7 @@ class Book implements Item {
       collectionIds: collectionIds ?? this.collectionIds,
       seriesId: seriesId ?? this.seriesId,
       lastCfiLocation: lastCfiLocation ?? this.lastCfiLocation,
+      finished: finished ?? this.finished,
     );
   }
 
@@ -126,6 +130,7 @@ class Book implements Item {
       'collectionIds': collectionIds.toList(),
       'seriesId': seriesId,
       'lastCfiLocation': lastCfiLocation,
+      'finished': finished,
     };
   }
 
@@ -152,6 +157,7 @@ class Book implements Item {
       collectionIds: Set<String>.from(map['collectionIds']),
       seriesId: map['seriesId'],
       lastCfiLocation: map['lastCfiLocation'],
+      finished: map['finished'],
     );
   }
 
@@ -175,6 +181,7 @@ class Book implements Item {
       'wordCount': wordCount,
       'collectionIds': collectionIds.toList(),
       'seriesId': seriesId,
+      'finished': finished,
     };
   }
 
@@ -197,6 +204,7 @@ class Book implements Item {
       wordCount: map['wordCount'],
       collectionIds: List<String>.from(map['collectionIds']).toSet(),
       seriesId: map['seriesId'],
+      finished: map['finished'],
     );
   }
 
@@ -229,6 +237,7 @@ class Book implements Item {
       wordCount ?? 'Unknown word count',
       collectionIds,
       lastCfiLocation ?? 'No last CFI location',
+      finished,
     ];
   }
 }
