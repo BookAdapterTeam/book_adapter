@@ -78,7 +78,7 @@ class BookReaderView extends HookConsumerWidget {
     );
   }
 
-  void onChange(
+  Future<void> onChange(
     BuildContext context, {
     EpubChapterViewValue? epubChapterViewValue,
     required EpubController epubReaderController,
@@ -109,19 +109,16 @@ class BookReaderView extends HookConsumerWidget {
       if (book.lastReadCfiLocation == cfi) return;
       bookController.state = book.copyWith(lastReadCfiLocation: cfi);
 
-      // ignore: unawaited_futures
-      read(readerViewControllerProvider.notifier)
-          .saveLastReadLocation(cfi, bookId: book.id)
-          .then((fail) {
-        log.i('Saved last read cfi location: ' + cfi);
+      final fail = await read(readerViewControllerProvider.notifier)
+          .saveLastReadLocation(cfi, bookId: book.id);
+      log.i('Saved last read cfi location: ' + cfi);
 
-        // Show snackbar with error if there is an error
-        if (fail == null) return;
-        final snackBar = SnackBar(
-          content: Text(fail.message),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      });
+      // Show snackbar with error if there is an error
+      if (fail == null) return;
+      final snackBar = SnackBar(
+        content: Text(fail.message),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }
 
