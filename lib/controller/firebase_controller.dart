@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
@@ -328,12 +330,15 @@ class FirebaseController {
           await EpubReader.openBook(stream.toBytes());
 
       final title = openedBook.Title ?? '';
-      final authors = openedBook.AuthorList?.join(',') ?? '';
       final subtitle =
           openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
       final filesize = file.size;
-      final filename =
-          '$title-$authors-$filesize-${file.name}'.replaceAll('/', '');
+
+      // Max filename is 127 characters
+      final filesizeLength = filesize.toString().length;
+      final startingInt = max(0, file.name.length - (127 - filesizeLength));
+      final tempFilename = file.name.substring(startingInt, file.name.length);
+      final filename = '$filesize-$tempFilename';
       final firebaseFilePath = '$userId/$filename';
       final collectionName = collection?.name ?? 'Default';
 
@@ -348,7 +353,9 @@ class FirebaseController {
         addedDate: DateTime.now().toUtc(),
         filepath: firebaseFilePath,
         filesize: filesize,
-        collectionIds: {'$userId-$collectionName'},
+        collectionIds: {
+          '$userId-$collectionName',
+        },
       );
 
       // Upload cover image to storage
