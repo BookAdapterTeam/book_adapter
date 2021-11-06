@@ -38,6 +38,7 @@ class BookReaderView extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const BackButton(),
         title: EpubActualChapter(
           controller: epubReaderController,
           builder: (chapterValue) => Text(
@@ -45,16 +46,16 @@ class BookReaderView extends HookConsumerWidget {
             textAlign: TextAlign.start,
           ),
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.save_alt),
-            color: Colors.white,
-            onPressed: () => _showCurrentEpubCfi(
-                context: context, controller: epubReaderController),
-          ),
-        ],
+        // actions: <Widget>[
+        //   IconButton(
+        //     icon: const Icon(Icons.save_alt),
+        //     color: Colors.white,
+        //     onPressed: () => _showCurrentEpubCfi(
+        //         context: context, controller: epubReaderController),
+        //   ),
+        // ],
       ),
-      drawer: Drawer(
+      endDrawer: Drawer(
         child: EpubReaderTableOfContents(controller: epubReaderController),
       ),
       body: EpubView(
