@@ -38,6 +38,7 @@ class BookReaderView extends HookConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: const BackButton(),
         title: EpubActualChapter(
           controller: epubReaderController,
           builder: (chapterValue) => Text(
@@ -45,16 +46,16 @@ class BookReaderView extends HookConsumerWidget {
             textAlign: TextAlign.start,
           ),
         ),
-        actions: <Widget>[
-          IconButton(
-            icon: const Icon(Icons.save_alt),
-            color: Colors.white,
-            onPressed: () => _showCurrentEpubCfi(
-                context: context, controller: epubReaderController),
-          ),
-        ],
+        // actions: <Widget>[
+        //   IconButton(
+        //     icon: const Icon(Icons.save_alt),
+        //     color: Colors.white,
+        //     onPressed: () => _showCurrentEpubCfi(
+        //         context: context, controller: epubReaderController),
+        //   ),
+        // ],
       ),
-      drawer: Drawer(
+      endDrawer: Drawer(
         child: EpubReaderTableOfContents(controller: epubReaderController),
       ),
       body: EpubView(
@@ -122,24 +123,25 @@ class BookReaderView extends HookConsumerWidget {
     }
   }
 
-  void _showCurrentEpubCfi({
-    required BuildContext context,
-    required EpubController controller,
-  }) {
-    final cfi = controller.generateEpubCfi();
+  // Example of how to use the epubCfi
+  // void _showCurrentEpubCfi({
+  //   required BuildContext context,
+  //   required EpubController controller,
+  // }) {
+  //   final cfi = controller.generateEpubCfi();
 
-    if (cfi != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(cfi),
-          action: SnackBarAction(
-            label: 'GO',
-            onPressed: () {
-              controller.gotoEpubCfi(cfi);
-            },
-          ),
-        ),
-      );
-    }
-  }
+  //   if (cfi != null) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(cfi),
+  //         action: SnackBarAction(
+  //           label: 'GO',
+  //           onPressed: () {
+  //             controller.gotoEpubCfi(cfi);
+  //           },
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
 }
