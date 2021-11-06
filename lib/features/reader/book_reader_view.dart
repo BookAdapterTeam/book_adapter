@@ -123,24 +123,25 @@ class BookReaderView extends HookConsumerWidget {
     }
   }
 
-  void _showCurrentEpubCfi({
-    required BuildContext context,
-    required EpubController controller,
-  }) {
-    final cfi = controller.generateEpubCfi();
+  // Example of how to use the epubCfi
+  // void _showCurrentEpubCfi({
+  //   required BuildContext context,
+  //   required EpubController controller,
+  // }) {
+  //   final cfi = controller.generateEpubCfi();
 
-    if (cfi != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(cfi),
-          action: SnackBarAction(
-            label: 'GO',
-            onPressed: () {
-              controller.gotoEpubCfi(cfi);
-            },
-          ),
-        ),
-      );
-    }
-  }
+  //   if (cfi != null) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       SnackBar(
+  //         content: Text(cfi),
+  //         action: SnackBarAction(
+  //           label: 'GO',
+  //           onPressed: () {
+  //             controller.gotoEpubCfi(cfi);
+  //           },
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
 }
