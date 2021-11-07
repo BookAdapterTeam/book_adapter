@@ -1,0 +1,12 @@
+{
+    "Code": 0,
+    "Msg": "",
+    "UpdateStatus": 3,
+    "VersionCode": 1,
+    "VersionName": "0.3.0-alpha.1",
+    "UploadTime": "2021-11-07 01:11:41",
+    "ModifyContent": "\r\nAdd In App Updater",
+    "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.3.0-alpha.1/bookadapter_v0_3_0-alpha_1_android.apk",
+    "ApkSize": 30945,
+    "ApkMd5": "850375d8707522e23e2ae8255be80242"
+}

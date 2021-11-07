@@ -1,3 +1,4 @@
+import 'package:book_adapter/features/in_app_update/update.dart';
 import 'package:book_adapter/features/widgets/async_value_widget.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -67,5 +68,29 @@ class InitStorageWidget extends ConsumerWidget {
         );
       },
     );
+  }
+}
+
+class UpdateChecker extends StatefulWidget {
+  const UpdateChecker({Key? key, required this.child}) : super(key: key);
+
+  final Widget child;
+
+  @override
+  _UpdateCheckerState createState() => _UpdateCheckerState();
+}
+
+class _UpdateCheckerState extends State<UpdateChecker> {
+  final _updateUrl = 'https://www.bookadapter.com/update/update.json';
+  
+  @override
+  void initState() {
+    super.initState();
+    UpdateManager.checkUpdate(context, _updateUrl);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
   }
 }
