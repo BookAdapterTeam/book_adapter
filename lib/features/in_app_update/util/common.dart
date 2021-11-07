@@ -6,6 +6,7 @@ import 'package:logger/logger.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/utils/common.dart
 
@@ -113,7 +114,8 @@ class CommonUtils {
       }
     } else {
       // Goes to iOS store app url
-      await AppInstaller.goStore('', uri);
+      // await AppInstaller.goStore('', uri);
+      await launch('https://github.com/BookAdapterTeam/book_adapter/releases');
     }
   }
 }
