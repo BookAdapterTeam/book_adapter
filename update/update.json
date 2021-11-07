@@ -2,11 +2,11 @@
     "Code": 0,
     "Msg": "",
     "UpdateStatus": 2,
-    "VersionCode": 3,
-    "VersionName": "0.3.0-alpha.2",
-    "UploadTime": "2021-11-07 05:40:00",
-    "ModifyContent": "\r\nAdd In App Updater",
-    "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.3.0-alpha.2/bookadapter_v0_3_0-alpha_2_android.apk",
+    "VersionCode": 4,
+    "VersionName": "0.3.0-alpha.3",
+    "UploadTime": "2021-11-07 08:52:00",
+    "ModifyContent": "\r\nAdd In-App Updater",
+    "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.3.0-alpha.3/bookadapter_v0_3_0-alpha_3_android.apk",
     "ApkSize": 31473,
-    "ApkMd5": "ff28eb86b3bed4baa6d133366e806174"
+    "ApkMd5": "4bc6d66c5e0ef7d52cbbf3c851a66542"
 }
