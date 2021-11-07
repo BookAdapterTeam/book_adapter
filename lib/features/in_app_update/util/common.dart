@@ -95,27 +95,28 @@ class CommonUtils {
   ///
   /// 安装apk
   static void installAPP(String uri) async {
-    if (Platform.isAndroid) {
-      // Install android apk
+    await launch('https://github.com/BookAdapterTeam/book_adapter/releases');
+    // if (Platform.isAndroid) {
+    //   // Install android apk
 
-      // 需要先允许读取存储权限才可以
-      // You need to allow read storage permissions first
-      final storageStatus = await Permission.storage.request();
-      if (storageStatus == PermissionStatus.granted) {
-        // ignore: unawaited_futures
-        try {
-          await AppInstaller.installApk(uri);
-          _log.i('App Update Installed');
-        } catch (e, st) {
-          _log.e(e.toString(), e, st);
-        }
-      } else {
-        _log.i('Permission request fail!');
-      }
-    } else {
-      // Goes to iOS store app url
-      // await AppInstaller.goStore('', uri);
-      await launch('https://github.com/BookAdapterTeam/book_adapter/releases');
-    }
+    //   // 需要先允许读取存储权限才可以
+    //   // You need to allow read storage permissions first
+    //   final storage = await Permission.storage.request();
+    //   final requestInstallPackages = await Permission.requestInstallPackages.request();
+    //   if (requestInstallPackages == PermissionStatus.granted && storage == PermissionStatus.granted) {
+    //     try {
+    //       await AppInstaller.installApk(uri);
+    //       _log.i('App Update Installed');
+    //     } catch (e, st) {
+    //       _log.e(e.toString(), e, st);
+    //     }
+    //   } else {
+    //     _log.i('Permission request fail!');
+    //   }
+    // } else {
+    //   // Goes to iOS store app url
+    //   // await AppInstaller.goStore('', uri);
+    //   await launch('https://github.com/BookAdapterTeam/book_adapter/releases');
+    // }
   }
 }

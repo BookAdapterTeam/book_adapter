@@ -31,17 +31,22 @@ class UpdatePrompter {
     if (_dialog != null && _dialog!.isShowing()) {
       return;
     }
-    final String title = '是否升级到${updateData.versionName}版本？';
+
+    if (updateData.hasUpdate == false) return;
+    
+    final String title = 'Upgrade to ${updateData.versionName}?';
     final String updateContent = getUpdateContent();
     if (Platform.isAndroid) {
       _apkFile = await CommonUtils.getApkFileByUpdateData(updateData);
     }
+
+
     if (_apkFile != null && _apkFile!.existsSync()) {
       _dialog = UpdateDialog.showUpdate(
         context,
         title: title,
         updateContent: updateContent,
-        updateButtonText: '安装',
+        updateButtonText: 'Install',
         extraHeight: 10,
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
@@ -65,7 +70,7 @@ class UpdatePrompter {
         CommonUtils.getTargetSize(updateData.apkSize.toDouble());
     String updateContent = '';
     if (targetSize.isNotEmpty) {
-      updateContent += '新版本大小：$targetSize\n';
+      updateContent += 'New Version Size：$targetSize\n';
     }
     updateContent += updateData.updateContent;
     return updateContent;
@@ -91,7 +96,7 @@ class UpdatePrompter {
     ).then((value) {
       doInstall();
     }).catchError((value) {
-      ToastUtils.success('下载失败！');
+      ToastUtils.success('Download Failed!');
       _dialog?.dismiss();
     });
   }

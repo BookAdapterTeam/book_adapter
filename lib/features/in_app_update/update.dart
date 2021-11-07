@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:book_adapter/features/in_app_update/update_parser.dart';
 import 'package:book_adapter/features/in_app_update/update_prompter.dart';
 import 'package:book_adapter/features/in_app_update/util/common.dart';
@@ -24,7 +26,7 @@ class UpdateManager {
 
   static void checkUpdate(BuildContext context, String url) {
     HttpUtils.get(url).then((response) {
-      UpdateParser.parseJson(response.toString()).then((data) {
+      UpdateParser.parseJson(json.encode(response)).then((data) {
         if (data == null) return;
         
         UpdatePrompter(
