@@ -32,8 +32,8 @@ class UpdatePrompter {
       return;
     }
 
-    if (updateData.hasUpdate == false) return;
-    
+    if (!updateData.hasUpdate) return;
+
     final String title = 'Upgrade to ${updateData.versionName}?';
     final String updateContent = getUpdateContent();
     if (Platform.isAndroid) {
@@ -47,6 +47,7 @@ class UpdatePrompter {
         title: title,
         updateContent: updateContent,
         updateButtonText: 'Install',
+        ignoreButtonText: 'Cancel Install',
         extraHeight: 10,
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
@@ -57,6 +58,8 @@ class UpdatePrompter {
         context,
         title: title,
         updateContent: updateContent,
+        updateButtonText: 'Download',
+        ignoreButtonText: 'Ignore Update',
         extraHeight: 10,
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
