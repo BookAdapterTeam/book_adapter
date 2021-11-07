@@ -15,6 +15,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.3.0"
+  app_installer:
+    dependency: "direct main"
+    description:
+      name: app_installer
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   archive:
     dependency: "direct overridden"
     description:
@@ -267,6 +274,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.10.0"
+  dio:
+    dependency: "direct main"
+    description:
+      name: dio
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.1"
   email_validator:
     dependency: "direct main"
     description:
@@ -553,6 +567,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_update_dialog:
+    dependency: "direct main"
+    description:
+      name: flutter_update_dialog
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -627,7 +648,7 @@ packages:
     source: hosted
     version: "0.15.0"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       url: "https://pub.dartlang.org"
@@ -780,10 +801,24 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0+1"
+  oktoast:
+    dependency: "direct main"
+    description:
+      name: oktoast
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.1.5"
   package_config:
     dependency: transitive
     description:
       name: package_config
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.2"
+  package_info:
+    dependency: "direct main"
+    description:
+      name: package_info
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
@@ -850,6 +885,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.11.1"
+  permission_handler:
+    dependency: "direct main"
+    description:
+      name: permission_handler
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "8.2.6"
+  permission_handler_platform_interface:
+    dependency: transitive
+    description:
+      name: permission_handler_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.7.0"
   petitparser:
     dependency: transitive
     description:
