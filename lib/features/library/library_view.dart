@@ -58,8 +58,8 @@ class MergeIntoSeriesButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewController viewController =
         ref.watch(libraryViewControllerProvider.notifier);
-    final selectedItems =
-        ref.watch(libraryViewControllerProvider.select((data) => data.selectedItems));
+    final selectedItems = ref.watch(
+        libraryViewControllerProvider.select((data) => data.selectedItems));
     final log = Logger();
 
     return IconButton(
@@ -108,7 +108,6 @@ class LibraryScrollView extends HookConsumerWidget {
     final LibraryViewController viewController =
         ref.watch(libraryViewControllerProvider.notifier);
     final scrollController = useScrollController();
-    final log = Logger();
 
     final notSelectingAppBar = SliverAppBar(
       key: const ValueKey('normal_app_bar'),
@@ -117,42 +116,9 @@ class LibraryScrollView extends HookConsumerWidget {
       floating: true,
       snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
-      actions: [
-        const AddBookButton(),
-        IconButton(
-          tooltip: 'Add a new collection',
-          onPressed: () async {
-            final collectionName = await showDialog<String>(
-                context: context,
-                builder: (context) {
-                  return const AddNewCollectionDialog();
-                });
-            if (collectionName == null) return;
-
-            final viewController = ref.read(libraryViewControllerProvider.notifier);
-            final res = await viewController.addNewCollection(collectionName);
-            res.fold(
-              (failure) {
-                final snackBar = SnackBar(
-                  content: Text(failure.message),
-                  duration: const Duration(seconds: 2),
-                );
-                log.e(failure.message);
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              },
-              (collection) {
-                final snackBar = SnackBar(
-                  content: Text('Successfully created ${collection.name}'),
-                  duration: const Duration(seconds: 2),
-                );
-                log.i('Successfully created ${collection.name}');
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              },
-            );
-          },
-          icon: const Icon(Icons.bookmark_add),
-        ),
-        const ProfileButton(),
+      actions: const [
+        AddBookButton(),
+        ProfileButton(),
       ],
     );
 
@@ -183,6 +149,13 @@ class LibraryScrollView extends HookConsumerWidget {
     final collections = (data.collections ?? [])
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
+    final List<BookCollection> filteredCollections = [];
+    for (final col in collections) {
+      if (data.getCollectionItems(col.id).isNotEmpty) {
+        filteredCollections.add(col);
+      }
+    }
+
     return CustomScrollView(
       controller: scrollController,
       slivers: [
@@ -193,32 +166,45 @@ class LibraryScrollView extends HookConsumerWidget {
 
         // List of collections
         SliverImplicitlyAnimatedList<BookCollection>(
-          items: collections,
+          items: filteredCollections,
           areItemsTheSame: (a, b) => a.id == b.id,
           itemBuilder: (context, animation, collection, index) =>
               collectionsBuilder(
-                  context, animation, collection, index, scrollController),
+                  context: context,
+                  animation: animation,
+                  collection: collection,
+                  index: index,
+                  controller: scrollController,
+                  hideHeader: filteredCollections.length <= 1),
         ),
       ],
     );
   }
 
-  Widget collectionsBuilder(BuildContext context, Animation<double> animation,
-      BookCollection collection, int index, ScrollController controller) {
+  Widget collectionsBuilder({
+    required BuildContext context,
+    required Animation<double> animation,
+    required BookCollection collection,
+    required int index,
+    required ScrollController controller,
+    bool hideHeader = false,
+  }) {
     // TODO: replace with sticky_and_expandable_list
     return StickyHeader(
       key: ValueKey(collection.id),
       controller: controller,
-      header: Container(
-        height: 50.0,
-        color: Colors.blueGrey[700],
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        alignment: Alignment.centerLeft,
-        child: Text(
-          collection.name,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
+      header: hideHeader
+          ? const SizedBox()
+          : Container(
+              height: 50.0,
+              color: Colors.blueGrey[700],
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                collection.name,
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
       content: BookCollectionList(
         key: ValueKey(collection.id + 'BookCollectionList'),
         collection: collection,

@@ -9,13 +9,14 @@ class AddNewSeriesDialog extends HookWidget {
   Widget build(BuildContext context) {
     final textController = useTextEditingController(text: initialText);
     return AlertDialog(
-      title: const Text('Enter the Name of the Series'),
+      title: const Text('Enter the Series Name'),
       actions: [
         TextField(
           controller: textController,
+          autofocus: true,
           decoration: const InputDecoration(
             labelText: 'Series name',
-            border: OutlineInputBorder(),
+            border: UnderlineInputBorder(),
           ),
         ),
         Row(
