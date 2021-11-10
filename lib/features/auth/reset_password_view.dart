@@ -51,14 +51,19 @@ class ResetPasswordView extends ConsumerWidget {
                 ),
 
                 // Email text field
-                _EmailTextField(data: data, viewController: viewController),
+                _EmailTextField(
+                  data: data,
+                  viewController: viewController,
+                ),
                 const SizedBox(
                   height: 8,
                 ),
 
                 // Send reset email button
                 _SendResetEmailButton(
-                    viewController: viewController, data: data),
+                  viewController: viewController,
+                  data: data,
+                ),
 
                 // Cancel button
                 const _CancelButton(),
@@ -100,23 +105,29 @@ class _SendResetEmailButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final log = Logger();
     return ElevatedButton(
-        child: const Text('Send Email', style: TextStyle(fontSize: 20.0)),
-        onPressed: () async {
-          final res = await viewController.sendResetEmail();
-          res.fold((failure) {
+      child: const Text('Send Email', style: TextStyle(fontSize: 20.0)),
+      onPressed: () async {
+        final res = await viewController.sendResetEmail();
+        res.fold(
+          (failure) {
             log.e(failure.message);
             final snackBar = SnackBar(
-                content: Text(failure is FirebaseFailure
-                    ? '${failure.code}: ${failure.message}'
-                    : failure.message));
+              content: Text(failure is FirebaseFailure
+                  ? '${failure.code}: ${failure.message}'
+                  : failure.message),
+            );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          }, (succcess) {
+          },
+          (succcess) {
             final snackBar = SnackBar(
-                content: Text(
-                    'Reset email was sent to ${data.email} from noreply@bookadapter.firebaseapp.com'));
+              content: Text(
+                  'Reset email was sent to ${data.email} from noreply@bookadapter.firebaseapp.com'),
+            );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          });
-        });
+          },
+        );
+      },
+    );
   }
 }
 
@@ -136,7 +147,9 @@ class _EmailTextField extends StatelessWidget {
       initialValue: data.email,
       autofocus: true,
       decoration: const InputDecoration(
-          border: UnderlineInputBorder(), labelText: 'Email'),
+        border: UnderlineInputBorder(),
+        labelText: 'Email',
+      ),
       validator: (email) => viewController.validate(email),
       onChanged: (emailValue) => viewController.updateData(email: emailValue),
       autofillHints: const [AutofillHints.email],
