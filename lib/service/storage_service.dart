@@ -129,7 +129,7 @@ class StorageService {
   /// Returns a list of the filenames
   Future<io.FileSystemEntity> deleteFile(String filepath) async {
     try {
-      final file = io.File(getAppFilePath(filepath));
+      final file = io.File(filepath);
       return await file.delete();
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);

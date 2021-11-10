@@ -59,9 +59,16 @@ class StorageController {
     }
   }
 
-  Future<List<int>> getBookData(Book book) {
+  Future<List<int>> getBookData(Book book) async {
     final bookPath = _storageService.getAppFilePath(book.filepath);
 
-    return _storageService.getFileInMemory(bookPath);
+    return await _storageService.getFileInMemory(bookPath);
+  }
+
+  Future<void> deleteBooks(List<Book> books) async {
+    for (final book in books) {
+      final bookPath = _storageService.getAppFilePath(book.filepath);
+      await _storageService.deleteFile(bookPath);
+    }
   }
 }
