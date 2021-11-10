@@ -1,9 +1,7 @@
 // Handles profile page information
 
 import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/features/profile/change_password_view.dart';
 import 'package:book_adapter/features/profile/edit_profile_view.dart';
-import 'package:book_adapter/features/profile/profile_view_controller.dart';
 import 'package:book_adapter/features/profile/widgets/change_password_button.dart';
 import 'package:book_adapter/features/profile/widgets/log_out_button.dart';
 import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
