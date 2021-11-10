@@ -2,6 +2,7 @@ import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
+import 'package:book_adapter/features/library/widgets/add_new_collection_button.dart';
 import 'package:book_adapter/features/library/widgets/add_to_collection_button.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
 import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
@@ -107,7 +108,6 @@ class LibraryScrollView extends HookConsumerWidget {
     final LibraryViewController viewController =
         ref.watch(libraryViewControllerProvider.notifier);
     final scrollController = useScrollController();
-    final log = Logger();
 
     final notSelectingAppBar = SliverAppBar(
       key: const ValueKey('normal_app_bar'),
@@ -116,43 +116,9 @@ class LibraryScrollView extends HookConsumerWidget {
       floating: true,
       snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
-      actions: [
-        const AddBookButton(),
-        IconButton(
-          tooltip: 'Add a new collection',
-          onPressed: () async {
-            final collectionName = await showDialog<String>(
-                context: context,
-                builder: (context) {
-                  return const AddNewCollectionDialog();
-                });
-            if (collectionName == null) return;
-
-            final viewController =
-                ref.read(libraryViewControllerProvider.notifier);
-            final res = await viewController.addNewCollection(collectionName);
-            res.fold(
-              (failure) {
-                final snackBar = SnackBar(
-                  content: Text(failure.message),
-                  duration: const Duration(seconds: 2),
-                );
-                log.e(failure.message);
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              },
-              (collection) {
-                final snackBar = SnackBar(
-                  content: Text('Successfully created ${collection.name}'),
-                  duration: const Duration(seconds: 2),
-                );
-                log.i('Successfully created ${collection.name}');
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              },
-            );
-          },
-          icon: const Icon(Icons.bookmark_add),
-        ),
-        const ProfileButton(),
+      actions: const [
+        AddBookButton(),
+        ProfileButton(),
       ],
     );
 

@@ -1,7 +1,7 @@
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
+import 'package:book_adapter/features/library/widgets/add_new_collection_button.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class AddToCollectionButton extends ConsumerWidget {
@@ -33,46 +33,6 @@ class AddToCollectionButton extends ConsumerWidget {
   }
 }
 
-class AddNewCollectionDialog extends HookWidget {
-  const AddNewCollectionDialog({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    final textController = useTextEditingController();
-    return AlertDialog(
-      title: const Text('Create New Collection'),
-      actions: [
-        TextField(
-          controller: textController,
-          decoration: const InputDecoration(
-            labelText: 'Collection name',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('CANCEL'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final collectionName = textController.text;
-                Navigator.of(context).pop(collectionName);
-              },
-              child: const Text('CREATE'),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
 final chosenCollectionsProvider = StateProvider<List<String>>((ref) {
   return [];
 });
@@ -98,15 +58,23 @@ class _ChooseCollectionsBottomSheetState
       child: Wrap(
         alignment: WrapAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0, top: 16, bottom: 16),
-            child: Text(
-              'Move to Collection...',
-              style: Theme.of(context)
-                  .textTheme
-                  .subtitle1
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: const [
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Text(
+                      'Move to Collection...',
+                      maxLines: 1,
+                    ),
+                  ),
+                ),
+              ),
+              AddNewCollectionButton(),
+            ],
           ),
           const Divider(
             height: 2,
