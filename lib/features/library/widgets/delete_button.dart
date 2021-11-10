@@ -1,15 +1,12 @@
-import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
 
 class DeleteButton extends ConsumerWidget {
   const DeleteButton({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final log = Logger();
     return IconButton(
       tooltip: 'Delete',
       icon: const Icon(Icons.delete),
