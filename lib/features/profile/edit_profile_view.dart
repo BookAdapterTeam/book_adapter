@@ -40,9 +40,10 @@ class EditProfileView extends HookConsumerWidget {
                 TextField(
                   restorationId: 'change_username',
                   controller: usernameController,
+                  autofocus: true,
                   autofillHints: const [AutofillHints.name],
                   decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: UnderlineInputBorder(),
                       labelText: 'Change Username'),
                   onChanged: (usernameValue) {
                     viewController.updateData(username: usernameValue);

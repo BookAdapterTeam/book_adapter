@@ -59,13 +59,14 @@ class AddNewCollectionDialog extends HookWidget {
   Widget build(BuildContext context) {
     final textController = useTextEditingController();
     return AlertDialog(
-      title: const Text('Create New Collection'),
+      title: const Text('Add New Book Collection'),
       actions: [
         TextField(
           controller: textController,
+          autofocus: true,
           decoration: const InputDecoration(
             labelText: 'Collection name',
-            border: OutlineInputBorder(),
+            border: UnderlineInputBorder(),
           ),
         ),
         Row(
