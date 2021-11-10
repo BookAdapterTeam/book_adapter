@@ -140,7 +140,7 @@ class LibraryScrollView extends HookConsumerWidget {
         if (!data.hasSeries && data.selectedItems.length > 1)
           const MergeIntoSeriesButton(),
 
-        DeleteButton(),
+        const DeleteButton(),
       ],
     );
 
