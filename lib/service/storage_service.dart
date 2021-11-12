@@ -6,6 +6,7 @@ import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -28,9 +29,11 @@ class StorageService {
 
   late io.Directory appBookAdaptDirectory;
 
-  final log = Logger();
+  final _log = Logger();
 
-  late final Box downloadedBooksBox;
+  late final Box<bool> _downloadedBooksBox;
+
+  ValueListenable<Box<bool>> get downloadedBooksValueListenable => _downloadedBooksBox.listenable();
 
   /// Initilize the class
   ///
@@ -40,9 +43,9 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
-      downloadedBooksBox = await Hive.openBox(kDownloadedBooksHiveBox);
+      _downloadedBooksBox = await Hive.openBox(kDownloadedBooksHiveBox);
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       rethrow;
     }
   }
@@ -56,7 +59,7 @@ class StorageService {
       return await io.Directory('${appBookAdaptDirectory.path}/$userId')
           .create();
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       rethrow;
     }
   }
@@ -126,7 +129,7 @@ class StorageService {
       );
       return files;
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       throw AppException(e.toString());
     }
   }
@@ -139,7 +142,7 @@ class StorageService {
       final file = io.File(filepath);
       return await file.delete();
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       rethrow;
     }
   }
@@ -290,7 +293,7 @@ class StorageService {
 
       return await fileRef.writeAsBytes(List<int>.from(data));
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       throw AppException(e.toString());
     }
   }
@@ -300,11 +303,15 @@ class StorageService {
     return file.readAsBytes();
   }
 
-  Future<void> saveDownloadedBookId(String bookId) async {
-    await downloadedBooksBox.put(bookId, true);
+  bool? isBookDownloaded(String bookId) {
+    return _downloadedBooksBox.get(bookId);
   }
 
-  Future<void> removeDownloadedBookId(String bookId) async {
-    await downloadedBooksBox.put(bookId, false);
+  Future<void> setBookDownloaded(String bookId) async {
+    await _downloadedBooksBox.put(bookId, true);
+  }
+
+  Future<void> setBookNotDownloaded(String bookId) async {
+    await _downloadedBooksBox.put(bookId, false);
   }
 }
