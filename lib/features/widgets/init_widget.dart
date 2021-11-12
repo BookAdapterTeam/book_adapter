@@ -96,8 +96,8 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   }
 }
 
-final hiveInitFutureProvider = FutureProvider<dynamic>((ref) async {
-  return await Hive.initFlutter('BookAdapterData');
+final hiveInitFutureProvider = FutureProvider<void>((ref) async {
+  await Hive.initFlutter('BookAdapterData');
 });
 
 class InitHiveWidget extends ConsumerWidget {

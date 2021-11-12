@@ -1,6 +1,7 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
+import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
@@ -13,7 +14,8 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 final storageInitProvider = FutureProvider<void>((ref) async {
-  return ref.watch(storageServiceProvider).init();
+  await ref.watch(storageServiceProvider).init();
+  ref.read(storageControllerProvider).updateDownloadedFiles();
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -33,7 +35,8 @@ class StorageService {
 
   late final Box<bool> _downloadedBooksBox;
 
-  ValueListenable<Box<bool>> get downloadedBooksValueListenable => _downloadedBooksBox.listenable();
+  ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
+      _downloadedBooksBox.listenable();
 
   /// Initilize the class
   ///
@@ -44,6 +47,8 @@ class StorageService {
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
       _downloadedBooksBox = await Hive.openBox(kDownloadedBooksHiveBox);
+      await clearDownloadedBooksCache();
+      // TODO: Delete downloaded books that are not in Firebase anymore
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
@@ -313,5 +318,9 @@ class StorageService {
 
   Future<void> setBookNotDownloaded(String bookId) async {
     await _downloadedBooksBox.put(bookId, false);
+  }
+
+  Future<void> clearDownloadedBooksCache() async {
+    await _downloadedBooksBox.clear();
   }
 }

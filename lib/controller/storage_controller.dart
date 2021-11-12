@@ -44,9 +44,15 @@ class StorageController {
         book.filepath, '$appBookAdaptPath/${book.filepath}');
     // ignore: unawaited_futures
     task.whenComplete(() async {
-      await _storageService.setBookDownloaded(book.id);
+      await _storageService.setBookDownloaded(book.filename);
       await whenDone(book.filename);
     });
+  }
+
+  List<String> updateDownloadedFiles() {
+    final downloadedFiles = getDownloadedFilenames();
+    downloadedFiles.forEach(_storageService.setBookDownloaded);
+    return downloadedFiles;
   }
 
   List<String> getDownloadedFilenames() {
@@ -79,7 +85,7 @@ class StorageController {
     for (final book in books) {
       final bookPath = _storageService.getAppFilePath(book.filepath);
       await _storageService.deleteFile(bookPath);
-      await _storageService.setBookNotDownloaded(book.id);
+      await _storageService.setBookNotDownloaded(book.filename);
     }
   }
 
