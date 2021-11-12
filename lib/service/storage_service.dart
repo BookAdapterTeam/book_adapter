@@ -5,6 +5,7 @@ import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,6 +29,8 @@ class StorageService {
 
   final log = Logger();
 
+  late final Box downloadedBooksBox;
+
   /// Initilize the class
   ///
   /// Throws a `MissingPlatformDirectoryException` if the system is unable to provide the directory.
@@ -36,18 +39,21 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
+      downloadedBooksBox = await Hive.openBox('BookAdapter-downloadedBooks');
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
       rethrow;
     }
   }
 
-  String getAppFilePath(filepath) => appBookAdaptDirectory.path + '/' + filepath;
+  String getAppFilePath(filepath) =>
+      appBookAdaptDirectory.path + '/' + filepath;
 
   /// Method to create a directory for the user when they login
   Future<io.Directory> createUserDirectory(String userId) async {
     try {
-      return await io.Directory('${appBookAdaptDirectory.path}/$userId').create();
+      return await io.Directory('${appBookAdaptDirectory.path}/$userId')
+          .create();
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
       rethrow;
@@ -110,9 +116,9 @@ class StorageService {
     bool recursive = false,
     bool followLinks = true,
   }) {
-
     try {
-      final userDirectory = io.Directory('${appBookAdaptDirectory.path}/$userId');
+      final userDirectory =
+          io.Directory('${appBookAdaptDirectory.path}/$userId');
       final files = userDirectory.listSync(
         recursive: recursive,
         followLinks: followLinks,

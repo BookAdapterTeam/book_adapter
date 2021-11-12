@@ -30,8 +30,10 @@ class StorageController {
   final StorageService _storageService;
   final log = Logger();
 
-  void downloadFile(Book book,
-      {required FutureOr<void> Function(String) whenDone}) {
+  void downloadFile(
+    Book book, {
+    required FutureOr<void> Function(String) whenDone,
+  }) {
     final appBookAdaptPath = _storageService.appBookAdaptDirectory.path;
     final task = _firebaseController.downloadFile(
         book.filepath, '$appBookAdaptPath/${book.filepath}');
