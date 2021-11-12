@@ -160,25 +160,31 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     return mergeBooks;
   }
 
-  Future<void> deleteBookDownloads(BuildContext context) async {
-    final books = state.allSelectedBooks;
+  Future<Failure?> deleteBookDownloads() async {
+    final selectedBooks = state.allSelectedBooks;
+    
     try {
-      await _read(storageControllerProvider).deleteBooks(books.toList());
+      state = state.copyWith(selectedItems: {});
+      // Remove file
+      await _read(storageControllerProvider)
+          .deleteBooks(selectedBooks.toList());
+      // TODO: Update UI
+      // _read(userModelProvider.notifier).removeDownloadedFilenames(
+      //     selectedBooks.map((book) => book.filepath).toList());
     } catch (e, st) {
       log.e(e.toString, e, st);
-      final snackBar = SnackBar(
-        content: Text(e.toString()),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+      return Failure(e.toString());
     }
-    state = state.copyWith(selectedItems: {});
+    
   }
 
   Future<void> moveItemsToCollections(List<String> collectionIds) async {
     final firebaseController = _read(firebaseControllerProvider);
     final items = state.selectedItems;
     await firebaseController.setItemsCollections(
-        items: items.toList(), collectionIds: collectionIds.toSet());
+      items: items.toList(),
+      collectionIds: collectionIds.toSet(),
+    );
   }
 
   Future<Either<Failure, BookCollection>> addNewCollection(String name) async {

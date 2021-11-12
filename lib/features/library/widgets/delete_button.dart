@@ -38,9 +38,15 @@ class DeleteButton extends ConsumerWidget {
         if (shouldDelete == null) return;
         if (!shouldDelete) return;
 
-        await ref
+        final failure = await ref
             .read(libraryViewControllerProvider.notifier)
-            .deleteBookDownloads(context);
+            .deleteBookDownloads();
+        if (failure == null) return;
+        
+        final snackBar = SnackBar(
+          content: Text(failure.message),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       },
     );
   }
