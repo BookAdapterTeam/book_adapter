@@ -13,10 +13,12 @@ class ItemListTileWidget extends ConsumerWidget {
     Key? key,
     required this.item,
     this.disableSelect = false,
+    this.isDownloaded,
   }) : super(key: key);
 
   final Item item;
   final bool disableSelect;
+  final bool? isDownloaded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,6 +34,7 @@ class ItemListTileWidget extends ConsumerWidget {
             item: item,
             disableSelect: disableSelect,
             isBook: true,
+            isDownloaded: isDownloaded,
           )
         : Stack(
             children: [
@@ -98,11 +101,13 @@ class _ItemListTile extends ConsumerWidget {
     required this.item,
     required this.disableSelect,
     required this.isBook,
+    this.isDownloaded,
   }) : super(key: key);
 
   final Item item;
   final bool disableSelect;
   final bool isBook;
+  final bool? isDownloaded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -126,7 +131,10 @@ class _ItemListTile extends ConsumerWidget {
 
     if (item is Book) {
       final book = item as Book;
-      final BookStatus bookStatus = data.getBookStatus(book);
+      // final BookStatus bookStatus = data.getBookStatus(book);
+      final bookStatus = isDownloaded ?? false
+          ? BookStatus.downloaded
+          : BookStatus.notDownloaded;
       final Widget? trailing;
       final Widget? icon;
       final VoidCallback? onPressed;

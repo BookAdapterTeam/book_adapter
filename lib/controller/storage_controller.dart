@@ -5,6 +5,8 @@ import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/service/storage_service.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -30,13 +32,27 @@ class StorageController {
   final StorageService _storageService;
   final log = Logger();
 
-  void downloadFile(Book book,
-      {required FutureOr<void> Function(String) whenDone}) {
+  ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
+      _storageService.downloadedBooksValueListenable;
+
+  void downloadFile(
+    Book book, {
+    required FutureOr<void> Function(String) whenDone,
+  }) {
     final appBookAdaptPath = _storageService.appBookAdaptDirectory.path;
     final task = _firebaseController.downloadFile(
         book.filepath, '$appBookAdaptPath/${book.filepath}');
     // ignore: unawaited_futures
-    task.whenComplete(() async => await whenDone(book.filename));
+    task.whenComplete(() async {
+      await _storageService.setBookDownloaded(book.filename);
+      await whenDone(book.filename);
+    });
+  }
+
+  List<String> updateDownloadedFiles() {
+    final downloadedFiles = getDownloadedFilenames();
+    downloadedFiles.forEach(_storageService.setBookDownloaded);
+    return downloadedFiles;
   }
 
   List<String> getDownloadedFilenames() {
@@ -59,9 +75,25 @@ class StorageController {
     }
   }
 
-  Future<List<int>> getBookData(Book book) {
+  Future<List<int>> getBookData(Book book) async {
     final bookPath = _storageService.getAppFilePath(book.filepath);
 
-    return _storageService.getFileInMemory(bookPath);
+    return await _storageService.getFileInMemory(bookPath);
+  }
+
+  Future<void> deleteBooks(List<Book> books) async {
+    for (final book in books) {
+      final bookPath = _storageService.getAppFilePath(book.filepath);
+      await _storageService.deleteFile(bookPath);
+      await _storageService.setBookNotDownloaded(book.filename);
+    }
+  }
+
+  Future<bool?> isBookDownloaded(String bookId) async {
+    final isDownloaded = _storageService.isBookDownloaded(bookId);
+    if (isDownloaded == null) {
+      await _storageService.setBookNotDownloaded(bookId);
+    }
+    return isDownloaded ?? false;
   }
 }

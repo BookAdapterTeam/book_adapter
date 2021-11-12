@@ -1,16 +1,21 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
+import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 final storageInitProvider = FutureProvider<void>((ref) async {
-  return ref.watch(storageServiceProvider).init();
+  await ref.watch(storageServiceProvider).init();
+  ref.read(storageControllerProvider).updateDownloadedFiles();
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -26,7 +31,12 @@ class StorageService {
 
   late io.Directory appBookAdaptDirectory;
 
-  final log = Logger();
+  final _log = Logger();
+
+  late final Box<bool> _downloadedBooksBox;
+
+  ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
+      _downloadedBooksBox.listenable();
 
   /// Initilize the class
   ///
@@ -36,20 +46,25 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
+      _downloadedBooksBox = await Hive.openBox(kDownloadedBooksHiveBox);
+      await clearDownloadedBooksCache();
+      // TODO: Delete downloaded books that are not in Firebase anymore
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       rethrow;
     }
   }
 
-  String getAppFilePath(filepath) => appBookAdaptDirectory.path + '/' + filepath;
+  String getAppFilePath(filepath) =>
+      appBookAdaptDirectory.path + '/' + filepath;
 
   /// Method to create a directory for the user when they login
   Future<io.Directory> createUserDirectory(String userId) async {
     try {
-      return await io.Directory('${appBookAdaptDirectory.path}/$userId').create();
+      return await io.Directory('${appBookAdaptDirectory.path}/$userId')
+          .create();
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       rethrow;
     }
   }
@@ -110,16 +125,16 @@ class StorageService {
     bool recursive = false,
     bool followLinks = true,
   }) {
-
     try {
-      final userDirectory = io.Directory('${appBookAdaptDirectory.path}/$userId');
+      final userDirectory =
+          io.Directory('${appBookAdaptDirectory.path}/$userId');
       final files = userDirectory.listSync(
         recursive: recursive,
         followLinks: followLinks,
       );
       return files;
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       throw AppException(e.toString());
     }
   }
@@ -129,10 +144,10 @@ class StorageService {
   /// Returns a list of the filenames
   Future<io.FileSystemEntity> deleteFile(String filepath) async {
     try {
-      final file = io.File(getAppFilePath(filepath));
+      final file = io.File(filepath);
       return await file.delete();
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       rethrow;
     }
   }
@@ -283,7 +298,7 @@ class StorageService {
 
       return await fileRef.writeAsBytes(List<int>.from(data));
     } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
+      _log.e(e.toString(), e, st);
       throw AppException(e.toString());
     }
   }
@@ -291,5 +306,21 @@ class StorageService {
   Future<Uint8List> getFileInMemory(String filepath) {
     final file = io.File(filepath);
     return file.readAsBytes();
+  }
+
+  bool? isBookDownloaded(String bookId) {
+    return _downloadedBooksBox.get(bookId);
+  }
+
+  Future<void> setBookDownloaded(String bookId) async {
+    await _downloadedBooksBox.put(bookId, true);
+  }
+
+  Future<void> setBookNotDownloaded(String bookId) async {
+    await _downloadedBooksBox.put(bookId, false);
+  }
+
+  Future<void> clearDownloadedBooksCache() async {
+    await _downloadedBooksBox.clear();
   }
 }

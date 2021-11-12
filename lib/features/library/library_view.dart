@@ -1,8 +1,11 @@
+import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
+import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
 import 'package:book_adapter/features/library/widgets/add_to_collection_button.dart';
+import 'package:book_adapter/features/library/widgets/delete_button.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
 import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
 import 'package:book_adapter/features/library/widgets/profile_button.dart';
@@ -11,6 +14,7 @@ import 'package:book_adapter/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
@@ -106,6 +110,7 @@ class LibraryScrollView extends HookConsumerWidget {
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
         ref.watch(libraryViewControllerProvider.notifier);
+    final storageController = ref.watch(storageControllerProvider);
     final scrollController = useScrollController();
 
     final notSelectingAppBar = SliverAppBar(
@@ -139,7 +144,7 @@ class LibraryScrollView extends HookConsumerWidget {
         if (!data.hasSeries && data.selectedItems.length > 1)
           const MergeIntoSeriesButton(),
 
-        // DeleteButton(),
+        const DeleteButton(),
       ],
     );
 
@@ -167,14 +172,22 @@ class LibraryScrollView extends HookConsumerWidget {
         SliverImplicitlyAnimatedList<BookCollection>(
           items: filteredCollections,
           areItemsTheSame: (a, b) => a.id == b.id,
-          itemBuilder: (context, animation, collection, index) =>
-              collectionsBuilder(
+          itemBuilder: (context, animation, collection, index) {
+            return ValueListenableBuilder(
+              valueListenable: storageController.downloadedBooksValueListenable,
+              builder: (context, Box<bool> isDownloadedBox, _) {
+                return collectionsBuilder(
                   context: context,
                   animation: animation,
                   collection: collection,
                   index: index,
                   controller: scrollController,
-                  hideHeader: filteredCollections.length <= 1),
+                  hideHeader: filteredCollections.length <= 1,
+                  isDownloadedBox: isDownloadedBox,
+                );
+              },
+            );
+          },
         ),
       ],
     );
@@ -187,6 +200,7 @@ class LibraryScrollView extends HookConsumerWidget {
     required int index,
     required ScrollController controller,
     bool hideHeader = false,
+    required Box<bool> isDownloadedBox,
   }) {
     // TODO: replace with sticky_and_expandable_list
     return StickyHeader(
@@ -207,16 +221,19 @@ class LibraryScrollView extends HookConsumerWidget {
       content: BookCollectionList(
         key: ValueKey(collection.id + 'BookCollectionList'),
         collection: collection,
+        isDownloadedBox: isDownloadedBox,
       ),
     );
   }
 }
 
 class BookCollectionList extends HookConsumerWidget {
-  const BookCollectionList({Key? key, required this.collection})
+  const BookCollectionList(
+      {Key? key, required this.collection, required this.isDownloadedBox})
       : super(key: key);
 
   final BookCollection collection;
+  final Box<bool> isDownloadedBox;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -257,12 +274,17 @@ class BookCollectionList extends HookConsumerWidget {
       child: ItemListTileWidget(
         key: ValueKey(collection.id + oldItem.id + 'ItemListWidget'),
         item: oldItem,
+        isDownloaded: oldItem is Book ? isDownloadedBox.get(oldItem.filename) ?? false : null,
       ),
     );
   }
 
   Widget booksBuilder(
-      BuildContext context, Animation<double> animation, Item item, int index) {
+    BuildContext context,
+    Animation<double> animation,
+    Item item,
+    int index,
+  ) {
     return SizeFadeTransition(
       sizeFraction: 0.7,
       curve: Curves.easeInOut,
@@ -270,6 +292,7 @@ class BookCollectionList extends HookConsumerWidget {
       child: ItemListTileWidget(
         key: ValueKey(collection.id + item.id + 'ItemListWidget'),
         item: item,
+        isDownloaded: item is Book ? isDownloadedBox.get(item.filename) ?? false : null,
       ),
     );
   }

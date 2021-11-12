@@ -3,6 +3,7 @@ import 'package:book_adapter/features/widgets/async_value_widget.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class InitFirebaseWidget extends ConsumerWidget {
@@ -82,7 +83,7 @@ class UpdateChecker extends StatefulWidget {
 
 class _UpdateCheckerState extends State<UpdateChecker> {
   final _updateUrl = 'https://www.bookadapter.com/update/update.json';
-  
+
   @override
   void initState() {
     super.initState();
@@ -92,5 +93,43 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   @override
   Widget build(BuildContext context) {
     return widget.child;
+  }
+}
+
+final hiveInitFutureProvider = FutureProvider<void>((ref) async {
+  await Hive.initFlutter('BookAdapterData');
+});
+
+class InitHiveWidget extends ConsumerWidget {
+  const InitHiveWidget({Key? key, required this.child}) : super(key: key);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncValue = ref.watch(hiveInitFutureProvider);
+
+    return AsyncValueWidget(
+      value: asyncValue,
+      data: (_) => child,
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (e, st) {
+        return Scaffold(
+          body: Center(
+            child: Text(
+              e.toString(),
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Colors.red),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

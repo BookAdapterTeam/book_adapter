@@ -1,4 +1,5 @@
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/data/user_data.dart';
@@ -159,11 +160,31 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     return mergeBooks;
   }
 
+  Future<Failure?> deleteBookDownloads() async {
+    final selectedBooks = state.allSelectedBooks;
+    
+    try {
+      state = state.copyWith(selectedItems: {});
+      // Remove file
+      await _read(storageControllerProvider)
+          .deleteBooks(selectedBooks.toList());
+      // TODO: Update UI
+      // _read(userModelProvider.notifier).removeDownloadedFilenames(
+      //     selectedBooks.map((book) => book.filepath).toList());
+    } catch (e, st) {
+      log.e(e.toString, e, st);
+      return Failure(e.toString());
+    }
+    
+  }
+
   Future<void> moveItemsToCollections(List<String> collectionIds) async {
     final firebaseController = _read(firebaseControllerProvider);
     final items = state.selectedItems;
     await firebaseController.setItemsCollections(
-        items: items.toList(), collectionIds: collectionIds.toSet());
+      items: items.toList(),
+      collectionIds: collectionIds.toSet(),
+    );
   }
 
   Future<Either<Failure, BookCollection>> addNewCollection(String name) async {
@@ -347,5 +368,20 @@ class LibraryViewData {
     allBooks
         .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return allBooks;
+  }
+
+  Set<Book> get allSelectedBooks {
+    final Set<Book> books = {};
+    for (final item in selectedItems) {
+      if (item is Book) {
+        books.add(item);
+      } else if (item is Series) {
+        final seriesBooks =
+            this.books?.where((book) => book.seriesId == item.id).toList() ??
+                [];
+        books.addAll(seriesBooks);
+      }
+    }
+    return books;
   }
 }
