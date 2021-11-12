@@ -2,6 +2,7 @@ import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:book_adapter/data/app_exception.dart';
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
@@ -39,7 +40,7 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
-      downloadedBooksBox = await Hive.openBox('BookAdapter-downloadedBooks');
+      downloadedBooksBox = await Hive.openBox(kDownloadedBooksHiveBox);
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
       rethrow;
@@ -297,5 +298,13 @@ class StorageService {
   Future<Uint8List> getFileInMemory(String filepath) {
     final file = io.File(filepath);
     return file.readAsBytes();
+  }
+
+  Future<void> saveDownloadedBookId(String bookId) async {
+    await downloadedBooksBox.put(bookId, true);
+  }
+
+  Future<void> removeDownloadedBookId(String bookId) async {
+    await downloadedBooksBox.put(bookId, false);
   }
 }
