@@ -296,7 +296,7 @@ class FirebaseController {
 
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
-    return await _firebaseService.getBooks();
+    return await _firebaseService.getAllBooks();
   }
 
   /// Get a list of books from the user's database
@@ -421,12 +421,12 @@ class FirebaseController {
     try {
       for (final item in items) {
         if (item is Book) {
-          await _firebaseService.setBookCollections(
+          await _firebaseService.updateBookCollections(
             bookId: item.id,
             collectionIds: collectionIds,
           );
         } else if (item is Series) {
-          await _firebaseService.setSeriesCollections(
+          await _firebaseService.updateSeriesCollections(
             seriesId: item.id,
             collectionIds: collectionIds,
           );

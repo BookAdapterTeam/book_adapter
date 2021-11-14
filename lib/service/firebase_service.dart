@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:book_adapter/data/app_exception.dart';
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
@@ -31,7 +32,7 @@ class FirebaseService
 
   /// Firestore BookCollections reference
   CollectionReference<BookCollection> get _collectionsRef =>
-      _firestore.collection('collections').withConverter<BookCollection>(
+      _firestore.collection(kBookCollectionsCollectionName).withConverter<BookCollection>(
             fromFirestore: (doc, _) {
               final data = doc.data();
               data!.addAll({'id': doc.id});
@@ -55,7 +56,7 @@ class FirebaseService
 
   /// Firestore BookCollections reference
   CollectionReference<Book> get _booksRef =>
-      _firestore.collection('books').withConverter<Book>(
+      _firestore.collection(kBooksCollectionName).withConverter<Book>(
             fromFirestore: (doc, _) {
               final data = doc.data();
               data!.addAll({'id': doc.id});
@@ -77,7 +78,7 @@ class FirebaseService
 
   /// Firestore BookCollections reference
   CollectionReference<Series> get _seriesRef =>
-      _firestore.collection('series').withConverter<Series>(
+      _firestore.collection(kSeriesCollectionName).withConverter<Series>(
             fromFirestore: (doc, _) {
               final data = doc.data();
               data!.addAll({'id': doc.id});
@@ -122,7 +123,7 @@ class FirebaseService
   }
 
   /// Get a list of books from the user's database
-  Future<Either<Failure, List<Book>>> getBooks() async {
+  Future<Either<Failure, List<Book>>> getAllBooks() async {
     try {
       final userId = currentUserUid;
       if (userId == null) {
@@ -208,7 +209,7 @@ class FirebaseService
   /// Takes a book and adds the series id to it
   ///
   /// Throws [AppException] if it fails.
-  Future<void> setBookCollections({
+  Future<void> updateBookCollections({
     required String bookId,
     required Set<String> collectionIds,
   }) async {
@@ -231,7 +232,7 @@ class FirebaseService
   /// Takes a series and adds the series id to it
   ///
   /// Throws [AppException] if it fails.
-  Future<void> setSeriesCollections({
+  Future<void> updateSeriesCollections({
     required String seriesId,
     required Set<String> collectionIds,
   }) async {
@@ -247,6 +248,18 @@ class FirebaseService
       }
       throw AppException(e.toString());
     }
+  }
+
+  /// Update a book's series
+  ///
+  /// Throws AppException if the book does not exist in Firestore
+  Future<void> updateBookSeries(String bookId, String? seriesId) async {
+    final bookDocumentSnaphot = await _booksRef.doc(bookId).get();
+    if (!bookDocumentSnaphot.exists) {
+      throw AppException(bookId + 'does not exist');
+    }
+
+    await _booksRef.doc(bookId).update({'seriesId': seriesId});
   }
 
   // Series *********************************************

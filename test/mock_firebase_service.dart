@@ -27,7 +27,7 @@ class MockFirebaseService implements FirebaseService {
 
   // Mock get list of books
   @override
-  Future<Either<Failure, List<Book>>> getBooks() async {
+  Future<Either<Failure, List<Book>>> getAllBooks() async {
     try {
       const List<Book> books = [
         // Book(title: 'Book 0', id: '0'),
@@ -159,14 +159,14 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<void> setBookCollections(
+  Future<void> updateBookCollections(
       {required String bookId, required Set<String> collectionIds}) {
     // TODO: implement addBookToCollections
     throw UnimplementedError();
   }
 
   @override
-  Future<void> setSeriesCollections(
+  Future<void> updateSeriesCollections(
       {required String seriesId, required Set<String> collectionIds}) {
     // TODO: implement setSeriesCollections
     throw UnimplementedError();
@@ -252,6 +252,12 @@ class MockFirebaseService implements FirebaseService {
   @override
   Future<Series?> getSeriesById(String seriesId) {
     // TODO: implement getSeriesById
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateBookSeries(String bookId, String? seriesId) {
+    // TODO: implement updateBookSeries
     throw UnimplementedError();
   }
 }
