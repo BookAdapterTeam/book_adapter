@@ -166,7 +166,7 @@ class MockFirebaseService implements FirebaseService {
   @override
   Future<void> updateBookCollections({
     required String bookId,
-    required List<String> collectionIds,
+    List<String>? collectionIds,
   }) {
     // TODO: implement addBookToCollections
     throw UnimplementedError();
@@ -175,7 +175,7 @@ class MockFirebaseService implements FirebaseService {
   @override
   Future<void> updateSeriesCollections({
     required String seriesId,
-    required List<String> collectionIds,
+    List<String>? collectionIds,
   }) {
     // TODO: implement setSeriesCollections
     throw UnimplementedError();
@@ -284,6 +284,12 @@ class MockFirebaseService implements FirebaseService {
   @override
   Future<void> updateBookSeries(String bookId, String? seriesId) {
     // TODO: implement updateBookSeries
+    throw UnimplementedError();
+  }
+
+  @override
+  String getDefaultCollectionName(String userUid) {
+    // TODO: implement getDefaultCollectionName
     throw UnimplementedError();
   }
 }

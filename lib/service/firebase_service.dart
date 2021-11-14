@@ -28,18 +28,21 @@ class FirebaseService
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static const uuid = Uuid();
 
+  String getDefaultCollectionName(String userUid) => '$userUid-Default';
+
   // Database ************************************************************************************************
 
   /// Firestore BookCollections reference
-  CollectionReference<BookCollection> get _collectionsRef =>
-      _firestore.collection(kBookCollectionsCollectionName).withConverter<BookCollection>(
-            fromFirestore: (doc, _) {
-              final data = doc.data();
-              data!.addAll({'id': doc.id});
-              return BookCollection.fromMap(data);
-            },
-            toFirestore: (collection, _) => collection.toMap(),
-          );
+  CollectionReference<BookCollection> get _collectionsRef => _firestore
+      .collection(kBookCollectionsCollectionName)
+      .withConverter<BookCollection>(
+        fromFirestore: (doc, _) {
+          final data = doc.data();
+          data!.addAll({'id': doc.id});
+          return BookCollection.fromMap(data);
+        },
+        toFirestore: (collection, _) => collection.toMap(),
+      );
 
   /// Get book collections stream
   Stream<QuerySnapshot<BookCollection>> get collectionsStream {
@@ -204,19 +207,27 @@ class FirebaseService
     }
   }
 
-  /// Add book to collections
+  /// Update a book's collections
   ///
-  /// Takes a book and adds the series id to it
+  /// Takes a book and adds the series id to it.
+  /// 
+  /// If a book does not have any collections, it will move it to the default collection
   ///
   /// Throws [AppException] if it fails.
   Future<void> updateBookCollections({
     required String bookId,
-    required List<String> collectionIds,
+    List<String>? collectionIds,
   }) async {
     try {
-      await _booksRef
-          .doc(bookId)
-          .update({'collectionIds': collectionIds.toList()});
+      if (currentUserUid == null) return;
+
+      collectionIds ??= [];
+      if (collectionIds.isEmpty) {
+        final String defaultCollection =
+            getDefaultCollectionName(currentUserUid!);
+        collectionIds.add(defaultCollection);
+      }
+      await _booksRef.doc(bookId).update({'collectionIds': collectionIds});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -230,16 +241,24 @@ class FirebaseService
   /// Add series to collections
   ///
   /// Takes a series and adds the series id to it
+  /// 
+  /// If a book does not have any collections, it will move it to the default collection
   ///
   /// Throws [AppException] if it fails.
   Future<void> updateSeriesCollections({
     required String seriesId,
-    required List<String> collectionIds,
+    List<String>? collectionIds,
   }) async {
     try {
-      await _seriesRef
-          .doc(seriesId)
-          .update({'collectionIds': collectionIds.toList()});
+      if (currentUserUid == null) return;
+
+      collectionIds ??= [];
+      if (collectionIds.isEmpty) {
+        final String defaultCollection =
+            getDefaultCollectionName(currentUserUid!);
+        collectionIds.add(defaultCollection);
+      }
+      await _seriesRef.doc(seriesId).update({'collectionIds': collectionIds});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
