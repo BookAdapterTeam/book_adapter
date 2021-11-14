@@ -6,7 +6,6 @@ import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
-import 'package:book_adapter/service/base_firebase_service.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -89,12 +88,12 @@ final firebaseControllerProvider =
 
 class FirebaseController {
   FirebaseController({
-    required BaseFirebaseService firebaseService,
+    required FirebaseService firebaseService,
     required StorageService storageService,
   })  : _firebaseService = firebaseService,
         _storageService = storageService;
 
-  final BaseFirebaseService _firebaseService;
+  final FirebaseService _firebaseService;
   final StorageService _storageService;
   final log = Logger();
   static const uuid = Uuid();

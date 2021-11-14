@@ -13,7 +13,6 @@ import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/src/logger.dart';
 
 final fakeFirebaseServiceProvider = Provider<MockFirebaseService>((ref) {
   return MockFirebaseService(firebaseAuth: MockFirebaseAuth());
@@ -230,12 +229,11 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  // TODO: implement log
-  Logger get log => throw UnimplementedError();
-
-  @override
   Future<void> saveLastReadCfiLocation({required String lastReadCfiLocation, required String bookId}) {
     // TODO: implement saveLastReadCfiLocation
     throw UnimplementedError();
   }
+
+  @override
+  String? get currentUserUid => 'dhsaolidjfolasijfsa';
 }
