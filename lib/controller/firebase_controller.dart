@@ -416,7 +416,7 @@ class FirebaseController {
   /// Throws [AppException] if theres an exception
   Future<void> setItemsCollections({
     required List<Item> items,
-    required Set<String> collectionIds,
+    required List<String> collectionIds,
   }) async {
     try {
       for (final item in items) {

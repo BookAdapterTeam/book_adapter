@@ -211,7 +211,7 @@ class FirebaseService
   /// Throws [AppException] if it fails.
   Future<void> updateBookCollections({
     required String bookId,
-    required Set<String> collectionIds,
+    required List<String> collectionIds,
   }) async {
     try {
       await _booksRef
@@ -234,7 +234,7 @@ class FirebaseService
   /// Throws [AppException] if it fails.
   Future<void> updateSeriesCollections({
     required String seriesId,
-    required Set<String> collectionIds,
+    required List<String> collectionIds,
   }) async {
     try {
       await _seriesRef
