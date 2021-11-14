@@ -29,7 +29,7 @@ class FirebaseService
 
   // Database ************************************************************************************************
 
-  // Firestore BookCollections reference
+  /// Firestore BookCollections reference
   CollectionReference<BookCollection> get _collectionsRef =>
       _firestore.collection('collections').withConverter<BookCollection>(
             fromFirestore: (doc, _) {
@@ -40,14 +40,20 @@ class FirebaseService
             toFirestore: (collection, _) => collection.toMap(),
           );
 
-  // Get book collections stream
+  /// Get book collections stream
   Stream<QuerySnapshot<BookCollection>> get collectionsStream {
     return _collectionsRef
         .where('userId', isEqualTo: currentUserUid)
         .snapshots();
   }
 
-  // Firestore BookCollections reference
+  /// Get a book collection document from Firestore by its document id
+  ///
+  /// Returns the [BookCollection] object if it exists, otherewise returns `null`
+  Future<BookCollection?> getBookCollectionById(String seriesId) async =>
+      (await _collectionsRef.doc(seriesId).get()).data();
+
+  /// Firestore BookCollections reference
   CollectionReference<Book> get _booksRef =>
       _firestore.collection('books').withConverter<Book>(
             fromFirestore: (doc, _) {
@@ -58,12 +64,18 @@ class FirebaseService
             toFirestore: (book, _) => book.toMapFirebase(),
           );
 
-  // Get books stream
+  /// Get books stream
   Stream<QuerySnapshot<Book>> get booksStream {
     return _booksRef.where('userId', isEqualTo: currentUserUid).snapshots();
   }
 
-  // Firestore BookCollections reference
+  /// Get a book document from Firestore by its document id
+  ///
+  /// Returns the [Book] object if it exists, otherewise returns `null`
+  Future<Book?> getBookDocumentById(String seriesId) async =>
+      (await _booksRef.doc(seriesId).get()).data();
+
+  /// Firestore BookCollections reference
   CollectionReference<Series> get _seriesRef =>
       _firestore.collection('series').withConverter<Series>(
             fromFirestore: (doc, _) {
@@ -74,13 +86,20 @@ class FirebaseService
             toFirestore: (series, _) => series.toMapFirebase(),
           );
 
-  // Get series stream
+  /// Get series stream
   Stream<QuerySnapshot<Series>> get seriesStream {
     return _seriesRef.where('userId', isEqualTo: currentUserUid).snapshots();
   }
 
+  /// Get a series document from Firestore by its document id
+  ///
+  /// Returns the [Series] object if it exists, otherewise returns `null`
+  Future<Series?> getSeriesById(String seriesId) async =>
+      (await _seriesRef.doc(seriesId).get()).data();
+
   // Books *****************************************************************************************************
 
+  /// Save a cfi to lastReadCfiLocation on a book document in Firestore
   Future<void> saveLastReadCfiLocation({
     required String lastReadCfiLocation,
     required String bookId,
@@ -292,7 +311,7 @@ class FirebaseService
   }
 
   /// Delete a firestore document
-  /// 
+  ///
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteDocument(String path) async {
     try {

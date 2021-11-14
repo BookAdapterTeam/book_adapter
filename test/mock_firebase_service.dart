@@ -236,4 +236,22 @@ class MockFirebaseService implements FirebaseService {
 
   @override
   String? get currentUserUid => 'dhsaolidjfolasijfsa';
+
+  @override
+  Future<BookCollection?> getBookCollectionById(String seriesId) {
+    // TODO: implement getBookCollectionById
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Book?> getBookDocumentById(String seriesId) {
+    // TODO: implement getBookDocumentById
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Series?> getSeriesById(String seriesId) {
+    // TODO: implement getSeriesById
+    throw UnimplementedError();
+  }
 }
