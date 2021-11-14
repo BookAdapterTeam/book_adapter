@@ -292,6 +292,8 @@ class FirebaseService
   }
 
   /// Delete a firestore document
+  /// 
+  /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteDocument(String path) async {
     try {
       await _firestore.doc(path).delete();
