@@ -13,7 +13,6 @@ import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/src/logger.dart';
 
 final fakeFirebaseServiceProvider = Provider<MockFirebaseService>((ref) {
   return MockFirebaseService(firebaseAuth: MockFirebaseAuth());
@@ -28,7 +27,7 @@ class MockFirebaseService implements FirebaseService {
 
   // Mock get list of books
   @override
-  Future<Either<Failure, List<Book>>> getBooks() async {
+  Future<Either<Failure, List<Book>>> getAllBooks() async {
     try {
       const List<Book> books = [
         // Book(title: 'Book 0', id: '0'),
@@ -49,8 +48,10 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, UserCredential>> signIn(
-      {required String email, required String password}) async {
+  Future<Either<Failure, UserCredential>> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       final userCredential = await firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
@@ -69,8 +70,10 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, UserCredential>> signUp(
-      {required String email, required String password}) async {
+  Future<Either<Failure, UserCredential>> signUp({
+    required String email,
+    required String password,
+  }) async {
     try {
       final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
         email: email,
@@ -145,30 +148,35 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<void> addBookToSeries(
-      {required String bookId,
-      required String seriesId,
-      required Set<String> collectionIds}) {
+  Future<void> addBookToSeries({
+    required String bookId,
+    required String seriesId,
+    required Set<String> collectionIds,
+  }) {
     // TODO: implement addBookToSeries
     throw UnimplementedError();
   }
 
   @override
-  Future<void> removeSeries(String seriesId) {
+  Future<void> deleteDocument(String seriesId) {
     // TODO: implement removeSeries
     throw UnimplementedError();
   }
 
   @override
-  Future<void> setBookCollections(
-      {required String bookId, required Set<String> collectionIds}) {
+  Future<void> updateBookCollections({
+    required String bookId,
+    List<String>? collectionIds,
+  }) {
     // TODO: implement addBookToCollections
     throw UnimplementedError();
   }
 
   @override
-  Future<void> setSeriesCollections(
-      {required String seriesId, required Set<String> collectionIds}) {
+  Future<void> updateSeriesCollections({
+    required String seriesId,
+    List<String>? collectionIds,
+  }) {
     // TODO: implement setSeriesCollections
     throw UnimplementedError();
   }
@@ -186,7 +194,6 @@ class MockFirebaseService implements FirebaseService {
   // TODO: implement seriesStream
   Stream<QuerySnapshot<Series>> get seriesStream => throw UnimplementedError();
 
-
   @override
   Future<bool> fileExists(String firebaseFilePath) {
     // TODO: implement fileExists
@@ -194,7 +201,10 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  DownloadTask downloadFile({required String firebaseFilePath, required String downloadToLocation}) {
+  DownloadTask downloadFile({
+    required String firebaseFilePath,
+    required String downloadToLocation,
+  }) {
     // TODO: implement downloadFile
     throw UnimplementedError();
   }
@@ -206,36 +216,80 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, String>> uploadBookToFirebaseStorage({required String firebaseFilePath, required String localFilePath}) {
+  Future<Either<Failure, String>> uploadBookToFirebaseStorage({
+    required String firebaseFilePath,
+    required String localFilePath,
+  }) {
     // TODO: implement uploadBookToFirebaseStorage
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, String>> uploadBytes({required String contentType, required String firebaseFilePath, required Uint8List bytes}) {
+  Future<Either<Failure, String>> uploadBytes(
+      {required String contentType,
+      required String firebaseFilePath,
+      required Uint8List bytes}) {
     // TODO: implement uploadBytes
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, String>> uploadCoverPhoto({required EpubBookRef openedBook, required String uploadToPath}) {
+  Future<Either<Failure, String>> uploadCoverPhoto({
+    required EpubBookRef openedBook,
+    required String uploadToPath,
+  }) {
     // TODO: implement uploadCoverPhoto
     throw UnimplementedError();
   }
 
   @override
-  Future<Either<Failure, String>> uploadFile({required String contentType, required String firebaseFilePath, required String localFilePath}) {
+  Future<Either<Failure, String>> uploadFile(
+      {required String contentType,
+      required String firebaseFilePath,
+      required String localFilePath}) {
     // TODO: implement uploadFile
     throw UnimplementedError();
   }
 
   @override
-  // TODO: implement log
-  Logger get log => throw UnimplementedError();
+  Future<void> saveLastReadCfiLocation({
+    required String lastReadCfiLocation,
+    required String bookId,
+  }) {
+    // TODO: implement saveLastReadCfiLocation
+    throw UnimplementedError();
+  }
 
   @override
-  Future<void> saveLastReadCfiLocation({required String lastReadCfiLocation, required String bookId}) {
-    // TODO: implement saveLastReadCfiLocation
+  String? get currentUserUid => 'dhsaolidjfolasijfsa';
+
+  @override
+  Future<BookCollection?> getBookCollectionById(String seriesId) {
+    // TODO: implement getBookCollectionById
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Book?> getBookDocumentById(String seriesId) {
+    // TODO: implement getBookDocumentById
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Series?> getSeriesById(String seriesId) {
+    // TODO: implement getSeriesById
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> updateBookSeries(String bookId, String? seriesId) {
+    // TODO: implement updateBookSeries
+    throw UnimplementedError();
+  }
+
+  @override
+  String getDefaultCollectionName(String userUid) {
+    // TODO: implement getDefaultCollectionName
     throw UnimplementedError();
   }
 }

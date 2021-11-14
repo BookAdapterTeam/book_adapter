@@ -183,7 +183,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     final items = state.selectedItems;
     await firebaseController.setItemsCollections(
       items: items.toList(),
-      collectionIds: collectionIds.toSet(),
+      collectionIds: collectionIds,
     );
   }
 

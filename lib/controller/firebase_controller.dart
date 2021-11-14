@@ -6,7 +6,6 @@ import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
-import 'package:book_adapter/service/base_firebase_service.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -89,12 +88,12 @@ final firebaseControllerProvider =
 
 class FirebaseController {
   FirebaseController({
-    required BaseFirebaseService firebaseService,
+    required FirebaseService firebaseService,
     required StorageService storageService,
   })  : _firebaseService = firebaseService,
         _storageService = storageService;
 
-  final BaseFirebaseService _firebaseService;
+  final FirebaseService _firebaseService;
   final StorageService _storageService;
   final log = Logger();
   static const uuid = Uuid();
@@ -297,7 +296,7 @@ class FirebaseController {
 
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
-    return await _firebaseService.getBooks();
+    return await _firebaseService.getAllBooks();
   }
 
   /// Get a list of books from the user's database
@@ -417,17 +416,17 @@ class FirebaseController {
   /// Throws [AppException] if theres an exception
   Future<void> setItemsCollections({
     required List<Item> items,
-    required Set<String> collectionIds,
+    required List<String> collectionIds,
   }) async {
     try {
       for (final item in items) {
         if (item is Book) {
-          await _firebaseService.setBookCollections(
+          await _firebaseService.updateBookCollections(
             bookId: item.id,
             collectionIds: collectionIds,
           );
         } else if (item is Series) {
-          await _firebaseService.setSeriesCollections(
+          await _firebaseService.updateSeriesCollections(
             seriesId: item.id,
             collectionIds: collectionIds,
           );
@@ -546,5 +545,48 @@ class FirebaseController {
   /// Throws `AppException` if user is not logged in
   Future<bool> fileExists(String firebaseFilePath) async {
     return await _firebaseService.fileExists(firebaseFilePath);
+  }
+
+  /// Unmerge a series
+  ///
+  /// This removes the series document and removes all references to it
+  /// in the books that belong to it. Each book in the series should be
+  /// assigned to the same collection as the series was
+  ///
+  /// `series` - The series to be unmerged
+  /// `books` - The books that belong to the above series
+  Future<void> unmergeSeries({
+    required Series series,
+    required List<Book> books,
+  }) {
+    try {
+      // TODO(@DNSbhan): Implement unmergeSeries method
+      throw UnimplementedError();
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
+  /// Remove a collection
+  Future<void> removeCollection({
+    required BookCollection collection,
+    required List<Item> items,
+  }) {
+    try {
+      // TODO(@Suman1415): Implement removeCollection method
+      throw UnimplementedError();
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
   }
 }
