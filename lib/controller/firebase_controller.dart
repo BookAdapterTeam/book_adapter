@@ -552,7 +552,10 @@ class FirebaseController {
   /// This removes the series document and removes all references to it
   /// in the books that belong to it. Each book in the series should be
   /// assigned to the same collection as the series was
-  Future<void> unmergeSeries(String seriesId) {
+  /// 
+  /// `series` - The series to be unmerged
+  /// `books` - The books that belong to the above series
+  Future<void> unmergeSeries({required Series series, required List<Book> books}) {
     try {
       // TODO: Implement unmergeSeries method
       throw UnimplementedError();
