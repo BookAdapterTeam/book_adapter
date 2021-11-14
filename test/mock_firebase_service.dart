@@ -153,7 +153,7 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<void> removeSeries(String seriesId) {
+  Future<void> deleteDocument(String seriesId) {
     // TODO: implement removeSeries
     throw UnimplementedError();
   }

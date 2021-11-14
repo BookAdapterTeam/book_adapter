@@ -291,14 +291,10 @@ class FirebaseService
     }
   }
 
-  /// Remove series
-  ///
-  /// This invokes a firebase function to remove all references to the series.
-  /// This does not delete the books.
-  Future<void> removeSeries(String seriesId) {
+  /// Delete a firestore document
+  Future<void> deleteDocument(String path) async {
     try {
-      // TODO: Implement removeSeries cloud function
-      throw UnimplementedError();
+      await _firestore.doc(path).delete();
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
