@@ -576,10 +576,24 @@ class FirebaseController {
   Future<void> removeCollection({
     required BookCollection collection,
     required List<Item> items,
-  }) {
+  }) async {
     try {
-      // TODO(@Suman1415): Implement removeCollection method
-      throw UnimplementedError();
+      for (final item in items) {
+        //remove collection id. Dart implements remove function inplace
+        item.collectionIds.remove(collection.id);
+        if (item is Book) {
+          await _firebaseService.updateBookCollections(
+            bookId: item.id,
+            collectionIds: item.collectionIds.toList(),
+          );
+        } else if (item is Series) {
+          await _firebaseService.updateSeriesCollections(
+            seriesId: item.id,
+            collectionIds: item.collectionIds.toList(),
+          );
+        }
+      }
+      await _firebaseService.deleteDocument('$collection/${collection.id}');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
