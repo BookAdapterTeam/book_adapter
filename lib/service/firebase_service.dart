@@ -209,7 +209,7 @@ class FirebaseService
 
   /// Update a book's collections
   ///
-  /// Takes a book and adds the series id to it.
+  /// Takes a book and adds the collectionIds to it.
   /// 
   /// If a book does not have any collections, it will move it to the default collection
   ///
