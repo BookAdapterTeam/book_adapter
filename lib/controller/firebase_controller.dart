@@ -555,11 +555,17 @@ class FirebaseController {
     // TODO(@getBoolean): On app start and logged in, delete files that are not in the Firestore database
     for (final item in items) {
       if (item is Book) {
-        // await deleteFirebaseStorageBook();
+        // await _firebaseService.deleteFirebaseStorageBook(item.filepath);
         // await _firebaseService.deleteDocument('$kBooksCollectionName/{item.id}');
       } else if (item is Series) {
-        // Delete all books in the series
+        // // Delete all books in the series
         // final seriesItems = getSeriesItems(item);
+        // for (final item in seriesItems) {
+        //   if (item is Book) {
+        //     await _firebaseService.deleteFirebaseStorageBook(item.filepath);
+        //     await _firebaseService.deleteDocument('$kBooksCollectionName/{item.id}');
+        //   }
+        // }
 
         // await _firebaseService.deleteDocument('$kSeriesCollectionName/{item.id}');
       }
