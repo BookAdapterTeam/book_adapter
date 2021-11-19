@@ -547,6 +547,15 @@ class FirebaseController {
     return await _firebaseService.fileExists(firebaseFilePath);
   }
 
+  /// List the files the user has uploaded to their folder
+  Future<List<String>> listFilenames() async {
+    final String? userId = _firebaseService.currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not authenticated.');
+    }
+    return _firebaseService.listFilenames(userId);
+  }
+
   /// Delete a library item permamently
   ///
   /// Arguments

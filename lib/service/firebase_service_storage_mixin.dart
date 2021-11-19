@@ -14,9 +14,16 @@ mixin FirebaseServiceStorageMixin {
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
 
   final _log = Logger();
-  
 
   // Storage *****************************************************************************************
+
+  /// List the files the user has uploaded to their folder
+  Future<List<String>> listFilenames(String userId) async {
+    final firebaseUploadedBooks = await _firebaseStorage.ref(userId).list();
+    return firebaseUploadedBooks.items
+        .map((listedItem) => listedItem.name)
+        .toList();
+  }
 
   /// Upload a book to Firebase Storage
   Future<Either<Failure, String>> uploadBookToFirebaseStorage({
