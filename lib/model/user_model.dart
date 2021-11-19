@@ -8,7 +8,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 final userModelProvider =
     StateNotifierProvider.autoDispose<UserModel, UserData>((ref) {
-  const userData = UserData();
+  final books = ref.watch(bookStreamProvider);
+  final userData = UserData(books: books.asData?.value);
 
   return UserModel(ref.read, userData);
 });
@@ -24,7 +25,6 @@ class UserModel extends StateNotifier<UserData> {
     // Queue download
     downloadQueueNotifier.addToQueue(book);
   }
-
 
   List<Book> get downloadQueue {
     return _read(queueBookProvider).queueListItems;

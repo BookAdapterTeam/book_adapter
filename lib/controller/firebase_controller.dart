@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:book_adapter/data/app_exception.dart';
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
@@ -560,26 +561,47 @@ class FirebaseController {
   ///
   /// Arguments
   /// `items` - Items to be deleted
-  Future<void> deleteItemsPermamently(List<Item> items) async {
-    // TODO(@getBoolean): Complete function
-    for (final item in items) {
+  Future<List<Book>> deleteItemsPermanently({
+    required List<Item> itemsToDelete,
+    required List<Book> allBooks,
+  }) async {
+    final deletedBooks = <Book>[];
+    for (final item in itemsToDelete) {
       if (item is Book) {
-        // await _firebaseService.deleteFirebaseStorageBook(item.filepath);
-        // await _firebaseService.deleteDocument('$kBooksCollectionName/{item.id}');
+        // Delete the book files on firebase storage
+        await _deleteFirebaseStorageBookFiles(item.filepath);
+        // Delete the book document in firebase
+        await _firebaseService
+            .deleteDocument('$kBooksCollectionName/${item.id}');
+        deletedBooks.add(item);
       } else if (item is Series) {
-        // // Delete all books in the series
-        // final seriesItems = getSeriesItems(item);
-        // for (final item in seriesItems) {
-        //   if (item is Book) {
-        //     await _firebaseService.deleteFirebaseStorageBook(item.filepath);
-        //     await _firebaseService.deleteDocument('$kBooksCollectionName/{item.id}');
-        //   }
-        // }
+        // Delete all books in the series
+        final seriesItems = _getSeriesItems(item, allBooks);
+        for (final itemInSeries in seriesItems) {
+          if (item is Book) {
+            await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
+            await _firebaseService
+                .deleteDocument('$kBooksCollectionName/${itemInSeries.id}');
+            deletedBooks.add(itemInSeries);
+          }
+        }
 
-        // await _firebaseService.deleteDocument('$kSeriesCollectionName/{item.id}');
+        // Delete the series document in firebase
+        await _firebaseService
+            .deleteDocument('$kSeriesCollectionName/${item.id}');
       }
     }
-    throw UnimplementedError();
+    return deletedBooks;
+  }
+
+  List<Book> _getSeriesItems(Series series, List<Book> allBooks) {
+    return allBooks.where((book) => book.seriesId == series.id).toList();
+  }
+
+  Future<void> _deleteFirebaseStorageBookFiles(String filepath) async {
+    await _firebaseService.deleteFile(filepath);
+    await _firebaseService
+        .deleteFile(filepath + kFirebaseStorageImageExtension);
   }
 
   /// Unmerge a series
