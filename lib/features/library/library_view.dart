@@ -1,3 +1,4 @@
+import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
@@ -143,7 +144,8 @@ class LibraryScrollView extends HookConsumerWidget {
         // Disable button until more than one book selected so that the user does not create series with only one book in it
         if (!data.hasSeries && data.selectedItems.length > 1)
           const MergeIntoSeriesButton(),
-
+        // TODO: Implement unmergeSeries method
+        data.hasSeries ? TextButton(onPressed: () {}, child: Text("Unmerge")) : Center(),
         const DeleteButton(),
       ],
     );
@@ -286,10 +288,12 @@ class BookCollectionList extends HookConsumerWidget {
     int index,
   ) {
     return SizeFadeTransition(
+
       sizeFraction: 0.7,
       curve: Curves.easeInOut,
       animation: animation,
       child: ItemListTileWidget(
+
         key: ValueKey(collection.id + item.id + 'ItemListWidget'),
         item: item,
         isDownloaded: item is Book ? isDownloadedBox.get(item.filename) ?? false : null,

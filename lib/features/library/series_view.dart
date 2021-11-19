@@ -66,6 +66,7 @@ class SeriesView extends HookConsumerWidget {
       item: item,
       disableSelect: true,
       isDownloaded: isDownloadedBox.get(item.id) ?? false,
+
     );
   }
 }

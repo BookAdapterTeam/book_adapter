@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:book_adapter/data/app_exception.dart';
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
@@ -10,6 +11,7 @@ import 'package:book_adapter/service/firebase_service.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:dartz/dartz_unsafe.dart';
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -558,9 +560,15 @@ class FirebaseController {
   Future<void> unmergeSeries({
     required Series series,
     required List<Book> books,
-  }) {
+  }) async {
     try {
       // TODO(@DNSbhan): Implement unmergeSeries method
+      books.forEach((book) {
+        _firebaseService.updateBookSeries(book.id, null);
+        _firebaseService.updateBookCollections(bookId: book.id, collectionIds: series.collectionIds.toList());
+      });
+      await _firebaseService.deleteDocument('$kSeriesCollectionName/${series.id}');
+
       throw UnimplementedError();
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
