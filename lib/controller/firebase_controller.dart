@@ -547,6 +547,24 @@ class FirebaseController {
     return await _firebaseService.fileExists(firebaseFilePath);
   }
 
+  /// Delete a library item permamently
+  ///
+  /// Arguments
+  /// `items` - Items to be deleted
+  Future<void> deleteItemsPermamently(List<Item> items) async {
+    for (final item in items) {
+      if (item is Book) {
+        // await deleteFirebaseStorageBook();
+        // await _firebaseService.deleteDocument('$kBooksCollectionName/{item.id}');
+      } else if (item is Series) {
+        // Delete all books in the series
+        // final seriesItems = getSeriesItems(item);
+
+        // await _firebaseService.deleteDocument('$kSeriesCollectionName/{item.id}');
+      }
+    }
+  }
+
   /// Unmerge a series
   ///
   /// This removes the series document and removes all references to it
