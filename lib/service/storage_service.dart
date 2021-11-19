@@ -52,7 +52,6 @@ class StorageService {
       await appBookAdaptDirectory.create();
       _downloadedBooksBox = await Hive.openBox(kDownloadedBooksHiveBox);
       await clearDownloadedBooksCache();
-      // TODO: Delete downloaded books that are not in Firebase anymore
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
