@@ -183,4 +183,8 @@ mixin FirebaseServiceStorageMixin {
       return false;
     }
   }
+
+  Future<void> deleteFile(String firebaseFilePath) async {
+    await _firebaseStorage.ref(firebaseFilePath).delete();
+  }
 }

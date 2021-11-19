@@ -300,4 +300,10 @@ class MockFirebaseService implements FirebaseService {
       'fdshfhdskhfkjdsfkd',
     ];
   }
+
+  @override
+  Future<void> deleteFile(String firebaseFilePath) {
+    // TODO: implement deleteFile
+    throw UnimplementedError();
+  }
 }
