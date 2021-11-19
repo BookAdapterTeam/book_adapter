@@ -552,6 +552,7 @@ class FirebaseController {
   /// Arguments
   /// `items` - Items to be deleted
   Future<void> deleteItemsPermamently(List<Item> items) async {
+    // TODO(@getBoolean): On app start and logged in, delete files that are not in the Firestore database
     for (final item in items) {
       if (item is Book) {
         // await deleteFirebaseStorageBook();
