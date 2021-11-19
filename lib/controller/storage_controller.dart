@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:io';
+import 'dart:io' as io;
 
 import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
@@ -55,6 +55,9 @@ class StorageController {
     return downloadedFiles;
   }
 
+  /// Get the list of files on downloaded to the device
+  ///
+  /// Returns a list of string filenames
   List<String> getDownloadedFilenames() {
     final String? userId = _firebaseController.currentUser?.uid;
     if (userId == null) {
@@ -66,13 +69,31 @@ class StorageController {
       return filesPaths.map((file) {
         return file.path.split('/').last;
       }).toList();
-    } on FileSystemException catch (e, st) {
+    } on io.FileSystemException catch (e, st) {
       log.e(e.message, e, st);
       return [];
     } on Exception catch (e, st) {
       log.e(e.toString(), e, st);
       return [];
     }
+  }
+
+  Future<List<String>> deleteDeletedBookFiles(List<String> filenames) async {
+    final String? userId = _firebaseController.currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
+    final deletedFilenames = <String>[];
+    final firebaseFilesnames = await _firebaseController.listFilenames();
+    for (final filename in filenames) {
+      if (!firebaseFilesnames.contains(filename)) {
+        final fullFilePath = _storageService.getPathFromFilename(
+            userId: userId, filename: filename);
+        await io.File(fullFilePath).delete();
+        deletedFilenames.add(filename);
+      }
+    }
+    return deletedFilenames;
   }
 
   Future<List<int>> getBookData(Book book) async {

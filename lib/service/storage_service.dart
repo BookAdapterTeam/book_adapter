@@ -13,9 +13,13 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
+/// Initialize storage service. User must be already authenticated with Firebase
 final storageInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
-  ref.read(storageControllerProvider).updateDownloadedFiles();
+  final downloadedFiles =
+      ref.read(storageControllerProvider).updateDownloadedFiles();
+  // ignore: unawaited_futures
+  ref.read(storageControllerProvider).deleteDeletedBookFiles(downloadedFiles);
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -55,8 +59,14 @@ class StorageService {
     }
   }
 
-  String getAppFilePath(filepath) =>
+  String getAppFilePath(String filepath) =>
       appBookAdaptDirectory.path + '/' + filepath;
+
+  String getPathFromFilename({
+    required String userId,
+    required String filename,
+  }) =>
+      appBookAdaptDirectory.path + '/' + userId + '/' + filename;
 
   /// Method to create a directory for the user when they login
   Future<io.Directory> createUserDirectory(String userId) async {
