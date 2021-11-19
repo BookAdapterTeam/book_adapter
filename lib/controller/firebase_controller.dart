@@ -561,6 +561,7 @@ class FirebaseController {
   /// Arguments
   /// `items` - Items to be deleted
   Future<void> deleteItemsPermamently(List<Item> items) async {
+    // TODO(@getBoolean): Complete function
     for (final item in items) {
       if (item is Book) {
         // await _firebaseService.deleteFirebaseStorageBook(item.filepath);
@@ -578,6 +579,7 @@ class FirebaseController {
         // await _firebaseService.deleteDocument('$kSeriesCollectionName/{item.id}');
       }
     }
+    throw UnimplementedError();
   }
 
   /// Unmerge a series
