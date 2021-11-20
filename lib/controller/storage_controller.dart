@@ -13,9 +13,6 @@ import 'package:logger/logger.dart';
 
 final storageControllerProvider =
     Provider.autoDispose<StorageController>((ref) {
-  final firebaseController = ref.watch(firebaseControllerProvider);
-  final storageService = ref.watch(storageServiceProvider);
-
   return StorageController(ref.read);
 });
 
