@@ -584,8 +584,6 @@ class FirebaseController {
         final List<String> collectionIds = [
           ...item.collectionIds.toList()..remove(collection.id)
         ];
-        final newCollectionIds = item.collectionIds;
-        newCollectionIds.remove(collection.id);
         if (item is Book) {
           await _firebaseService.updateBookCollections(
             bookId: item.id,
