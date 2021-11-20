@@ -30,7 +30,7 @@ class UserModel extends StateNotifier<UserData> {
     return _read(queueBookProvider).queueListItems;
   }
 
-  Future<void> setDownloadedFilenames() async {
+  Future<void> updateDownloadedFilenames() async {
     final firebaseController = _read(firebaseControllerProvider);
     final storageController = _read(storageControllerProvider);
 
