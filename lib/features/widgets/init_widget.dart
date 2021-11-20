@@ -39,7 +39,8 @@ class InitFirebaseWidget extends ConsumerWidget {
 }
 
 class InitStorageServiceWidget extends ConsumerWidget {
-  const InitStorageServiceWidget({Key? key, required this.child}) : super(key: key);
+  const InitStorageServiceWidget({Key? key, required this.child})
+      : super(key: key);
 
   final Widget child;
 
@@ -73,7 +74,8 @@ class InitStorageServiceWidget extends ConsumerWidget {
 }
 
 class InitDownloadedFilesWidget extends ConsumerWidget {
-  const InitDownloadedFilesWidget({Key? key, required this.child}) : super(key: key);
+  const InitDownloadedFilesWidget({Key? key, required this.child})
+      : super(key: key);
 
   final Widget child;
 

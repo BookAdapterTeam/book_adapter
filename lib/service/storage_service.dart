@@ -18,10 +18,13 @@ final storageServiceInitProvider = FutureProvider<void>((ref) async {
 });
 
 /// Get a list of files downloaded on the device
-/// 
+///
 /// Should only be called if the user is authenticated
 final updateDownloadedFilesProvider = FutureProvider<void>((ref) async {
-  ref.read(storageControllerProvider).updateDownloadedFiles();
+  final storageController = ref.read(storageControllerProvider);
+  final downloadedFiles = storageController.updateDownloadedFiles();
+  // ignore: unawaited_futures
+  storageController.deleteDeletedBookFiles(downloadedFiles);
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -54,15 +57,20 @@ class StorageService {
       await appBookAdaptDirectory.create();
       _downloadedBooksBox = await Hive.openBox(kDownloadedBooksHiveBox);
       await clearDownloadedBooksCache();
-      // TODO: Delete downloaded books that are not in Firebase anymore
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
     }
   }
 
-  String getAppFilePath(filepath) =>
+  String getAppFilePath(String filepath) =>
       appBookAdaptDirectory.path + '/' + filepath;
+
+  String getPathFromFilename({
+    required String userId,
+    required String filename,
+  }) =>
+      appBookAdaptDirectory.path + '/' + userId + '/' + filename;
 
   /// Method to create a directory for the user when they login
   Future<io.Directory> createUserDirectory(String userId) async {
@@ -322,8 +330,8 @@ class StorageService {
     await _downloadedBooksBox.put(bookId, true);
   }
 
-  Future<void> setBookNotDownloaded(String bookId) async {
-    await _downloadedBooksBox.put(bookId, false);
+  Future<void> setBookNotDownloaded(String filename) async {
+    await _downloadedBooksBox.put(filename, false);
   }
 
   Future<void> clearDownloadedBooksCache() async {

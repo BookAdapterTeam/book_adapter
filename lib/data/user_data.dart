@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 @immutable
 class UserData extends Equatable {
   const UserData({
-    this.books = const [],
+    this.books,
     this.downloadedFiles,
   });
 

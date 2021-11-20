@@ -12,14 +12,13 @@ import 'package:logger/logger.dart';
 final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
     QueueNotifierData<Book>>((ref) {
   final storageController = ref.read(storageControllerProvider);
-  final userModel = ref.read(userModelProvider.notifier);
   final data = QueueNotifierData<Book>(queueListItems: [], queue: Queue());
 
   return QueueNotifier(
     data: data,
     processItem: (book) => storageController.downloadFile(
       book,
-      whenDone: (filename) => userModel.addDownloadedFilename(filename),
+      whenDone: (filename) => ref.read(userModelProvider.notifier).addDownloadedFilename(filename),
     ),
   );
 });

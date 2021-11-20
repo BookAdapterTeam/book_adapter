@@ -292,4 +292,18 @@ class MockFirebaseService implements FirebaseService {
     // TODO: implement getDefaultCollectionName
     throw UnimplementedError();
   }
+
+  @override
+  Future<List<String>> listFilenames(String userId) async {
+    return [
+      'fhiasjflasjfl;as',
+      'fdshfhdskhfkjdsfkd',
+    ];
+  }
+
+  @override
+  Future<void> deleteFile(String firebaseFilePath) {
+    // TODO: implement deleteFile
+    throw UnimplementedError();
+  }
 }
