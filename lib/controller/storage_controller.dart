@@ -32,9 +32,10 @@ class StorageController {
     Book book, {
     required FutureOr<void> Function(String) whenDone,
   }) {
-    final appBookAdaptPath = _read(storageServiceProvider).appBookAdaptDirectory.path;
-    final task = _read(firebaseControllerProvider).downloadFile(
-        book.filepath, '$appBookAdaptPath/${book.filepath}');
+    final appBookAdaptPath =
+        _read(storageServiceProvider).appBookAdaptDirectory.path;
+    final task = _read(firebaseControllerProvider)
+        .downloadFile(book.filepath, '$appBookAdaptPath/${book.filepath}');
     // ignore: unawaited_futures
     task.whenComplete(() async {
       await _read(storageServiceProvider).setBookDownloaded(book.filename);
@@ -48,6 +49,10 @@ class StorageController {
     return downloadedFiles;
   }
 
+  Future<void> markDownloadedBook(String bookId) async {
+    await _read(storageServiceProvider).setBookDownloaded(bookId);
+  }
+
   /// Get the list of files on downloaded to the device
   ///
   /// Returns a list of string filenames
@@ -58,7 +63,8 @@ class StorageController {
     }
 
     try {
-      final filesPaths = _read(storageServiceProvider).listFiles(userId: userId);
+      final filesPaths =
+          _read(storageServiceProvider).listFiles(userId: userId);
       return filesPaths.map((file) {
         return file.path.split('/').last;
       }).toList();
@@ -79,7 +85,8 @@ class StorageController {
     required List<Item> itemsToDelete,
     required List<Book> allBooks,
   }) async {
-    final deletedBooks = await _read(firebaseControllerProvider).deleteItemsPermanently(
+    final deletedBooks =
+        await _read(firebaseControllerProvider).deleteItemsPermanently(
       itemsToDelete: itemsToDelete,
       allBooks: allBooks,
     );
@@ -94,11 +101,12 @@ class StorageController {
       throw AppException('User not logged in');
     }
     final deletedFilenames = <String>[];
-    final firebaseFilesnames = await _read(firebaseControllerProvider).listFilenames();
+    final firebaseFilesnames =
+        await _read(firebaseControllerProvider).listFilenames();
     for (final filename in filenames) {
       if (!firebaseFilesnames.contains(filename)) {
-        final fullFilePath = _read(storageServiceProvider).getPathFromFilename(
-            userId: userId, filename: filename);
+        final fullFilePath = _read(storageServiceProvider)
+            .getPathFromFilename(userId: userId, filename: filename);
         await io.File(fullFilePath).delete();
         deletedFilenames.add(filename);
       }
@@ -107,14 +115,16 @@ class StorageController {
   }
 
   Future<List<int>> getBookData(Book book) async {
-    final bookPath = _read(storageServiceProvider).getAppFilePath(book.filepath);
+    final bookPath =
+        _read(storageServiceProvider).getAppFilePath(book.filepath);
 
     return await _read(storageServiceProvider).getFileInMemory(bookPath);
   }
 
   Future<void> deleteBooks(List<Book> books) async {
     for (final book in books) {
-      final bookPath = _read(storageServiceProvider).getAppFilePath(book.filepath);
+      final bookPath =
+          _read(storageServiceProvider).getAppFilePath(book.filepath);
       await _read(storageServiceProvider).deleteFile(bookPath);
       await _read(storageServiceProvider).setBookNotDownloaded(book.filename);
     }

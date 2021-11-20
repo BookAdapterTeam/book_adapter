@@ -48,8 +48,14 @@ class SeriesView extends HookConsumerWidget {
                 _SliverBackgroundAppBar(imageUrl: imageUrl, series: series),
                 SliverImplicitlyAnimatedList<Book>(
                   items: books ?? [],
-                  itemBuilder: (context, animation, item, index) =>
-                      itemBuilder(context, animation, item, index, books, isDownloadedBox),
+                  itemBuilder: (context, animation, item, index,) => itemBuilder(
+                    context,
+                    animation,
+                    item,
+                    index,
+                    books,
+                    isDownloadedBox,
+                  ),
                   areItemsTheSame: (oldItem, newItem) {
                     return oldItem.id == newItem.id;
                   },
