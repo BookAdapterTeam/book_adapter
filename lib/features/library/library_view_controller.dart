@@ -162,20 +162,32 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   Future<Failure?> deleteBookDownloads() async {
     final selectedBooks = state.allSelectedBooks;
-    
+
     try {
       state = state.copyWith(selectedItems: {});
       // Remove file
       await _read(storageControllerProvider)
           .deleteBooks(selectedBooks.toList());
-      // TODO: Update UI
-      // _read(userModelProvider.notifier).removeDownloadedFilenames(
-      //     selectedBooks.map((book) => book.filepath).toList());
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
     }
-    
+  }
+
+  Future<Failure?> deleteBooksPermanently() async {
+    final selectedBooks = state.allSelectedBooks;
+
+    try {
+      state = state.copyWith(selectedItems: {});
+      // Remove books
+      await _read(storageControllerProvider).deleteItemsPermanently(
+        itemsToDelete: selectedBooks.toList(),
+        allBooks: state.books ?? [],
+      );
+    } catch (e, st) {
+      log.e(e.toString, e, st);
+      return Failure(e.toString());
+    }
   }
 
   Future<void> moveItemsToCollections(List<String> collectionIds) async {
