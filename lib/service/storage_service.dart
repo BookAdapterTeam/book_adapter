@@ -21,10 +21,10 @@ final storageServiceInitProvider = FutureProvider<void>((ref) async {
 ///
 /// Should only be called if the user is authenticated
 final updateDownloadedFilesProvider = FutureProvider<void>((ref) async {
-  final downloadedFiles =
-      ref.read(storageControllerProvider).updateDownloadedFiles();
+  final storageController = ref.read(storageControllerProvider);
+  final downloadedFiles = storageController.updateDownloadedFiles();
   // ignore: unawaited_futures
-  ref.read(storageControllerProvider).deleteDeletedBookFiles(downloadedFiles);
+  storageController.deleteDeletedBookFiles(downloadedFiles);
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
