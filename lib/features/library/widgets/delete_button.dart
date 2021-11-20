@@ -1,3 +1,4 @@
+import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -20,10 +21,12 @@ class DeleteButton extends ConsumerWidget {
               //     'Are you sure you remove the downloads of all selected books?'),
               title: const Text('Permanently Delete Selected Items'),
               content: const Text('''
-                  Are you sure you want to permanently delete all selected Books and Series? 
-                  Any books inside a selected series will also be deleted. 
-                  This cannot be undone!
-                  '''),
+Are you sure you want to permanently delete all selected Books and Series?
+
+Any books inside a selected series will also be deleted.
+
+This cannot be undone!
+'''),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -52,10 +55,7 @@ class DeleteButton extends ConsumerWidget {
             .deleteBooksPermanently();
         if (failure == null) return;
 
-        final snackBar = SnackBar(
-          content: Text(failure.message),
-        );
-        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+        ToastUtils.error(failure.message);
       },
     );
   }

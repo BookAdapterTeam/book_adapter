@@ -71,7 +71,7 @@ class SeriesView extends HookConsumerWidget {
     return ItemListTileWidget(
       item: item,
       disableSelect: true,
-      isDownloaded: isDownloadedBox.get(item.id) ?? false,
+      isDownloaded: isDownloadedBox.get(item.filename) ?? false,
     );
   }
 }

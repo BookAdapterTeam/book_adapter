@@ -330,8 +330,8 @@ class StorageService {
     await _downloadedBooksBox.put(bookId, true);
   }
 
-  Future<void> setBookNotDownloaded(String bookId) async {
-    await _downloadedBooksBox.put(bookId, false);
+  Future<void> setBookNotDownloaded(String filename) async {
+    await _downloadedBooksBox.put(filename, false);
   }
 
   Future<void> clearDownloadedBooksCache() async {

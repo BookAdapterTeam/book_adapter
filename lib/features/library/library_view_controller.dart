@@ -175,13 +175,12 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   Future<Failure?> deleteBooksPermanently() async {
-    final selectedBooks = state.allSelectedBooks;
-
+    final selectedItems = state.selectedItems;
     try {
       state = state.copyWith(selectedItems: {});
       // Remove books
       await _read(storageControllerProvider).deleteItemsPermanently(
-        itemsToDelete: selectedBooks.toList(),
+        itemsToDelete: selectedItems.toList(),
         allBooks: state.books ?? [],
       );
     } catch (e, st) {

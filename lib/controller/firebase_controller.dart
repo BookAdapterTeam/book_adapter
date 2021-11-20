@@ -578,7 +578,7 @@ class FirebaseController {
         // Delete all books in the series
         final seriesItems = _getSeriesItems(item, allBooks);
         for (final itemInSeries in seriesItems) {
-          if (item is Book) {
+          if (itemInSeries is Book) {
             await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
             await _firebaseService
                 .deleteDocument('$kBooksCollectionName/${itemInSeries.id}');
