@@ -13,8 +13,14 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
-final storageInitProvider = FutureProvider<void>((ref) async {
+final storageServiceInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
+});
+
+/// Get a list of files downloaded on the device
+/// 
+/// Should only be called if the user is authenticated
+final updateDownloadedFilesProvider = FutureProvider<void>((ref) async {
   ref.read(storageControllerProvider).updateDownloadedFiles();
 });
 

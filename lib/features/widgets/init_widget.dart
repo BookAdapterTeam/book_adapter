@@ -38,14 +38,48 @@ class InitFirebaseWidget extends ConsumerWidget {
   }
 }
 
-class InitStorageWidget extends ConsumerWidget {
-  const InitStorageWidget({Key? key, required this.child}) : super(key: key);
+class InitStorageServiceWidget extends ConsumerWidget {
+  const InitStorageServiceWidget({Key? key, required this.child}) : super(key: key);
 
   final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncValue = ref.watch(storageInitProvider);
+    final asyncValue = ref.watch(storageServiceInitProvider);
+
+    return AsyncValueWidget(
+      value: asyncValue,
+      data: (_) => child,
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (e, st) {
+        return Scaffold(
+          body: Center(
+            child: Text(
+              e.toString(),
+              style: Theme.of(context)
+                  .textTheme
+                  .headline6!
+                  .copyWith(color: Colors.red),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class InitDownloadedFilesWidget extends ConsumerWidget {
+  const InitDownloadedFilesWidget({Key? key, required this.child}) : super(key: key);
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final asyncValue = ref.watch(updateDownloadedFilesProvider);
 
     return AsyncValueWidget(
       value: asyncValue,
