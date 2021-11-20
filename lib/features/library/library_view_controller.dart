@@ -162,20 +162,31 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   Future<Failure?> deleteBookDownloads() async {
     final selectedBooks = state.allSelectedBooks;
-    
+
     try {
       state = state.copyWith(selectedItems: {});
       // Remove file
       await _read(storageControllerProvider)
           .deleteBooks(selectedBooks.toList());
-      // TODO: Update UI
-      // _read(userModelProvider.notifier).removeDownloadedFilenames(
-      //     selectedBooks.map((book) => book.filepath).toList());
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
     }
-    
+  }
+
+  Future<Failure?> deleteBooksPermanently() async {
+    final selectedItems = state.selectedItems;
+    try {
+      state = state.copyWith(selectedItems: {});
+      // Remove books
+      await _read(storageControllerProvider).deleteItemsPermanently(
+        itemsToDelete: selectedItems.toList(),
+        allBooks: state.books ?? [],
+      );
+    } catch (e, st) {
+      log.e(e.toString, e, st);
+      return Failure(e.toString());
+    }
   }
 
   Future<void> moveItemsToCollections(List<String> collectionIds) async {
@@ -206,7 +217,6 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   Future<Either<Failure, void>> queueDownloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
     final firebaseController = _read(firebaseControllerProvider);
-    final userModel = _read(userModelProvider.notifier);
 
     try {
       // Check if file exists on server before downloading
@@ -214,7 +224,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
       if (!exists) return Left(Failure('Could not find file on server'));
 
-      userModel.queueDownload(book);
+      _read(userModelProvider.notifier).queueDownload(book);
       return const Right(null);
     } on AppException catch (e) {
       log.e(e.toString());
