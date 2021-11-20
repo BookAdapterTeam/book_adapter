@@ -218,7 +218,6 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   Future<Either<Failure, void>> queueDownloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
     final firebaseController = _read(firebaseControllerProvider);
-    final userModel = _read(userModelProvider.notifier);
 
     try {
       // Check if file exists on server before downloading
@@ -226,7 +225,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
       if (!exists) return Left(Failure('Could not find file on server'));
 
-      userModel.queueDownload(book);
+      _read(userModelProvider.notifier).queueDownload(book);
       return const Right(null);
     } on AppException catch (e) {
       log.e(e.toString());
