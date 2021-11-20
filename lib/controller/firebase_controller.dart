@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:book_adapter/data/app_exception.dart';
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
@@ -580,20 +581,25 @@ class FirebaseController {
     try {
       for (final item in items) {
         //remove collection id. Dart implements remove function inplace
-        item.collectionIds.remove(collection.id);
+        final List<String> collectionIds = [
+          ...item.collectionIds.toList()..remove(collection.id)
+        ];
+        final newCollectionIds = item.collectionIds;
+        newCollectionIds.remove(collection.id);
         if (item is Book) {
           await _firebaseService.updateBookCollections(
             bookId: item.id,
-            collectionIds: item.collectionIds.toList(),
+            collectionIds: collectionIds,
           );
         } else if (item is Series) {
           await _firebaseService.updateSeriesCollections(
             seriesId: item.id,
-            collectionIds: item.collectionIds.toList(),
+            collectionIds: collectionIds,
           );
         }
       }
-      await _firebaseService.deleteDocument('$collection/${collection.id}');
+      await _firebaseService
+          .deleteDocument('$kBookCollectionsCollectionName/${collection.id}');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
