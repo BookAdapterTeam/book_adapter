@@ -4,6 +4,7 @@ import 'package:book_adapter/features/auth/register_view.dart';
 import 'package:book_adapter/features/auth/reset_password_view.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -97,6 +98,7 @@ class _EmailTextField extends ConsumerWidget {
       onChanged: (email) {
         ref.read(loginViewController.notifier).updateData(email: email);
       },
+      textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.email],
     );
   }
@@ -123,6 +125,8 @@ class _PasswordTextField extends ConsumerWidget {
       validator: (password) =>
           ref.read(loginViewController.notifier).validatePassword(password),
       autofillHints: const [AutofillHints.password],
+      textInputAction: TextInputAction.done,
+      onEditingComplete: () => TextInput.finishAutofillContext(),
     );
   }
 }
