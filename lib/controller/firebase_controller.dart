@@ -617,7 +617,6 @@ class FirebaseController {
     required List<Book> books,
   }) async {
     try {
-      // TODO(@DNSbhan): Implement unmergeSeries method
       for (final book in books) {
         await _firebaseService.updateBookSeries(book.id, null);
         await _firebaseService.updateBookCollections(bookId: book.id, collectionIds: series.collectionIds.toList());
