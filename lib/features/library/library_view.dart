@@ -1,4 +1,3 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
@@ -37,7 +36,10 @@ class LibraryView extends ConsumerWidget {
 }
 
 class MergeIntoSeriesButton extends ConsumerWidget {
-  const MergeIntoSeriesButton({Key? key}) : super(key: key);
+  const MergeIntoSeriesButton({Key? key, required this.isDisabled})
+      : super(key: key);
+
+  final bool isDisabled;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -49,35 +51,37 @@ class MergeIntoSeriesButton extends ConsumerWidget {
 
     return IconButton(
       tooltip: 'Merge to series',
-      onPressed: () async {
-        final seriesName = await showDialog<String>(
-            context: context,
-            builder: (context) {
-              // Could sort the list before using choosig the title.
-              // Without soring, it will use the title of the first book selected.
-              // final selectedItemsList = selectedItems.toList()
-              //   ..sort((a, b) => a.title.compareTo(b.title));
-              // final initialText = selectedItemsList.first.title;
-              final initialText = selectedItems.first.title;
-              return AddNewSeriesDialog(
-                initialText: initialText,
-              );
-            });
-        if (seriesName == null) return;
-        final res = await viewController.mergeIntoSeries(seriesName);
+      onPressed: isDisabled
+          ? null
+          : () async {
+              final seriesName = await showDialog<String>(
+                  context: context,
+                  builder: (context) {
+                    // Could sort the list before using choosig the title.
+                    // Without soring, it will use the title of the first book selected.
+                    // final selectedItemsList = selectedItems.toList()
+                    //   ..sort((a, b) => a.title.compareTo(b.title));
+                    // final initialText = selectedItemsList.first.title;
+                    final initialText = selectedItems.first.title;
+                    return AddNewSeriesDialog(
+                      initialText: initialText,
+                    );
+                  });
+              if (seriesName == null) return;
+              final res = await viewController.mergeIntoSeries(seriesName);
 
-        res.fold(
-          (failure) {
-            final snackBar = SnackBar(
-              content: Text(failure.message),
-              duration: const Duration(seconds: 2),
-            );
-            log.e(failure.message);
-            ScaffoldMessenger.of(context).showSnackBar(snackBar);
-          },
-          (_) => null,
-        );
-      },
+              res.fold(
+                (failure) {
+                  final snackBar = SnackBar(
+                    content: Text(failure.message),
+                    duration: const Duration(seconds: 2),
+                  );
+                  log.e(failure.message);
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                },
+                (_) => null,
+              );
+            },
       // onPressed: () => viewController.mergeIntoSeries(),
       icon: const Icon(Icons.merge_type),
     );
@@ -123,8 +127,9 @@ class LibraryScrollView extends HookConsumerWidget {
 
         // TODO: Button is disabled a series is selected until remove series cloud function is implemented, delete old series
         // Disable button until more than one book selected so that the user does not create series with only one book in it
-        if (!data.hasSeries && data.selectedItems.length > 1)
-          const MergeIntoSeriesButton(),
+        MergeIntoSeriesButton(
+          isDisabled: data.hasSeries || data.selectedItems.length <= 1,
+        ),
         // TODO: Implement unmergeSeries method
         data.hasSeries ? TextButton(onPressed: () {}, child: Text("Unmerge")) : Center(),
         const DeleteButton(),
@@ -271,12 +276,10 @@ class BookCollectionList extends HookConsumerWidget {
     int index,
   ) {
     return SizeFadeTransition(
-
       sizeFraction: 0.7,
       curve: Curves.easeInOut,
       animation: animation,
       child: ItemListTileWidget(
-
         key: ValueKey(collection.id + item.id + 'ItemListWidget'),
         item: item,
         isDownloaded:
