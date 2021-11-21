@@ -131,7 +131,15 @@ class LibraryScrollView extends HookConsumerWidget {
           isDisabled: data.hasSeries || data.selectedItems.length <= 1,
         ),
         // TODO: Implement unmergeSeries method
-        data.hasSeries ? TextButton(onPressed: () {}, child: Text("Unmerge")) : Center(),
+        data.hasSeries
+            ? TextButton(
+                onPressed: () async {
+                  await ref
+                      .read(libraryViewControllerProvider.notifier)
+                      .unmergeSeries();
+                },
+                child: const Text('Unmerge'))
+            : const Center(),
         const DeleteButton(),
       ],
     );
