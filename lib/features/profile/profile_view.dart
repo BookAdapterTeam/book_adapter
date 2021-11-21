@@ -20,9 +20,6 @@ class ProfileView extends ConsumerWidget {
     final user = userStreamAsyncValue.asData?.value;
     const String title = 'Profile Page';
 
-    // final isLoading = ref.watch(profileViewController);
-    // final viewController = ref.watch(profileViewController.notifier);
-
     return Scaffold(
       appBar: AppBar(
         title: const Text(title),

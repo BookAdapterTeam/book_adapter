@@ -113,8 +113,6 @@ class _ItemListTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
-    final LibraryViewController viewController =
-        ref.watch(libraryViewControllerProvider.notifier);
     final imageUrl = item.imageUrl;
     final subtitle = item.subtitle != null ? Text(item.subtitle!) : null;
     final isSelected = data.selectedItems.contains(item);
@@ -163,7 +161,7 @@ class _ItemListTile extends ConsumerWidget {
           icon = const Icon(Icons.download);
           onPressed = () async {
             try {
-              final res = await viewController.queueDownloadBook(book);
+              final res = await ref.read(libraryViewControllerProvider.notifier).queueDownloadBook(book);
               res.fold(
                 (failure) {
                   log.e(failure.message);
@@ -277,8 +275,6 @@ class _CustomListTileWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
-    final LibraryViewController viewController =
-        ref.watch(libraryViewControllerProvider.notifier);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -296,15 +292,15 @@ class _CustomListTileWidget extends ConsumerWidget {
       onLongPress: () {
         if (disableSelect) return;
 
-        viewController.selectItem(item);
+        ref.read(libraryViewControllerProvider.notifier).selectItem(item);
       },
       onTap: () async {
         if (isSelected) {
-          return viewController.deselectItem(item);
+          return ref.read(libraryViewControllerProvider.notifier).deselectItem(item);
         }
 
         if (data.isSelecting && !disableSelect) {
-          return viewController.selectItem(item);
+          return ref.read(libraryViewControllerProvider.notifier).selectItem(item);
         }
 
         if (item is Series) {
@@ -328,7 +324,7 @@ class _CustomListTileWidget extends ConsumerWidget {
 
         if (item is Book && status == BookStatus.notDownloaded) {
           try {
-            final res = await viewController.queueDownloadBook(item as Book);
+            final res = await ref.read(libraryViewControllerProvider.notifier).queueDownloadBook(item as Book);
             res.fold(
               (failure) {
                 log.e(failure.message);
