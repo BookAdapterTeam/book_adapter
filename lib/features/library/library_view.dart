@@ -11,7 +11,6 @@ import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart
 import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
 import 'package:book_adapter/features/library/widgets/profile_button.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
-import 'package:book_adapter/model/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -31,27 +30,9 @@ class LibraryView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userModel = ref.watch(userModelProvider.notifier);
-    return FutureBuilder<void>(
-        future: userModel.setDownloadedFilenames(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                  'Error occurred when listing files on the device\n + ${snapshot.error.toString()}'),
-            );
-          }
-
-          if (snapshot.connectionState == ConnectionState.done) {
-            return const Scaffold(
-              body: LibraryScrollView(),
-            );
-          }
-
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        });
+    return const Scaffold(
+      body: LibraryScrollView(),
+    );
   }
 }
 
@@ -276,7 +257,9 @@ class BookCollectionList extends HookConsumerWidget {
       child: ItemListTileWidget(
         key: ValueKey(collection.id + oldItem.id + 'ItemListWidget'),
         item: oldItem,
-        isDownloaded: oldItem is Book ? isDownloadedBox.get(oldItem.filename) ?? false : null,
+        isDownloaded: oldItem is Book
+            ? isDownloadedBox.get(oldItem.filename) ?? false
+            : null,
       ),
     );
   }
@@ -296,7 +279,8 @@ class BookCollectionList extends HookConsumerWidget {
 
         key: ValueKey(collection.id + item.id + 'ItemListWidget'),
         item: item,
-        isDownloaded: item is Book ? isDownloadedBox.get(item.filename) ?? false : null,
+        isDownloaded:
+            item is Book ? isDownloadedBox.get(item.filename) ?? false : null,
       ),
     );
   }

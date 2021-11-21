@@ -83,11 +83,13 @@ class _MyAppState extends ConsumerState<MyApp> {
                   child: InitFirebaseWidget(
                     key: const ValueKey('Initialize Firebase App'),
                     child: InitHiveWidget(
-                      child: AuthChecker(
-                        key: const ValueKey('Auth Checker'),
-                        child: InitStorageWidget(
-                          key: const ValueKey('Initialize Storage Service'),
-                          child: page,
+                      child: InitStorageServiceWidget(
+                        key: const ValueKey('Initialize Storage Service'),
+                        child: AuthChecker(
+                          key: const ValueKey('Auth Checker'),
+                          child: InitDownloadedFilesWidget(
+                            child: page,
+                          ),
                         ),
                       ),
                     ),
