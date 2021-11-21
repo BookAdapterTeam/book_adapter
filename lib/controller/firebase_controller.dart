@@ -11,7 +11,6 @@ import 'package:book_adapter/service/firebase_service.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:dartz/dartz_unsafe.dart';
 import 'package:epubx/epubx.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -619,13 +618,11 @@ class FirebaseController {
   }) async {
     try {
       // TODO(@DNSbhan): Implement unmergeSeries method
-      books.forEach((book) {
-        _firebaseService.updateBookSeries(book.id, null);
-        _firebaseService.updateBookCollections(bookId: book.id, collectionIds: series.collectionIds.toList());
-      });
+      for (final book in books) {
+        await _firebaseService.updateBookSeries(book.id, null);
+        await _firebaseService.updateBookCollections(bookId: book.id, collectionIds: series.collectionIds.toList());
+      }
       await _firebaseService.deleteDocument('$kSeriesCollectionName/${series.id}');
-
-      throw UnimplementedError();
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
