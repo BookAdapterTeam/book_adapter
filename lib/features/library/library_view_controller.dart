@@ -3,6 +3,7 @@ import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/data/user_data.dart';
+import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
@@ -12,7 +13,6 @@ import 'package:book_adapter/model/user_model.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -43,7 +43,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   final Reader _read;
   final log = Logger();
 
-  Future<void> addBooks(BuildContext context) async {
+  Future<void> addBooks() async {
     // Make storage service call to pick books
     final sRes = await _read(storageServiceProvider).pickFile(
       type: FileType.custom,
@@ -64,12 +64,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       final fRes = await _read(firebaseControllerProvider).addBook(file);
       fRes.fold(
         (failure) {
-          final snackBar = SnackBar(
-            content: Text(failure.message),
-            duration: const Duration(seconds: 2),
-          );
           log.e(failure.message);
-          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          ToastUtils.error(failure.message);
         },
         (book) => uploadedBooks.add(book),
       );
@@ -158,6 +154,23 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       }
     }
     return mergeBooks;
+  }
+
+  /// Remove a collection
+  ///
+  /// Items in the collection are not deleted
+  Future<Failure?> removeBookCollection(BookCollection collection) async {
+    try {
+      final collectionItems = state.getCollectionItems(collection.id);
+      // Remove file
+      await _read(firebaseControllerProvider).removeCollection(
+        collection: collection,
+        collectionItems: collectionItems,
+      );
+    } catch (e, st) {
+      log.e(e.toString, e, st);
+      return Failure(e.toString());
+    }
   }
 
   Future<Failure?> deleteBookDownloads() async {
