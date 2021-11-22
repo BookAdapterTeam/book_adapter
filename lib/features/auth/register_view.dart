@@ -2,6 +2,7 @@ import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/auth/register_view_controller.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -13,8 +14,6 @@ class RegisterView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final RegisterViewData data = ref.watch(registerViewController);
-    final RegisterViewController viewController =
-        ref.watch(registerViewController.notifier);
 
     return Scaffold(
         appBar: AppBar(
@@ -26,60 +25,57 @@ class RegisterView extends ConsumerWidget {
               child: Form(
                 autovalidateMode: AutovalidateMode.always,
                 key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: <Widget>[
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height * 1 / 9,
-                    ),
-                    // TODO: Add image picker for profile image, upload to Firebase Storage
+                child: AutofillGroup(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 1 / 9,
+                      ),
+                      // TODO: Add image picker for profile image, upload to Firebase Storage
 
-                    // Enter username
-                    _UsernameTextField(
-                        data: data, viewController: viewController),
-                    const SizedBox(
-                      height: 8,
-                    ),
+                      // Enter username
+                      _UsernameTextField(data: data),
+                      const SizedBox(
+                        height: 8,
+                      ),
 
-                    // Enter email
-                    _EmailTextField(data: data, viewController: viewController),
-                    const SizedBox(
-                      height: 8,
-                    ),
+                      // Enter email
+                      _EmailTextField(data: data),
+                      const SizedBox(
+                        height: 8,
+                      ),
 
-                    // Enter password
-                    _PasswordTextField(
-                        data: data, viewController: viewController),
-                    const SizedBox(
-                      height: 8,
-                    ),
+                      // Enter password
+                      _PasswordTextField(data: data),
+                      const SizedBox(
+                        height: 8,
+                      ),
 
-                    // Enter password again
-                    _VerifyPasswordTextField(
-                        data: data, viewController: viewController),
+                      // Enter password again
+                      _VerifyPasswordTextField(data: data),
 
-                    // Submit
-                    _RegisterButton(data: data, viewController: viewController)
-                  ],
+                      // Submit
+                      _RegisterButton(data: data)
+                    ],
+                  ),
                 ),
               )),
         ));
   }
 }
 
-class _RegisterButton extends StatelessWidget {
+class _RegisterButton extends ConsumerWidget {
   const _RegisterButton({
     Key? key,
     required this.data,
-    required this.viewController,
   }) : super(key: key);
 
   final RegisterViewData data;
-  final RegisterViewController viewController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
     return ElevatedButton(
       child: const Text('Register', style: TextStyle(fontSize: 20.0)),
@@ -92,7 +88,7 @@ class _RegisterButton extends StatelessWidget {
           return;
         }
 
-        final res = await viewController.register();
+        final res = await ref.read(registerViewController.notifier).register();
         return res.fold(
           (failure) {
             log.e(failure.message);
@@ -109,18 +105,16 @@ class _RegisterButton extends StatelessWidget {
   }
 }
 
-class _VerifyPasswordTextField extends StatelessWidget {
+class _VerifyPasswordTextField extends ConsumerWidget {
   const _VerifyPasswordTextField({
     Key? key,
     required this.data,
-    required this.viewController,
   }) : super(key: key);
 
   final RegisterViewData data;
-  final RegisterViewController viewController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextFormField(
       initialValue: data.verifyPassword,
       keyboardType: TextInputType.text,
@@ -139,30 +133,31 @@ class _VerifyPasswordTextField extends StatelessWidget {
         }
       },
       onChanged: (verifyPasswordValue) {
-        viewController.updateData(verifyPassword: verifyPasswordValue);
+        ref
+            .read(registerViewController.notifier)
+            .updateData(verifyPassword: verifyPasswordValue);
       },
       autofillHints: const [AutofillHints.password],
+      textInputAction: TextInputAction.done,
     );
   }
 }
 
-class _PasswordTextField extends StatelessWidget {
+class _PasswordTextField extends ConsumerWidget {
   const _PasswordTextField({
     Key? key,
     required this.data,
-    required this.viewController,
   }) : super(key: key);
 
   final RegisterViewData data;
-  final RegisterViewController viewController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextFormField(
       initialValue: data.password,
       keyboardType: TextInputType.text,
       decoration: const InputDecoration(
-          border: OutlineInputBorder(), labelText: 'Enter Password'),
+          border: OutlineInputBorder(), labelText: 'Password'),
       obscureText: true,
       validator: (passwordValue) {
         if (passwordValue == null) {
@@ -177,25 +172,27 @@ class _PasswordTextField extends StatelessWidget {
         }
       },
       onChanged: (passwordValue) {
-        viewController.updateData(password: passwordValue);
+        ref
+            .read(registerViewController.notifier)
+            .updateData(password: passwordValue);
       },
       autofillHints: const [AutofillHints.password],
+      onEditingComplete: () => TextInput.finishAutofillContext(),
+      textInputAction: TextInputAction.next,
     );
   }
 }
 
-class _EmailTextField extends StatelessWidget {
+class _EmailTextField extends ConsumerWidget {
   const _EmailTextField({
     Key? key,
     required this.data,
-    required this.viewController,
   }) : super(key: key);
 
   final RegisterViewData data;
-  final RegisterViewController viewController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextFormField(
       initialValue: data.email,
       keyboardType: TextInputType.emailAddress,
@@ -214,34 +211,37 @@ class _EmailTextField extends StatelessWidget {
         return null;
       },
       onChanged: (emailValue) {
-        viewController.updateData(email: emailValue);
+        ref.read(registerViewController.notifier).updateData(email: emailValue);
       },
       autofillHints: const [AutofillHints.email],
+      textInputAction: TextInputAction.next,
     );
   }
 }
 
-class _UsernameTextField extends StatelessWidget {
+class _UsernameTextField extends ConsumerWidget {
   const _UsernameTextField({
     Key? key,
     required this.data,
-    required this.viewController,
   }) : super(key: key);
 
   final RegisterViewData data;
-  final RegisterViewController viewController;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextFormField(
       initialValue: data.username,
       decoration: const InputDecoration(
           border: OutlineInputBorder(), labelText: 'Username'),
       onChanged: (usernameValue) {
-        viewController.updateData(username: usernameValue);
+        ref
+            .read(registerViewController.notifier)
+            .updateData(username: usernameValue);
       },
-      validator: (username) => viewController.validate(
-          string: username, message: "Username can't be empty"),
+      validator: (username) => ref
+          .read(registerViewController.notifier)
+          .validate(string: username, message: "Username can't be empty"),
+      textInputAction: TextInputAction.next,
       autofillHints: const [AutofillHints.username],
     );
   }

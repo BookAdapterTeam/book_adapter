@@ -9,7 +9,6 @@ class LogOutButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final viewController = ref.watch(profileViewController.notifier);
     return IconButton(
       key: const ValueKey('signOut'),
       icon: const Icon(Icons.logout),
@@ -32,13 +31,13 @@ class LogOutButton extends ConsumerWidget {
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).popUntil(ModalRoute.withName('/'));
-                    viewController.signOut();
+                    ref.read(profileViewController.notifier).signOut();
                   },
                   child: Text(
                     'LOGOUT',
                     style: DefaultTextStyle.of(context).style.copyWith(
                           fontWeight: FontWeight.w500,
-                          color: Theme.of(context).errorColor,
+                          color: Colors.redAccent,
                         ),
                   ),
                 ),
