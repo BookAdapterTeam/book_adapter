@@ -17,7 +17,6 @@ class EditProfileView extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userStreamAsyncValue = ref.watch(userChangesProvider);
     final user = userStreamAsyncValue.asData?.value;
-    final viewController = ref.watch(editProfileViewController.notifier);
     final usernameController = useTextEditingController();
 
     return Scaffold(
@@ -46,7 +45,7 @@ class EditProfileView extends HookConsumerWidget {
                       border: UnderlineInputBorder(),
                       labelText: 'Change Username'),
                   onChanged: (usernameValue) {
-                    viewController.updateData(username: usernameValue);
+                    ref.read(editProfileViewController.notifier).updateData(username: usernameValue);
                   },
                 ),
                 const SizedBox(height: 24),
@@ -76,11 +75,10 @@ class _SubmitButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
     final data = ref.watch(editProfileViewController);
-    final viewController = ref.watch(editProfileViewController.notifier);
     return ElevatedButton(
       child: const Text('Submit', style: TextStyle(fontSize: 20.0)),
       onPressed: () async {
-        final success = await viewController.submit();
+        final success = await ref.read(editProfileViewController.notifier).submit();
         if (!success) {
           const errorMessage = 'Updating Userdata Failed';
           log.e(errorMessage);

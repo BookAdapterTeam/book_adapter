@@ -1,4 +1,5 @@
 import 'package:book_adapter/controller/storage_controller.dart';
+import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
@@ -36,19 +37,18 @@ class LibraryView extends ConsumerWidget {
 }
 
 class MergeIntoSeriesButton extends ConsumerWidget {
-  const MergeIntoSeriesButton({Key? key, required this.isDisabled})
-      : super(key: key);
+  const MergeIntoSeriesButton({
+    Key? key,
+    required this.onMerge,
+    required this.isDisabled,
+  }) : super(key: key);
+
+  final Function(String) onMerge;
 
   final bool isDisabled;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewController viewController =
-        ref.watch(libraryViewControllerProvider.notifier);
-    final selectedItems = ref.watch(
-        libraryViewControllerProvider.select((data) => data.selectedItems));
-    final log = Logger();
-
     return IconButton(
       tooltip: 'Merge to series',
       onPressed: isDisabled
@@ -62,25 +62,17 @@ class MergeIntoSeriesButton extends ConsumerWidget {
                     // final selectedItemsList = selectedItems.toList()
                     //   ..sort((a, b) => a.title.compareTo(b.title));
                     // final initialText = selectedItemsList.first.title;
-                    final initialText = selectedItems.first.title;
+                    final initialText = ref
+                        .read(libraryViewControllerProvider)
+                        .selectedItems
+                        .first
+                        .title;
                     return AddNewSeriesDialog(
                       initialText: initialText,
                     );
                   });
               if (seriesName == null) return;
-              final res = await viewController.mergeIntoSeries(seriesName);
-
-              res.fold(
-                (failure) {
-                  final snackBar = SnackBar(
-                    content: Text(failure.message),
-                    duration: const Duration(seconds: 2),
-                  );
-                  log.e(failure.message);
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                },
-                (_) => null,
-              );
+              onMerge.call(seriesName);
             },
       // onPressed: () => viewController.mergeIntoSeries(),
       icon: const Icon(Icons.merge_type),
@@ -98,6 +90,7 @@ class LibraryScrollView extends HookConsumerWidget {
         ref.watch(libraryViewControllerProvider.notifier);
     final storageController = ref.watch(storageControllerProvider);
     final scrollController = useScrollController();
+    final log = Logger();
 
     final notSelectingAppBar = SliverAppBar(
       key: const ValueKey('normal_app_bar'),
@@ -106,9 +99,12 @@ class LibraryScrollView extends HookConsumerWidget {
       floating: true,
       snap: true,
       systemOverlayStyle: SystemUiOverlayStyle.light,
-      actions: const [
-        AddBookButton(),
-        ProfileButton(),
+      actions: [
+        AddBookButton(
+          onAdd: () =>
+              ref.read(libraryViewControllerProvider.notifier).addBooks(),
+        ),
+        const ProfileButton(),
       ],
     );
 
@@ -123,24 +119,59 @@ class LibraryScrollView extends HookConsumerWidget {
         onPressed: () => viewController.deselectAllItems(),
       ),
       actions: [
-        const AddToCollectionButton(),
+        AddToCollectionButton(
+          onMove: (List<String> collectionIds) async {
+            await ref
+                .read(libraryViewControllerProvider.notifier)
+                .moveItemsToCollections(collectionIds);
+          },
+        ),
 
         // TODO: Button is disabled a series is selected until remove series cloud function is implemented, delete old series
         // Disable button until more than one book selected so that the user does not create series with only one book in it
         MergeIntoSeriesButton(
           isDisabled: data.hasSeries || data.selectedItems.length <= 1,
+          onMerge: (seriesName) async {
+            final res = await ref
+                .read(libraryViewControllerProvider.notifier)
+                .mergeIntoSeries(seriesName);
+
+            res.fold(
+              (failure) {
+                final snackBar = SnackBar(
+                  content: Text(failure.message),
+                  duration: const Duration(seconds: 2),
+                );
+                log.e(failure.message);
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+              (_) => null,
+            );
+          },
         ),
-        // TODO: Implement unmergeSeries method
-        data.hasSeries
-            ? TextButton(
-                onPressed: () async {
-                  await ref
-                      .read(libraryViewControllerProvider.notifier)
-                      .unmergeSeries();
-                },
-                child: const Text('Unmerge'))
-            : const Center(),
-        const DeleteButton(),
+        // TODO: Implement unmergeSeries button
+        TextButton(
+            onPressed: !data.hasSeries
+                ? null
+                : () async {
+                    await ref
+                        .read(libraryViewControllerProvider.notifier)
+                        .unmergeSeries();
+                  },
+            child: const Text('Unmerge')),
+        DeleteButton(
+          onDelete: () async {
+            final failure = await ref
+                .read(libraryViewControllerProvider.notifier)
+                .deleteBookDownloads();
+            // final failure = await ref
+            //     .read(libraryViewControllerProvider.notifier)
+            //     .deleteBooksPermanently();
+            if (failure == null) return;
+
+            ToastUtils.error(failure.message);
+          },
+        ),
       ],
     );
 
@@ -168,15 +199,30 @@ class LibraryScrollView extends HookConsumerWidget {
         SliverImplicitlyAnimatedList<BookCollection>(
           items: filteredCollections,
           areItemsTheSame: (a, b) => a.id == b.id,
-          itemBuilder: (context, animation, collection, index) {
+          removeItemBuilder: (_, animation, oldCollection) {
+            return FadeTransition(
+              opacity: animation,
+              key: ValueKey(oldCollection.id + 'FadeTransition'),
+              child: ValueListenableBuilder(
+                valueListenable:
+                    storageController.downloadedBooksValueListenable,
+                builder: (_, Box<bool> isDownloadedBox, __) {
+                  return collectionsBuilder(
+                    collection: oldCollection,
+                    controller: scrollController,
+                    hideHeader: filteredCollections.length <= 1,
+                    isDownloadedBox: isDownloadedBox,
+                  );
+                },
+              ),
+            );
+          },
+          itemBuilder: (_, __, collection, ___) {
             return ValueListenableBuilder(
               valueListenable: storageController.downloadedBooksValueListenable,
-              builder: (context, Box<bool> isDownloadedBox, _) {
+              builder: (_, Box<bool> isDownloadedBox, __) {
                 return collectionsBuilder(
-                  context: context,
-                  animation: animation,
                   collection: collection,
-                  index: index,
                   controller: scrollController,
                   hideHeader: filteredCollections.length <= 1,
                   isDownloadedBox: isDownloadedBox,
@@ -190,10 +236,7 @@ class LibraryScrollView extends HookConsumerWidget {
   }
 
   Widget collectionsBuilder({
-    required BuildContext context,
-    required Animation<double> animation,
     required BookCollection collection,
-    required int index,
     required ScrollController controller,
     bool hideHeader = false,
     required Box<bool> isDownloadedBox,
@@ -204,20 +247,82 @@ class LibraryScrollView extends HookConsumerWidget {
       controller: controller,
       header: hideHeader
           ? const SizedBox()
-          : Container(
-              height: 50.0,
-              color: Colors.blueGrey[700],
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              alignment: Alignment.centerLeft,
-              child: Text(
-                collection.name,
-                style: const TextStyle(color: Colors.white),
-              ),
-            ),
+          : BookCollectionHeader(collection: collection),
       content: BookCollectionList(
         key: ValueKey(collection.id + 'BookCollectionList'),
         collection: collection,
         isDownloadedBox: isDownloadedBox,
+      ),
+    );
+  }
+}
+
+class BookCollectionHeader extends ConsumerWidget {
+  const BookCollectionHeader({
+    Key? key,
+    required this.collection,
+  }) : super(key: key);
+
+  final BookCollection collection;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return InkWell(
+      onLongPress: () async {
+        final bool? shouldDelete = await showDialog<bool>(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Remove collection'),
+              content: Text(
+                collection.name != 'Default'
+                    ? 'Are you sure you remove the this collection? Items in this collection will not be deleted. After the collection is removed, any items without a collection will be moved to the default collection.'
+                    : 'The default collection cannot be removed.',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false);
+                  },
+                  child: const Text('CANCEL'),
+                ),
+                TextButton(
+                  onPressed: collection.name != 'Default'
+                      ? () => Navigator.of(context).pop(true)
+                      : null,
+                  child: Text(
+                    'REMOVE',
+                    style: DefaultTextStyle.of(context).style.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: collection.name != 'Default'
+                              ? Colors.redAccent
+                              : Theme.of(context).disabledColor,
+                        ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+        if (shouldDelete == null || !shouldDelete) return;
+
+        final failure = await ref
+            .read(libraryViewControllerProvider.notifier)
+            .removeBookCollection(collection);
+
+        if (failure == null) return;
+
+        ToastUtils.error(failure.message);
+      },
+      child: Container(
+        height: 50.0,
+        color: Colors.blueGrey[700],
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        alignment: Alignment.centerLeft,
+        child: Text(
+          collection.name,
+          style: const TextStyle(color: Colors.white),
+        ),
       ),
     );
   }
@@ -234,8 +339,6 @@ class BookCollectionList extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
-    final LibraryViewController viewController =
-        ref.watch(libraryViewControllerProvider.notifier);
 
     // Get the  list of books in the collection. It will not show books in a series, only the series itself
     final List<Item> items = data.getCollectionItems(collection.id);
@@ -248,20 +351,21 @@ class BookCollectionList extends HookConsumerWidget {
       areItemsTheSame: (a, b) => a.id == b.id,
       itemBuilder: booksBuilder,
       removeItemBuilder: (context, animation, oldItem) =>
-          removeItemBuilder(context, animation, oldItem, viewController, data),
+          removeItemBuilder(context, animation, oldItem, data, ref),
     );
   }
 
   Widget removeItemBuilder(
-      BuildContext context,
-      Animation<double> animation,
-      Item oldItem,
-      LibraryViewController viewController,
-      LibraryViewData data) {
+    BuildContext context,
+    Animation<double> animation,
+    Item oldItem,
+    LibraryViewData data,
+    WidgetRef ref,
+  ) {
     final isSelected = data.selectedItems.contains(oldItem);
 
     if (isSelected) {
-      viewController.deselectItem(oldItem);
+      ref.read(libraryViewControllerProvider.notifier).deselectItem(oldItem);
     }
 
     return FadeTransition(

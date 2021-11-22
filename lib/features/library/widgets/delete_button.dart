@@ -1,10 +1,13 @@
-import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class DeleteButton extends ConsumerWidget {
-  const DeleteButton({Key? key}) : super(key: key);
+  const DeleteButton({
+    Key? key,
+    required this.onDelete,
+  }) : super(key: key);
+
+  final VoidCallback onDelete;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -44,18 +47,8 @@ class DeleteButton extends ConsumerWidget {
             );
           },
         );
-        if (shouldDelete == null) return;
-        if (!shouldDelete) return;
-
-        final failure = await ref
-            .read(libraryViewControllerProvider.notifier)
-            .deleteBookDownloads();
-        // final failure = await ref
-        //     .read(libraryViewControllerProvider.notifier)
-        //     .deleteBooksPermanently();
-        if (failure == null) return;
-
-        ToastUtils.error(failure.message);
+        if (shouldDelete == null || !shouldDelete) return;
+        onDelete.call();
       },
     );
   }
