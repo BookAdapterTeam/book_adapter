@@ -615,10 +615,13 @@ class FirebaseController {
   Future<void> unmergeSeries({
     required Series series,
     required List<Book> books,
-  }) {
+  }) async {
     try {
-      // TODO(@DNSbhan): Implement unmergeSeries method
-      throw UnimplementedError();
+      for (final book in books) {
+        await _firebaseService.updateBookSeries(book.id, null);
+        await _firebaseService.updateBookCollections(bookId: book.id, collectionIds: series.collectionIds.toList());
+      }
+      await _firebaseService.deleteDocument('$kSeriesCollectionName/${series.id}');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
