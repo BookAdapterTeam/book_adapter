@@ -127,10 +127,9 @@ class LibraryScrollView extends HookConsumerWidget {
           },
         ),
 
-        // TODO: Button is disabled a series is selected until remove series cloud function is implemented, delete old series
         // Disable button until more than one book selected so that the user does not create series with only one book in it
         MergeIntoSeriesButton(
-          isDisabled: data.hasSeries || data.selectedItems.length <= 1,
+          isDisabled: data.selectedItems.length <= 1,
           onMerge: (seriesName) async {
             final res = await ref
                 .read(libraryViewControllerProvider.notifier)
