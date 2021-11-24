@@ -5,10 +5,12 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
     Key? key,
     required this.onRemoveDownloads,
     required this.onDeletePermanently,
+    required this.onDownload,
   }) : super(key: key);
 
   final VoidCallback onRemoveDownloads;
   final VoidCallback onDeletePermanently;
+  final VoidCallback onDownload;
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +19,22 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
       icon: const Icon(Icons.more_vert),
       itemBuilder: (context) {
         return <PopupMenuEntry>[
+          PopupMenuItem(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Icon(Icons.download),
+                SizedBox(
+                  width: 8,
+                ),
+                Text('Download Books'),
+              ],
+            ),
+            onTap: () async {
+              onDownload.call();
+            },
+          ),
           PopupMenuItem(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,

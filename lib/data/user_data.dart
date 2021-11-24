@@ -17,7 +17,6 @@ class UserData extends Equatable {
   UserData copyWith({
     List<Book>? books,
     List<String>? downloadedFiles,
-    Set<String>? downloadingFiles,
   }) {
     return UserData(
       books: books ?? this.books,
