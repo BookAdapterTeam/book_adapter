@@ -9,6 +9,7 @@ import 'package:book_adapter/features/library/widgets/add_to_collection_button.d
 import 'package:book_adapter/features/library/widgets/delete_button.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
 import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
+import 'package:book_adapter/features/library/widgets/overflow_popup_menu_button.dart';
 import 'package:book_adapter/features/library/widgets/profile_button.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:flutter/material.dart';
@@ -160,14 +161,19 @@ class LibraryScrollView extends HookConsumerWidget {
         //         },
         //   child: const Text('Unmerge'),
         // ),
-        DeleteButton(
-          onDelete: () async {
+        OverflowPopupMenuButton(
+          onRemoveDownloads: () async {
             final failure = await ref
                 .read(libraryViewControllerProvider.notifier)
                 .deleteBookDownloads();
-            // final failure = await ref
-            //     .read(libraryViewControllerProvider.notifier)
-            //     .deleteBooksPermanently();
+            if (failure == null) return;
+
+            ToastUtils.error(failure.message);
+          },
+          onDeletePermanently:  () async {
+            final failure = await ref
+                .read(libraryViewControllerProvider.notifier)
+                .deleteBooksPermanently();
             if (failure == null) return;
 
             ToastUtils.error(failure.message);
