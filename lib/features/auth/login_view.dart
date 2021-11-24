@@ -2,7 +2,6 @@ import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/auth/login_view_controller.dart';
 import 'package:book_adapter/features/auth/register_view.dart';
 import 'package:book_adapter/features/auth/reset_password_view.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
