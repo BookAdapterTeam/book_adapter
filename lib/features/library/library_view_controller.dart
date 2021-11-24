@@ -109,43 +109,29 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   // Pass in Reader because was getting an error after unmerging then merging a series
   // _AssertionError ('package:riverpod/src/framework/provider_base.dart': Failed assertion: line 645 pos 7: '_debugDidChangeDependency == false': Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt)
-  Future<Either<Failure, void>> mergeIntoSeries(
+  Future<Either<Failure, Series>> mergeIntoSeries(
     Reader read, [
     String? name,
   ]) async {
     // Get the list of all books selected, including books in a series
-    final items = state.selectedItems;
+    final selectedBooks = state.allSelectedBooksWithBooksInSeries.toList();
+    final selectedSeries = state.selectedSeries.toList();
+    deselectAllItems();
 
     // final selectedSeries = state.selectedSeries;
 
-    final List<Book> mergeBooks = _convertItemsToBooks(items);
-
     // Put series in collections the book was in
     // TODO: Get input from user to decide collection
-    mergeBooks
+    selectedBooks
         .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
-    final Set<String> collectionIds = {};
-    for (final book in mergeBooks) {
-      collectionIds.addAll(book.collectionIds);
-    }
-    deselectAllItems();
 
     try {
-      // Create a new series with the title with the first item in the list
-      const defaultImage =
-          'https://st4.depositphotos.com/14953852/24787/v/600/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';
-      final series = await read(firebaseControllerProvider).addSeries(
-          name: name ?? items.first.title,
-          imageUrl: items.first.imageUrl ?? defaultImage);
-
-      await read(firebaseControllerProvider).addBooksToSeries(
-          books: mergeBooks, series: series, collectionIds: collectionIds);
-      // TODO: Delete old series items. For now, merging series is disabled
-
-      // for (final collectionId in collectionIds) {
-      //   await firebaseController.removeSeries(collectionId);
-      // }
-      return const Right(null);
+      final series = await read(firebaseControllerProvider).mergeToSeries(
+        selectedBooks: selectedBooks,
+        selectedSeries: selectedSeries,
+        name: name,
+      );
+      return Right(series);
     } on AppException catch (e, st) {
       log.e('${e.message ?? e.toString()} ${e.code}', e, st);
       return Left(Failure(e.message ?? e.toString()));
@@ -153,22 +139,6 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       log.e(e.toString(), e, st);
       return Left(Failure(e.toString()));
     }
-  }
-
-  List<Book> _convertItemsToBooks(Set<Item> items) {
-    final List<Book> mergeBooks = [];
-    for (final item in items) {
-      if (item is Book) {
-        mergeBooks.add(item);
-      } else if (item is Series) {
-        final books = state.books;
-        if (books == null) break;
-
-        mergeBooks
-            .addAll(books.where((book) => book.seriesId == item.id).toList());
-      }
-    }
-    return mergeBooks;
   }
 
   /// Remove a collection

@@ -443,6 +443,46 @@ class FirebaseController {
     }
   }
 
+  Future<Series> mergeToSeries({
+    String? name,
+    // List of selected books including books in selected series
+    required List<Book> selectedBooks,
+    required List<Series> selectedSeries,
+  }) async {
+    try {
+      // Get list of collections to put the new series in
+      final Set<String> collectionIds = {};
+      for (final book in selectedBooks) {
+        collectionIds.addAll(book.collectionIds);
+      }
+
+      // Create a new series with the title with the first item in the list
+      final newSeries = await addSeries(
+        name: name ?? selectedBooks.first.title,
+        imageUrl: selectedBooks.first.imageUrl ?? kDefaultImage,
+      );
+
+      await addBooksToSeries(
+        books: selectedBooks,
+        series: newSeries,
+        collectionIds: collectionIds,
+      );
+
+      for (final series in selectedSeries) {
+        await _firebaseService.deleteSeriesDocument(series.id);
+      }
+
+      return newSeries;
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
   /// Add a list of books to a series
   ///
   /// Throws [AppException] if theres an exception
