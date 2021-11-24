@@ -1,4 +1,5 @@
 import 'package:book_adapter/controller/storage_controller.dart';
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
@@ -112,7 +113,7 @@ class LibraryScrollView extends HookConsumerWidget {
       key: const ValueKey('selecting_app_bar'),
       title: Text('Selected: ${data.numberSelected}'),
       pinned: true,
-      backgroundColor: Colors.black12,
+      backgroundColor: kSelectingAppBarColor,
       systemOverlayStyle: SystemUiOverlayStyle.light,
       elevation: 3.0,
       leading: BackButton(
