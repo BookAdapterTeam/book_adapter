@@ -3,7 +3,10 @@ const kDownloadedBooksHiveBox = 'BookAdapter-downloadedBooks';
 
 /// 'books'
 const kBooksCollectionName = 'books';
-const kBookCollectionsCollectionName = 'collections';
+
+/// 'collections'
+const kCollectionsCollectionName = 'collections';
+
 /// 'series'
 const kSeriesCollectionName = 'series';
 

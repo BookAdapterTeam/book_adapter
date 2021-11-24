@@ -44,7 +44,7 @@ final userChangesProvider = StreamProvider.autoDispose<User?>((ref) async* {
 
 // Provide the stream with riverpod for easy access
 final collectionsStreamProvider =
-    StreamProvider.autoDispose<List<BookCollection>>((ref) async* {
+    StreamProvider.autoDispose<List<AppCollection>>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
   // Parse the value received and emit a Message instance
   try {
@@ -279,7 +279,7 @@ class FirebaseController {
 
   // Database
   Stream<QuerySnapshot<Book>> get booksStream => _firebaseService.booksStream;
-  Stream<QuerySnapshot<BookCollection>> get collectionsStream =>
+  Stream<QuerySnapshot<AppCollection>> get collectionsStream =>
       _firebaseService.collectionsStream;
   Stream<QuerySnapshot<Series>> get seriesStream =>
       _firebaseService.seriesStream;
@@ -303,7 +303,7 @@ class FirebaseController {
   /// Get a list of books from the user's database
   Future<Either<Failure, Book>> addBook(
     PlatformFile file, {
-    BookCollection? collection,
+    AppCollection? collection,
   }) async {
     try {
       final userId = _firebaseService.currentUser?.uid;
@@ -407,7 +407,7 @@ class FirebaseController {
   }
 
   /// Create a collection
-  Future<Either<Failure, BookCollection>> addCollection(String name) async {
+  Future<Either<Failure, AppCollection>> addCollection(String name) async {
     // Upload book to storage
     return await _firebaseService.addCollection(name);
   }
@@ -492,7 +492,6 @@ class FirebaseController {
     required Set<String> collectionIds,
   }) async {
     try {
-      //
       for (final book in books) {
         await _firebaseService.addBookToSeries(
           bookId: book.id,
@@ -674,7 +673,7 @@ class FirebaseController {
 
   /// Remove a collection
   Future<void> removeCollection({
-    required BookCollection collection,
+    required AppCollection collection,
     required List<Item> collectionItems,
   }) async {
     try {

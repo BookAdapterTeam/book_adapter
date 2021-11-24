@@ -144,7 +144,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   /// Remove a collection
   ///
   /// Items in the collection are not deleted
-  Future<Failure?> removeBookCollection(BookCollection collection) async {
+  Future<Failure?> removeBookCollection(AppCollection collection) async {
     try {
       final collectionItems = state.getCollectionItems(collection.id);
       // Remove file
@@ -196,7 +196,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     );
   }
 
-  Future<Either<Failure, BookCollection>> addNewCollection(String name) async {
+  Future<Either<Failure, AppCollection>> addNewCollection(String name) async {
     final bool foundCollection = collectionExist(name);
     if (foundCollection) {
       return Left(Failure('Collection Already Exists'));
@@ -297,7 +297,7 @@ enum BookStatus {
 class LibraryViewData {
   final List<Book>? books;
   final List<String>? downloadingBooks;
-  final List<BookCollection>? collections;
+  final List<AppCollection>? collections;
   final List<Series>? series;
   final QueueNotifierData<Book> queueData;
 
@@ -334,7 +334,7 @@ class LibraryViewData {
 
   LibraryViewData copyWith({
     List<Book>? books,
-    List<BookCollection>? collections,
+    List<AppCollection>? collections,
     Set<Item>? selectedItems,
     List<Series>? series,
     UserData? userData,

@@ -33,19 +33,19 @@ class FirebaseService
   // Database ************************************************************************************************
 
   /// Firestore BookCollections reference
-  CollectionReference<BookCollection> get _collectionsRef => _firestore
-      .collection(kBookCollectionsCollectionName)
-      .withConverter<BookCollection>(
+  CollectionReference<AppCollection> get _collectionsRef => _firestore
+      .collection(kCollectionsCollectionName)
+      .withConverter<AppCollection>(
         fromFirestore: (doc, _) {
           final data = doc.data();
           data!.addAll({'id': doc.id});
-          return BookCollection.fromMap(data);
+          return AppCollection.fromMap(data);
         },
         toFirestore: (collection, _) => collection.toMap(),
       );
 
   /// Get book collections stream
-  Stream<QuerySnapshot<BookCollection>> get collectionsStream {
+  Stream<QuerySnapshot<AppCollection>> get collectionsStream {
     return _collectionsRef
         .where('userId', isEqualTo: currentUserUid)
         .snapshots();
@@ -53,9 +53,9 @@ class FirebaseService
 
   /// Get a book collection document from Firestore by its document id
   ///
-  /// Returns the [BookCollection] object if it exists, otherewise returns `null`
-  Future<BookCollection?> getBookCollectionById(String seriesId) async =>
-      (await _collectionsRef.doc(seriesId).get()).data();
+  /// Returns the [AppCollection] object if it exists, otherewise returns `null`
+  Future<AppCollection?> getCollectionById(String collectionId) async =>
+      (await _collectionsRef.doc(collectionId).get()).data();
 
   /// Firestore BookCollections reference
   CollectionReference<Book> get _booksRef =>
@@ -76,8 +76,8 @@ class FirebaseService
   /// Get a book document from Firestore by its document id
   ///
   /// Returns the [Book] object if it exists, otherewise returns `null`
-  Future<Book?> getBookDocumentById(String seriesId) async =>
-      (await _booksRef.doc(seriesId).get()).data();
+  Future<Book?> getBookDocumentById(String bookId) async =>
+      (await _booksRef.doc(bookId).get()).data();
 
   /// Firestore BookCollections reference
   CollectionReference<Series> get _seriesRef =>
@@ -184,7 +184,7 @@ class FirebaseService
   // BookCollections ********************************************************************************************
 
   /// Create a shelf in firestore
-  Future<Either<Failure, BookCollection>> addCollection(
+  Future<Either<Failure, AppCollection>> addCollection(
     String collectionName,
   ) async {
     try {
@@ -194,7 +194,7 @@ class FirebaseService
       }
 
       // Create a shelf with a custom id so that it can easily be referenced later
-      final bookCollection = BookCollection(
+      final bookCollection = AppCollection(
           id: '$userId-$collectionName', name: collectionName, userId: userId);
       await _collectionsRef.doc('$userId-$collectionName').set(bookCollection);
 
