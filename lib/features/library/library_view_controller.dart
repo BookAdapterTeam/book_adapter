@@ -159,7 +159,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   Future<Failure?> deleteBookDownloads() async {
-    final selectedBooks = state.allSelectedBooks;
+    final selectedBooks = state.allSelectedBooksWithBooksInSeries;
 
     try {
       deselectAllItems();
@@ -246,7 +246,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   Future<Failure?> queueDownloadBooks() async {
     try {
       // Check if file exists on server before downloading
-      final selectedBooks = state.allSelectedBooks.toList();
+      final selectedBooks = state.allSelectedBooksWithBooksInSeries.toList();
       deselectAllItems();
       for (final book in selectedBooks) {
         await queueDownloadBook(book);
@@ -418,7 +418,8 @@ class LibraryViewData {
     return items;
   }
 
-  Set<Book> get allSelectedBooks {
+  /// Get the selected book items including the books inside a series
+  Set<Book> get allSelectedBooksWithBooksInSeries {
     final Set<Book> books = {};
     for (final item in selectedItems) {
       if (item is Book) {
