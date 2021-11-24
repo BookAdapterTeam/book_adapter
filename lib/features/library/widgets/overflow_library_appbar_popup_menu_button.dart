@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class OverflowPopupMenuButton extends StatelessWidget {
-  const OverflowPopupMenuButton({
+class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
+  const OverflowLibraryAppBarPopupMenuButton({
     Key? key,
     required this.onRemoveDownloads,
     required this.onDeletePermanently,
