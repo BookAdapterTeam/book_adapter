@@ -95,9 +95,24 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     await _read(firebaseControllerProvider).signOut();
   }
 
-  Future<Either<Failure, void>> mergeIntoSeries([String? name]) async {
-    final firebaseController = _read(firebaseControllerProvider);
+  Future<void> unmergeSeries() async {
+    final selectedSeries = state.selectedSeries;
+    state = state.copyWith(selectedItems: {});
+    for (final series in selectedSeries) {
+      final booksInSeries = state.getSeriesItems(series.id);
+      await _read(firebaseControllerProvider).unmergeSeries(
+        series: series,
+        books: booksInSeries,
+      );
+    }
+  }
 
+  // Pass in Reader because was getting an error after unmerging then merging a series
+  // _AssertionError ('package:riverpod/src/framework/provider_base.dart': Failed assertion: line 645 pos 7: '_debugDidChangeDependency == false': Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt)
+  Future<Either<Failure, void>> mergeIntoSeries(
+    Reader read, [
+    String? name,
+  ]) async {
     // Get the list of all books selected, including books in a series
     final items = state.selectedItems;
 
@@ -119,11 +134,11 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       // Create a new series with the title with the first item in the list
       const defaultImage =
           'https://st4.depositphotos.com/14953852/24787/v/600/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';
-      final series = await firebaseController.addSeries(
+      final series = await read(firebaseControllerProvider).addSeries(
           name: name ?? items.first.title,
           imageUrl: items.first.imageUrl ?? defaultImage);
 
-      await firebaseController.addBooksToSeries(
+      await read(firebaseControllerProvider).addBooksToSeries(
           books: mergeBooks, series: series, collectionIds: collectionIds);
       // TODO: Delete old series items. For now, merging series is disabled
 
@@ -216,9 +231,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     if (foundCollection) {
       return Left(Failure('Collection Already Exists'));
     }
-    final firebaseController = _read(firebaseControllerProvider);
-    await firebaseController.addCollection(name);
-    return await firebaseController.addCollection(name);
+    await _read(firebaseControllerProvider).addCollection(name);
+    return await _read(firebaseControllerProvider).addCollection(name);
   }
 
   bool collectionExist(String name) {
@@ -229,11 +243,11 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   Future<Either<Failure, void>> queueDownloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
-    final firebaseController = _read(firebaseControllerProvider);
 
     try {
       // Check if file exists on server before downloading
-      final bool exists = await firebaseController.fileExists(book.filepath);
+      final bool exists =
+          await _read(firebaseControllerProvider).fileExists(book.filepath);
 
       if (!exists) return Left(Failure('Could not find file on server'));
 
@@ -391,6 +405,15 @@ class LibraryViewData {
     allBooks
         .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return allBooks;
+  }
+
+  List<Book> getSeriesItems(String seriesId) {
+    final List<Book> items =
+        books?.where((book) => book.seriesId == seriesId).toList() ?? [];
+
+    items
+        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    return items;
   }
 
   Set<Book> get allSelectedBooks {
