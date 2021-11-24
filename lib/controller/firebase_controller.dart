@@ -460,6 +460,7 @@ class FirebaseController {
       final newSeries = await addSeries(
         name: name ?? selectedBooks.first.title,
         imageUrl: selectedBooks.first.imageUrl ?? kDefaultImage,
+        collectionIds: collectionIds,
       );
 
       await addBooksToSeries(
@@ -516,13 +517,14 @@ class FirebaseController {
     required String name,
     required String imageUrl,
     String description = '',
-    List<String>? collectionIds,
+    Set<String>? collectionIds,
   }) async {
     try {
       return await _firebaseService.addSeries(
         name,
         imageUrl: imageUrl,
         description: description,
+        collectionIds: collectionIds,
       );
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);

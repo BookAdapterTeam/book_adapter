@@ -124,6 +124,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     // TODO: Get input from user to decide collection
     selectedBooks
         .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    selectedSeries
+        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
 
     try {
       final series = await read(firebaseControllerProvider).mergeToSeries(

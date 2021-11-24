@@ -210,7 +210,7 @@ class FirebaseService
   /// Update a book's collections
   ///
   /// Takes a book and adds the collectionIds to it.
-  /// 
+  ///
   /// If a book does not have any collections, it will move it to the default collection
   ///
   /// Throws [AppException] if it fails.
@@ -241,7 +241,7 @@ class FirebaseService
   /// Add series to collections
   ///
   /// Takes a series and adds the series id to it
-  /// 
+  ///
   /// If a book does not have any collections, it will move it to the default collection
   ///
   /// Throws [AppException] if it fails.
@@ -331,7 +331,11 @@ class FirebaseService
   }) async {
     try {
       await _booksRef.doc(bookId).update(
-          {'seriesId': seriesId, 'collectionIds': collectionIds.toList()});
+        {
+          'seriesId': seriesId,
+          'collectionIds': collectionIds.toList(),
+        },
+      );
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
