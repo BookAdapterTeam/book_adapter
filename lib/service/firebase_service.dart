@@ -342,6 +342,54 @@ class FirebaseService
     }
   }
 
+  /// Delete a book firestore document
+  ///
+  /// path is the firestore path to the document, ie `collection/document/collection/...`
+  Future<void> deleteCollectionDocument(String collectionId) async {
+    try {
+      await deleteDocument('$kCollectionsCollectionName/$collectionId');
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
+  /// Delete a book firestore document
+  ///
+  /// path is the firestore path to the document, ie `collection/document/collection/...`
+  Future<void> deleteBookDocument(String bookId) async {
+    try {
+      await deleteDocument('$kBooksCollectionName/$bookId');
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
+  /// Delete a series firestore document
+  ///
+  /// path is the firestore path to the document, ie `collection/document/collection/...`
+  Future<void> deleteSeriesDocument(String seriesId) async {
+    try {
+      await deleteDocument('$kSeriesCollectionName/$seriesId');
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
   /// Delete a firestore document
   ///
   /// path is the firestore path to the document, ie `collection/document/collection/...`

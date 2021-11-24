@@ -306,4 +306,22 @@ class MockFirebaseService implements FirebaseService {
     // TODO: implement deleteFile
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> deleteBookDocument(String bookId) {
+    // TODO: implement deleteBookDocument
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteCollectionDocument(String collectionId) {
+    // TODO: implement deleteCollectionDocument
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteSeriesDocument(String seriesId) {
+    // TODO: implement deleteSeriesDocument
+    throw UnimplementedError();
+  }
 }

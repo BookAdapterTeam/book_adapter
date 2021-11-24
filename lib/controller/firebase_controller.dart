@@ -571,8 +571,7 @@ class FirebaseController {
         // Delete the book files on firebase storage
         await _deleteFirebaseStorageBookFiles(item.filepath);
         // Delete the book document in firebase
-        await _firebaseService
-            .deleteDocument('$kBooksCollectionName/${item.id}');
+        await _firebaseService.deleteCollectionDocument(item.id);
         deletedBooks.add(item);
       } else if (item is Series) {
         // Delete all books in the series
@@ -580,15 +579,13 @@ class FirebaseController {
         for (final itemInSeries in seriesItems) {
           if (itemInSeries is Book) {
             await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
-            await _firebaseService
-                .deleteDocument('$kBooksCollectionName/${itemInSeries.id}');
+            await _firebaseService.deleteBookDocument(itemInSeries.id);
             deletedBooks.add(itemInSeries);
           }
         }
 
         // Delete the series document in firebase
-        await _firebaseService
-            .deleteDocument('$kSeriesCollectionName/${item.id}');
+        await _firebaseService.deleteSeriesDocument(item.id);
       }
     }
     return deletedBooks;
@@ -619,9 +616,12 @@ class FirebaseController {
     try {
       for (final book in books) {
         await _firebaseService.updateBookSeries(book.id, null);
-        await _firebaseService.updateBookCollections(bookId: book.id, collectionIds: series.collectionIds.toList());
+        await _firebaseService.updateBookCollections(
+          bookId: book.id,
+          collectionIds: series.collectionIds.toList(),
+        );
       }
-      await _firebaseService.deleteDocument('$kSeriesCollectionName/${series.id}');
+      await _firebaseService.deleteSeriesDocument(series.id);
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -655,8 +655,7 @@ class FirebaseController {
           );
         }
       }
-      await _firebaseService
-          .deleteDocument('$kBookCollectionsCollectionName/${collection.id}');
+      await _firebaseService.deleteCollectionDocument(collection.id);
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
