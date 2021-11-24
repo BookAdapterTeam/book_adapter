@@ -134,7 +134,7 @@ class LibraryScrollView extends HookConsumerWidget {
           onMerge: (seriesName) async {
             final res = await ref
                 .read(libraryViewControllerProvider.notifier)
-                .mergeIntoSeries(seriesName);
+                .mergeIntoSeries(ref.read, seriesName);
 
             res.fold(
               (failure) {
@@ -151,14 +151,15 @@ class LibraryScrollView extends HookConsumerWidget {
         ),
         // TODO: Implement unmergeSeries button
         TextButton(
-            onPressed: !data.hasSeries
-                ? null
-                : () async {
-                    await ref
-                        .read(libraryViewControllerProvider.notifier)
-                        .unmergeSeries();
-                  },
-            child: const Text('Unmerge')),
+          onPressed: !data.hasSeries
+              ? null
+              : () async {
+                  await ref
+                      .read(libraryViewControllerProvider.notifier)
+                      .unmergeSeries();
+                },
+          child: const Text('Unmerge'),
+        ),
         DeleteButton(
           onDelete: () async {
             final failure = await ref

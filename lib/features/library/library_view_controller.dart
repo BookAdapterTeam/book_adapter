@@ -32,15 +32,16 @@ final libraryViewControllerProvider =
     userData: userData,
     queueData: queueData,
   );
-  return LibraryViewController(ref.read, data: data);
+  return LibraryViewController(ref.read, ref, data: data);
 });
 
 // State is if the view is loading
 class LibraryViewController extends StateNotifier<LibraryViewData> {
-  LibraryViewController(this._read, {required LibraryViewData data})
+  LibraryViewController(this._read, this._ref, {required LibraryViewData data})
       : super(data);
 
   final Reader _read;
+  final Ref _ref;
   final log = Logger();
 
   Future<void> addBooks() async {
@@ -107,7 +108,12 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     }
   }
 
-  Future<Either<Failure, void>> mergeIntoSeries([String? name]) async {
+  // Pass in Reader because was getting an error after unmerging then merging a series
+  // _AssertionError ('package:riverpod/src/framework/provider_base.dart': Failed assertion: line 645 pos 7: '_debugDidChangeDependency == false': Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt)
+  Future<Either<Failure, void>> mergeIntoSeries(
+    Reader read, [
+    String? name,
+  ]) async {
     // Get the list of all books selected, including books in a series
     final items = state.selectedItems;
 
@@ -129,11 +135,11 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       // Create a new series with the title with the first item in the list
       const defaultImage =
           'https://st4.depositphotos.com/14953852/24787/v/600/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';
-      final series = await _read(firebaseControllerProvider).addSeries(
+      final series = await read(firebaseControllerProvider).addSeries(
           name: name ?? items.first.title,
           imageUrl: items.first.imageUrl ?? defaultImage);
 
-      await _read(firebaseControllerProvider).addBooksToSeries(
+      await read(firebaseControllerProvider).addBooksToSeries(
           books: mergeBooks, series: series, collectionIds: collectionIds);
       // TODO: Delete old series items. For now, merging series is disabled
 
