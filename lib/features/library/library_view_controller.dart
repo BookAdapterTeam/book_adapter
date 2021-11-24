@@ -97,7 +97,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   Future<void> unmergeSeries() async {
     final selectedSeries = state.selectedSeries;
-    state = state.copyWith(selectedItems: {});
+    deselectAllItems();
     for (final series in selectedSeries) {
       final booksInSeries = state.getSeriesItems(series.id);
       await _read(firebaseControllerProvider).unmergeSeries(
@@ -162,7 +162,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     final selectedBooks = state.allSelectedBooks;
 
     try {
-      state = state.copyWith(selectedItems: {});
+      deselectAllItems();
       // Remove file
       await _read(storageControllerProvider)
           .deleteBooks(selectedBooks.toList());
@@ -175,7 +175,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   Future<Failure?> deleteBooksPermanently() async {
     final selectedItems = state.selectedItems;
     try {
-      state = state.copyWith(selectedItems: {});
+      deselectAllItems();
       // Remove books
       await _read(storageControllerProvider).deleteItemsPermanently(
         itemsToDelete: selectedItems.toList(),
@@ -247,7 +247,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     try {
       // Check if file exists on server before downloading
       final selectedBooks = state.allSelectedBooks.toList();
-      state = state.copyWith(selectedItems: {});
+      deselectAllItems();
       for (final book in selectedBooks) {
         await queueDownloadBook(book);
       }
