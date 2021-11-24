@@ -6,7 +6,6 @@ import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
 import 'package:book_adapter/features/library/widgets/add_to_collection_button.dart';
-import 'package:book_adapter/features/library/widgets/delete_button.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
 import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
 import 'package:book_adapter/features/library/widgets/overflow_popup_menu_button.dart';
