@@ -103,7 +103,7 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
                           onPressed: () {
                             Navigator.of(context).pop(true);
                           },
-                          child: const Text('REMOVE'),
+                          child: const Text('DELETE'),
                         ),
                       ],
                     );
