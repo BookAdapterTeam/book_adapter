@@ -52,15 +52,16 @@ class SeriesView extends HookConsumerWidget {
                     animation,
                     item,
                     index,
-                  ) =>
-                      itemBuilder(
-                    context,
-                    animation,
-                    item,
-                    index,
-                    books,
-                    isDownloadedBox,
-                  ),
+                  ) {
+                    return itemBuilder(
+                      context,
+                      animation,
+                      item,
+                      index,
+                      books,
+                      isDownloadedBox,
+                    );
+                  },
                   areItemsTheSame: (oldItem, newItem) {
                     return oldItem.id == newItem.id;
                   },
@@ -75,7 +76,7 @@ class SeriesView extends HookConsumerWidget {
       Book item, int index, List<Book>? books, Box<bool> isDownloadedBox) {
     return ItemListTileWidget(
       item: item,
-      disableSelect: true,
+      disableSelect: false,
       isDownloaded: isDownloadedBox.get(item.filename) ?? false,
     );
   }
