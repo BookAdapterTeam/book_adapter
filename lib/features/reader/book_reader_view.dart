@@ -16,13 +16,16 @@ class BookReaderView extends HookConsumerWidget {
 
   static const routeName = '/book_reader';
 
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
     final Book? book = ref.read(currentBookProvider);
+    //final _key = GlobalKey<ScaffoldState>();
 
     if (book == null) {
-      return const Scaffold(
+      return  const Scaffold(
+       // key: _key,
         body: Center(
           child: Text('Error: No book has been chosen'),
         ),
@@ -37,7 +40,9 @@ class BookReaderView extends HookConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
+      //  key: _key,
+
+        appBar: AppBar(
         leading: const BackButton(),
         title: EpubActualChapter(
           controller: epubReaderController,
@@ -55,13 +60,24 @@ class BookReaderView extends HookConsumerWidget {
         //   ),
         // ],
       ),
-      endDrawer: Drawer(
-        child: EpubReaderTableOfContents(controller: epubReaderController),
-      ),
-      body: EpubView(
+      // endDrawer: Drawer(
+      //   child: EpubReaderTableOfContents(controller: epubReaderController),
+      // ),
+      body: GestureDetector(
+          onTap: () {
+            // _key.currentState!.openEndDrawer();
+
+            showModalBottomSheet(context: context, builder: (ctx) {
+              return EpubReaderTableOfContents(controller: epubReaderController);
+            });
+    },
+          child: EpubView(
         controller: epubReaderController,
         onDocumentLoaded: (document) {
           log.i('isLoaded: $document');
+
+
+         // Scaffold.of(context).openEndDrawer();
         },
         onExternalLinkPressed: (link) async {
           log.i('Attempting to open link: ' + link);
@@ -75,7 +91,8 @@ class BookReaderView extends HookConsumerWidget {
           epubReaderController: epubReaderController,
           read: ref.read,
         ),
-      ),
+
+      ),)
     );
   }
 
