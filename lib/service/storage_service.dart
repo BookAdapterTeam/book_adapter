@@ -322,12 +322,12 @@ class StorageService {
     return file.readAsBytes();
   }
 
-  bool? isBookDownloaded(String bookId) {
-    return _downloadedBooksBox.get(bookId);
+  bool? isBookDownloaded(String filename) {
+    return _downloadedBooksBox.get(filename);
   }
 
-  Future<void> setBookDownloaded(String bookId) async {
-    await _downloadedBooksBox.put(bookId, true);
+  Future<void> setBookDownloaded(String filename) async {
+    await _downloadedBooksBox.put(filename, true);
   }
 
   Future<void> setBookNotDownloaded(String filename) async {

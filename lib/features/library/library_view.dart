@@ -169,13 +169,25 @@ class LibraryScrollView extends HookConsumerWidget {
 
             ToastUtils.error(failure.message);
           },
-          onDeletePermanently:  () async {
+          onDeletePermanently: () async {
             final failure = await ref
                 .read(libraryViewControllerProvider.notifier)
                 .deleteBooksPermanently();
             if (failure == null) return;
 
             ToastUtils.error(failure.message);
+          },
+          onDownload: () async {
+            final failure = await ref
+                .read(libraryViewControllerProvider.notifier)
+                .queueDownloadBooks();
+            if (failure == null) return;
+
+            log.e(failure.message);
+            final SnackBar snackBar = SnackBar(
+              content: Text(failure.message),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
         ),
       ],

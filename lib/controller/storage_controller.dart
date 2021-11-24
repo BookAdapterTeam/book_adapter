@@ -127,10 +127,10 @@ class StorageController {
     }
   }
 
-  Future<bool?> isBookDownloaded(String bookId) async {
-    final isDownloaded = _read(storageServiceProvider).isBookDownloaded(bookId);
+  Future<bool?> isBookDownloaded(String filename) async {
+    final isDownloaded = _read(storageServiceProvider).isBookDownloaded(filename);
     if (isDownloaded == null) {
-      await _read(storageServiceProvider).setBookNotDownloaded(bookId);
+      await _read(storageServiceProvider).setBookNotDownloaded(filename);
     }
     return isDownloaded ?? false;
   }

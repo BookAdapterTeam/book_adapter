@@ -245,17 +245,49 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     // TODO: Fix only able to download one book at a time
 
     try {
+      // TODO: Check that book is not already downloaded
+      final bool isDownloaded = await _read(storageControllerProvider)
+              .isBookDownloaded(book.filename) ??
+          false;
+
+      if (isDownloaded) {
+        return Left(Failure('Book has already been downloaded'));
+      }
+
       // Check if file exists on server before downloading
-      final bool exists =
+      final bool existsInFirebase =
           await _read(firebaseControllerProvider).fileExists(book.filepath);
 
-      if (!exists) return Left(Failure('Could not find file on server'));
+      if (!existsInFirebase) {
+        return Left(Failure('Could not find file on server'));
+      }
 
       _read(userModelProvider.notifier).queueDownload(book);
       return const Right(null);
     } on AppException catch (e) {
       log.e(e.toString());
       return Left(Failure(e.message ?? e.toString()));
+    } on Exception catch (e) {
+      log.e(e.toString());
+      return Left(Failure(e.toString()));
+    }
+  }
+
+  Future<Failure?> queueDownloadBooks() async {
+    try {
+      // Check if file exists on server before downloading
+      final selectedBooks = state.allSelectedBooks.toList();
+      state = state.copyWith(selectedItems: {});
+      for (final book in selectedBooks) {
+        await queueDownloadBook(book);
+      }
+      return null;
+    } on AppException catch (e) {
+      log.e(e.toString());
+      return Failure(e.message ?? e.toString());
+    } on Exception catch (e) {
+      log.e(e.toString());
+      return Failure(e.toString());
     }
   }
 
