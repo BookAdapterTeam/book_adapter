@@ -32,16 +32,15 @@ final libraryViewControllerProvider =
     userData: userData,
     queueData: queueData,
   );
-  return LibraryViewController(ref.read, ref, data: data);
+  return LibraryViewController(ref.read, data: data);
 });
 
 // State is if the view is loading
 class LibraryViewController extends StateNotifier<LibraryViewData> {
-  LibraryViewController(this._read, this._ref, {required LibraryViewData data})
+  LibraryViewController(this._read, {required LibraryViewData data})
       : super(data);
 
   final Reader _read;
-  final Ref _ref;
   final log = Logger();
 
   Future<void> addBooks() async {
