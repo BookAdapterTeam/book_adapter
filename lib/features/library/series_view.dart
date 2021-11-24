@@ -37,7 +37,6 @@ class SeriesView extends HookConsumerWidget {
     // ignore: prefer_const_constructors
     return Scaffold(
       // appBar: AppBar(title: const Text('Series'),),
-      // body: const Center(child: Text('Books here'),),
       // ignore: prefer_const_constructors
       body: ValueListenableBuilder(
           valueListenable: storageController.downloadedBooksValueListenable,
@@ -48,7 +47,13 @@ class SeriesView extends HookConsumerWidget {
                 _SliverBackgroundAppBar(imageUrl: imageUrl, series: series),
                 SliverImplicitlyAnimatedList<Book>(
                   items: books ?? [],
-                  itemBuilder: (context, animation, item, index,) => itemBuilder(
+                  itemBuilder: (
+                    context,
+                    animation,
+                    item,
+                    index,
+                  ) =>
+                      itemBuilder(
                     context,
                     animation,
                     item,
@@ -76,7 +81,7 @@ class SeriesView extends HookConsumerWidget {
   }
 }
 
-class _SliverBackgroundAppBar extends StatelessWidget {
+class _SliverBackgroundAppBar extends ConsumerWidget {
   const _SliverBackgroundAppBar({
     Key? key,
     required this.imageUrl,
@@ -87,7 +92,10 @@ class _SliverBackgroundAppBar extends StatelessWidget {
   final Series series;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final bool isSelecting = ref.watch(libraryViewControllerProvider
+        .select((controller) => controller.isSelecting));
+
     return SliverAppBar(
       expandedHeight: 250,
       stretch: true,
