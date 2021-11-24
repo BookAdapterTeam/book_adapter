@@ -36,7 +36,7 @@ class UpdateManager {
             }).show(context);
       });
     }).catchError((onError) {
-      ToastUtils.error(onError);
+      ToastUtils.error(onError.toString());
     });
   }
 }
