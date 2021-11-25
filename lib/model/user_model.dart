@@ -49,4 +49,10 @@ class UserModel extends StateNotifier<UserData> {
       filename,
     ]);
   }
+
+  void removeDownloadedFilename(String filename) {
+    state = state.copyWith(downloadedFiles: [
+      ...?state.downloadedFiles?..remove(filename),
+    ]);
+  }
 }

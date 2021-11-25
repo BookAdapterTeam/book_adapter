@@ -42,6 +42,7 @@ class StorageController {
   }
 
   List<String> updateDownloadedFiles() {
+    _read(storageServiceProvider).clearDownloadedBooksCache();
     final downloadedFiles = getDownloadedFilenames();
     downloadedFiles.forEach(_read(storageServiceProvider).setBookDownloaded);
     return downloadedFiles;
@@ -63,9 +64,7 @@ class StorageController {
     try {
       final filesPaths =
           _read(storageServiceProvider).listFiles(userId: userId);
-      return filesPaths.map((file) {
-        return file.path.split('/').last;
-      }).toList();
+      return filesPaths.map((file) => file.path.split('/').last).toList();
     } on io.FileSystemException catch (e, st) {
       log.e(e.message, e, st);
       return [];
@@ -83,16 +82,19 @@ class StorageController {
     required List<Item> itemsToDelete,
     required List<Book> allBooks,
   }) async {
+    final String? userId = _read(firebaseControllerProvider).currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
     final deletedBooks =
         await _read(firebaseControllerProvider).deleteItemsPermanently(
       itemsToDelete: itemsToDelete,
       allBooks: allBooks,
     );
+    final downloadedFiles = getDownloadedFilenames();
     await deleteDeletedBookFiles(deletedBooks
         .map((item) => item.filename)
-        .where((filename) =>
-            _read(userModelProvider).downloadedFiles?.contains(filename) ??
-            false)
+        .where((filename) => downloadedFiles.contains(filename))
         .toList());
   }
 
@@ -103,15 +105,12 @@ class StorageController {
       throw AppException('User not logged in');
     }
     final deletedFilenames = <String>[];
-    final firebaseFilesnames =
-        await _read(firebaseControllerProvider).listFilenames();
     for (final filename in filenames) {
-      if (!firebaseFilesnames.contains(filename)) {
-        final fullFilePath = _read(storageServiceProvider)
-            .getPathFromFilename(userId: userId, filename: filename);
-        await io.File(fullFilePath).delete();
-        deletedFilenames.add(filename);
-      }
+      final fullFilePath = _read(storageServiceProvider)
+          .getPathFromFilename(userId: userId, filename: filename);
+      await io.File(fullFilePath).delete();
+      deletedFilenames.add(filename);
+      await _read(storageServiceProvider).setBookNotDownloaded(filename);
     }
     return deletedFilenames;
   }
