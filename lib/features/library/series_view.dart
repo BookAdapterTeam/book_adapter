@@ -1,10 +1,12 @@
 import 'dart:ui';
-
+import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
+import 'package:book_adapter/service/firebase_service.dart';
+import 'package:book_adapter/service/storage_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -16,6 +18,8 @@ class SeriesView extends HookConsumerWidget {
   const SeriesView({Key? key}) : super(key: key);
 
   static const routeName = '/series';
+
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -45,9 +49,9 @@ class SeriesView extends HookConsumerWidget {
             return CustomScrollView(
               controller: scrollController,
               slivers: [
-                _SliverBackgroundAppBar(imageUrl: imageUrl, series: series),
+                _SliverBackgroundAppBar(imageUrl: imageUrl, series: series, books: books!),
                 SliverImplicitlyAnimatedList<Book>(
-                  items: books ?? [],
+                  items: books,
                   itemBuilder: (context, animation, item, index,) => itemBuilder(
                     context,
                     animation,
@@ -81,13 +85,20 @@ class _SliverBackgroundAppBar extends StatelessWidget {
     Key? key,
     required this.imageUrl,
     required this.series,
+    required this.books,
   }) : super(key: key);
 
   final String? imageUrl;
   final Series series;
+  final List<Book> books;
+
 
   @override
   Widget build(BuildContext context) {
+    final FirebaseController _firebaseController = FirebaseController(
+      firebaseService: FirebaseService(),
+      storageService: StorageService(),
+    );
     return SliverAppBar(
       expandedHeight: 250,
       stretch: true,
@@ -129,6 +140,39 @@ class _SliverBackgroundAppBar extends StatelessWidget {
               ),
             )
           : null,
+      actions: [
+        PopupMenuButton(
+          offset: const Offset(0, kToolbarHeight),
+          icon: const Icon(Icons.more_vert),
+          itemBuilder: (context) {
+            return <PopupMenuEntry>[
+              PopupMenuItem(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.merge_type),
+                    SizedBox(
+                      width: 8,
+                    ),
+                    Text('unmerge'),
+                  ],
+                ),
+                onTap: () {
+                  _firebaseController.unmergeSeries(series: series, books: books).then((value) => Navigator.pop(context));
+                },
+              ),
+
+            ];
+          },
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(9.0),
+            ),
+          ),
+        ),
+      ],
     );
   }
+
 }
