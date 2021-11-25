@@ -114,7 +114,7 @@ class _ChooseCollectionsBottomSheetState
             height: 2,
           ),
           // Current collections
-          for (final collection in collectionList ?? <BookCollection>[]) ...[
+          for (final collection in collectionList ?? <AppCollection>[]) ...[
             CheckboxListTile(
               title: Text(collection.name),
               onChanged: (bool? checked) {
