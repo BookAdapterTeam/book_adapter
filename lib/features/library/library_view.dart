@@ -1,29 +1,25 @@
-import 'package:book_adapter/controller/storage_controller.dart';
+// ignore_for_file: prefer_const_constructors
+
 import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/collection_section.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
 import 'package:book_adapter/features/library/widgets/add_to_collection_button.dart';
-import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
 import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
 import 'package:book_adapter/features/library/widgets/overflow_library_appbar_popup_menu_button.dart';
 import 'package:book_adapter/features/library/widgets/profile_button.dart';
+import 'package:book_adapter/features/library/widgets/section_widget.dart';
 import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
-import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:logger/logger.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 /// Displays a list of BookItems.
 class LibraryView extends ConsumerWidget {
@@ -91,7 +87,6 @@ class LibraryScrollView extends HookConsumerWidget {
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
         ref.watch(libraryViewControllerProvider.notifier);
-    final storageController = ref.watch(storageControllerProvider);
     final scrollController = useScrollController();
     final log = Logger();
 
@@ -207,52 +202,85 @@ class LibraryScrollView extends HookConsumerWidget {
       }
     }
 
-    return CustomScrollView(
-      controller: scrollController,
-      slivers: [
-        SliverAnimatedSwitcher(
-          child: appBar,
-          duration: const Duration(milliseconds: 250),
-        ),
+    final sectionList = filteredCollections.map((collection) {
+      return CollectionSection(
+        expanded: true,
+        items: data.getCollectionItems(collection.id),
+        header: collection.name,
+      );
+    }).toList();
 
-        // List of collections
-        SliverExpandableList(
-          builder: SliverExpandableChildDelegate<Item, CollectionSection>(
-          sectionList: [],
-          headerBuilder: (context, sectionIndex, index) =>
-              Text('Header #$sectionIndex'),
-          itemBuilder: (context, sectionIndex, itemIndex, index) {
-            String item = sectionList[sectionIndex].items[itemIndex];
-            return ListTile(
-              leading: CircleAvatar(
-                child: Text("$index"),
-              ),
-              title: Text(item),
-            );
-          }),
-        ),
-      ],
+    return SafeArea(
+      child: CustomScrollView(
+        controller: scrollController,
+        slivers: [
+          SliverAnimatedSwitcher(
+            child: appBar,
+            duration: const Duration(milliseconds: 250),
+          ),
+
+          // List of collections
+          SliverCollectionsList(sectionList: sectionList),
+        ],
+      ),
+    );
+  }
+}
+
+/// Collection List View
+/// 
+/// Collection headers can be expanded and the top header is pinned to the screen
+/// 
+/// The implementation is based on the below examples.
+/// 
+/// https://github.com/tp7309/flutter_sticky_and_expandable_list/blob/master/example/lib/example_custom_section_animation.dart
+/// 
+/// https://github.com/tp7309/flutter_sticky_and_expandable_list/blob/master/example/lib/example_custom_section.dart
+class SliverCollectionsList extends StatefulWidget {
+  const SliverCollectionsList({
+    Key? key,
+    required this.sectionList,
+  }) : super(key: key);
+
+  final List<CollectionSection> sectionList;
+
+  @override
+  State<SliverCollectionsList> createState() => _SliverCollectionsListState();
+}
+
+class _SliverCollectionsListState extends State<SliverCollectionsList> {
+  @override
+  Widget build(BuildContext context) {
+    return SliverExpandableList(
+      builder: SliverExpandableChildDelegate<Item, CollectionSection>(
+        sectionList: widget.sectionList,
+        sectionBuilder: _buildSection,
+        itemBuilder: (context, sectionIndex, itemIndex, index) {
+          final Item item = widget.sectionList[sectionIndex].items[itemIndex];
+          return ListTile(
+            leading: CircleAvatar(
+              child: Text('$index'),
+            ),
+            title: Text(item.title),
+          );
+        },
+      ),
     );
   }
 
-  Widget collectionsBuilder({
-    required AppCollection collection,
-    required ScrollController controller,
-    bool hideHeader = false,
-    required Box<bool> isDownloadedBox,
-  }) {
-    // TODO: replace with sticky_and_expandable_list
-    return StickyHeader(
-      key: ValueKey(collection.id),
-      controller: controller,
-      header: hideHeader
-          ? const SizedBox()
-          : BookCollectionHeader(collection: collection),
-      content: BookCollectionList(
-        key: ValueKey(collection.id + 'BookCollectionList'),
-        collection: collection,
-        isDownloadedBox: isDownloadedBox,
-      ),
+  Widget _buildSection(
+      BuildContext context, ExpandableSectionContainerInfo containerInfo) {
+    return SectionWidget(
+      section: widget.sectionList[containerInfo.sectionIndex],
+      containerInfo: containerInfo,
+      onStateChanged: () {
+        //notify ExpandableListView that expand state has changed.
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          if (mounted) {
+            setState(() {});
+          }
+        });
+      },
     );
   }
 }
@@ -323,79 +351,6 @@ class BookCollectionHeader extends ConsumerWidget {
           collection.name,
           style: const TextStyle(color: Colors.white),
         ),
-      ),
-    );
-  }
-}
-
-class BookCollectionList extends HookConsumerWidget {
-  const BookCollectionList(
-      {Key? key, required this.collection, required this.isDownloadedBox})
-      : super(key: key);
-
-  final AppCollection collection;
-  final Box<bool> isDownloadedBox;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
-
-    // Get the  list of books in the collection. It will not show books in a series, only the series itself
-    final List<Item> items = data.getCollectionItems(collection.id);
-
-    return ImplicitlyAnimatedList<Item>(
-      padding: const EdgeInsets.only(bottom: 16, top: 4, left: 8, right: 8),
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      items: items,
-      areItemsTheSame: (a, b) => a.id == b.id,
-      itemBuilder: booksBuilder,
-      removeItemBuilder: (context, animation, oldItem) =>
-          removeItemBuilder(context, animation, oldItem, data, ref),
-    );
-  }
-
-  Widget removeItemBuilder(
-    BuildContext context,
-    Animation<double> animation,
-    Item oldItem,
-    LibraryViewData data,
-    WidgetRef ref,
-  ) {
-    final isSelected = data.selectedItems.contains(oldItem);
-
-    if (isSelected) {
-      ref.read(libraryViewControllerProvider.notifier).deselectItem(oldItem);
-    }
-
-    return FadeTransition(
-      opacity: animation,
-      key: ValueKey(collection.id + oldItem.id + 'FadeTransition'),
-      child: ItemListTileWidget(
-        key: ValueKey(collection.id + oldItem.id + 'ItemListWidget'),
-        item: oldItem,
-        isDownloaded: oldItem is Book
-            ? isDownloadedBox.get(oldItem.filename) ?? false
-            : null,
-      ),
-    );
-  }
-
-  Widget booksBuilder(
-    BuildContext context,
-    Animation<double> animation,
-    Item item,
-    int index,
-  ) {
-    return SizeFadeTransition(
-      sizeFraction: 0.7,
-      curve: Curves.easeInOut,
-      animation: animation,
-      child: ItemListTileWidget(
-        key: ValueKey(collection.id + item.id + 'ItemListWidget'),
-        item: item,
-        isDownloaded:
-            item is Book ? isDownloadedBox.get(item.filename) ?? false : null,
       ),
     );
   }

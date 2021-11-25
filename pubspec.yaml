@@ -39,7 +39,6 @@ dependencies:
   responsive_builder: ^0.4.1
   shared_preferences: ^2.0.5
   uuid: ^3.0.4
-  sticky_headers: ^0.2.0
   flutter_hooks: ^0.18.0
   sliver_tools: ^0.2.5
   url_launcher: ^6.0.12
