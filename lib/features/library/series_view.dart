@@ -143,6 +143,7 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
                       ],
                     ),
                     onTap: () {
+                      Navigator.pop(context);
                       ref
                           .read(libraryViewControllerProvider.notifier)
                           .unmergeSeries(series);
