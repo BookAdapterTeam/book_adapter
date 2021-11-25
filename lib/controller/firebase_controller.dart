@@ -609,17 +609,16 @@ class FirebaseController {
     final deletedBooks = <Book>[];
     for (final item in itemsToDelete) {
       if (item is Book) {
+        // Delete the book document in firebase
+        await _firebaseService.deleteBookDocument(item.id);
         // Delete the book files on firebase storage
         await _deleteFirebaseStorageBookFiles(item.filepath);
-        // Delete the book document in firebase
-        await _firebaseService.deleteCollectionDocument(item.id);
         deletedBooks.add(item);
       } else if (item is Series) {
         // Delete all books in the series
         final seriesItems = _getSeriesItems(item, allBooks);
         for (final itemInSeries in seriesItems) {
           if (itemInSeries is Book) {
-            await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
             await _firebaseService.deleteBookDocument(itemInSeries.id);
             deletedBooks.add(itemInSeries);
           }
@@ -627,6 +626,12 @@ class FirebaseController {
 
         // Delete the series document in firebase
         await _firebaseService.deleteSeriesDocument(item.id);
+
+        for (final itemInSeries in seriesItems) {
+          if (itemInSeries is Book) {
+            await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
+          }
+        }
       }
     }
     return deletedBooks;
@@ -637,9 +642,17 @@ class FirebaseController {
   }
 
   Future<void> _deleteFirebaseStorageBookFiles(String filepath) async {
-    await _firebaseService.deleteFile(filepath);
-    await _firebaseService
-        .deleteFile(filepath + kFirebaseStorageImageExtension);
+    try {
+      await _firebaseService.deleteFile(filepath);
+    } on FirebaseException catch (error) {
+      if (error.code != 'object-not-found') rethrow;
+    }
+    try {
+      await _firebaseService
+          .deleteFile(filepath + kFirebaseStorageImageExtension);
+    } on FirebaseException catch (error) {
+      if (error.code != 'object-not-found') rethrow;
+    }
   }
 
   /// Unmerge a series

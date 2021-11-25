@@ -114,17 +114,25 @@ mixin FirebaseServiceStorageMixin {
     required Uint8List bytes,
   }) async {
     try {
-      // Check if file exists, exit if it does
-      await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
-      return Left(Failure('File already exists'));
-    } on FirebaseException catch (_) {
-      // File does not exist, continue uploading
-      await _firebaseStorage.ref(firebaseFilePath).putData(
-            bytes,
-            SettableMetadata(contentType: contentType),
-          );
+      // Check if file exists, return url if it does
       final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return Right(url);
+    } on FirebaseException catch (error) {
+      if (error.code != 'unauthorized') rethrow;
+
+      try {
+        // File does not exist, continue uploading
+        final TaskSnapshot taskSnapshot =
+            await _firebaseStorage.ref(firebaseFilePath).putData(
+                  bytes,
+                  SettableMetadata(contentType: contentType),
+                );
+        final url = await taskSnapshot.ref.getDownloadURL();
+        return Right(url);
+      } on FirebaseException catch (e, st) {
+        _log.e(e.message, e, st);
+        rethrow;
+      }
     }
   }
 
@@ -138,19 +146,20 @@ mixin FirebaseServiceStorageMixin {
   }) async {
     try {
       // Check if file exists, exit if it does
-      await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
-      return Left(Failure('File already exists'));
+      final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
+      return Right(url);
     } on FirebaseException catch (_) {
       // File does not exist, continue uploading
-      final UploadTask task = _firebaseStorage.ref(firebaseFilePath).putFile(
-            io.File(localFilePath),
-            SettableMetadata(contentType: contentType),
-          );
+      final TaskSnapshot taskSnapshot =
+          await _firebaseStorage.ref(firebaseFilePath).putFile(
+                io.File(localFilePath),
+                SettableMetadata(contentType: contentType),
+              );
 
       // TODO: Somehow expose this to UI for upload progress
-      /*final TaskSnapshot snapshot = */ await task;
+      // final TaskSnapshot snapshot = await uploadTask;
 
-      final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
+      final url = await taskSnapshot.ref.getDownloadURL();
       return Right(url);
     }
   }
