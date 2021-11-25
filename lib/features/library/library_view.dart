@@ -228,13 +228,13 @@ class LibraryScrollView extends HookConsumerWidget {
 }
 
 /// Collection List View
-/// 
+///
 /// Collection headers can be expanded and the top header is pinned to the screen
-/// 
+///
 /// The implementation is based on the below examples.
-/// 
+///
 /// https://github.com/tp7309/flutter_sticky_and_expandable_list/blob/master/example/lib/example_custom_section_animation.dart
-/// 
+///
 /// https://github.com/tp7309/flutter_sticky_and_expandable_list/blob/master/example/lib/example_custom_section.dart
 class SliverCollectionsList extends StatefulWidget {
   const SliverCollectionsList({
@@ -281,77 +281,6 @@ class _SliverCollectionsListState extends State<SliverCollectionsList> {
           }
         });
       },
-    );
-  }
-}
-
-class BookCollectionHeader extends ConsumerWidget {
-  const BookCollectionHeader({
-    Key? key,
-    required this.collection,
-  }) : super(key: key);
-
-  final AppCollection collection;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return InkWell(
-      onLongPress: () async {
-        final bool? shouldDelete = await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Remove collection'),
-              content: Text(
-                collection.name != 'Default'
-                    ? 'Are you sure you remove the this collection? Items in this collection will not be deleted. After the collection is removed, any items without a collection will be moved to the default collection.'
-                    : 'The default collection cannot be removed.',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: const Text('CANCEL'),
-                ),
-                TextButton(
-                  onPressed: collection.name != 'Default'
-                      ? () => Navigator.of(context).pop(true)
-                      : null,
-                  child: Text(
-                    'REMOVE',
-                    style: DefaultTextStyle.of(context).style.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: collection.name != 'Default'
-                              ? Colors.redAccent
-                              : Theme.of(context).disabledColor,
-                        ),
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-        if (shouldDelete == null || !shouldDelete) return;
-
-        final failure = await ref
-            .read(libraryViewControllerProvider.notifier)
-            .removeBookCollection(collection);
-
-        if (failure == null) return;
-
-        ToastUtils.error(failure.message);
-      },
-      child: Container(
-        height: 50.0,
-        color: Colors.blueGrey[700],
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        alignment: Alignment.centerLeft,
-        child: Text(
-          collection.name,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ),
     );
   }
 }
