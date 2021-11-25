@@ -668,6 +668,7 @@ class FirebaseController {
     required List<Book> books,
   }) async {
     try {
+      await _firebaseService.deleteSeriesDocument(series.id);
       for (final book in books) {
         await _firebaseService.updateBookSeries(book.id, null);
         await _firebaseService.updateBookCollections(
@@ -675,7 +676,6 @@ class FirebaseController {
           collectionIds: series.collectionIds.toList(),
         );
       }
-      await _firebaseService.deleteSeriesDocument(series.id);
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
