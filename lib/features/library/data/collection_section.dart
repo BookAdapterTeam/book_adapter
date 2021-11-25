@@ -6,14 +6,17 @@ import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 ///Section model must implements ExpandableListSection<T>, each section has
 ///expand state, sublist. "T" is the model of each item in the sublist.
 class CollectionSection implements ExpandableListSection<Item> {
+
+  CollectionSection({required this.expanded, required this.items, required this.header});
+
   //store expand state.
-  late bool expanded;
+  bool expanded;
 
   // Return item model list.
-  late List<Item> items;
+  List<Item> items;
 
   // Header text, optional
-  late String header;
+  String header;
 
   @override
   List<Item> getItems() {
