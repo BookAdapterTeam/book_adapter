@@ -97,7 +97,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   Future<void> unmergeSeries() async {
     final selectedSeries = state.selectedSeries;
-    state = state.copyWith(selectedItems: {});
+    deselectAllItems();
     for (final series in selectedSeries) {
       final booksInSeries = state.getSeriesItems(series.id);
       await _read(firebaseControllerProvider).unmergeSeries(
@@ -109,43 +109,31 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   // Pass in Reader because was getting an error after unmerging then merging a series
   // _AssertionError ('package:riverpod/src/framework/provider_base.dart': Failed assertion: line 645 pos 7: '_debugDidChangeDependency == false': Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt)
-  Future<Either<Failure, void>> mergeIntoSeries(
+  Future<Either<Failure, Series>> mergeIntoSeries(
     Reader read, [
     String? name,
   ]) async {
     // Get the list of all books selected, including books in a series
-    final items = state.selectedItems;
+    final selectedBooks = state.allSelectedBooksWithBooksInSeries.toList();
+    final selectedSeries = state.selectedSeries.toList();
+    deselectAllItems();
 
     // final selectedSeries = state.selectedSeries;
 
-    final List<Book> mergeBooks = _convertItemsToBooks(items);
-
     // Put series in collections the book was in
     // TODO: Get input from user to decide collection
-    mergeBooks
+    selectedBooks
         .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
-    final Set<String> collectionIds = {};
-    for (final book in mergeBooks) {
-      collectionIds.addAll(book.collectionIds);
-    }
-    deselectAllItems();
+    selectedSeries
+        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
 
     try {
-      // Create a new series with the title with the first item in the list
-      const defaultImage =
-          'https://st4.depositphotos.com/14953852/24787/v/600/depositphotos_247872612-stock-illustration-no-image-available-icon-vector.jpg';
-      final series = await read(firebaseControllerProvider).addSeries(
-          name: name ?? items.first.title,
-          imageUrl: items.first.imageUrl ?? defaultImage);
-
-      await read(firebaseControllerProvider).addBooksToSeries(
-          books: mergeBooks, series: series, collectionIds: collectionIds);
-      // TODO: Delete old series items. For now, merging series is disabled
-
-      // for (final collectionId in collectionIds) {
-      //   await firebaseController.removeSeries(collectionId);
-      // }
-      return const Right(null);
+      final series = await read(firebaseControllerProvider).mergeToSeries(
+        selectedBooks: selectedBooks,
+        selectedSeries: selectedSeries,
+        name: name,
+      );
+      return Right(series);
     } on AppException catch (e, st) {
       log.e('${e.message ?? e.toString()} ${e.code}', e, st);
       return Left(Failure(e.message ?? e.toString()));
@@ -155,26 +143,10 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     }
   }
 
-  List<Book> _convertItemsToBooks(Set<Item> items) {
-    final List<Book> mergeBooks = [];
-    for (final item in items) {
-      if (item is Book) {
-        mergeBooks.add(item);
-      } else if (item is Series) {
-        final books = state.books;
-        if (books == null) break;
-
-        mergeBooks
-            .addAll(books.where((book) => book.seriesId == item.id).toList());
-      }
-    }
-    return mergeBooks;
-  }
-
   /// Remove a collection
   ///
   /// Items in the collection are not deleted
-  Future<Failure?> removeBookCollection(BookCollection collection) async {
+  Future<Failure?> removeBookCollection(AppCollection collection) async {
     try {
       final collectionItems = state.getCollectionItems(collection.id);
       // Remove file
@@ -189,10 +161,10 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   Future<Failure?> deleteBookDownloads() async {
-    final selectedBooks = state.allSelectedBooks;
+    final selectedBooks = state.allSelectedBooksWithBooksInSeries;
 
     try {
-      state = state.copyWith(selectedItems: {});
+      deselectAllItems();
       // Remove file
       await _read(storageControllerProvider)
           .deleteBooks(selectedBooks.toList());
@@ -205,7 +177,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   Future<Failure?> deleteBooksPermanently() async {
     final selectedItems = state.selectedItems;
     try {
-      state = state.copyWith(selectedItems: {});
+      deselectAllItems();
       // Remove books
       await _read(storageControllerProvider).deleteItemsPermanently(
         itemsToDelete: selectedItems.toList(),
@@ -226,7 +198,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     );
   }
 
-  Future<Either<Failure, BookCollection>> addNewCollection(String name) async {
+  Future<Either<Failure, AppCollection>> addNewCollection(String name) async {
     final bool foundCollection = collectionExist(name);
     if (foundCollection) {
       return Left(Failure('Collection Already Exists'));
@@ -276,8 +248,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   Future<Failure?> queueDownloadBooks() async {
     try {
       // Check if file exists on server before downloading
-      final selectedBooks = state.allSelectedBooks.toList();
-      state = state.copyWith(selectedItems: {});
+      final selectedBooks = state.allSelectedBooksWithBooksInSeries.toList();
+      deselectAllItems();
       for (final book in selectedBooks) {
         await queueDownloadBook(book);
       }
@@ -327,7 +299,7 @@ enum BookStatus {
 class LibraryViewData {
   final List<Book>? books;
   final List<String>? downloadingBooks;
-  final List<BookCollection>? collections;
+  final List<AppCollection>? collections;
   final List<Series>? series;
   final QueueNotifierData<Book> queueData;
 
@@ -364,7 +336,7 @@ class LibraryViewData {
 
   LibraryViewData copyWith({
     List<Book>? books,
-    List<BookCollection>? collections,
+    List<AppCollection>? collections,
     Set<Item>? selectedItems,
     List<Series>? series,
     UserData? userData,
@@ -448,7 +420,8 @@ class LibraryViewData {
     return items;
   }
 
-  Set<Book> get allSelectedBooks {
+  /// Get the selected book items including the books inside a series
+  Set<Book> get allSelectedBooksWithBooksInSeries {
     final Set<Book> books = {};
     for (final item in selectedItems) {
       if (item is Book) {

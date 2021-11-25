@@ -128,10 +128,9 @@ class LibraryScrollView extends HookConsumerWidget {
           },
         ),
 
-        // TODO: Button is disabled a series is selected until remove series cloud function is implemented, delete old series
         // Disable button until more than one book selected so that the user does not create series with only one book in it
         MergeIntoSeriesButton(
-          isDisabled: data.hasSeries || data.selectedItems.length <= 1,
+          isDisabled: data.selectedItems.length <= 1,
           onMerge: (seriesName) async {
             final res = await ref
                 .read(libraryViewControllerProvider.notifier)
@@ -199,7 +198,7 @@ class LibraryScrollView extends HookConsumerWidget {
     final collections = (data.collections ?? [])
       ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
 
-    final List<BookCollection> filteredCollections = [];
+    final List<AppCollection> filteredCollections = [];
     for (final col in collections) {
       if (data.getCollectionItems(col.id).isNotEmpty) {
         filteredCollections.add(col);
@@ -215,7 +214,7 @@ class LibraryScrollView extends HookConsumerWidget {
         ),
 
         // List of collections
-        SliverImplicitlyAnimatedList<BookCollection>(
+        SliverImplicitlyAnimatedList<AppCollection>(
           items: filteredCollections,
           areItemsTheSame: (a, b) => a.id == b.id,
           removeItemBuilder: (_, animation, oldCollection) {
@@ -255,7 +254,7 @@ class LibraryScrollView extends HookConsumerWidget {
   }
 
   Widget collectionsBuilder({
-    required BookCollection collection,
+    required AppCollection collection,
     required ScrollController controller,
     bool hideHeader = false,
     required Box<bool> isDownloadedBox,
@@ -282,7 +281,7 @@ class BookCollectionHeader extends ConsumerWidget {
     required this.collection,
   }) : super(key: key);
 
-  final BookCollection collection;
+  final AppCollection collection;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -352,7 +351,7 @@ class BookCollectionList extends HookConsumerWidget {
       {Key? key, required this.collection, required this.isDownloadedBox})
       : super(key: key);
 
-  final BookCollection collection;
+  final AppCollection collection;
   final Box<bool> isDownloadedBox;
 
   @override

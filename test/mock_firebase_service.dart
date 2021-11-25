@@ -129,7 +129,7 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, BookCollection>> addCollection(String shelfName) {
+  Future<Either<Failure, AppCollection>> addCollection(String shelfName) {
     // TODO: implement addShelf
     throw UnimplementedError();
   }
@@ -187,7 +187,7 @@ class MockFirebaseService implements FirebaseService {
 
   @override
   // TODO: implement collectionsStream
-  Stream<QuerySnapshot<BookCollection>> get collectionsStream =>
+  Stream<QuerySnapshot<AppCollection>> get collectionsStream =>
       throw UnimplementedError();
 
   @override
@@ -264,7 +264,7 @@ class MockFirebaseService implements FirebaseService {
   String? get currentUserUid => 'dhsaolidjfolasijfsa';
 
   @override
-  Future<BookCollection?> getBookCollectionById(String seriesId) {
+  Future<AppCollection?> getCollectionById(String seriesId) {
     // TODO: implement getBookCollectionById
     throw UnimplementedError();
   }
@@ -304,6 +304,24 @@ class MockFirebaseService implements FirebaseService {
   @override
   Future<void> deleteFile(String firebaseFilePath) {
     // TODO: implement deleteFile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteBookDocument(String bookId) {
+    // TODO: implement deleteBookDocument
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteCollectionDocument(String collectionId) {
+    // TODO: implement deleteCollectionDocument
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<void> deleteSeriesDocument(String seriesId) {
+    // TODO: implement deleteSeriesDocument
     throw UnimplementedError();
   }
 }
