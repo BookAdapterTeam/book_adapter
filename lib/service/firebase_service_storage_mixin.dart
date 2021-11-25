@@ -117,8 +117,11 @@ mixin FirebaseServiceStorageMixin {
       // Check if file exists, return url if it does
       final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return Right(url);
-    } on FirebaseException catch (error) {
-      if (error.code != 'unauthorized') rethrow;
+    } on FirebaseException catch (e, st) {
+      if (e.code != 'unauthorized') {
+        _log.e('${e.code} + ${e.message ?? ''}', e, st);
+        rethrow;
+      }
 
       try {
         // File does not exist, continue uploading
@@ -130,7 +133,7 @@ mixin FirebaseServiceStorageMixin {
         final url = await taskSnapshot.ref.getDownloadURL();
         return Right(url);
       } on FirebaseException catch (e, st) {
-        _log.e(e.message, e, st);
+        _log.e('${e.code} + ${e.message ?? ''}', e, st);
         rethrow;
       }
     }
@@ -148,19 +151,29 @@ mixin FirebaseServiceStorageMixin {
       // Check if file exists, exit if it does
       final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return Right(url);
-    } on FirebaseException catch (_) {
+    } on FirebaseException catch (e, st) {
+      if (e.code != 'unauthorized') {
+        _log.e('${e.code} + ${e.message ?? ''}', e, st);
+        rethrow;
+      }
+
       // File does not exist, continue uploading
-      final TaskSnapshot taskSnapshot =
-          await _firebaseStorage.ref(firebaseFilePath).putFile(
-                io.File(localFilePath),
-                SettableMetadata(contentType: contentType),
-              );
+      try {
+        final TaskSnapshot taskSnapshot =
+            await _firebaseStorage.ref(firebaseFilePath).putFile(
+                  io.File(localFilePath),
+                  SettableMetadata(contentType: contentType),
+                );
 
-      // TODO: Somehow expose this to UI for upload progress
-      // final TaskSnapshot snapshot = await uploadTask;
+        // TODO: Somehow expose this to UI for upload progress
+        // final TaskSnapshot snapshot = await uploadTask;
 
-      final url = await taskSnapshot.ref.getDownloadURL();
-      return Right(url);
+        final url = await taskSnapshot.ref.getDownloadURL();
+        return Right(url);
+      } on FirebaseException catch (e, st) {
+        _log.e('${e.code} + ${e.message ?? ''}', e, st);
+        rethrow;
+      }
     }
   }
 
@@ -188,8 +201,12 @@ mixin FirebaseServiceStorageMixin {
     try {
       await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return true;
-    } on FirebaseException catch (e, _) {
-      return false;
+    } on FirebaseException catch (e, st) {
+      if (e.code == 'unauthorized') {
+        _log.e(e.message, e, st);
+        return false;
+      }
+      rethrow;
     }
   }
 

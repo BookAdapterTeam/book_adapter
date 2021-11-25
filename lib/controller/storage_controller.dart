@@ -36,19 +36,26 @@ class StorageController {
         .downloadFile(book.filepath, '$appBookAdaptPath/${book.filepath}');
     // ignore: unawaited_futures
     task.whenComplete(() async {
-      await _read(storageServiceProvider).setBookDownloaded(book.filename);
+      await _read(storageServiceProvider).setFileDownloaded(book.filename);
       await whenDone(book.filename);
     });
   }
 
-  List<String> updateDownloadedFiles() {
-    final downloadedFiles = getDownloadedFilenames();
-    downloadedFiles.forEach(_read(storageServiceProvider).setBookDownloaded);
-    return downloadedFiles;
+  Future<void> setFileDownloaded(String filename) async {
+    await _read(storageServiceProvider).setFileDownloaded(filename);
+    _read(userModelProvider.notifier).addDownloadedFilename(filename);
   }
 
-  Future<void> markDownloadedBook(String bookId) async {
-    await _read(storageServiceProvider).setBookDownloaded(bookId);
+  Future<void> setFileNotDownloaded(String filename) async {
+    await _read(storageServiceProvider).setFileNotDownloaded(filename);
+    _read(userModelProvider.notifier).removeDownloadedFilename(filename);
+  }
+
+  List<String> updateDownloadedFiles() {
+    _read(storageServiceProvider).clearDownloadedBooksCache();
+    final downloadedFiles = getDownloadedFilenames();
+    downloadedFiles.forEach(_read(storageServiceProvider).setFileDownloaded);
+    return downloadedFiles;
   }
 
   /// Get the list of files on downloaded to the device
@@ -63,9 +70,7 @@ class StorageController {
     try {
       final filesPaths =
           _read(storageServiceProvider).listFiles(userId: userId);
-      return filesPaths.map((file) {
-        return file.path.split('/').last;
-      }).toList();
+      return filesPaths.map((file) => file.path.split('/').last).toList();
     } on io.FileSystemException catch (e, st) {
       log.e(e.message, e, st);
       return [];
@@ -83,34 +88,34 @@ class StorageController {
     required List<Item> itemsToDelete,
     required List<Book> allBooks,
   }) async {
+    final String? userId = _read(firebaseControllerProvider).currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
     final deletedBooks =
         await _read(firebaseControllerProvider).deleteItemsPermanently(
       itemsToDelete: itemsToDelete,
       allBooks: allBooks,
     );
-    await deleteDeletedBookFiles(deletedBooks
-        .map((item) => item.filename)
-        .where((filename) =>
-            _read(userModelProvider).downloadedFiles?.contains(filename) ??
-            false)
-        .toList());
+    await deleteFiles(deletedBooks.map((item) => item.filename).toList());
   }
 
   // Delete downloaded books files from device if they are removed from Firebase Storage
-  Future<List<String>> deleteDeletedBookFiles(List<String> filenames) async {
+  Future<List<String>> deleteFiles(List<String> filenames) async {
     final String? userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
     }
     final deletedFilenames = <String>[];
-    final firebaseFilesnames =
-        await _read(firebaseControllerProvider).listFilenames();
     for (final filename in filenames) {
-      if (!firebaseFilesnames.contains(filename)) {
-        final fullFilePath = _read(storageServiceProvider)
-            .getPathFromFilename(userId: userId, filename: filename);
+      final fullFilePath = _read(storageServiceProvider)
+          .getPathFromFilename(userId: userId, filename: filename);
+      final exists =
+          await _read(storageServiceProvider).fileExists(fullFilePath);
+      if (exists) {
         await io.File(fullFilePath).delete();
         deletedFilenames.add(filename);
+        await setFileNotDownloaded(filename);
       }
     }
     return deletedFilenames;
@@ -123,20 +128,11 @@ class StorageController {
     return await _read(storageServiceProvider).getFileInMemory(bookPath);
   }
 
-  Future<void> deleteBooks(List<Book> books) async {
-    for (final book in books) {
-      final bookPath =
-          _read(storageServiceProvider).getAppFilePath(book.filepath);
-      await _read(storageServiceProvider).deleteFile(bookPath);
-      await _read(storageServiceProvider).setBookNotDownloaded(book.filename);
-    }
-  }
-
   Future<bool?> isBookDownloaded(String filename) async {
     final isDownloaded =
         _read(storageServiceProvider).isBookDownloaded(filename);
     if (isDownloaded == null) {
-      await _read(storageServiceProvider).setBookNotDownloaded(filename);
+      await _read(storageServiceProvider).setFileNotDownloaded(filename);
     }
     return isDownloaded ?? false;
   }

@@ -378,8 +378,8 @@ class FirebaseController {
       );
       if (firestoreRes.isLeft()) {
         return firestoreRes.fold(
-          (failure) => Left(
-              Failure('Could not add book to Firestore: ${failure.message}')),
+          (failure) => Left(Failure(
+              'Could not add book ${book.filename} to Firestore: ${failure.message}')),
           (right) => Left(Failure('')), // Wont ever be returned
         );
       }

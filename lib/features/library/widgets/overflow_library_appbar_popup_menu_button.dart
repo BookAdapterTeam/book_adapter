@@ -47,39 +47,7 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
                 Text('Remove Downloads'),
               ],
             ),
-            onTap: () async {
-              // Weird work around
-              // See here for details: https://stackoverflow.com/questions/69568862/flutter-showdialog-is-not-shown-on-popupmenuitem-tap
-              final bool? shouldDelete = await Future<bool?>.delayed(
-                const Duration(),
-                () => showDialog<bool>(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Remove Downloads'),
-                      content: const Text(
-                          'Are you sure you remove the downloads of all selected books?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(false);
-                          },
-                          child: const Text('CANCEL'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                          },
-                          child: const Text('REMOVE'),
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              );
-              if (shouldDelete == null || !shouldDelete) return;
-              onRemoveDownloads.call();
-            },
+            onTap: onRemoveDownloads,
           ),
           PopupMenuItem(
             child: Row(
