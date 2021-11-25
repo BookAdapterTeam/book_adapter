@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
@@ -9,8 +8,6 @@ import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/item_list_tile_widget.dart';
 import 'package:book_adapter/features/library/widgets/overflow_library_appbar_popup_menu_button.dart';
-import 'package:book_adapter/service/firebase_service.dart';
-import 'package:book_adapter/service/storage_service.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -112,11 +109,6 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
     final int numberSelected = ref.watch(libraryViewControllerProvider
         .select((controller) => controller.numberSelected));
     final log = Logger();
-
-    final FirebaseController _firebaseController = FirebaseController(
-      firebaseService: FirebaseService(),
-      storageService: StorageService(),
-    );
 
     return SliverStack(
       children: [
