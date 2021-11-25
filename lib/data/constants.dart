@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// 'BookAdapter-downloadedBooks'
-const kDownloadedBooksHiveBox = 'BookAdapter-downloadedBooks';
+const kDownloadedFilesHiveBox = 'BookAdapter-downloadedFiles';
 
 /// 'books'
 const kBooksCollectionName = 'books';

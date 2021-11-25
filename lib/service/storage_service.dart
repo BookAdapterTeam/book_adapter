@@ -55,7 +55,7 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
-      _downloadedFilesBox = await Hive.openBox(kDownloadedBooksHiveBox);
+      _downloadedFilesBox = await Hive.openBox(kDownloadedFilesHiveBox);
       await clearDownloadedBooksCache();
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
