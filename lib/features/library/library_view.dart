@@ -3,6 +3,7 @@ import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
+import 'package:book_adapter/features/library/data/collection_section.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_book_button.dart';
@@ -21,6 +22,7 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:logger/logger.dart';
 import 'package:sliver_tools/sliver_tools.dart';
+import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 import 'package:sticky_headers/sticky_headers.dart';
 
 /// Displays a list of BookItems.
@@ -214,40 +216,20 @@ class LibraryScrollView extends HookConsumerWidget {
         ),
 
         // List of collections
-        SliverImplicitlyAnimatedList<AppCollection>(
-          items: filteredCollections,
-          areItemsTheSame: (a, b) => a.id == b.id,
-          removeItemBuilder: (_, animation, oldCollection) {
-            return FadeTransition(
-              opacity: animation,
-              key: ValueKey(oldCollection.id + 'FadeTransition'),
-              child: ValueListenableBuilder(
-                valueListenable:
-                    storageController.downloadedBooksValueListenable,
-                builder: (_, Box<bool> isDownloadedBox, __) {
-                  return collectionsBuilder(
-                    collection: oldCollection,
-                    controller: scrollController,
-                    hideHeader: filteredCollections.length <= 1,
-                    isDownloadedBox: isDownloadedBox,
-                  );
-                },
+        SliverExpandableList(
+          builder: SliverExpandableChildDelegate<Item, CollectionSection>(
+          sectionList: [],
+          headerBuilder: (context, sectionIndex, index) =>
+              Text('Header #$sectionIndex'),
+          itemBuilder: (context, sectionIndex, itemIndex, index) {
+            String item = sectionList[sectionIndex].items[itemIndex];
+            return ListTile(
+              leading: CircleAvatar(
+                child: Text("$index"),
               ),
+              title: Text(item),
             );
-          },
-          itemBuilder: (_, __, collection, ___) {
-            return ValueListenableBuilder(
-              valueListenable: storageController.downloadedBooksValueListenable,
-              builder: (_, Box<bool> isDownloadedBox, __) {
-                return collectionsBuilder(
-                  collection: collection,
-                  controller: scrollController,
-                  hideHeader: filteredCollections.length <= 1,
-                  isDownloadedBox: isDownloadedBox,
-                );
-              },
-            );
-          },
+          }),
         ),
       ],
     );
