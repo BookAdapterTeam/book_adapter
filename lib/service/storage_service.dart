@@ -24,7 +24,7 @@ final updateDownloadedFilesProvider = FutureProvider<void>((ref) async {
   final storageController = ref.read(storageControllerProvider);
   final downloadedFiles = storageController.updateDownloadedFiles();
   // ignore: unawaited_futures
-  storageController.deleteDeletedBookFiles(downloadedFiles);
+  storageController.deleteFiles(downloadedFiles);
 });
 
 /// Provider to easily get access to the [FirebaseService] functions

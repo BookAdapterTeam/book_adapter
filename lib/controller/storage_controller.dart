@@ -97,15 +97,11 @@ class StorageController {
       itemsToDelete: itemsToDelete,
       allBooks: allBooks,
     );
-    final downloadedFiles = getDownloadedFilenames();
-    await deleteDeletedBookFiles(deletedBooks
-        .map((item) => item.filename)
-        .where((filename) => downloadedFiles.contains(filename))
-        .toList());
+    await deleteFiles(deletedBooks.map((item) => item.filename).toList());
   }
 
   // Delete downloaded books files from device if they are removed from Firebase Storage
-  Future<List<String>> deleteDeletedBookFiles(List<String> filenames) async {
+  Future<List<String>> deleteFiles(List<String> filenames) async {
     final String? userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
@@ -114,9 +110,13 @@ class StorageController {
     for (final filename in filenames) {
       final fullFilePath = _read(storageServiceProvider)
           .getPathFromFilename(userId: userId, filename: filename);
-      await io.File(fullFilePath).delete();
-      deletedFilenames.add(filename);
-      await setFileNotDownloaded(filename);
+      final exists =
+          await _read(storageServiceProvider).fileExists(fullFilePath);
+      if (exists) {
+        await io.File(fullFilePath).delete();
+        deletedFilenames.add(filename);
+        await setFileNotDownloaded(filename);
+      }
     }
     return deletedFilenames;
   }
@@ -126,15 +126,6 @@ class StorageController {
         _read(storageServiceProvider).getAppFilePath(book.filepath);
 
     return await _read(storageServiceProvider).getFileInMemory(bookPath);
-  }
-
-  Future<void> deleteBooks(List<Book> books) async {
-    for (final book in books) {
-      final bookPath =
-          _read(storageServiceProvider).getAppFilePath(book.filepath);
-      await _read(storageServiceProvider).deleteFile(bookPath);
-      await _read(storageServiceProvider).setFileNotDownloaded(book.filename);
-    }
   }
 
   Future<bool?> isBookDownloaded(String filename) async {

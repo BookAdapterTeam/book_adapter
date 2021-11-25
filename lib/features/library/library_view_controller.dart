@@ -167,7 +167,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       deselectAllItems();
       // Remove file
       await _read(storageControllerProvider)
-          .deleteBooks(selectedBooks.toList());
+          .deleteFiles(selectedBooks.map((book) => book.filename).toList());
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
