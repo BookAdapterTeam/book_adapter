@@ -95,10 +95,25 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     await _read(firebaseControllerProvider).signOut();
   }
 
-  Future<void> unmergeSeries() async {
-    final selectedSeries = state.selectedSeries;
-    deselectAllItems();
-    for (final series in selectedSeries) {
+  /// Unmerge series
+  ///
+  /// Use optional `series` argument to unmerge the specified series
+  ///
+  /// Ommit `series` to unmerge all selected series
+  Future<void> unmergeSeries([Series? series]) async {
+    if (series == null) {
+      // Unmerge all selected series items
+      final selectedSeries = state.selectedSeries;
+      deselectAllItems();
+      for (final selectedSeries in selectedSeries) {
+        final booksInSeries = state.getSeriesItems(selectedSeries.id);
+        await _read(firebaseControllerProvider).unmergeSeries(
+          series: selectedSeries,
+          books: booksInSeries,
+        );
+      }
+    } else {
+      // Unmerge a specific series
       final booksInSeries = state.getSeriesItems(series.id);
       await _read(firebaseControllerProvider).unmergeSeries(
         series: series,
