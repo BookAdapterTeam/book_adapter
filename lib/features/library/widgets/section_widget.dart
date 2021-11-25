@@ -16,14 +16,14 @@ class SectionWidget extends StatefulWidget {
   final CollectionSection section;
   final ExpandableSectionContainerInfo containerInfo;
   final VoidCallback onStateChanged;
-  final bool isOnlySection;
+  final bool hideHeader;
 
   const SectionWidget({
     Key? key,
     required this.section,
     required this.containerInfo,
     required this.onStateChanged,
-    required this.isOnlySection,
+    required this.hideHeader,
   }) : super(key: key);
 
   @override
@@ -71,7 +71,7 @@ class _SectionWidgetState extends State<SectionWidget>
   }
 
   Widget _buildHeader(BuildContext context) {
-    if (widget.isOnlySection) return Container();
+    if (widget.hideHeader) return Container();
     return Container(
       color: Colors.blueGrey[700],
       child: ListTile(

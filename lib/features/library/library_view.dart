@@ -282,8 +282,8 @@ class _SliverCollectionsListState extends State<SliverCollectionsList> {
         });
       },
       // @getBoolean: Disabled because it would mean the collection can't be collapsed
-      isOnlySection: false,
-      // isOnlySection: widget.sectionList.length == 1,
+      hideHeader: false,
+      // hideHeader: widget.sectionList.length == 1,
     );
   }
 }
