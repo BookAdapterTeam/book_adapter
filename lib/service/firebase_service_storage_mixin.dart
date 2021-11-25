@@ -117,14 +117,21 @@ mixin FirebaseServiceStorageMixin {
       // Check if file exists, exit if it does
       await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return Left(Failure('File already exists'));
-    } on FirebaseException catch (_) {
+    } on FirebaseException catch (error) {
+      if (error.code != '403') rethrow;
+    }
+
+    try {
       // File does not exist, continue uploading
-      await _firebaseStorage.ref(firebaseFilePath).putData(
+      final uploadTask = await _firebaseStorage.ref(firebaseFilePath).putData(
             bytes,
             SettableMetadata(contentType: contentType),
           );
-      final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
+      final url = await uploadTask.ref.getDownloadURL();
       return Right(url);
+    } on FirebaseException catch (e, st) {
+      _log.e(e.message, e, st);
+      rethrow;
     }
   }
 
