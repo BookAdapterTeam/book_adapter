@@ -143,9 +143,9 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
                       ],
                     ),
                     onTap: () {
-                      _firebaseController
-                          .unmergeSeries(series: series, books: books)
-                          .then((value) => Navigator.pop(context));
+                      ref
+                          .read(libraryViewControllerProvider.notifier)
+                          .unmergeSeries(series);
                     },
                   ),
                 ];
