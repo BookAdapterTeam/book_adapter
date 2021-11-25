@@ -42,10 +42,10 @@ class StorageService {
 
   final _log = Logger();
 
-  late final Box<bool> _downloadedBooksBox;
+  late final Box<bool> _downloadedFilesBox;
 
   ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
-      _downloadedBooksBox.listenable();
+      _downloadedFilesBox.listenable();
 
   /// Initilize the class
   ///
@@ -55,7 +55,7 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
-      _downloadedBooksBox = await Hive.openBox(kDownloadedBooksHiveBox);
+      _downloadedFilesBox = await Hive.openBox(kDownloadedBooksHiveBox);
       await clearDownloadedBooksCache();
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
@@ -323,18 +323,18 @@ class StorageService {
   }
 
   bool? isBookDownloaded(String filename) {
-    return _downloadedBooksBox.get(filename);
+    return _downloadedFilesBox.get(filename);
   }
 
-  Future<void> setBookDownloaded(String filename) async {
-    await _downloadedBooksBox.put(filename, true);
+  Future<void> setFileDownloaded(String filename) async {
+    await _downloadedFilesBox.put(filename, true);
   }
 
-  Future<void> setBookNotDownloaded(String filename) async {
-    await _downloadedBooksBox.put(filename, false);
+  Future<void> setFileNotDownloaded(String filename) async {
+    await _downloadedFilesBox.put(filename, false);
   }
 
   Future<void> clearDownloadedBooksCache() async {
-    await _downloadedBooksBox.clear();
+    await _downloadedFilesBox.clear();
   }
 }

@@ -18,7 +18,9 @@ final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
     data: data,
     processItem: (book) => storageController.downloadFile(
       book,
-      whenDone: (filename) => ref.read(userModelProvider.notifier).addDownloadedFilename(filename),
+      whenDone: (filename) {
+        ref.read(storageControllerProvider).setFileDownloaded(filename);
+      },
     ),
   );
 });

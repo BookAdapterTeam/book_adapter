@@ -36,20 +36,26 @@ class StorageController {
         .downloadFile(book.filepath, '$appBookAdaptPath/${book.filepath}');
     // ignore: unawaited_futures
     task.whenComplete(() async {
-      await _read(storageServiceProvider).setBookDownloaded(book.filename);
+      await _read(storageServiceProvider).setFileDownloaded(book.filename);
       await whenDone(book.filename);
     });
+  }
+
+  Future<void> setFileDownloaded(String filename) async {
+    await _read(storageServiceProvider).setFileDownloaded(filename);
+    _read(userModelProvider.notifier).addDownloadedFilename(filename);
+  }
+
+  Future<void> setFileNotDownloaded(String filename) async {
+    await _read(storageServiceProvider).setFileNotDownloaded(filename);
+    _read(userModelProvider.notifier).removeDownloadedFilename(filename);
   }
 
   List<String> updateDownloadedFiles() {
     _read(storageServiceProvider).clearDownloadedBooksCache();
     final downloadedFiles = getDownloadedFilenames();
-    downloadedFiles.forEach(_read(storageServiceProvider).setBookDownloaded);
+    downloadedFiles.forEach(_read(storageServiceProvider).setFileDownloaded);
     return downloadedFiles;
-  }
-
-  Future<void> markDownloadedBook(String bookId) async {
-    await _read(storageServiceProvider).setBookDownloaded(bookId);
   }
 
   /// Get the list of files on downloaded to the device
@@ -110,7 +116,7 @@ class StorageController {
           .getPathFromFilename(userId: userId, filename: filename);
       await io.File(fullFilePath).delete();
       deletedFilenames.add(filename);
-      await _read(storageServiceProvider).setBookNotDownloaded(filename);
+      await setFileNotDownloaded(filename);
     }
     return deletedFilenames;
   }
@@ -127,7 +133,7 @@ class StorageController {
       final bookPath =
           _read(storageServiceProvider).getAppFilePath(book.filepath);
       await _read(storageServiceProvider).deleteFile(bookPath);
-      await _read(storageServiceProvider).setBookNotDownloaded(book.filename);
+      await _read(storageServiceProvider).setFileNotDownloaded(book.filename);
     }
   }
 
@@ -135,7 +141,7 @@ class StorageController {
     final isDownloaded =
         _read(storageServiceProvider).isBookDownloaded(filename);
     if (isDownloaded == null) {
-      await _read(storageServiceProvider).setBookNotDownloaded(filename);
+      await _read(storageServiceProvider).setFileNotDownloaded(filename);
     }
     return isDownloaded ?? false;
   }
