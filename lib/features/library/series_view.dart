@@ -51,9 +51,9 @@ class SeriesView extends HookConsumerWidget {
               controller: scrollController,
               slivers: [
                 _SliverBackgroundAppBar(
-                    imageUrl: imageUrl, series: series, books: books!),
+                    imageUrl: imageUrl, series: series),
                 SliverImplicitlyAnimatedList<Book>(
-                  items: books,
+                  items: books ?? [],
                   itemBuilder: (
                     context,
                     animation,
@@ -94,12 +94,10 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
     Key? key,
     required this.imageUrl,
     required this.series,
-    required this.books,
   }) : super(key: key);
 
   final String? imageUrl;
   final Series series;
-  final List<Book> books;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
