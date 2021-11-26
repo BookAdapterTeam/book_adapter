@@ -1,3 +1,4 @@
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:book_adapter/features/library/data/series_item.dart';
@@ -161,7 +162,9 @@ class _ItemListTile extends ConsumerWidget {
           icon = const Icon(Icons.download);
           onPressed = () async {
             try {
-              final res = await ref.read(libraryViewControllerProvider.notifier).queueDownloadBook(book);
+              final res = await ref
+                  .read(libraryViewControllerProvider.notifier)
+                  .queueDownloadBook(book);
               res.fold(
                 (failure) {
                   log.e(failure.message);
@@ -277,7 +280,11 @@ class _CustomListTileWidget extends ConsumerWidget {
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(kCornerRadius),
+        ),
+      ),
       title: Text(
         item.title,
         maxLines: subtitle == null ? 3 : 2,
@@ -296,11 +303,15 @@ class _CustomListTileWidget extends ConsumerWidget {
       },
       onTap: () async {
         if (isSelected) {
-          return ref.read(libraryViewControllerProvider.notifier).deselectItem(item);
+          return ref
+              .read(libraryViewControllerProvider.notifier)
+              .deselectItem(item);
         }
 
         if (data.isSelecting && !disableSelect) {
-          return ref.read(libraryViewControllerProvider.notifier).selectItem(item);
+          return ref
+              .read(libraryViewControllerProvider.notifier)
+              .selectItem(item);
         }
 
         if (item is Series) {
@@ -324,7 +335,9 @@ class _CustomListTileWidget extends ConsumerWidget {
 
         if (item is Book && status == BookStatus.notDownloaded) {
           try {
-            final res = await ref.read(libraryViewControllerProvider.notifier).queueDownloadBook(item as Book);
+            final res = await ref
+                .read(libraryViewControllerProvider.notifier)
+                .queueDownloadBook(item as Book);
             res.fold(
               (failure) {
                 log.e(failure.message);

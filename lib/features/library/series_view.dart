@@ -50,8 +50,7 @@ class SeriesView extends HookConsumerWidget {
             return CustomScrollView(
               controller: scrollController,
               slivers: [
-                _SliverBackgroundAppBar(
-                    imageUrl: imageUrl, series: series),
+                _SliverBackgroundAppBar(imageUrl: imageUrl, series: series),
                 SliverImplicitlyAnimatedList<Book>(
                   items: books ?? [],
                   itemBuilder: (
@@ -143,7 +142,7 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
               },
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
-                  Radius.circular(9.0),
+                  Radius.circular(kCornerRadius),
                 ),
               ),
             ),
