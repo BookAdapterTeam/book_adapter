@@ -1,7 +1,11 @@
 import 'package:book_adapter/controller/storage_controller.dart';
+// ignore: unused_import
+import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/collection_section.dart';
 import 'package:book_adapter/features/library/data/item.dart';
+import 'package:book_adapter/features/library/library_view.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -72,25 +76,87 @@ class _SectionWidgetState extends State<SectionWidget>
 
   Widget _buildHeader(BuildContext context) {
     if (widget.hideHeader) return Container();
-    return Container(
-      color: Colors.blueGrey[700],
-      child: ListTile(
-        title: Text(
-          widget.section.header,
-        ),
-        leading: RotationTransition(
-          turns: _iconTurns as Animation<double>,
-          child: const Icon(
-            Icons.expand_more,
-            color: Colors.white70,
+    return Consumer(builder: (_, ref, __) {
+      return Container(
+        color: Colors.blueGrey[700],
+        child: ListTile(
+          title: Text(
+            widget.section.header,
           ),
+          leading: RotationTransition(
+            turns: _iconTurns as Animation<double>,
+            child: const Icon(
+              Icons.expand_more,
+              color: Colors.white70,
+            ),
+          ),
+          minLeadingWidth: 0,
+          // Add pop up menu with option for removing the collection
+          trailing: PopupMenuButton(
+            offset: const Offset(0, kToolbarHeight),
+            icon: const Icon(Icons.more_vert),
+            itemBuilder: (context) {
+              return <PopupMenuEntry>[
+                PopupMenuItem(
+                  onTap: () async {
+                    final bool? shouldDelete = await Future<bool?>.delayed(
+                      const Duration(),
+                      () => showDialog<bool>(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: const Text('Remove Collection'),
+                            content: const Text(
+                                'Are you sure you want to delete this collection?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop(false);
+                                },
+                                child: const Text('CANCEL'),
+                              ),
+                              TextButton(
+                                onPressed: widget.section.header != 'Default'
+                                    ? () => Navigator.of(context).pop(true)
+                                    : null,
+                                child: Text(
+                                  'REMOVE',
+                                  style: DefaultTextStyle.of(context)
+                                      .style
+                                      .copyWith(
+                                        fontWeight: FontWeight.w500,
+                                        color: widget.section.header !=
+                                                'Default'
+                                            ? Colors.redAccent
+                                            : Theme.of(context).disabledColor,
+                                      ),
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    );
+                    },
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.delete),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text('Delete Collection'),
+                    ],
+                  ),
+                ),
+              ];
+            },
+          ),
+          onTap: _onTap,
         ),
-        minLeadingWidth: 0,
-        // TODO(@Suman1415): Add pop up menu with option for removing the collection
-        // trailing: const Icon(Icons.more_horiz),
-        onTap: _onTap,
-      ),
-    );
+      );
+    });
   }
 
   void _onTap() {
