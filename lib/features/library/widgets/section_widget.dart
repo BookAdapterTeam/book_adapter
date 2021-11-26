@@ -5,7 +5,6 @@ import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/collection_section.dart';
 import 'package:book_adapter/features/library/data/item.dart';
-import 'package:book_adapter/features/library/library_view.dart';
 import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
