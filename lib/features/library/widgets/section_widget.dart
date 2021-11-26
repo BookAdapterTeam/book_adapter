@@ -137,7 +137,22 @@ class _SectionWidgetState extends State<SectionWidget>
                         },
                       ),
                     );
-                    },
+                    if (shouldDelete == null || !shouldDelete) return;
+                     final collection = AppCollection(
+                        id: widget.section
+                            .getItems()[0]
+                            .collectionIds
+                            .toList()[0],
+                        userId: widget.section.getItems()[0].userId,
+                        name: widget.section.header);
+                    final failure = await ref
+                        .read(libraryViewControllerProvider.notifier)
+                        .removeBookCollection(collection);
+
+                    if (failure == null) return;
+
+                    ToastUtils.error(failure.message);
+                  },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
