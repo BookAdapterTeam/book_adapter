@@ -1,3 +1,4 @@
+import 'package:book_adapter/data/constants.dart';
 import 'package:flutter/material.dart';
 
 class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
@@ -17,6 +18,11 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
     return PopupMenuButton(
       offset: const Offset(0, kToolbarHeight),
       icon: const Icon(Icons.more_vert),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(kCornerRadius),
+        ),
+      ),
       itemBuilder: (context) {
         return <PopupMenuEntry>[
           PopupMenuItem(

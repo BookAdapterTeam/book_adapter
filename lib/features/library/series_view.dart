@@ -113,6 +113,40 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
           expandedHeight: 250,
           stretch: true,
           flexibleSpace: imageUrl != null ? _buildFlexibleSpace() : null,
+          actions: [
+            PopupMenuButton(
+              offset: const Offset(0, kToolbarHeight),
+              icon: const Icon(Icons.more_vert),
+              itemBuilder: (context) {
+                return <PopupMenuEntry>[
+                  PopupMenuItem(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Icon(Icons.merge_type),
+                        SizedBox(
+                          width: 8,
+                        ),
+                        Text('unmerge'),
+                      ],
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      ref
+                          .read(libraryViewControllerProvider.notifier)
+                          .unmergeSeries(series);
+                    },
+                  ),
+                ];
+              },
+              shape: const RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(
+                  Radius.circular(kCornerRadius),
+                ),
+              ),
+            ),
+          ],
         ),
         if (isSelecting)
           SliverAppBar(
