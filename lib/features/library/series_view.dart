@@ -128,7 +128,7 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
                         SizedBox(
                           width: 8,
                         ),
-                        Text('unmerge'),
+                        Text('Unmerge'),
                       ],
                     ),
                     onTap: () {
