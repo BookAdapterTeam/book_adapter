@@ -2,7 +2,6 @@ import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/data/constants.dart';
 // ignore: unused_import
 import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:book_adapter/features/library/data/collection_section.dart';
 import 'package:book_adapter/features/library/data/item.dart';
