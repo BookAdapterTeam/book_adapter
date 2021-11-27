@@ -12,9 +12,9 @@ class CollectionSection implements ExpandableListSection<Item> {
     required this.items,
     required this.header,
     required this.collection,
-  })  : _expanded = expanded;
+  }) : _expanded = expanded;
 
-  //store expand state.
+  // Store expanded state.
   bool _expanded;
 
   // Return item model list.
