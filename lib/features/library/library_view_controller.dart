@@ -205,9 +205,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   Future<void> moveItemsToCollections(List<String> collectionIds) async {
-    final firebaseController = _read(firebaseControllerProvider);
     final items = state.selectedItems;
-    await firebaseController.setItemsCollections(
+    await _read(firebaseControllerProvider).setItemsCollections(
       items: items.toList(),
       collectionIds: collectionIds,
     );
