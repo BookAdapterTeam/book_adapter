@@ -153,7 +153,7 @@ class _SectionWidgetState extends State<SectionWidget>
                             SizedBox(
                               width: 8,
                             ),
-                            Text('Delete Collection'),
+                            Text('Remove Collection'),
                           ],
                         ),
                       ),
