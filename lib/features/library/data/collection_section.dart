@@ -8,23 +8,23 @@ import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 ///expand state, sublist. "T" is the model of each item in the sublist.
 class CollectionSection implements ExpandableListSection<Item> {
   CollectionSection({
-    required this.expanded,
+    required bool expanded,
     required this.items,
     required this.header,
     required this.collection,
-  });
+  })  : _expanded = expanded;
 
   //store expand state.
-  bool expanded;
+  bool _expanded;
 
   // Return item model list.
-  List<Item> items;
+  final List<Item> items;
 
   // Header text, optional
-  String header;
+  final String header;
 
-  //collection
-  AppCollection collection;
+  // Collection associated with this section
+  final AppCollection collection;
 
   @override
   List<Item> getItems() {
@@ -33,11 +33,11 @@ class CollectionSection implements ExpandableListSection<Item> {
 
   @override
   bool isSectionExpanded() {
-    return expanded;
+    return _expanded;
   }
 
   @override
   void setSectionExpanded(bool expanded) {
-    this.expanded = expanded;
+    _expanded = expanded;
   }
 }
