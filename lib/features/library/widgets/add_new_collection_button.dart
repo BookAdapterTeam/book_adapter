@@ -14,6 +14,7 @@ class AddNewCollectionButton extends StatelessWidget {
       child: TextButton.icon(
         icon: const Text('ADD'),
         onPressed: () async {
+          Navigator.of(context).pop();
           final collectionName = await showDialog<String>(
               context: context,
               builder: (context) {
