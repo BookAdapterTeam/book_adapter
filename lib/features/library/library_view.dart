@@ -123,6 +123,23 @@ class LibraryScrollView extends HookConsumerWidget {
                 .read(libraryViewControllerProvider.notifier)
                 .moveItemsToCollections(collectionIds);
           },
+          onAddNewCollection: (collectionName) async {
+            final res = await ref
+                .read(libraryViewControllerProvider.notifier)
+                .addNewCollection(collectionName);
+            res.fold(
+              (failure) {
+                log.e(failure.message);
+                ToastUtils.error(failure.message);
+              },
+              (collection) {
+                log.i('Successfully created ${collection.name}');
+                ToastUtils.success(
+                  'Successfully created ${collection.name}',
+                );
+              },
+            );
+          },
         ),
 
         // Disable button until more than one book selected so that the user does not create series with only one book in it
