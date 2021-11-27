@@ -1,3 +1,4 @@
+import 'package:book_adapter/features/library/data/book_collection.dart';
 import 'package:book_adapter/features/library/data/item.dart';
 import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 
@@ -6,8 +7,11 @@ import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 ///Section model must implements ExpandableListSection<T>, each section has
 ///expand state, sublist. "T" is the model of each item in the sublist.
 class CollectionSection implements ExpandableListSection<Item> {
-
-  CollectionSection({required this.expanded, required this.items, required this.header});
+  CollectionSection(
+      {required this.expanded,
+      required this.items,
+      required this.header,
+      required this.collection});
 
   //store expand state.
   bool expanded;
@@ -17,6 +21,9 @@ class CollectionSection implements ExpandableListSection<Item> {
 
   // Header text, optional
   String header;
+
+  //collection
+  AppCollection collection;
 
   @override
   List<Item> getItems() {

@@ -207,6 +207,7 @@ class LibraryScrollView extends HookConsumerWidget {
         expanded: true,
         items: data.getCollectionItems(collection.id),
         header: collection.name,
+        collection: collection,
       );
     }).toList();
 

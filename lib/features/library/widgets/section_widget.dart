@@ -107,7 +107,7 @@ class _SectionWidgetState extends State<SectionWidget>
                           return AlertDialog(
                             title: const Text('Remove Collection'),
                             content: const Text(
-                                'Are you sure you want to delete this collection?'),
+                                'Are you sure you want to remove this collection? Items inside the collection will not be removed'),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -138,13 +138,7 @@ class _SectionWidgetState extends State<SectionWidget>
                       ),
                     );
                     if (shouldDelete == null || !shouldDelete) return;
-                     final collection = AppCollection(
-                        id: widget.section
-                            .getItems()[0]
-                            .collectionIds
-                            .toList()[0],
-                        userId: widget.section.getItems()[0].userId,
-                        name: widget.section.header);
+                    final collection = widget.section.collection;
                     final failure = await ref
                         .read(libraryViewControllerProvider.notifier)
                         .removeBookCollection(collection);
