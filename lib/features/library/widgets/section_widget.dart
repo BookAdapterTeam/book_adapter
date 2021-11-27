@@ -91,77 +91,80 @@ class _SectionWidgetState extends State<SectionWidget>
           ),
           minLeadingWidth: 0,
           // Add pop up menu with option for removing the collection
-          trailing: widget.section.header == 'Default' ? null :PopupMenuButton(
-            offset: const Offset(0, kToolbarHeight),
-            icon: const Icon(Icons.more_vert),
-            itemBuilder: (context) {
-              return <PopupMenuEntry>[
-                PopupMenuItem(
-                  onTap: () async {
-                    final bool? shouldDelete = await Future<bool?>.delayed(
-                      const Duration(),
-                      () => showDialog<bool>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: const Text('Remove Collection'),
-                            content: const Text(
-                                'Are you sure you want to remove this collection? Items inside the collection will not be removed'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop(false);
-                                },
-                                child: const Text('CANCEL'),
-                              ),
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(true),
-                                child: Text(
-                                  'REMOVE',
-                                  style: DefaultTextStyle.of(context)
-                                      .style
-                                      .copyWith(
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.redAccent,
-                                           
+          trailing: widget.section.header == 'Default'
+              ? null
+              : PopupMenuButton(
+                  offset: const Offset(0, kToolbarHeight),
+                  icon: const Icon(Icons.more_vert),
+                  itemBuilder: (context) {
+                    return <PopupMenuEntry>[
+                      PopupMenuItem(
+                        onTap: () async {
+                          final bool? shouldDelete =
+                              await Future<bool?>.delayed(
+                            const Duration(),
+                            () => showDialog<bool>(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: const Text('Remove Collection'),
+                                  content: const Text(
+                                      'Are you sure you want to remove this collection? Items inside the collection will not be removed'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false);
+                                      },
+                                      child: const Text('CANCEL'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: Text(
+                                        'REMOVE',
+                                        style: DefaultTextStyle.of(context)
+                                            .style
+                                            .copyWith(
+                                              fontWeight: FontWeight.w500,
+                                              color: Colors.redAccent,
+                                            ),
                                       ),
-                                ),
-                              ),
-                            ],
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                           );
+                          if (shouldDelete == null || !shouldDelete) return;
+                          final collection = widget.section.collection;
+                          final failure = await ref
+                              .read(libraryViewControllerProvider.notifier)
+                              .removeBookCollection(collection);
+
+                          if (failure == null) return;
+
+                          ToastUtils.error(failure.message);
                         },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(Icons.delete),
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text('Delete Collection'),
+                          ],
+                        ),
                       ),
-                    );
-                    if (shouldDelete == null || !shouldDelete) return;
-                    final collection = widget.section.collection;
-                    final failure = await ref
-                        .read(libraryViewControllerProvider.notifier)
-                        .removeBookCollection(collection);
-
-                    if (failure == null) return;
-
-                    ToastUtils.error(failure.message);
+                    ];
                   },
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Icon(Icons.delete),
-                      SizedBox(
-                        width: 8,
-                      ),
-                      Text('Delete Collection'),
-                    ],
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(kCornerRadius),
+                    ),
                   ),
                 ),
-              ];
-            },
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(
-                Radius.circular(kCornerRadius),
-              ),
-            ),
-          ),
           onTap: _onTap,
         ),
       );
