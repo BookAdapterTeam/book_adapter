@@ -45,7 +45,7 @@ Source: [gskinner](https://blog.gskinner.com/archives/2020/09/flutter-state-mana
 7. Run `flutter pub get` in terminal or press the button when prompted by VSCode
 8. Launch the app to the emulator with `flutter run`, or with the play button in Android Studio with the emulator selected in the dropdown menu
 
-## Testing
+## Testing (Currently Broken)
 
 ### Unit tests and widget tests
 
