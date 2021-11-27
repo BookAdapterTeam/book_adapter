@@ -93,7 +93,7 @@ class _SectionWidgetState extends State<SectionWidget>
           // Add pop up menu with option for removing the collection
           trailing: PopupMenuButton(
             offset: const Offset(0, kToolbarHeight),
-            icon: const Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_horiz),
             itemBuilder: (context) {
               return <PopupMenuEntry>[
                 PopupMenuItem(
