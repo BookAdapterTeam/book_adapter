@@ -84,7 +84,7 @@
   <!-- Permissions options for the `access notification policy` group -->
   <!-- <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY"/> -->
 
-  <application android:label="book_adapter" android:icon="@mipmap/ic_launcher">
+  <application android:label="BookAdapter" android:icon="@mipmap/ic_launcher">
     <provider android:name="androidx.core.content.FileProvider" android:authorities="${applicationId}.fileProvider" android:exported="false" android:grantUriPermissions="true">
       <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/provider_paths" />
     </provider>
