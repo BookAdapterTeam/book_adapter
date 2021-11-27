@@ -85,7 +85,8 @@ class _ChooseCollectionsBottomSheetState
   @override
   Widget build(BuildContext context) {
     final data = ref.watch(libraryViewControllerProvider);
-    final collectionList = data.collections;
+    final collectionList = data.collections
+      ?..sort((a, b) => a.name.compareTo(b.name));
 
     return SingleChildScrollView(
       child: Wrap(
