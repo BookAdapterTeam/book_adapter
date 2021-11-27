@@ -85,10 +85,18 @@ class _CancelButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-        child: const Text('Cancel', style: TextStyle(fontSize: 20.0)),
-        onPressed: () {
-          Navigator.of(context).pop();
-        });
+      child: const Text('Cancel'),
+      style: ButtonStyle(
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(kCornerRadius),
+          ),
+        ),
+      ),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
   }
 }
 
