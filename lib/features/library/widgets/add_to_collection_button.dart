@@ -67,9 +67,10 @@ final chosenCollectionsProvider = StateProvider<List<String>>((ref) {
 });
 
 class ChooseCollectionsBottomSheet extends ConsumerStatefulWidget {
-  const ChooseCollectionsBottomSheet(
-      {Key? key, required this.onAddNewCollection})
-      : super(key: key);
+  const ChooseCollectionsBottomSheet({
+    Key? key,
+    required this.onAddNewCollection,
+  }) : super(key: key);
 
   final void Function(String) onAddNewCollection;
 
@@ -108,7 +109,8 @@ class _ChooseCollectionsBottomSheetState
                 ),
               ),
               AddNewCollectionButton(
-                  onAddNewCollection: widget.onAddNewCollection),
+                onAddNewCollection: widget.onAddNewCollection,
+              ),
             ],
           ),
           const Divider(
