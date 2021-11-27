@@ -4,7 +4,7 @@ import 'package:book_adapter/features/library/widgets/add_new_collection_button.
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class AddToCollectionButton extends ConsumerWidget {
+class AddToCollectionButton extends StatelessWidget {
   const AddToCollectionButton({
     Key? key,
     required this.onMove,
