@@ -88,7 +88,7 @@ class UpdatePrompter {
     if (_apkFile == null) return;
 
     HttpUtils.downloadFile(
-      updateData.downloadUrl,
+      updateData.androidDownloadUrl,
       _apkFile!.path,
       onReceiveProgress: (int count, int total) {
         _progress = count.toDouble() / total;
@@ -109,6 +109,6 @@ class UpdatePrompter {
   /// 安装
   void doInstall() {
     _dialog?.dismiss();
-    onInstall.call(_apkFile != null ? _apkFile!.path : updateData.downloadUrl);
+    onInstall.call(_apkFile != null ? _apkFile!.path : updateData.androidDownloadUrl);
   }
 }
