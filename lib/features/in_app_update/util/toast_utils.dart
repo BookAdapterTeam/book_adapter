@@ -10,12 +10,12 @@ class ToastUtils {
   ToastUtils._internal();
 
   /// Initialize Toast configuration globally, child is MaterialApp
-  /// 
+  ///
   /// 全局初始化Toast配置, child为MaterialApp
   static init({required Widget child}) {
     return OKToast(
       /// Front Size
-      /// 
+      ///
       /// 字体大小
       textStyle: const TextStyle(fontSize: 16, color: Colors.white),
       backgroundColor: defaultToastColor,
@@ -32,27 +32,47 @@ class ToastUtils {
     Duration duration = defaultToastDuration,
     Color color = defaultToastColor,
   }) {
-    showToast(msg, duration: duration, backgroundColor: color);
+    showToast(
+      msg,
+      duration: duration,
+      backgroundColor: color,
+      position: ToastPosition.bottom,
+    );
   }
 
   static void waring(
     String msg, {
     Duration duration = defaultToastDuration,
   }) {
-    showToast(msg, duration: duration, backgroundColor: Colors.yellow);
+    showToast(
+      msg,
+      duration: duration,
+      backgroundColor: Colors.yellow,
+      position: ToastPosition.bottom,
+    );
   }
 
   static void error(
     String msg, {
     Duration duration = defaultToastDuration,
   }) {
-    showToast(msg, duration: duration, backgroundColor: Colors.red);
+    showToast(
+      msg,
+      duration: duration,
+      backgroundColor: Colors.red,
+      position: ToastPosition.bottom,
+    );
   }
 
   static void success(
     String msg, {
     Duration duration = defaultToastDuration,
   }) {
-    showToast(msg, duration: duration, backgroundColor: Colors.lightGreen);
+    showToast(
+      msg,
+      duration: duration,
+      backgroundColor: Colors.lightGreen,
+      position: ToastPosition.bottom,
+    );
   }
 }

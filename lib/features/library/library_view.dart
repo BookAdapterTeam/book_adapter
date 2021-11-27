@@ -119,9 +119,40 @@ class LibraryScrollView extends HookConsumerWidget {
       actions: [
         AddToCollectionButton(
           onMove: (List<String> collectionIds) async {
-            await ref
+            final failure = await ref
                 .read(libraryViewControllerProvider.notifier)
                 .moveItemsToCollections(collectionIds);
+            if (failure == null) return;
+
+            final snackBar = SnackBar(
+              content: Text(failure.message),
+              duration: const Duration(seconds: 2),
+            );
+            log.e(failure.message);
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          },
+          onAddNewCollection: (collectionName) async {
+            final res = await ref
+                .read(libraryViewControllerProvider.notifier)
+                .addNewCollection(collectionName);
+            res.fold(
+              (failure) {
+                final snackBar = SnackBar(
+                  content: Text(failure.message),
+                  duration: const Duration(seconds: 2),
+                );
+                log.e(failure.message);
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+              (collection) {
+                final snackBar = SnackBar(
+                  content: Text('Successfully created ${collection.name}'),
+                  duration: const Duration(seconds: 2),
+                );
+                log.i('Successfully created ${collection.name}');
+                ScaffoldMessenger.of(context).showSnackBar(snackBar);
+              },
+            );
           },
         ),
 
@@ -207,6 +238,7 @@ class LibraryScrollView extends HookConsumerWidget {
         expanded: true,
         items: data.getCollectionItems(collection.id),
         header: collection.name,
+        collection: collection,
       );
     }).toList();
 

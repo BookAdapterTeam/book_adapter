@@ -11,6 +11,7 @@ import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/model/queue_model.dart';
 import 'package:book_adapter/model/user_model.dart';
 import 'package:book_adapter/service/storage_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -204,13 +205,20 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     }
   }
 
-  Future<void> moveItemsToCollections(List<String> collectionIds) async {
-    final firebaseController = _read(firebaseControllerProvider);
-    final items = state.selectedItems;
-    await firebaseController.setItemsCollections(
-      items: items.toList(),
-      collectionIds: collectionIds,
-    );
+  Future<Failure?> moveItemsToCollections(List<String> collectionIds) async {
+    try {
+      final items = state.selectedItems;
+      await _read(firebaseControllerProvider).setItemsCollections(
+        items: items.toList(),
+        collectionIds: collectionIds,
+      );
+    } on FirebaseException catch (e, st) {
+      log.e(e.code + e.message.toString(), e, st);
+      return FirebaseFailure(e.message.toString(), e.code);
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
+      return Failure(e.toString());
+    }
   }
 
   Future<Either<Failure, AppCollection>> addNewCollection(String name) async {
@@ -218,7 +226,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     if (foundCollection) {
       return Left(Failure('Collection Already Exists'));
     }
-    await _read(firebaseControllerProvider).addCollection(name);
+
     return await _read(firebaseControllerProvider).addCollection(name);
   }
 

@@ -408,7 +408,7 @@ class FirebaseController {
 
   /// Create a collection
   Future<Either<Failure, AppCollection>> addCollection(String name) async {
-    // Upload book to storage
+    // Create collection document
     return await _firebaseService.addCollection(name);
   }
 

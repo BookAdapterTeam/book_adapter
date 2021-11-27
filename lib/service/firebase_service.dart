@@ -195,8 +195,11 @@ class FirebaseService
 
       // Create a shelf with a custom id so that it can easily be referenced later
       final bookCollection = AppCollection(
-          id: '$userId-$collectionName', name: collectionName, userId: userId);
-      await _collectionsRef.doc('$userId-$collectionName').set(bookCollection);
+        id: '$userId-$collectionName',
+        name: collectionName,
+        userId: userId,
+      );
+      await _collectionsRef.doc(bookCollection.id).set(bookCollection);
 
       // Return the shelf to the caller in case they care
       return Right(bookCollection);
