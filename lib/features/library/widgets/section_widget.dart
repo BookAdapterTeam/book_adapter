@@ -115,19 +115,15 @@ class _SectionWidgetState extends State<SectionWidget>
                                 child: const Text('CANCEL'),
                               ),
                               TextButton(
-                                onPressed: widget.section.header != 'Default'
-                                    ? () => Navigator.of(context).pop(true)
-                                    : null,
+                                onPressed: () => Navigator.of(context).pop(true),
                                 child: Text(
                                   'REMOVE',
                                   style: DefaultTextStyle.of(context)
                                       .style
                                       .copyWith(
                                         fontWeight: FontWeight.w500,
-                                        color: widget.section.header !=
-                                                'Default'
-                                            ? Colors.redAccent
-                                            : Theme.of(context).disabledColor,
+                                        color: Colors.redAccent,
+                                           
                                       ),
                                 ),
                               ),
