@@ -109,7 +109,7 @@ class _SectionWidgetState extends State<SectionWidget>
                                 return AlertDialog(
                                   title: const Text('Remove Collection'),
                                   content: const Text(
-                                      'Are you sure you want to remove this collection? Items inside the collection will not be removed'),
+                                      'Are you sure you want to remove this collection? Items inside the collection will not be deleted.'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
