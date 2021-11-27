@@ -91,9 +91,9 @@ class _SectionWidgetState extends State<SectionWidget>
           ),
           minLeadingWidth: 0,
           // Add pop up menu with option for removing the collection
-          trailing: PopupMenuButton(
+          trailing: widget.section.header == 'Default' ? null :PopupMenuButton(
             offset: const Offset(0, kToolbarHeight),
-            icon: const Icon(Icons.more_horiz),
+            icon: const Icon(Icons.more_vert),
             itemBuilder: (context) {
               return <PopupMenuEntry>[
                 PopupMenuItem(
