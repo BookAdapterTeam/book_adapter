@@ -218,7 +218,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     if (foundCollection) {
       return Left(Failure('Collection Already Exists'));
     }
-    await _read(firebaseControllerProvider).addCollection(name);
+
     return await _read(firebaseControllerProvider).addCollection(name);
   }
 
