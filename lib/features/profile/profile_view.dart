@@ -62,7 +62,7 @@ class ProfileView extends ConsumerWidget {
                   },
                 ) /*: const Icon(Icons.account_circle, size: 128,)*/,
                 const SizedBox(height: 24),
-                const _NameWidget(),
+                const _NameEmailWidget(),
                 const SizedBox(height: 64),
                 const ChangePasswordButton(),
                 const LogOutButton(),
@@ -75,8 +75,8 @@ class ProfileView extends ConsumerWidget {
   }
 }
 
-class _NameWidget extends ConsumerWidget {
-  const _NameWidget({
+class _NameEmailWidget extends ConsumerWidget {
+  const _NameEmailWidget({
     Key? key,
   }) : super(key: key);
 
@@ -84,27 +84,53 @@ class _NameWidget extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userStreamAsyncValue = ref.watch(userChangesProvider);
     final user = userStreamAsyncValue.asData?.value;
-    return user != null
-        ? Center(
-            child: Column(
-              children: [
-                if (user.displayName != null) ...[
-                  Text(
+    if (user == null) return const SizedBox();
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          if (user.displayName != null) ...[
+            Flexible(
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
                     user.displayName!,
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 40),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 40,
+                    ),
+                    maxLines: 1,
                   ),
-                  const SizedBox(
-                    height: 4,
-                  ),
-                ],
-                Text(
-                  user.email ?? 'Signed in anonymously',
-                  style: const TextStyle(color: Colors.grey, fontSize: 25),
                 ),
-              ],
+              ),
             ),
-          )
-        : const SizedBox();
+            const SizedBox(
+              height: 4,
+            ),
+          ],
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  user.email ?? 'Signed in anonymously',
+                  style: const TextStyle(
+                    color: Colors.grey,
+                    fontSize: 25,
+                  ),
+                  maxLines: 1,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
