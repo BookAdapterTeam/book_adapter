@@ -51,7 +51,7 @@ class StorageController {
     _read(userModelProvider.notifier).removeDownloadedFilename(filename);
   }
 
-  Future<List<String>> updateDownloadedFiles() async {
+  Future<List<String>> updateDownloadedFilenameList() async {
     await _read(storageServiceProvider).clearDownloadedBooksCache();
     final downloadedFilenameList = getDownloadedFilenames();
     for (final filename in downloadedFilenameList) {

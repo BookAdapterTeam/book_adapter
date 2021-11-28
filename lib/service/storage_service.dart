@@ -1,6 +1,7 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
+import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/constants.dart';
@@ -17,16 +18,23 @@ final storageServiceInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
 });
 
-/// Get a list of files downloaded on the device
+/// Get a list of files downloaded on the device. This also deletes any files not in firebase storage
 ///
 /// Should only be called if the user is authenticated
 final updateDownloadedFilesProvider = FutureProvider<void>((ref) async {
   final storageController = ref.read(storageControllerProvider);
-  /*final downloadedFiles = */await storageController.updateDownloadedFiles();
+  final downloadedFilenameList =
+      await storageController.updateDownloadedFilenameList();
 
-  // ignore: unawaited_futures
-  // TODO: Delete files not on device
-  // storageController.deleteFiles(downloadedFiles);
+  final firebaseController = ref.read(firebaseControllerProvider);
+  final uploadedFilenameList = await firebaseController.listFilenames();
+  final deletedFirebaseFilenameList = downloadedFilenameList
+      .toSet()
+      .difference(uploadedFilenameList.toSet())
+      .toList();
+  await storageController.deleteFiles(
+    filenameList: deletedFirebaseFilenameList,
+  );
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -291,7 +299,8 @@ class StorageService {
   }
 
   /// Check if a file exists on the device given the filename
-  Future<bool> appFileExists({required String userId, required String filename}) async {
+  Future<bool> appFileExists(
+      {required String userId, required String filename}) async {
     final String path = getPathFromFilename(userId: userId, filename: filename);
     if (await io.File(path).exists()) {
       return true;
