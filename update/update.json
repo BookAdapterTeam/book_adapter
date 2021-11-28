@@ -3,7 +3,7 @@
     "Msg": "",
     "UpdateStatus": 1,
     "VersionCode": 8,
-    "VersionName": "0.4.0-alpha.3",
+    "VersionName": "0.4.0-alpha.4",
     "UploadTime": "2021-11-28 09:40:00",
     "ModifyContent": "## What's Changed\r\n* Fix delete downloads button\r\n* Fix app deleting books on app launch\r\n**Full Changelog and Release Details**: https://bit.ly/3ld6AU7",
     "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.4.0-alpha.4/bookadapter_v0_4_0-alpha_4_android.apk",
