@@ -2,12 +2,12 @@
     "Code": 0,
     "Msg": "",
     "UpdateStatus": 1,
-    "VersionCode": 7,
+    "VersionCode": 8,
     "VersionName": "0.4.0-alpha.3",
-    "UploadTime": "2021-11-27 07:56:00",
-    "ModifyContent": "You must uninstall the app and install the APK from Github if you are on Android.\r\n\r\n## What's Changed\r\n* Empty collections are now hidden\r\n* Add \"Download Books\", \"Remove Downloads\" and \"Delete Permanently\" Popup Menu Button\r\n* Add Remove collection button\r\n* Add Unmerge Button in Series App Bar* Allow merging series with series and book\r\n* Add selecting app bar to series view\r\n* Collections are now collapsible\r\n**Full Changelog and Release Details**: https://bit.ly/316eRSE",
-    "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.4.0-alpha.3/bookadapter_v0_4_0-alpha_3_android.apk",
-    "GithubReleaseUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/tag/v0.4.0-alpha.3",
-    "ApkSize": 31497,
-    "ApkMd5": "b9d1a7693d58a47bab84768a5cc34ee6"
+    "UploadTime": "2021-11-28 09:40:00",
+    "ModifyContent": "## What's Changed\r\n* Fix delete downloads button\r\n* Fix app deleting books on app launch\r\n**Full Changelog and Release Details**: https://bit.ly/3ld6AU7",
+    "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.4.0-alpha.4/bookadapter_v0_4_0-alpha_4_android.apk",
+    "GithubReleaseUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/tag/v0.4.0-alpha.4",
+    "ApkSize": 31500,
+    "ApkMd5": "8f21d1d51e7bc1937c91fe45a0c1a174"
 }
