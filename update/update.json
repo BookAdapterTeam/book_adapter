@@ -5,7 +5,7 @@
     "VersionCode": 7,
     "VersionName": "0.4.0-alpha.3",
     "UploadTime": "2021-11-27 07:56:00",
-    "ModifyContent": "\r\n## What's Changed\r\n* Empty collections are now hidden\r\n* Add Remove Downloads and Permanently Delete Library Items Popup Menu Button\r\n* Add Remove collection button\r\n* Add Unmerge Button in Series App Bar\r\n* Add button in selecting app bar to queue download for multiple books\r\n* Allow merging series with series and book\r\n* Add selecting app bar to series view\r\n* Collections are now collapsible\r\n* Polish profile UI\r\n\r\nBug Fixes:\r\n* Fix collection headers going behind app bar (collections are also now collapsible)\r\n* Fix error that pops up when deleting a book that isn't downloaded\r\n\r\n\r\n**Full Changelog**: https://github.com/BookAdapterTeam/book_adapter/compare/v0.3.0-alpha.3...v0.4.0-alpha.3",
+    "ModifyContent": "\r\n## What's Changed\r\n* Empty collections are now hidden\r\n* Add Remove Downloads and Permanently Delete Library Items Popup Menu Button\r\n* Add Remove collection button\r\n* Add Unmerge Button in Series App Bar\r\n* Add button in selecting app bar to queue download for multiple books\r\n* Allow merging series with series and book\r\n* Add selecting app bar to series view\r\n* Collections are now collapsible\r\n**Full Changelog**: https://bit.ly/316eRSE",
     "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.4.0-alpha.3/bookadapter_v0_4_0-alpha_3_android.apk",
     "GithubReleaseUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/tag/v0.4.0-alpha.3",
     "ApkSize": 31497,
