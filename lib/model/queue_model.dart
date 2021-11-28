@@ -15,10 +15,10 @@ final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
 
   return QueueNotifier(
     data: data,
-    processItem: (book) => storageController.downloadFile(
+    processItem: (book) async => await storageController.downloadFile(
       book,
-      whenDone: (filename) {
-        ref.read(storageControllerProvider).setFileDownloaded(filename);
+      whenDone: (filename) async {
+        await ref.read(storageControllerProvider).setFileDownloaded(filename);
       },
     ),
   );

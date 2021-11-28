@@ -22,9 +22,11 @@ final storageServiceInitProvider = FutureProvider<void>((ref) async {
 /// Should only be called if the user is authenticated
 final updateDownloadedFilesProvider = FutureProvider<void>((ref) async {
   final storageController = ref.read(storageControllerProvider);
-  final downloadedFiles = storageController.updateDownloadedFiles();
+  /*final downloadedFiles = */await storageController.updateDownloadedFiles();
+
   // ignore: unawaited_futures
-  storageController.deleteFiles(downloadedFiles);
+  // TODO: Delete files not on device
+  // storageController.deleteFiles(downloadedFiles);
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -289,8 +291,8 @@ class StorageService {
   }
 
   /// Check if a file exists on the device given the filename
-  Future<bool> fileExists(String filepath) async {
-    final String path = getAppFilePath(filepath);
+  Future<bool> appFileExists({required String userId, required String filename}) async {
+    final String path = getPathFromFilename(userId: userId, filename: filename);
     if (await io.File(path).exists()) {
       return true;
     }
