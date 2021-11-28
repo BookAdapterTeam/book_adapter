@@ -26,16 +26,16 @@ class StorageController {
   ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
       _read(storageServiceProvider).downloadedBooksValueListenable;
 
-  void downloadFile(
+  Future<void> downloadFile(
     Book book, {
     required FutureOr<void> Function(String) whenDone,
-  }) {
+  }) async {
     final appBookAdaptPath =
         _read(storageServiceProvider).appBookAdaptDirectory.path;
     final task = _read(firebaseControllerProvider)
         .downloadFile(book.filepath, '$appBookAdaptPath/${book.filepath}');
-    // ignore: unawaited_futures
-    task.whenComplete(() async {
+
+    await task.whenComplete(() async {
       await _read(storageServiceProvider).setFileDownloaded(book.filename);
       await whenDone(book.filename);
     });
@@ -51,11 +51,13 @@ class StorageController {
     _read(userModelProvider.notifier).removeDownloadedFilename(filename);
   }
 
-  List<String> updateDownloadedFiles() {
-    _read(storageServiceProvider).clearDownloadedBooksCache();
-    final downloadedFiles = getDownloadedFilenames();
-    downloadedFiles.forEach(_read(storageServiceProvider).setFileDownloaded);
-    return downloadedFiles;
+  Future<List<String>> updateDownloadedFilenameList() async {
+    await _read(storageServiceProvider).clearDownloadedBooksCache();
+    final downloadedFilenameList = getDownloadedFilenames();
+    for (final filename in downloadedFilenameList) {
+      await _read(storageServiceProvider).setFileDownloaded(filename);
+    }
+    return downloadedFilenameList;
   }
 
   /// Get the list of files on downloaded to the device
@@ -92,28 +94,35 @@ class StorageController {
     if (userId == null) {
       throw AppException('User not logged in');
     }
-    final deletedBooks =
+    final deletedFirebaseBooks =
         await _read(firebaseControllerProvider).deleteItemsPermanently(
       itemsToDelete: itemsToDelete,
       allBooks: allBooks,
     );
-    await deleteFiles(deletedBooks.map((item) => item.filename).toList());
+    final deletedFirebaseFilenameList = deletedFirebaseBooks.map((item) => item.filename).toList();
+    await deleteFiles(filenameList: deletedFirebaseFilenameList);
   }
 
   // Delete downloaded books files from device if they are removed from Firebase Storage
-  Future<List<String>> deleteFiles(List<String> filenames) async {
+  Future<List<String>> deleteFiles({required List<String> filenameList}) async {
     final String? userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
     }
+
     final deletedFilenames = <String>[];
-    for (final filename in filenames) {
+
+    for (final filename in filenameList) {
       final fullFilePath = _read(storageServiceProvider)
           .getPathFromFilename(userId: userId, filename: filename);
-      final exists =
-          await _read(storageServiceProvider).fileExists(fullFilePath);
+
+      final exists = await _read(storageServiceProvider)
+          .appFileExists(userId: userId, filename: filename);
       if (exists) {
         await io.File(fullFilePath).delete();
+        deletedFilenames.add(filename);
+        await setFileNotDownloaded(filename);
+      } else {
         deletedFilenames.add(filename);
         await setFileNotDownloaded(filename);
       }
