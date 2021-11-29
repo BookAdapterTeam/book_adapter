@@ -8,6 +8,6 @@
     "ModifyContent": "## What's Changed\r\n* Fix delete downloads button\r\n* Fix app deleting books on app launch\r\n**Full Changelog and Release Details**: https://bit.ly/3I5gbqe",
     "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.4.1/bookadapter_v0_4_1_android.apk",
     "GithubReleaseUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/tag/v0.4.1",
-    "ApkSize": 31500,
-    "ApkMd5": "8f21d1d51e7bc1937c91fe45a0c1a174"
+    "ApkSize": 28188,
+    "ApkMd5": "38103937c215b31424105e088d2a8432"
 }
