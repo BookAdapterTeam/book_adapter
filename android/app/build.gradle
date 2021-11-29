@@ -67,8 +67,12 @@ android {
        }
     }
     buildTypes {
-        release {
+        release keystoreProperties['storeFile'] ? {
             signingConfig signingConfigs.release
+        } : {
+            signingConfig signingConfigs.debug
+            minifyEnabled false
+            shrinkResources false
         }
     }
 }
