@@ -144,7 +144,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Install Firebase google services
+      - name: Install Firebase google services and setup keystore for signing
         env:
           ANDROID_GOOGLE_SERVICES_BASE64: ${{ secrets.ANDROID_GOOGLE_SERVICES_BASE64 }}
           KEY_JKS_BASE64: ${{ secrets.KEY_JKS }}
@@ -186,7 +186,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - name: Install Firebase google services
+      - name: Install Firebase google services and setup keystore for signing
         env:
           ANDROID_GOOGLE_SERVICES_BASE64: ${{ secrets.ANDROID_GOOGLE_SERVICES_BASE64 }}
           KEY_JKS_BASE64: ${{ secrets.KEY_JKS }}
