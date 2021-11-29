@@ -147,12 +147,20 @@ jobs:
       - name: Install Firebase google services
         env:
           ANDROID_GOOGLE_SERVICES_BASE64: ${{ secrets.ANDROID_GOOGLE_SERVICES_BASE64 }}
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+          KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
         run: |
           # create variables
           SERVICES_PATH=android/app/google-services.json
+          KEY_PROPERTIES_PATH=android/key.properties
+          KEYSTORE_PATH=upload-keystore.jks
 
           # import google services from secrets
           echo -n "$ANDROID_GOOGLE_SERVICES_BASE64" | base64 --decode > $SERVICES_PATH
+
+          # import keystore from secrets
+          echo -n $KEY_PROPERTIES | base64 --decode  > $KEY_PROPERTIES_PATH
+          echo -n $KEY_JKS | base64 --decode > $KEYSTORE_PATH
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -181,12 +189,20 @@ jobs:
       - name: Install Firebase google services
         env:
           ANDROID_GOOGLE_SERVICES_BASE64: ${{ secrets.ANDROID_GOOGLE_SERVICES_BASE64 }}
+          KEY_JKS: ${{ secrets.KEY_JKS }}
+          KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
         run: |
           # create variables
           SERVICES_PATH=android/app/google-services.json
+          KEY_PROPERTIES_PATH=android/key.properties
+          KEYSTORE_PATH=upload-keystore.jks
 
           # import google services from secrets
           echo -n "$ANDROID_GOOGLE_SERVICES_BASE64" | base64 --decode > $SERVICES_PATH
+
+          # import keystore from secrets
+          echo -n $KEY_PROPERTIES | base64 --decode  > $KEY_PROPERTIES_PATH
+          echo -n $KEY_JKS | base64 --decode > $KEYSTORE_PATH
       - name: Setup Java
         uses: actions/setup-java@v1
         with:

@@ -46,3 +46,8 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Keystore
+# See here for instructions on signing https://docs.flutter.dev/deployment/android#signing-the-app
+*.jks
+key.properties
