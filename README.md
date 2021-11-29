@@ -1,7 +1,7 @@
 
 # BookAdapter - ePub Reader & Library Management
 
-[![CI](https://github.com/BookAdapterTeam/book_adapter/actions/workflows/ci.yml/badge.svg)](https://github.com/BookAdapterTeam/book_adapter/actions/workflows/ci.yml)
+[![CI](https://github.com/BookAdapterTeam/book_adapter/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BookAdapterTeam/book_adapter/actions/workflows/ci.yml)
 
 A new Flutter app for reading ePub books, built for android and iOS.
 
