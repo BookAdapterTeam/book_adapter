@@ -12,15 +12,17 @@ class AuthChecker extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userStreamAsyncValue = ref.watch(authStateChangesProvider);
 
-    return AsyncValueWidget<User?>(
-      value: userStreamAsyncValue,
-      data: (data) => AnimatedSwitcher(
-        switchInCurve: Curves.easeInCubic,
-        switchOutCurve: Curves.easeOutCubic,
-        duration: const Duration(milliseconds: 500),
-        child: data == null
-        ? LoginView(key: const ValueKey('login'),)
-        : child,  
+    return Scaffold(
+      body: AsyncValueWidget<User?>(
+        value: userStreamAsyncValue,
+        data: (data) => AnimatedSwitcher(
+          switchInCurve: Curves.easeInCubic,
+          switchOutCurve: Curves.easeOutCubic,
+          duration: const Duration(milliseconds: 500),
+          child: data == null
+          ? LoginView(key: const ValueKey('login'),)
+          : child,  
+        ),
       ),
     );
   }
