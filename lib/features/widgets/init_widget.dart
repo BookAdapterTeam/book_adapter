@@ -1,10 +1,12 @@
 import 'package:book_adapter/features/in_app_update/update.dart';
+import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/features/widgets/async_value_widget.dart';
 import 'package:book_adapter/service/storage_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 
 class InitFirebaseWidget extends ConsumerWidget {
   const InitFirebaseWidget({Key? key, required this.child}) : super(key: key);
@@ -13,16 +15,19 @@ class InitFirebaseWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Future<FirebaseApp> _initialization = Firebase.initializeApp();
-    return FutureBuilder(
+    final Future<FirebaseApp> _initialization =
+        Firebase.initializeApp().timeout(const Duration(seconds: 5));
+    final log = Logger();
+    return FutureBuilder<FirebaseApp>(
       future: _initialization,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
         if (snapshot.hasError) {
-          return Scaffold(
-            body: Center(
-              child: Text('Firebase Initialization Failed: ${snapshot.error}'),
-            ),
+          log.e('Warning: Running in Offline Mode', snapshot.error,
+              snapshot.stackTrace);
+          ToastUtils.waring(
+            'Warning: Running in Offline Mode - ${snapshot.error.toString()}',
           );
+          return child;
         }
         if (snapshot.connectionState == ConnectionState.done) {
           return child;
@@ -47,6 +52,7 @@ class InitStorageServiceWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncValue = ref.watch(storageServiceInitProvider);
+    final log = Logger();
 
     return AsyncValueWidget(
       value: asyncValue,
@@ -57,6 +63,7 @@ class InitStorageServiceWidget extends ConsumerWidget {
         ),
       ),
       error: (e, st) {
+        log.e(e.toString(), e, st);
         return Scaffold(
           body: Center(
             child: Text(
@@ -82,27 +89,16 @@ class InitDownloadedFilesWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncValue = ref.watch(updateDownloadedFilesProvider);
+    final log = Logger();
 
     return AsyncValueWidget(
       value: asyncValue,
       data: (_) => child,
-      loading: () => const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
+      loading: () => child,
       error: (e, st) {
-        return Scaffold(
-          body: Center(
-            child: Text(
-              e.toString(),
-              style: Theme.of(context)
-                  .textTheme
-                  .headline6!
-                  .copyWith(color: Colors.red),
-            ),
-          ),
-        );
+        log.e(e.toString(), e, st);
+        ToastUtils.error(e.toString());
+        return child;
       },
     );
   }
@@ -144,6 +140,7 @@ class InitHiveWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncValue = ref.watch(hiveInitFutureProvider);
+    final log = Logger();
 
     return AsyncValueWidget(
       value: asyncValue,
@@ -154,6 +151,7 @@ class InitHiveWidget extends ConsumerWidget {
         ),
       ),
       error: (e, st) {
+        log.e(e.toString(), e, st);
         return Scaffold(
           body: Center(
             child: Text(
