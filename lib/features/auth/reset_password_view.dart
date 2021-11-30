@@ -20,6 +20,7 @@ class ResetPasswordView extends ConsumerWidget {
         title: const Text('Reset Password'),
       ),
       body: SingleChildScrollView(
+        reverse: true,
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Form(
