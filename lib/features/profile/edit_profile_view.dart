@@ -1,6 +1,7 @@
 // Handles Profile edit action
 
 import 'package:book_adapter/controller/firebase_controller.dart';
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/features/profile/edit_profile_view_controller.dart';
 import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,6 @@ class EditProfileView extends HookConsumerWidget {
                       photoUrl: user.photoURL!, onPressed: () async {}),
                   const SizedBox(height: 24),
                 ],
-
                 TextField(
                   restorationId: 'change_username',
                   controller: usernameController,
@@ -45,7 +45,9 @@ class EditProfileView extends HookConsumerWidget {
                       border: UnderlineInputBorder(),
                       labelText: 'Change Username'),
                   onChanged: (usernameValue) {
-                    ref.read(editProfileViewController.notifier).updateData(username: usernameValue);
+                    ref
+                        .read(editProfileViewController.notifier)
+                        .updateData(username: usernameValue);
                   },
                 ),
                 const SizedBox(height: 24),
@@ -76,9 +78,17 @@ class _SubmitButton extends ConsumerWidget {
     final log = Logger();
     final data = ref.watch(editProfileViewController);
     return ElevatedButton(
-      child: const Text('Submit', style: TextStyle(fontSize: 20.0)),
+      child: const Text('Submit'),
+      style: ButtonStyle(
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(kCornerRadius),
+          ),
+        ),
+      ),
       onPressed: () async {
-        final success = await ref.read(editProfileViewController.notifier).submit();
+        final success =
+            await ref.read(editProfileViewController.notifier).submit();
         if (!success) {
           const errorMessage = 'Updating Userdata Failed';
           log.e(errorMessage);

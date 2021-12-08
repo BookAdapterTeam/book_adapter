@@ -44,7 +44,8 @@ class CommonUtils {
   static Future<File> getApkFileByUpdateData(
     UpdateData updateData,
   ) async {
-    final String appName = getApkNameByDownloadUrl(updateData.downloadUrl);
+    final String appName =
+        getApkNameByDownloadUrl(updateData.androidDownloadUrl);
     final String dirPath = await getDownloadDirPath();
     return File('$dirPath/${updateData.versionName}/$appName');
   }
@@ -94,17 +95,21 @@ class CommonUtils {
   /// Installs APK on android, goes to app store on iOS
   ///
   /// 安装apk
-  static void installAPP(String uri) async {
+  static void installAPP({
+    required String filePath,
+    required String githubReleaseUrl,
+  }) async {
     // await launch('https://github.com/BookAdapterTeam/book_adapter/releases');
     if (Platform.isAndroid) {
       // Install android apk
 
       // 需要先允许读取存储权限才可以
       // You need to allow read storage permissions first
-      final requestInstallPackages = await Permission.requestInstallPackages.request();
+      final requestInstallPackages =
+          await Permission.requestInstallPackages.request();
       if (requestInstallPackages == PermissionStatus.granted) {
         try {
-          await AppInstaller.installApk(uri);
+          await AppInstaller.installApk(filePath);
           _log.i('App Update Installed');
         } catch (e, st) {
           _log.e(e.toString(), e, st);
@@ -115,7 +120,7 @@ class CommonUtils {
     } else {
       // Goes to iOS store app url
       // await AppInstaller.goStore('', uri);
-      await launch('https://github.com/BookAdapterTeam/book_adapter/releases');
+      await launch(githubReleaseUrl);
     }
   }
 }

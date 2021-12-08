@@ -9,49 +9,52 @@ class UpdateData {
   //===========Can App Be Updated - 是否可以升级=============//
 
   /// Is there a new version
-  /// 
+  ///
   /// 是否有新版本
   final bool hasUpdate;
 
   /// Mandatory installation: the app cannot be used without installation
-  /// 
+  ///
   /// 是否强制安装：不安装无法使用app
   final bool isForce;
 
   /// Can this version be ignored
-  /// 
+  ///
   /// 是否可忽略该版本
   final bool isIgnorable;
 
   //===========Update information - 升级的信息=============//
 
   /// Version Number
-  /// 
+  ///
   /// 版本号
   final int versionCode;
 
   /// Version Name
-  /// 
+  ///
   /// 版本名称
   final String versionName;
 
   /// Update Content
-  /// 
+  ///
   /// 更新内容
   final String updateContent;
 
-  /// Download Link
-  /// 
-  /// 下载地址
-  final String downloadUrl;
+  /// Android Download Link
+  ///
+  /// Android 下载地址
+  final String androidDownloadUrl;
+
+  /// Github Release Url
+  final String githubReleaseUrl;
 
   /// APK Size [KB]
-  /// 
+  ///
   /// apk的大小[KB]
   final int apkSize;
 
   /// The encrypted value of the apk file (here the default is the md5 value)
-  /// 
+  ///
   /// apk文件的加密值（这里默认是md5值）
   final String apkMd5;
 
@@ -62,7 +65,8 @@ class UpdateData {
     required this.versionCode,
     required this.versionName,
     required this.updateContent,
-    required this.downloadUrl,
+    required this.androidDownloadUrl,
+    required this.githubReleaseUrl,
     this.apkSize = 0,
     this.apkMd5 = '',
   });
@@ -75,7 +79,8 @@ class UpdateData {
       'versionCode': versionCode,
       'versionName': versionName,
       'updateContent': updateContent,
-      'downloadUrl': downloadUrl,
+      'downloadUrl': androidDownloadUrl,
+      'githubReleaseUrl': githubReleaseUrl,
       'apkSize': apkSize,
       'apkMd5': apkMd5,
     };
@@ -89,7 +94,8 @@ class UpdateData {
       versionCode: map['versionCode']?.toInt(),
       versionName: map['versionName'],
       updateContent: map['updateContent'],
-      downloadUrl: map['downloadUrl'],
+      androidDownloadUrl: map['downloadUrl'],
+      githubReleaseUrl: map['githubReleaseUrl'],
       apkSize: map['apkSize']?.toInt(),
       apkMd5: map['apkMd5'],
     );
@@ -101,6 +107,6 @@ class UpdateData {
 
   @override
   String toString() {
-    return 'UpdateEntity hasUpdate: $hasUpdate, isForce: $isForce, isIgnorable: $isIgnorable, versionCode: $versionCode, versionName: $versionName, updateContent: $updateContent, downloadUrl: $downloadUrl, apkSize: $apkSize, apkMd5: $apkMd5';
+    return 'UpdateEntity hasUpdate: $hasUpdate, isForce: $isForce, isIgnorable: $isIgnorable, versionCode: $versionCode, versionName: $versionName, updateContent: $updateContent, downloadUrl: $androidDownloadUrl, githubReleaseUrl: $githubReleaseUrl, apkSize: $apkSize, apkMd5: $apkMd5';
   }
 }

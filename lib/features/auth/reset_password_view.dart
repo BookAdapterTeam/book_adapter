@@ -1,3 +1,4 @@
+import 'package:book_adapter/data/constants.dart';
 import 'package:book_adapter/data/failure.dart';
 import 'package:book_adapter/features/auth/reset_password_view_controller.dart';
 import 'package:flutter/material.dart';
@@ -19,6 +20,7 @@ class ResetPasswordView extends ConsumerWidget {
         title: const Text('Reset Password'),
       ),
       body: SingleChildScrollView(
+        reverse: true,
         child: Padding(
           padding: const EdgeInsets.all(25.0),
           child: Form(
@@ -84,10 +86,18 @@ class _CancelButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-        child: const Text('Cancel', style: TextStyle(fontSize: 20.0)),
-        onPressed: () {
-          Navigator.of(context).pop();
-        });
+      child: const Text('Cancel'),
+      style: ButtonStyle(
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(kCornerRadius),
+          ),
+        ),
+      ),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
   }
 }
 
@@ -105,7 +115,14 @@ class _SendResetEmailButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final log = Logger();
     return ElevatedButton(
-      child: const Text('Send Email', style: TextStyle(fontSize: 20.0)),
+      child: const Text('Send Email'),
+      style: ButtonStyle(
+        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+          RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(kCornerRadius),
+          ),
+        ),
+      ),
       onPressed: () async {
         final res = await viewController.sendResetEmail();
         res.fold(

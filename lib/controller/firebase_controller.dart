@@ -44,7 +44,7 @@ final userChangesProvider = StreamProvider.autoDispose<User?>((ref) async* {
 
 // Provide the stream with riverpod for easy access
 final collectionsStreamProvider =
-    StreamProvider.autoDispose<List<BookCollection>>((ref) async* {
+    StreamProvider.autoDispose<List<AppCollection>>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
   // Parse the value received and emit a Message instance
   try {
@@ -279,7 +279,7 @@ class FirebaseController {
 
   // Database
   Stream<QuerySnapshot<Book>> get booksStream => _firebaseService.booksStream;
-  Stream<QuerySnapshot<BookCollection>> get collectionsStream =>
+  Stream<QuerySnapshot<AppCollection>> get collectionsStream =>
       _firebaseService.collectionsStream;
   Stream<QuerySnapshot<Series>> get seriesStream =>
       _firebaseService.seriesStream;
@@ -303,7 +303,7 @@ class FirebaseController {
   /// Get a list of books from the user's database
   Future<Either<Failure, Book>> addBook(
     PlatformFile file, {
-    BookCollection? collection,
+    AppCollection? collection,
   }) async {
     try {
       final userId = _firebaseService.currentUser?.uid;
@@ -378,8 +378,8 @@ class FirebaseController {
       );
       if (firestoreRes.isLeft()) {
         return firestoreRes.fold(
-          (failure) => Left(
-              Failure('Could not add book to Firestore: ${failure.message}')),
+          (failure) => Left(Failure(
+              'Could not add book ${book.filename} to Firestore: ${failure.message}')),
           (right) => Left(Failure('')), // Wont ever be returned
         );
       }
@@ -407,8 +407,8 @@ class FirebaseController {
   }
 
   /// Create a collection
-  Future<Either<Failure, BookCollection>> addCollection(String name) async {
-    // Upload book to storage
+  Future<Either<Failure, AppCollection>> addCollection(String name) async {
+    // Create collection document
     return await _firebaseService.addCollection(name);
   }
 
@@ -443,6 +443,47 @@ class FirebaseController {
     }
   }
 
+  Future<Series> mergeToSeries({
+    String? name,
+    // List of selected books including books in selected series
+    required List<Book> selectedBooks,
+    required List<Series> selectedSeries,
+  }) async {
+    try {
+      // Get list of collections to put the new series in
+      final Set<String> collectionIds = {};
+      for (final book in selectedBooks) {
+        collectionIds.addAll(book.collectionIds);
+      }
+
+      // Create a new series with the title with the first item in the list
+      final newSeries = await addSeries(
+        name: name ?? selectedBooks.first.title,
+        imageUrl: selectedBooks.first.imageUrl ?? kDefaultImage,
+        collectionIds: collectionIds,
+      );
+
+      await addBooksToSeries(
+        books: selectedBooks,
+        series: newSeries,
+        collectionIds: collectionIds,
+      );
+
+      for (final series in selectedSeries) {
+        await _firebaseService.deleteSeriesDocument(series.id);
+      }
+
+      return newSeries;
+    } on FirebaseException catch (e) {
+      throw AppException(e.message ?? e.toString(), e.code);
+    } on Exception catch (e) {
+      if (e is AppException) {
+        rethrow;
+      }
+      throw AppException(e.toString());
+    }
+  }
+
   /// Add a list of books to a series
   ///
   /// Throws [AppException] if theres an exception
@@ -452,7 +493,6 @@ class FirebaseController {
     required Set<String> collectionIds,
   }) async {
     try {
-      //
       for (final book in books) {
         await _firebaseService.addBookToSeries(
           bookId: book.id,
@@ -477,13 +517,14 @@ class FirebaseController {
     required String name,
     required String imageUrl,
     String description = '',
-    List<String>? collectionIds,
+    Set<String>? collectionIds,
   }) async {
     try {
       return await _firebaseService.addSeries(
         name,
         imageUrl: imageUrl,
         description: description,
+        collectionIds: collectionIds,
       );
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -568,27 +609,29 @@ class FirebaseController {
     final deletedBooks = <Book>[];
     for (final item in itemsToDelete) {
       if (item is Book) {
+        // Delete the book document in firebase
+        await _firebaseService.deleteBookDocument(item.id);
         // Delete the book files on firebase storage
         await _deleteFirebaseStorageBookFiles(item.filepath);
-        // Delete the book document in firebase
-        await _firebaseService
-            .deleteDocument('$kBooksCollectionName/${item.id}');
         deletedBooks.add(item);
       } else if (item is Series) {
         // Delete all books in the series
         final seriesItems = _getSeriesItems(item, allBooks);
         for (final itemInSeries in seriesItems) {
           if (itemInSeries is Book) {
-            await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
-            await _firebaseService
-                .deleteDocument('$kBooksCollectionName/${itemInSeries.id}');
+            await _firebaseService.deleteBookDocument(itemInSeries.id);
             deletedBooks.add(itemInSeries);
           }
         }
 
         // Delete the series document in firebase
-        await _firebaseService
-            .deleteDocument('$kSeriesCollectionName/${item.id}');
+        await _firebaseService.deleteSeriesDocument(item.id);
+
+        for (final itemInSeries in seriesItems) {
+          if (itemInSeries is Book) {
+            await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
+          }
+        }
       }
     }
     return deletedBooks;
@@ -599,9 +642,17 @@ class FirebaseController {
   }
 
   Future<void> _deleteFirebaseStorageBookFiles(String filepath) async {
-    await _firebaseService.deleteFile(filepath);
-    await _firebaseService
-        .deleteFile(filepath + kFirebaseStorageImageExtension);
+    try {
+      await _firebaseService.deleteFile(filepath);
+    } on FirebaseException catch (error) {
+      if (error.code != 'object-not-found') rethrow;
+    }
+    try {
+      await _firebaseService
+          .deleteFile(filepath + kFirebaseStorageImageExtension);
+    } on FirebaseException catch (error) {
+      if (error.code != 'object-not-found') rethrow;
+    }
   }
 
   /// Unmerge a series
@@ -617,11 +668,14 @@ class FirebaseController {
     required List<Book> books,
   }) async {
     try {
+      await _firebaseService.deleteSeriesDocument(series.id);
       for (final book in books) {
         await _firebaseService.updateBookSeries(book.id, null);
-        await _firebaseService.updateBookCollections(bookId: book.id, collectionIds: series.collectionIds.toList());
+        await _firebaseService.updateBookCollections(
+          bookId: book.id,
+          collectionIds: series.collectionIds.toList(),
+        );
       }
-      await _firebaseService.deleteDocument('$kSeriesCollectionName/${series.id}');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -634,7 +688,7 @@ class FirebaseController {
 
   /// Remove a collection
   Future<void> removeCollection({
-    required BookCollection collection,
+    required AppCollection collection,
     required List<Item> collectionItems,
   }) async {
     try {
@@ -655,8 +709,7 @@ class FirebaseController {
           );
         }
       }
-      await _firebaseService
-          .deleteDocument('$kBookCollectionsCollectionName/${collection.id}');
+      await _firebaseService.deleteCollectionDocument(collection.id);
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {

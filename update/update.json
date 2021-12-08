@@ -1,12 +1,13 @@
 {
     "Code": 0,
     "Msg": "",
-    "UpdateStatus": 2,
-    "VersionCode": 4,
-    "VersionName": "0.3.0-alpha.3",
-    "UploadTime": "2021-11-07 08:52:00",
-    "ModifyContent": "\r\nAdd In-App Updater",
-    "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.3.0-alpha.3/bookadapter_v0_3_0-alpha_3_android.apk",
-    "ApkSize": 31473,
-    "ApkMd5": "4bc6d66c5e0ef7d52cbbf3c851a66542"
+    "UpdateStatus": 1,
+    "VersionCode": 8,
+    "VersionName": "0.4.1",
+    "UploadTime": "2021-11-28 010:30:00",
+    "ModifyContent": "## What's Changed\r\n* Fix delete downloads button\r\n* Fix app deleting books on app launch\r\n**Full Changelog and Release Details**: https://bit.ly/3I5gbqe",
+    "DownloadUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/download/v0.4.1/bookadapter_v0_4_1_android.apk",
+    "GithubReleaseUrl": "https://github.com/BookAdapterTeam/book_adapter/releases/tag/v0.4.1",
+    "ApkSize": 28188,
+    "ApkMd5": "38103937c215b31424105e088d2a8432"
 }

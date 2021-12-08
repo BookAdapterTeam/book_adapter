@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class AddNewCollectionButton extends ConsumerWidget {
+class AddNewCollectionButton extends StatelessWidget {
   const AddNewCollectionButton({Key? key, required this.onAddNewCollection})
       : super(key: key);
 
   final void Function(String) onAddNewCollection;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Semantics(
       onLongPressHint: 'Add a new collection',
       child: TextButton.icon(
         icon: const Text('ADD'),
         onPressed: () async {
+          Navigator.of(context).pop();
           final collectionName = await showDialog<String>(
               context: context,
               builder: (context) {

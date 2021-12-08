@@ -1,4 +1,3 @@
-
 import 'package:book_adapter/features/in_app_update/data/update_data.dart';
 import 'package:book_adapter/features/in_app_update/util/common.dart';
 
@@ -7,11 +6,11 @@ import 'data/update_info.dart';
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/update/entity/update_info.dart
 
 /// The default method of version update
-/// 
+///
 /// 版本更新默认的方法
 class UpdateParser {
   /// Parser
-  /// 
+  ///
   /// 解析器
   static Future<UpdateData?> parseJson(String json) async {
     final UpdateInfo updateInfo = UpdateInfo.fromJson(json);
@@ -33,13 +32,15 @@ class UpdateParser {
     }
 
     return UpdateData(
-        hasUpdate: hasUpdate,
-        isForce: updateInfo.updateStatus == haveNewVersionForcedUpload,
-        versionCode: updateInfo.versionCode,
-        versionName: updateInfo.versionName,
-        updateContent: updateInfo.modifyContent,
-        downloadUrl: updateInfo.downloadUrl,
-        apkSize: updateInfo.apkSize,
-        apkMd5: updateInfo.apkMd5);
+      hasUpdate: hasUpdate,
+      isForce: updateInfo.updateStatus == haveNewVersionForcedUpload,
+      versionCode: updateInfo.versionCode,
+      versionName: updateInfo.versionName,
+      updateContent: updateInfo.modifyContent,
+      androidDownloadUrl: updateInfo.androidDownloadUrl,
+      githubReleaseUrl: updateInfo.githubReleaseUrl,
+      apkSize: updateInfo.apkSize,
+      apkMd5: updateInfo.apkMd5,
+    );
   }
 }

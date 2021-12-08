@@ -9,18 +9,29 @@ class LogOutButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
+    return TextButton.icon(
       key: const ValueKey('signOut'),
-      icon: const Icon(Icons.logout),
-      tooltip: 'Sign out',
+      icon: const Icon(
+        Icons.logout,
+        color: Colors.redAccent,
+      ),
+      label: Text(
+        'Sign out',
+        style: Theme.of(context)
+            .textTheme
+            .button
+            ?.copyWith(color: Colors.redAccent),
+      ),
       onPressed: () {
         // Log out the user
         showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: const Text('Logout'),
-              content: const Text('Are you sure you want to log out?'),
+              title: const Text('Are you sure you want to sign out?'),
+              content: const Text(
+                'Downloaded books will remain on your device.',
+              ),
               actions: [
                 TextButton(
                   onPressed: () {
@@ -34,7 +45,7 @@ class LogOutButton extends ConsumerWidget {
                     ref.read(profileViewController.notifier).signOut();
                   },
                   child: Text(
-                    'LOGOUT',
+                    'YES, LOGOUT',
                     style: DefaultTextStyle.of(context).style.copyWith(
                           fontWeight: FontWeight.w500,
                           color: Colors.redAccent,

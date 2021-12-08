@@ -3,19 +3,19 @@ import 'package:book_adapter/features/library/library_view_controller.dart';
 import 'package:book_adapter/features/library/widgets/add_new_collection_button.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
 
-class AddToCollectionButton extends ConsumerWidget {
+class AddToCollectionButton extends StatelessWidget {
   const AddToCollectionButton({
     Key? key,
     required this.onMove,
+    required this.onAddNewCollection,
   }) : super(key: key);
 
   final Function(List<String>) onMove;
+  final void Function(String) onAddNewCollection;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final log = Logger();
+  Widget build(BuildContext context) {
     return IconButton(
       onPressed: () async {
         // Show popup for user to choose which collection to move the items to
@@ -27,30 +27,7 @@ class AddToCollectionButton extends ConsumerWidget {
             // Using Wrap makes the bottom sheet height the height of the content.
             // Otherwise, the height will be half the height of the screen.
             return ChooseCollectionsBottomSheet(
-              onAddNewCollection: (collectionName) async {
-                final viewController =
-                    ref.read(libraryViewControllerProvider.notifier);
-                final res =
-                    await viewController.addNewCollection(collectionName);
-                res.fold(
-                  (failure) {
-                    final snackBar = SnackBar(
-                      content: Text(failure.message),
-                      duration: const Duration(seconds: 2),
-                    );
-                    log.e(failure.message);
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  },
-                  (collection) {
-                    final snackBar = SnackBar(
-                      content: Text('Successfully created ${collection.name}'),
-                      duration: const Duration(seconds: 2),
-                    );
-                    log.i('Successfully created ${collection.name}');
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  },
-                );
-              },
+              onAddNewCollection: onAddNewCollection,
             );
           },
         );
@@ -67,9 +44,10 @@ final chosenCollectionsProvider = StateProvider<List<String>>((ref) {
 });
 
 class ChooseCollectionsBottomSheet extends ConsumerStatefulWidget {
-  const ChooseCollectionsBottomSheet(
-      {Key? key, required this.onAddNewCollection})
-      : super(key: key);
+  const ChooseCollectionsBottomSheet({
+    Key? key,
+    required this.onAddNewCollection,
+  }) : super(key: key);
 
   final void Function(String) onAddNewCollection;
 
@@ -85,7 +63,8 @@ class _ChooseCollectionsBottomSheetState
   @override
   Widget build(BuildContext context) {
     final data = ref.watch(libraryViewControllerProvider);
-    final collectionList = data.collections;
+    final collectionList = data.collections
+      ?..sort((a, b) => a.name.compareTo(b.name));
 
     return SingleChildScrollView(
       child: Wrap(
@@ -107,14 +86,15 @@ class _ChooseCollectionsBottomSheetState
                 ),
               ),
               AddNewCollectionButton(
-                  onAddNewCollection: widget.onAddNewCollection),
+                onAddNewCollection: widget.onAddNewCollection,
+              ),
             ],
           ),
           const Divider(
             height: 2,
           ),
           // Current collections
-          for (final collection in collectionList ?? <BookCollection>[]) ...[
+          for (final collection in collectionList ?? <AppCollection>[]) ...[
             CheckboxListTile(
               title: Text(collection.name),
               onChanged: (bool? checked) {

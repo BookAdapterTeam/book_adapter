@@ -10,11 +10,11 @@ import 'package:flutter/material.dart';
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/update/update.dart
 
 /// Version Update Manager
-/// 
+///
 /// 版本更新管理
 class UpdateManager {
   /// Global initialization
-  /// 
+  ///
   /// 全局初始化
   static init({
     String baseUrl = '',
@@ -26,17 +26,23 @@ class UpdateManager {
 
   static void checkUpdate(BuildContext context, String url) {
     HttpUtils.get(url).then((response) {
-      UpdateParser.parseJson(json.encode(response)).then((data) {
-        if (data == null) return;
-        
-        UpdatePrompter(
+      UpdateParser.parseJson(json.encode(response)).then(
+        (data) {
+          if (data == null) return;
+
+          UpdatePrompter(
             updateData: data,
             onInstall: (String filePath) {
-              CommonUtils.installAPP(filePath);
-            }).show(context);
-      });
+              CommonUtils.installAPP(
+                filePath: filePath,
+                githubReleaseUrl: data.githubReleaseUrl,
+              );
+            },
+          ).show(context);
+        },
+      );
     }).catchError((onError) {
-      ToastUtils.error(onError);
+      ToastUtils.error(onError.toString());
     });
   }
 }

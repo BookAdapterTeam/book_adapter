@@ -3,7 +3,6 @@ import 'dart:collection';
 
 import 'package:book_adapter/controller/storage_controller.dart';
 import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/model/user_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -16,9 +15,11 @@ final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
 
   return QueueNotifier(
     data: data,
-    processItem: (book) => storageController.downloadFile(
+    processItem: (book) async => await storageController.downloadFile(
       book,
-      whenDone: (filename) => ref.read(userModelProvider.notifier).addDownloadedFilename(filename),
+      whenDone: (filename) async {
+        await ref.read(storageControllerProvider).setFileDownloaded(filename);
+      },
     ),
   );
 });

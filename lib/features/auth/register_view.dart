@@ -20,6 +20,7 @@ class RegisterView extends ConsumerWidget {
           title: const Text('Register Account'),
         ),
         body: SingleChildScrollView(
+          reverse: true,
           child: Padding(
               padding: const EdgeInsets.all(25.0),
               child: Form(
