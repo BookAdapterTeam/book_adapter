@@ -12,7 +12,10 @@ import 'package:logger/logger.dart';
 final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
     QueueNotifierData<Book>>((ref) {
   final storageController = ref.read(storageControllerProvider);
-  final data = QueueNotifierData<Book>(queueListItems: [], queue: Queue());
+  final data = QueueNotifierData<Book>(
+    queueListItems: [],
+    queue: Queue(),
+  );
 
   return QueueNotifier<Book>(
     data: data,
@@ -33,8 +36,10 @@ final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
 /// such as downloading a file and saving it to the device.
 class QueueNotifier<T extends Item>
     extends StateNotifier<QueueNotifierData<T>> {
-  QueueNotifier({required QueueNotifierData<T> data, required this.processItem})
-      : super(data);
+  QueueNotifier({
+    required QueueNotifierData<T> data,
+    required this.processItem,
+  }) : super(data);
 
   bool processing = false;
   final log = Logger();
