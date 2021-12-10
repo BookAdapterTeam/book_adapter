@@ -457,23 +457,27 @@ class FirebaseController {
       }
 
       // Create a new series with the title with the first item in the list
-      final newSeries = await addSeries(
+      final newSeriesFuture = addSeries(
         name: name ?? selectedBooks.first.title,
         imageUrl: selectedBooks.first.imageUrl ?? kDefaultImage,
         collectionIds: collectionIds,
       );
 
-      await addBooksToSeries(
-        books: selectedBooks,
-        series: newSeries,
-        collectionIds: collectionIds,
-      );
+      // ignore: unawaited_futures
+      newSeriesFuture.then((newSeries) {
+        addBooksToSeries(
+          books: selectedBooks,
+          series: newSeries,
+          collectionIds: collectionIds,
+        );
+      });
 
       for (final series in selectedSeries) {
-        await _firebaseService.deleteSeriesDocument(series.id);
+        // ignore: unawaited_futures
+        _firebaseService.deleteSeriesDocument(series.id);
       }
 
-      return newSeries;
+      return newSeriesFuture;
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
