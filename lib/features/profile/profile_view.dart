@@ -5,7 +5,6 @@ import 'package:book_adapter/features/profile/edit_profile_view.dart';
 import 'package:book_adapter/features/profile/widgets/change_password_button.dart';
 import 'package:book_adapter/features/profile/widgets/log_out_button.dart';
 import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info/package_info.dart';
