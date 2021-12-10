@@ -263,7 +263,7 @@ class FirebaseService
             getDefaultCollectionName(currentUserUid!);
         collectionIds.add(defaultCollection);
       }
-      
+
       return _seriesRef.doc(seriesId).update({'collectionIds': collectionIds});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -301,15 +301,15 @@ class FirebaseService
       }
 
       // Create a shelf with a custom id so that it can easily be referenced later
-      final String id = uuid.v4();
       final series = Series(
-          id: id,
+          id: uuid.v4(),
           userId: userId,
           title: name,
           description: description,
           imageUrl: imageUrl,
           collectionIds: collectionIds ?? {'$userId-Default'});
-      await _seriesRef.doc(id).set(series);
+      // ignore: unawaited_futures
+      _seriesRef.doc(series.id).set(series);
 
       // Return the shelf to the caller in case they care
       return series;

@@ -527,7 +527,7 @@ class FirebaseController {
     Set<String>? collectionIds,
   }) async {
     try {
-      return await _firebaseService.addSeries(
+      return _firebaseService.addSeries(
         name,
         imageUrl: imageUrl,
         description: description,
