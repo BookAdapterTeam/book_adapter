@@ -498,7 +498,8 @@ class FirebaseController {
   }) async {
     try {
       for (final book in books) {
-        await _firebaseService.addBookToSeries(
+        // ignore: unawaited_futures
+        _firebaseService.addBookToSeries(
           bookId: book.id,
           seriesId: series.id,
           collectionIds: collectionIds,

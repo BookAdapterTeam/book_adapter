@@ -333,7 +333,8 @@ class FirebaseService
     required Set<String> collectionIds,
   }) async {
     try {
-      await _booksRef.doc(bookId).update(
+      // ignore: unawaited_futures
+      _booksRef.doc(bookId).update(
         {
           'seriesId': seriesId,
           'collectionIds': collectionIds.toList(),
@@ -386,7 +387,8 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteSeriesDocument(String seriesId) async {
     try {
-      await deleteDocument('$kSeriesCollectionName/$seriesId');
+      // ignore: unawaited_futures
+      deleteDocument('$kSeriesCollectionName/$seriesId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
