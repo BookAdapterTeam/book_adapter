@@ -626,19 +626,15 @@ class FirebaseController {
         // Delete all books in the series
         final seriesItems = _getSeriesItems(item, allBooks);
         for (final itemInSeries in seriesItems) {
-          if (itemInSeries is Book) {
-            await _firebaseService.deleteBookDocument(itemInSeries.id);
-            deletedBooks.add(itemInSeries);
-          }
+          await _firebaseService.deleteBookDocument(itemInSeries.id);
+          deletedBooks.add(itemInSeries);
         }
 
         // Delete the series document in firebase
         await _firebaseService.deleteSeriesDocument(item.id);
 
         for (final itemInSeries in seriesItems) {
-          if (itemInSeries is Book) {
-            await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
-          }
+          await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
         }
       }
     }
