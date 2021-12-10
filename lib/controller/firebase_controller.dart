@@ -673,10 +673,13 @@ class FirebaseController {
     required List<Book> books,
   }) async {
     try {
-      await _firebaseService.deleteSeriesDocument(series.id);
+      // ignore: unawaited_futures
+      _firebaseService.deleteSeriesDocument(series.id);
       for (final book in books) {
-        await _firebaseService.updateBookSeries(book.id, null);
-        await _firebaseService.updateBookCollections(
+        // ignore: unawaited_futures
+        _firebaseService.updateBookSeries(book.id, null);
+        // ignore: unawaited_futures
+        _firebaseService.updateBookCollections(
           bookId: book.id,
           collectionIds: series.collectionIds.toList(),
         );
