@@ -552,11 +552,12 @@ class FirebaseController {
     required Book book,
     required Series series,
   }) async {
-    final collectionIds = series.collectionIds;
+    final Set<String> collectionIds = series.collectionIds;
     collectionIds.addAll(book.collectionIds);
 
     try {
-      await _firebaseService.addBookToSeries(
+      // ignore: unawaited_futures
+      _firebaseService.addBookToSeries(
         bookId: book.id,
         seriesId: series.id,
         collectionIds: collectionIds,
