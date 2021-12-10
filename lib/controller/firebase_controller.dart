@@ -470,12 +470,12 @@ class FirebaseController {
           series: newSeries,
           collectionIds: collectionIds,
         );
+        
+        for (final series in selectedSeries) {
+          // ignore: unawaited_futures
+          _firebaseService.deleteSeriesDocument(series.id);
+        }
       });
-
-      for (final series in selectedSeries) {
-        // ignore: unawaited_futures
-        _firebaseService.deleteSeriesDocument(series.id);
-      }
 
       return newSeriesFuture;
     } on FirebaseException catch (e) {
