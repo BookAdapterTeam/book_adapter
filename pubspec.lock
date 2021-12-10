@@ -23,7 +23,7 @@ packages:
     source: hosted
     version: "1.1.0"
   archive:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
       name: archive
       url: "https://pub.dartlang.org"
