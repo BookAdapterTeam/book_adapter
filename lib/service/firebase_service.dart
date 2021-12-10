@@ -199,7 +199,8 @@ class FirebaseService
         name: collectionName,
         userId: userId,
       );
-      await _collectionsRef.doc(bookCollection.id).set(bookCollection);
+      // ignore: unawaited_futures
+      _collectionsRef.doc(bookCollection.id).set(bookCollection);
 
       // Return the shelf to the caller in case they care
       return Right(bookCollection);
@@ -231,7 +232,6 @@ class FirebaseService
         collectionIds.add(defaultCollection);
       }
 
-      // ignore: unawaited_futures
       return _booksRef.doc(bookId).update({'collectionIds': collectionIds});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -263,7 +263,8 @@ class FirebaseService
             getDefaultCollectionName(currentUserUid!);
         collectionIds.add(defaultCollection);
       }
-      await _seriesRef.doc(seriesId).update({'collectionIds': collectionIds});
+      
+      return _seriesRef.doc(seriesId).update({'collectionIds': collectionIds});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {

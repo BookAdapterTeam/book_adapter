@@ -409,7 +409,7 @@ class FirebaseController {
   /// Create a collection
   Future<Either<Failure, AppCollection>> addCollection(String name) async {
     // Create collection document
-    return await _firebaseService.addCollection(name);
+    return _firebaseService.addCollection(name);
   }
 
   /// Add a list of books to a collection
@@ -422,12 +422,14 @@ class FirebaseController {
     try {
       for (final item in items) {
         if (item is Book) {
-          await _firebaseService.updateBookCollections(
+          // ignore: unawaited_futures
+          _firebaseService.updateBookCollections(
             bookId: item.id,
             collectionIds: collectionIds,
           );
         } else if (item is Series) {
-          await _firebaseService.updateSeriesCollections(
+          // ignore: unawaited_futures
+          _firebaseService.updateSeriesCollections(
             seriesId: item.id,
             collectionIds: collectionIds,
           );
@@ -470,7 +472,7 @@ class FirebaseController {
           series: newSeries,
           collectionIds: collectionIds,
         );
-        
+
         for (final series in selectedSeries) {
           // ignore: unawaited_futures
           _firebaseService.deleteSeriesDocument(series.id);
