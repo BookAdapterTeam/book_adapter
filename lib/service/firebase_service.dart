@@ -332,7 +332,7 @@ class FirebaseService
   }) async {
     try {
       // ignore: unawaited_futures
-      _booksRef.doc(bookId).update(
+      return _booksRef.doc(bookId).update(
         {
           'seriesId': seriesId,
           'collectionIds': collectionIds.toList(),
@@ -354,7 +354,7 @@ class FirebaseService
   Future<void> deleteCollectionDocument(String collectionId) async {
     try {
       // ignore: unawaited_futures
-      deleteDocument('$kCollectionsCollectionName/$collectionId');
+      return deleteDocument('$kCollectionsCollectionName/$collectionId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -371,7 +371,7 @@ class FirebaseService
   Future<void> deleteBookDocument(String bookId) async {
     try {
       // ignore: unawaited_futures
-      deleteDocument('$kBooksCollectionName/$bookId');
+      return deleteDocument('$kBooksCollectionName/$bookId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
