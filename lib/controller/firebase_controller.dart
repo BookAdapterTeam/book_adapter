@@ -409,7 +409,7 @@ class FirebaseController {
   /// Create a collection
   Future<Either<Failure, AppCollection>> addCollection(String name) async {
     // Create collection document
-    return await _firebaseService.addCollection(name);
+    return _firebaseService.addCollection(name);
   }
 
   /// Add a list of books to a collection
@@ -422,12 +422,14 @@ class FirebaseController {
     try {
       for (final item in items) {
         if (item is Book) {
-          await _firebaseService.updateBookCollections(
+          // ignore: unawaited_futures
+          _firebaseService.updateBookCollections(
             bookId: item.id,
             collectionIds: collectionIds,
           );
         } else if (item is Series) {
-          await _firebaseService.updateSeriesCollections(
+          // ignore: unawaited_futures
+          _firebaseService.updateSeriesCollections(
             seriesId: item.id,
             collectionIds: collectionIds,
           );
@@ -457,23 +459,27 @@ class FirebaseController {
       }
 
       // Create a new series with the title with the first item in the list
-      final newSeries = await addSeries(
+      final newSeriesFuture = addSeries(
         name: name ?? selectedBooks.first.title,
         imageUrl: selectedBooks.first.imageUrl ?? kDefaultImage,
         collectionIds: collectionIds,
       );
 
-      await addBooksToSeries(
-        books: selectedBooks,
-        series: newSeries,
-        collectionIds: collectionIds,
-      );
+      // ignore: unawaited_futures
+      newSeriesFuture.then((newSeries) {
+        addBooksToSeries(
+          books: selectedBooks,
+          series: newSeries,
+          collectionIds: collectionIds,
+        );
 
-      for (final series in selectedSeries) {
-        await _firebaseService.deleteSeriesDocument(series.id);
-      }
+        for (final series in selectedSeries) {
+          // ignore: unawaited_futures
+          _firebaseService.deleteSeriesDocument(series.id);
+        }
+      });
 
-      return newSeries;
+      return newSeriesFuture;
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -494,7 +500,8 @@ class FirebaseController {
   }) async {
     try {
       for (final book in books) {
-        await _firebaseService.addBookToSeries(
+        // ignore: unawaited_futures
+        _firebaseService.addBookToSeries(
           bookId: book.id,
           seriesId: series.id,
           collectionIds: collectionIds,
@@ -520,7 +527,7 @@ class FirebaseController {
     Set<String>? collectionIds,
   }) async {
     try {
-      return await _firebaseService.addSeries(
+      return _firebaseService.addSeries(
         name,
         imageUrl: imageUrl,
         description: description,
@@ -545,11 +552,12 @@ class FirebaseController {
     required Book book,
     required Series series,
   }) async {
-    final collectionIds = series.collectionIds;
+    final Set<String> collectionIds = series.collectionIds;
     collectionIds.addAll(book.collectionIds);
 
     try {
-      await _firebaseService.addBookToSeries(
+      // ignore: unawaited_futures
+      _firebaseService.addBookToSeries(
         bookId: book.id,
         seriesId: series.id,
         collectionIds: collectionIds,
@@ -618,19 +626,15 @@ class FirebaseController {
         // Delete all books in the series
         final seriesItems = _getSeriesItems(item, allBooks);
         for (final itemInSeries in seriesItems) {
-          if (itemInSeries is Book) {
-            await _firebaseService.deleteBookDocument(itemInSeries.id);
-            deletedBooks.add(itemInSeries);
-          }
+          await _firebaseService.deleteBookDocument(itemInSeries.id);
+          deletedBooks.add(itemInSeries);
         }
 
         // Delete the series document in firebase
         await _firebaseService.deleteSeriesDocument(item.id);
 
         for (final itemInSeries in seriesItems) {
-          if (itemInSeries is Book) {
-            await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
-          }
+          await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
         }
       }
     }
@@ -668,10 +672,13 @@ class FirebaseController {
     required List<Book> books,
   }) async {
     try {
-      await _firebaseService.deleteSeriesDocument(series.id);
+      // ignore: unawaited_futures
+      _firebaseService.deleteSeriesDocument(series.id);
       for (final book in books) {
-        await _firebaseService.updateBookSeries(book.id, null);
-        await _firebaseService.updateBookCollections(
+        // ignore: unawaited_futures
+        _firebaseService.updateBookSeries(book.id, null);
+        // ignore: unawaited_futures
+        _firebaseService.updateBookCollections(
           bookId: book.id,
           collectionIds: series.collectionIds.toList(),
         );
