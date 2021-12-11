@@ -197,8 +197,7 @@ class FirebaseService
         name: collectionName,
         userId: userId,
       );
-      // ignore: unawaited_futures
-      _collectionsRef.doc(bookCollection.id).set(bookCollection);
+      unawaited(_collectionsRef.doc(bookCollection.id).set(bookCollection));
 
       // Return the shelf to the caller in case they care
       return Right(bookCollection);
@@ -277,7 +276,6 @@ class FirebaseService
   ///
   /// Throws AppException if the book does not exist in Firestore
   Future<void> updateBookSeries(String bookId, String? seriesId) async {
-    // ignore: unawaited_futures
     return _booksRef.doc(bookId).update({'seriesId': seriesId});
   }
 
@@ -306,8 +304,7 @@ class FirebaseService
           description: description,
           imageUrl: imageUrl,
           collectionIds: collectionIds ?? {'$userId-Default'});
-      // ignore: unawaited_futures
-      _seriesRef.doc(series.id).set(series);
+      unawaited(_seriesRef.doc(series.id).set(series));
 
       // Return the shelf to the caller in case they care
       return series;
@@ -330,7 +327,6 @@ class FirebaseService
     required Set<String> collectionIds,
   }) async {
     try {
-      // ignore: unawaited_futures
       return _booksRef.doc(bookId).update(
         {
           'seriesId': seriesId,
@@ -352,7 +348,6 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteCollectionDocument(String collectionId) async {
     try {
-      // ignore: unawaited_futures
       return deleteDocument('$kCollectionsCollectionName/$collectionId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -369,7 +364,6 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteBookDocument(String bookId) async {
     try {
-      // ignore: unawaited_futures
       return deleteDocument('$kBooksCollectionName/$bookId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -386,7 +380,6 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteSeriesDocument(String seriesId) async {
     try {
-      // ignore: unawaited_futures
       return deleteDocument('$kSeriesCollectionName/$seriesId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -403,7 +396,6 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteDocument(String path) async {
     try {
-      // ignore: unawaited_futures
       return _firestore.doc(path).delete();
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);

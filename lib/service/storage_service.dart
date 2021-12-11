@@ -211,9 +211,8 @@ class StorageService {
     bool withReadStream = false,
   }) async {
     try {
+      // Clear cache because it is buggy and will confuse files of similar filenames
       if (io.Platform.isIOS || io.Platform.isAndroid) {
-        // Should be fine to ignore unawaited_futures because its only a cache
-        // ignore: unawaited_futures
         await FilePicker.platform.clearTemporaryFiles();
       }
 
