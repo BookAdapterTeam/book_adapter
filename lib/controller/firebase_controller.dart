@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:book_adapter/data/app_exception.dart';
@@ -422,17 +423,15 @@ class FirebaseController {
     try {
       for (final item in items) {
         if (item is Book) {
-          // ignore: unawaited_futures
-          _firebaseService.updateBookCollections(
+          unawaited(_firebaseService.updateBookCollections(
             bookId: item.id,
             collectionIds: collectionIds,
-          );
+          ));
         } else if (item is Series) {
-          // ignore: unawaited_futures
-          _firebaseService.updateSeriesCollections(
+          unawaited(_firebaseService.updateSeriesCollections(
             seriesId: item.id,
             collectionIds: collectionIds,
-          );
+          ));
         }
       }
     } on FirebaseException catch (e) {
@@ -465,8 +464,7 @@ class FirebaseController {
         collectionIds: collectionIds,
       );
 
-      // ignore: unawaited_futures
-      newSeriesFuture.then((newSeries) {
+      unawaited(newSeriesFuture.then((newSeries) {
         addBooksToSeries(
           books: selectedBooks,
           series: newSeries,
@@ -474,10 +472,9 @@ class FirebaseController {
         );
 
         for (final series in selectedSeries) {
-          // ignore: unawaited_futures
-          _firebaseService.deleteSeriesDocument(series.id);
+          unawaited(_firebaseService.deleteSeriesDocument(series.id));
         }
-      });
+      }));
 
       return newSeriesFuture;
     } on FirebaseException catch (e) {
@@ -500,12 +497,11 @@ class FirebaseController {
   }) async {
     try {
       for (final book in books) {
-        // ignore: unawaited_futures
-        _firebaseService.addBookToSeries(
+        unawaited(_firebaseService.addBookToSeries(
           bookId: book.id,
           seriesId: series.id,
           collectionIds: collectionIds,
-        );
+        ));
       }
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -556,12 +552,11 @@ class FirebaseController {
     collectionIds.addAll(book.collectionIds);
 
     try {
-      // ignore: unawaited_futures
-      _firebaseService.addBookToSeries(
+      unawaited(_firebaseService.addBookToSeries(
         bookId: book.id,
         seriesId: series.id,
         collectionIds: collectionIds,
-      );
+      ));
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -672,16 +667,13 @@ class FirebaseController {
     required List<Book> books,
   }) async {
     try {
-      // ignore: unawaited_futures
-      _firebaseService.deleteSeriesDocument(series.id);
+      unawaited(_firebaseService.deleteSeriesDocument(series.id));
       for (final book in books) {
-        // ignore: unawaited_futures
-        _firebaseService.updateBookSeries(book.id, null);
-        // ignore: unawaited_futures
-        _firebaseService.updateBookCollections(
+        unawaited(_firebaseService.updateBookSeries(book.id, null));
+        unawaited(_firebaseService.updateBookCollections(
           bookId: book.id,
           collectionIds: series.collectionIds.toList(),
-        );
+        ));
       }
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
