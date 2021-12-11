@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:book_adapter/data/app_exception.dart';
 import 'package:book_adapter/data/failure.dart';
+import 'package:crypto/crypto.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:epubx/epubx.dart';
@@ -125,10 +126,19 @@ mixin FirebaseServiceStorageMixin {
 
       try {
         // File does not exist, continue uploading
+        final digestSha1 = sha1.convert(bytes);
+        final digestMd5 = md5.convert(bytes);
+
         final TaskSnapshot taskSnapshot =
             await _firebaseStorage.ref(firebaseFilePath).putData(
                   bytes,
-                  SettableMetadata(contentType: contentType),
+                  SettableMetadata(
+                    contentType: contentType,
+                    customMetadata: {
+                      'sha1': digestSha1.toString(),
+                      'md5': digestMd5.toString(),
+                    },
+                  ),
                 );
         final url = await taskSnapshot.ref.getDownloadURL();
         return Right(url);
@@ -159,10 +169,20 @@ mixin FirebaseServiceStorageMixin {
 
       // File does not exist, continue uploading
       try {
+        // File does not exist, continue uploading
+        final bytes = io.File(localFilePath).readAsBytesSync();
+        final digestSha1 = sha1.convert(bytes);
+        final digestMd5 = md5.convert(bytes);
         final TaskSnapshot taskSnapshot =
             await _firebaseStorage.ref(firebaseFilePath).putFile(
                   io.File(localFilePath),
-                  SettableMetadata(contentType: contentType),
+                  SettableMetadata(
+                    contentType: contentType,
+                    customMetadata: {
+                      'sha1': digestSha1.toString(),
+                      'md5': digestMd5.toString(),
+                    },
+                  ),
                 );
 
         // TODO: Somehow expose this to UI for upload progress
