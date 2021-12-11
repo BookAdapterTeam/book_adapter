@@ -46,6 +46,7 @@ dependencies:
   dio: ^4.0.1
   permission_handler: ^8.2.6
   sticky_and_expandable_list: ^1.0.2
+  crypto: ^3.0.1
 
 dev_dependencies:
   build_runner: ^2.1.2
