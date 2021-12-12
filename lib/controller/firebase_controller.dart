@@ -308,7 +308,9 @@ class FirebaseController {
   /// 1. Create Isolate 1
   /// 2. Pass list of book filepaths to Isolate 1
   /// 3. Isolate 1 uses compute() to create a new isolate in same group for every book to upload
+  /// 
   ///     a. Each compute is passed the book filepath
+  /// 
   ///     b. The following is performed in the new isolate (Parsing and Uploading the Book)
   /// 
   /// Parsing and Uploading the Book
@@ -317,11 +319,12 @@ class FirebaseController {
   ///     -   If book found, stop uploading and show snack bar with message "Book already uploaded",
   /// 3. Grab Book Cover Image
   ///     -   If no cover image exists, put null in book document for the cover image url.
+  /// 
   ///         In the app, a default image will be shown included in the assets if image url is null
   /// 4. Upload Book Cover Image
-  /// 5.   Don't upload if null
-  /// 6. Upload Book Document with Cover Image URL, MD5, and SHA1
-  /// 7. Upload Book File with MD5 and SHA1 in metadata
+  ///     -   Don't upload if null
+  /// 5. Upload Book Document with Cover Image URL, MD5, and SHA1
+  /// 6. Upload Book File with MD5 and SHA1 in metadata
   Future<Either<Failure, Book>> addBook(
     PlatformFile file, {
     AppCollection? collection,
