@@ -10,6 +10,8 @@
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
+  errors:
+    todo: ignore
   exclude:
     - "lib/generated_plugin_registrant.dart"
     - "**/*.g.dart"
@@ -49,6 +51,5 @@ linter:
     directives_ordering: true
 
     unawaited_futures: true
-
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
