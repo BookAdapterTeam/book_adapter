@@ -302,24 +302,25 @@ class FirebaseController {
   }
 
   /// Add a book to the user's library
-  /// 
+  ///
+  /// TODO(@getBoolean): Determine how to set book status
   ///
   /// Use new Dart isolate groups, create a new isolate in the books group for every book
   /// 1. Create Isolate 1
   /// 2. Pass list of book filepaths to Isolate 1
   /// 3. Isolate 1 uses compute() to create a new isolate in same group for every book to upload
-  /// 
+  ///
   ///     a. Each compute is passed the book filepath
-  /// 
+  ///
   ///     b. The following is performed in the new isolate (Parsing and Uploading the Book)
-  /// 
+  ///
   /// Parsing and Uploading the Book
   /// 1. Get MD5 and SHA1 of File Contents
   /// 2. Check Firestore for user books with same MD5 and SHA1
   ///     -   If book found, stop uploading and show snack bar with message "Book already uploaded",
   /// 3. Grab Book Cover Image
   ///     -   If no cover image exists, put null in book document for the cover image url.
-  /// 
+  ///
   ///         In the app, a default image will be shown included in the assets if image url is null
   /// 4. Upload Book Cover Image
   ///     -   Don't upload if null
