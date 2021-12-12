@@ -307,14 +307,14 @@ class FirebaseController {
   ///
   /// 1. Get MD5 and SHA1 of File Contents
   /// 2. Check Firestore for user books with same MD5 and SHA1
-  /// 3.   If book found, stop uploading and show snack bar with message "Book already uploaded",
-  /// 4. Grab Book Cover Image
-  /// 5.   If no cover image exists, put null in book document for the cover image url
-  ///      In the app, a default image will be shown included in the assets if image url is null
-  /// 6. Upload Book Cover Image
-  /// 7.   Don't upload if null
-  /// 8. Upload Book Document with Cover Image URL, MD5, and SHA1
-  /// 9. Upload Book File with MD5 and SHA1 in metadata
+  ///     -   If book found, stop uploading and show snack bar with message "Book already uploaded",
+  /// 3. Grab Book Cover Image
+  ///     -   If no cover image exists, put null in book document for the cover image url.
+  ///         In the app, a default image will be shown included in the assets if image url is null
+  /// 4. Upload Book Cover Image
+  /// 5.   Don't upload if null
+  /// 6. Upload Book Document with Cover Image URL, MD5, and SHA1
+  /// 7. Upload Book File with MD5 and SHA1 in metadata
   Future<Either<Failure, Book>> addBook(
     PlatformFile file, {
     AppCollection? collection,
