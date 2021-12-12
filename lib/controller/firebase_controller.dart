@@ -301,7 +301,20 @@ class FirebaseController {
     return await _firebaseService.getAllBooks();
   }
 
-  /// Get a list of books from the user's database
+  /// Add a book to the user's library
+  ///
+  /// 0. Use new Dart isolate groups, create a new isolate in the books group for every book
+  ///
+  /// 1. Get MD5 and SHA1 of File Contents
+  /// 2. Check Firestore for user books with same MD5 and SHA1
+  /// 3.   If book found, stop uploading and show snack bar with message "Book already uploaded",
+  /// 4. Grab Book Cover Image
+  /// 5.   If no cover image exists, put null in book document for the cover image url
+  ///      In the app, a default image will be shown included in the assets if image url is null
+  /// 6. Upload Book Cover Image
+  /// 7.   Don't upload if null
+  /// 8. Upload Book Document with Cover Image URL, MD5, and SHA1
+  /// 9. Upload Book File with MD5 and SHA1 in metadata
   Future<Either<Failure, Book>> addBook(
     PlatformFile file, {
     AppCollection? collection,
