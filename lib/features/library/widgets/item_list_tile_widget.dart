@@ -136,11 +136,16 @@ class _ItemListTile extends ConsumerWidget {
             case BookStatus.downloaded:
               return null;
             case BookStatus.downloading:
-              return const Icon(Icons.cloud_download_outlined);
-            case BookStatus.waiting:
+              return const Icon(Icons.downloading_outlined);
+            case BookStatus.downloadWaiting:
               return const Icon(Icons.circle_outlined);
+            case BookStatus.uploadWaiting:
+              return const Icon(Icons.cloud_off_outlined);
             case BookStatus.uploading:
-              return const Icon(Icons.cloud_upload_outlined);
+              return const RotatedBox(
+                quarterTurns: 2,
+                child: Icon(Icons.downloading_outlined),
+              );
             case BookStatus.notDownloaded:
               return const Icon(Icons.cloud_outlined);
             case BookStatus.errorUploading:
@@ -164,10 +169,12 @@ class _ItemListTile extends ConsumerWidget {
               return () {
                 // TODO: Cancel download after download starts
               };
-            case BookStatus.waiting:
+            case BookStatus.downloadWaiting:
               return () {
                 // TODO: Cancel download before download starts
               };
+            case BookStatus.uploadWaiting:
+              return null;
             case BookStatus.uploading:
               return null;
             case BookStatus.notDownloaded:

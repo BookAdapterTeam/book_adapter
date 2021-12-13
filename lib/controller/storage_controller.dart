@@ -55,7 +55,7 @@ class StorageController {
 
   Future<void> downloadFile(
     Book book, {
-    required FutureOr<void> Function(String) whenDone,
+    FutureOr<void> Function(String)? whenDone,
   }) async {
     final appBookAdaptPath =
         _read(storageServiceProvider).appBookAdaptDirectory.path;
@@ -63,7 +63,7 @@ class StorageController {
         .downloadFile(book.filepath, '$appBookAdaptPath/${book.filepath}');
 
     await task.whenComplete(() async {
-      await whenDone(book.filename);
+      await whenDone?.call(book.filename);
     });
   }
 

@@ -7,6 +7,7 @@ import 'package:logger/logger.dart';
 import '../controller/storage_controller.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
+import '../features/library/model/book_status_notifier.dart';
 
 /// A queue that will process the items in the queue
 /// whenever it is not empty
@@ -20,12 +21,15 @@ final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
 
   return QueueNotifier<Book>(
     data: data,
-    processItem: (book) async => await storageController.downloadFile(
-      book,
-      whenDone: (_) async {
-        
-      },
-    ),
+    whenItemQueued: (book) {
+      ref.read(bookStatusProvider(book).notifier).setDownloadWaiting();
+    },
+    processItem: (book) async {
+      ref.read(bookStatusProvider(book).notifier).setDownloading();
+      await storageController.downloadFile(
+        book,
+      );
+    },
   );
 });
 
@@ -39,7 +43,8 @@ class QueueNotifier<T extends Item>
     extends StateNotifier<QueueNotifierData<T>> {
   QueueNotifier({
     required QueueNotifierData<T> data,
-    required this.processItem,
+    this.processItem,
+    this.whenItemQueued,
   }) : super(data);
 
   bool processing = false;
@@ -47,10 +52,15 @@ class QueueNotifier<T extends Item>
 
   /// A function that takes an item of the specified type
   /// and runs code using it.
-  final FutureOr<void> Function(T) processItem;
+  final FutureOr<void> Function(T)? processItem;
+
+  /// A function that takes an item of the specified type
+  /// and runs code using it when the item is queued
+  final FutureOr<void> Function(T)? whenItemQueued;
 
   /// Add an item to the queue immediately
   void addToQueue(T item) {
+    whenItemQueued?.call(item);
     final bool isEmpty = state.queue.isEmpty;
     state.queue.add(item);
     state.queueListItems.add(item);
@@ -75,7 +85,7 @@ class QueueNotifier<T extends Item>
       // and save to device storage
       final item = state.queue.removeFirst();
       log.i('Processing Book: ${item.title}');
-      await processItem(item);
+      await processItem?.call(item);
 
       // Remove from the list after processing
       state.queueListItems.remove(item);

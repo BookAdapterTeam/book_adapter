@@ -50,9 +50,14 @@ class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
     updateStatus();
   }
 
-  /// Set BookStatus as waiting for upload or download
-  void setWaiting() {
-    state = const AsyncValue.data(BookStatus.waiting);
+  /// Set BookStatus as waiting to download
+  void setDownloadWaiting() {
+    state = const AsyncValue.data(BookStatus.downloadWaiting);
+  }
+
+  /// Set BookStatus as waiting to upload
+  void setUploadWaiting() {
+    state = const AsyncValue.data(BookStatus.uploadWaiting);
   }
 
   /// Set BookStatus as currently downloading the book file
@@ -107,10 +112,11 @@ enum BookStatus {
   /// The book file is currrently being downloaded to this device
   downloading,
 
-  /// The book is either waiting to upload or download
-  ///
-  /// TODO: Change to downloadWaiting
-  waiting,
+  /// The book is waiting to download
+  downloadWaiting,
+
+  /// The book is waiting to upload
+  uploadWaiting,
 
   /// The book file is currently uploading to the server
   uploading,
