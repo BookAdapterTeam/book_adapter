@@ -17,6 +17,7 @@ import 'data/book_collection.dart';
 import 'data/book_item.dart';
 import 'data/item.dart';
 import 'data/series_item.dart';
+import 'model/book_status_notifier.dart';
 
 final libraryViewControllerProvider =
     StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>(
@@ -287,38 +288,6 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       return Failure(e.toString());
     }
   }
-
-  /// Get the current status of a book to determine what icon to show on the book tile
-  ///
-  /// TODO: Determine if the book is uploading, or an error downloading/uploading
-  // BookStatus getBookStatus(Book book) {
-  //   final BookStatus status;
-  //   if (state.queueData.queueListItems.contains(book)) {
-  //     status = BookStatus.downloading;
-  //   } else {
-  //     final bool exists = state.userData.downloadedFiles
-  //             ?.contains(book.filepath.split('/').last) ??
-  //         false;
-
-  //     if (exists) {
-  //       status = BookStatus.downloaded;
-  //     } else {
-  //       status = BookStatus.notDownloaded;
-  //     }
-  //   }
-  //   return status;
-  // }
-}
-
-enum BookStatus {
-  downloaded,
-  downloading,
-  waiting,
-  uploading,
-  notDownloaded,
-  errorUploading,
-  errorDownloading,
-  unknown,
 }
 
 class LibraryViewData {

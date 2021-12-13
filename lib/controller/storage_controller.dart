@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:watcher/watcher.dart';
 
 import '../data/app_exception.dart';
 import '../features/library/data/book_item.dart';
@@ -12,6 +13,29 @@ import '../features/library/data/item.dart';
 import '../model/user_model.dart';
 import '../service/storage_service.dart';
 import 'firebase_controller.dart';
+
+final fileStreamProvider =
+    StreamProvider.family.autoDispose<WatchEvent, Book>((ref, book) async* {
+  final stream = ref.watch(directorySteamProvider.stream);
+
+  /// Yield the events for this file
+  await for (final event in stream) {
+    if (event.path.split('/').last == book.filename) {
+      yield event;
+    }
+  }
+});
+
+final directorySteamProvider =
+    StreamProvider.autoDispose<WatchEvent>((ref) async* {
+  final storageController = ref.watch(storageControllerProvider);
+  final watcher = DirectoryWatcher(storageController.getUserDirectory());
+
+  // Parse the value received and emit a Message instance\
+  await for (final event in watcher.events) {
+    yield event;
+  }
+});
 
 final storageControllerProvider =
     Provider.autoDispose<StorageController>((ref) {
@@ -26,6 +50,14 @@ class StorageController {
 
   ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
       _read(storageServiceProvider).downloadedBooksValueListenable;
+
+  String getUserDirectory() {
+    final userId = _read(firebaseControllerProvider).currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
+    return _read(storageServiceProvider).getAppFilePath(userId);
+  }
 
   Future<void> downloadFile(
     Book book, {
@@ -100,7 +132,8 @@ class StorageController {
       itemsToDelete: itemsToDelete,
       allBooks: allBooks,
     );
-    final deletedFirebaseFilenameList = deletedFirebaseBooks.map((item) => item.filename).toList();
+    final deletedFirebaseFilenameList =
+        deletedFirebaseBooks.map((item) => item.filename).toList();
     await deleteFiles(filenameList: deletedFirebaseFilenameList);
   }
 
