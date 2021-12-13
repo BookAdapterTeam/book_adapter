@@ -88,9 +88,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                         key: const ValueKey('Initialize Storage Service'),
                         child: AuthChecker(
                           key: const ValueKey('Auth Checker'),
-                          child: InitDownloadedFilesWidget(
-                            child: page,
-                          ),
+                          child: page,
                         ),
                       ),
                     ),

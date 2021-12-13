@@ -3,39 +3,15 @@ import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../controller/firebase_controller.dart';
-import '../controller/storage_controller.dart';
 import '../data/app_exception.dart';
-import '../data/constants.dart';
 import '../data/failure.dart';
 
 final storageServiceInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
-});
-
-/// Get a list of files downloaded on the device. This also deletes any files not in firebase storage
-///
-/// Should only be called if the user is authenticated
-final updateDownloadedFilesProvider = FutureProvider<void>((ref) async {
-  final storageController = ref.read(storageControllerProvider);
-  final downloadedFilenameList =
-      await storageController.updateDownloadedFilenameList();
-
-  final firebaseController = ref.read(firebaseControllerProvider);
-  final uploadedFilenameList = await firebaseController.listFilenames();
-  final deletedFirebaseFilenameList = downloadedFilenameList
-      .toSet()
-      .difference(uploadedFilenameList.toSet())
-      .toList();
-  await storageController.deleteFiles(
-    filenameList: deletedFirebaseFilenameList,
-  );
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -53,11 +29,6 @@ class StorageService {
 
   final _log = Logger();
 
-  late final Box<bool> _downloadedFilesBox;
-
-  ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
-      _downloadedFilesBox.listenable();
-
   /// Initilize the class
   ///
   /// Throws a `MissingPlatformDirectoryException` if the system is unable to provide the directory.
@@ -66,8 +37,6 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
-      _downloadedFilesBox = await Hive.openBox(kDownloadedFilesHiveBox);
-      await clearDownloadedBooksCache();
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
@@ -331,21 +300,5 @@ class StorageService {
   Future<Uint8List> getFileInMemory(String filepath) {
     final file = io.File(filepath);
     return file.readAsBytes();
-  }
-
-  bool? isBookDownloaded(String filename) {
-    return _downloadedFilesBox.get(filename);
-  }
-
-  Future<void> setFileDownloaded(String filename) async {
-    await _downloadedFilesBox.put(filename, true);
-  }
-
-  Future<void> setFileNotDownloaded(String filename) async {
-    await _downloadedFilesBox.put(filename, false);
-  }
-
-  Future<void> clearDownloadedBooksCache() async {
-    await _downloadedFilesBox.clear();
   }
 }

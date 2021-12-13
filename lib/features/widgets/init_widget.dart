@@ -81,30 +81,6 @@ class InitStorageServiceWidget extends ConsumerWidget {
   }
 }
 
-class InitDownloadedFilesWidget extends ConsumerWidget {
-  const InitDownloadedFilesWidget({Key? key, required this.child})
-      : super(key: key);
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncValue = ref.watch(updateDownloadedFilesProvider);
-    final log = Logger();
-
-    return AsyncValueWidget(
-      value: asyncValue,
-      data: (_) => child,
-      loading: () => child,
-      error: (e, st) {
-        log.e(e.toString(), e, st);
-        ToastUtils.error(e.toString());
-        return child;
-      },
-    );
-  }
-}
-
 class UpdateChecker extends StatefulWidget {
   const UpdateChecker({Key? key, required this.child}) : super(key: key);
 

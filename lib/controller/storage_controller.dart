@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:flutter/foundation.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:watcher/watcher.dart';
@@ -10,7 +8,6 @@ import 'package:watcher/watcher.dart';
 import '../data/app_exception.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
-import '../model/user_model.dart';
 import '../service/storage_service.dart';
 import 'firebase_controller.dart';
 
@@ -48,9 +45,6 @@ class StorageController {
   final Reader _read;
   final log = Logger();
 
-  ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
-      _read(storageServiceProvider).downloadedBooksValueListenable;
-
   String getUserDirectory() {
     final userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
@@ -69,28 +63,8 @@ class StorageController {
         .downloadFile(book.filepath, '$appBookAdaptPath/${book.filepath}');
 
     await task.whenComplete(() async {
-      await _read(storageServiceProvider).setFileDownloaded(book.filename);
       await whenDone(book.filename);
     });
-  }
-
-  Future<void> setFileDownloaded(String filename) async {
-    await _read(storageServiceProvider).setFileDownloaded(filename);
-    _read(userModelProvider.notifier).addDownloadedFilename(filename);
-  }
-
-  Future<void> setFileNotDownloaded(String filename) async {
-    await _read(storageServiceProvider).setFileNotDownloaded(filename);
-    _read(userModelProvider.notifier).removeDownloadedFilename(filename);
-  }
-
-  Future<List<String>> updateDownloadedFilenameList() async {
-    await _read(storageServiceProvider).clearDownloadedBooksCache();
-    final downloadedFilenameList = getDownloadedFilenames();
-    for (final filename in downloadedFilenameList) {
-      await _read(storageServiceProvider).setFileDownloaded(filename);
-    }
-    return downloadedFilenameList;
   }
 
   /// Get the list of files on downloaded to the device
@@ -155,10 +129,8 @@ class StorageController {
       if (exists) {
         await io.File(fullFilePath).delete();
         deletedFilenames.add(filename);
-        await setFileNotDownloaded(filename);
       } else {
         deletedFilenames.add(filename);
-        await setFileNotDownloaded(filename);
       }
     }
     return deletedFilenames;
@@ -169,14 +141,5 @@ class StorageController {
         _read(storageServiceProvider).getAppFilePath(book.filepath);
 
     return await _read(storageServiceProvider).getFileInMemory(bookPath);
-  }
-
-  Future<bool?> isBookDownloaded(String filename) async {
-    final isDownloaded =
-        _read(storageServiceProvider).isBookDownloaded(filename);
-    if (isDownloaded == null) {
-      await _read(storageServiceProvider).setFileNotDownloaded(filename);
-    }
-    return isDownloaded ?? false;
   }
 }

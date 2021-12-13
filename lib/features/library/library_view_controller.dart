@@ -184,7 +184,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     try {
       deselectAllItems();
       // Remove file
-      final selectedFilenameList = selectedBooks.map((book) => book.filename).toList();
+      final selectedFilenameList =
+          selectedBooks.map((book) => book.filename).toList();
       await _read(storageControllerProvider)
           .deleteFiles(filenameList: selectedFilenameList);
     } catch (e, st) {
@@ -244,11 +245,9 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
     try {
       // TODO: Check that book is not already downloaded
-      final bool isDownloaded = await _read(storageControllerProvider)
-              .isBookDownloaded(book.filename) ??
-          false;
+      final bookStatus = _read(bookStatusProvider(book)).asData?.value;
 
-      if (isDownloaded) {
+      if (bookStatus == BookStatus.downloaded) {
         return Left(Failure('Book has already been downloaded'));
       }
 

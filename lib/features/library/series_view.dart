@@ -4,13 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:logger/logger.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
-import '../../controller/storage_controller.dart';
 import '../../data/constants.dart';
 import '../in_app_update/util/toast_utils.dart';
 import 'data/book_item.dart';
@@ -30,7 +28,6 @@ class SeriesView extends HookConsumerWidget {
         ModalRoute.of(context)!.settings.arguments! as Map<String, dynamic>;
     final series = Series.fromMapFirebase(bookMap);
     final data = ref.watch(libraryViewControllerProvider);
-    final storageController = ref.watch(storageControllerProvider);
 
     final books = data.books?.where((book) {
       return series.id == book.seriesId;
@@ -45,46 +42,45 @@ class SeriesView extends HookConsumerWidget {
     return Scaffold(
       // appBar: AppBar(title: const Text('Series'),),
       // ignore: prefer_const_constructors
-      body: ValueListenableBuilder(
-          valueListenable: storageController.downloadedBooksValueListenable,
-          builder: (context, Box<bool> isDownloadedBox, _) {
-            return CustomScrollView(
-              controller: scrollController,
-              slivers: [
-                _SliverBackgroundAppBar(imageUrl: imageUrl, series: series),
-                SliverImplicitlyAnimatedList<Book>(
-                  items: books ?? [],
-                  itemBuilder: (
-                    context,
-                    animation,
-                    item,
-                    index,
-                  ) {
-                    return itemBuilder(
-                      context,
-                      animation,
-                      item,
-                      index,
-                      books,
-                      isDownloadedBox,
-                    );
-                  },
-                  areItemsTheSame: (oldItem, newItem) {
-                    return oldItem.id == newItem.id;
-                  },
-                ),
-              ],
-            );
-          }),
+      body: CustomScrollView(
+        controller: scrollController,
+        slivers: [
+          _SliverBackgroundAppBar(imageUrl: imageUrl, series: series),
+          SliverImplicitlyAnimatedList<Book>(
+            items: books ?? [],
+            itemBuilder: (
+              context,
+              animation,
+              item,
+              index,
+            ) {
+              return itemBuilder(
+                context,
+                animation,
+                item,
+                index,
+                books,
+              );
+            },
+            areItemsTheSame: (oldItem, newItem) {
+              return oldItem.id == newItem.id;
+            },
+          ),
+        ],
+      ),
     );
   }
 
-  Widget itemBuilder(BuildContext context, Animation<double> animation,
-      Book item, int index, List<Book>? books, Box<bool> isDownloadedBox) {
+  Widget itemBuilder(
+    BuildContext context,
+    Animation<double> animation,
+    Book item,
+    int index,
+    List<Book>? books,
+  ) {
     return ItemListTileWidget(
       item: item,
       disableSelect: false,
-      isDownloaded: isDownloadedBox.get(item.filename) ?? false,
     );
   }
 }
