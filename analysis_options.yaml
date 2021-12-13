@@ -51,5 +51,7 @@ linter:
     directives_ordering: true
 
     unawaited_futures: true
+
+    prefer_relative_imports: true
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options

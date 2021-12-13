@@ -1,17 +1,18 @@
 import 'dart:async';
 
-import 'package:book_adapter/data/app_exception.dart';
-import 'package:book_adapter/data/constants.dart';
-import 'package:book_adapter/data/failure.dart';
-import 'package:book_adapter/features/library/data/book_collection.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/series_item.dart';
-import 'package:book_adapter/service/firebase_service_auth_mixin.dart';
-import 'package:book_adapter/service/firebase_service_storage_mixin.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
+
+import '../data/app_exception.dart';
+import '../data/constants.dart';
+import '../data/failure.dart';
+import '../features/library/data/book_collection.dart';
+import '../features/library/data/book_item.dart';
+import '../features/library/data/series_item.dart';
+import 'firebase_service_auth_mixin.dart';
+import 'firebase_service_storage_mixin.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
 final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {

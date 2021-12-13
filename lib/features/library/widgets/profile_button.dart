@@ -1,9 +1,10 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/features/profile/profile_view.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../../controller/firebase_controller.dart';
+import '../../profile/profile_view.dart';
 
 class ProfileButton extends ConsumerWidget {
   const ProfileButton({

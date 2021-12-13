@@ -1,7 +1,6 @@
-import 'package:book_adapter/features/in_app_update/data/update_data.dart';
-import 'package:book_adapter/features/in_app_update/util/common.dart';
-
+import 'data/update_data.dart';
 import 'data/update_info.dart';
+import 'util/common.dart';
 
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/update/entity/update_info.dart
 

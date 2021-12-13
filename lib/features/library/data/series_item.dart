@@ -1,7 +1,6 @@
 import 'dart:convert';
 
-import 'package:book_adapter/features/library/series_view.dart';
-
+import '../series_view.dart';
 import 'item.dart';
 
 class Series implements Item {

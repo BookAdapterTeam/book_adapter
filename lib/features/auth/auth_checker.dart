@@ -1,9 +1,10 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/features/auth/login_view.dart';
-import 'package:book_adapter/features/widgets/async_value_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../controller/firebase_controller.dart';
+import '../widgets/async_value_widget.dart';
+import 'login_view.dart';
 
 class AuthChecker extends ConsumerWidget {
   const AuthChecker({Key? key, required this.child}) : super(key: key);
