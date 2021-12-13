@@ -306,19 +306,19 @@ class FirebaseController {
   ///
   /// Book status
   ///
-  /// Family StateNotifierProvider<AsyncValue<BookStatus>>
+  /// Family StateNotifierProvider `StateNotifierProvider.family<AsyncValue<BookStatus>, Book>`
   /// - Pass in book id
-  /// - Default value is AsyncValue.loading()  // Dont show logo if loading
+  /// - Default value is `AsyncValue.loading()`  // Dont show logo if loading
   /// - Get File Status with pub package watcher
-  /// 
-  ///     - Only update state if it is AsyncValue.loading(), BookStatus.downloaded, or BookStatus.notDownloaded
-  /// 
-  ///     - Run if AsyncValue set to `loading()`
-  /// 
-  /// - Manually set downloading, waiting, uploading, errorUploading, errorDownloading
+  ///
+  ///     - Only update state if it is `AsyncValue.loading(), BookStatus.downloaded, or BookStatus.notDownloaded`
+  ///
+  ///     - Run if `AsyncValue` set to `loading()`
+  ///
+  /// - Manually set `downloading, waiting, uploading, errorUploading, errorDownloading`
   /// - with methods and callbacks
   ///
-  /// - Returns type AsyncValue<BookStatus>
+  /// - Returns type `AsyncValue<BookStatus>`
   ///
   /// Use new Dart isolate groups, create a new isolate in the books group for every book
   /// 1. Create Isolate 1
