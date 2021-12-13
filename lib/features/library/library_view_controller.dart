@@ -1,21 +1,22 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/controller/storage_controller.dart';
-import 'package:book_adapter/data/app_exception.dart';
-import 'package:book_adapter/data/failure.dart';
-import 'package:book_adapter/data/user_data.dart';
-import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/features/library/data/book_collection.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/item.dart';
-import 'package:book_adapter/features/library/data/series_item.dart';
-import 'package:book_adapter/model/queue_model.dart';
-import 'package:book_adapter/model/user_model.dart';
-import 'package:book_adapter/service/storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../controller/firebase_controller.dart';
+import '../../controller/storage_controller.dart';
+import '../../data/app_exception.dart';
+import '../../data/failure.dart';
+import '../../data/user_data.dart';
+import '../../model/queue_model.dart';
+import '../../model/user_model.dart';
+import '../../service/storage_service.dart';
+import '../in_app_update/util/toast_utils.dart';
+import 'data/book_collection.dart';
+import 'data/book_item.dart';
+import 'data/item.dart';
+import 'data/series_item.dart';
 
 final libraryViewControllerProvider =
     StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>(

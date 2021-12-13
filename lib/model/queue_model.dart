@@ -1,19 +1,24 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:book_adapter/controller/storage_controller.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../controller/storage_controller.dart';
+import '../features/library/data/book_item.dart';
+import '../features/library/data/item.dart';
 
 /// A queue that will process the items in the queue
 /// whenever it is not empty
 final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
     QueueNotifierData<Book>>((ref) {
   final storageController = ref.read(storageControllerProvider);
-  final data = QueueNotifierData<Book>(queueListItems: [], queue: Queue());
+  final data = QueueNotifierData<Book>(
+    queueListItems: [],
+    queue: Queue(),
+  );
 
-  return QueueNotifier(
+  return QueueNotifier<Book>(
     data: data,
     processItem: (book) async => await storageController.downloadFile(
       book,
@@ -30,9 +35,12 @@ final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
 /// - `processItem` A function that takes an argument of
 /// the same type as the class and runs code using it,
 /// such as downloading a file and saving it to the device.
-class QueueNotifier<T> extends StateNotifier<QueueNotifierData<T>> {
-  QueueNotifier({required QueueNotifierData<T> data, required this.processItem})
-      : super(data);
+class QueueNotifier<T extends Item>
+    extends StateNotifier<QueueNotifierData<T>> {
+  QueueNotifier({
+    required QueueNotifierData<T> data,
+    required this.processItem,
+  }) : super(data);
 
   bool processing = false;
   final log = Logger();
@@ -46,6 +54,8 @@ class QueueNotifier<T> extends StateNotifier<QueueNotifierData<T>> {
     final bool isEmpty = state.queue.isEmpty;
     state.queue.add(item);
     state.queueListItems.add(item);
+    log.i(
+        'Updated Book Queue: ${state.queueListItems.map((item) => item.title)}');
 
     // Start downloading
     if (isEmpty) process();
@@ -58,18 +68,19 @@ class QueueNotifier<T> extends StateNotifier<QueueNotifierData<T>> {
 
     processing = true;
     while (state.queue.isNotEmpty) {
-      log.i('\nCurrent ${T.toString()} Queue: ${state.queueListItems}');
+      log.i(
+          'Current Book Queue: ${state.queueListItems.map((item) => item.title)}');
 
       // Process the item, for example: download a file
       // and save to device storage
       final item = state.queue.removeFirst();
-      log.i('Processing ${T.toString()}: ${item.toString()}');
+      log.i('Processing Book: ${item.title}');
       await processItem(item);
-      
+
       // Remove from the list after processing
       state.queueListItems.remove(item);
     }
-    log.i('\n${T.toString()} Queue is empty\n');
+    log.i('Book Queue is empty');
     processing = false;
   }
 }

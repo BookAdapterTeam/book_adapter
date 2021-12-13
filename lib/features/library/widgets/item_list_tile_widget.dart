@@ -1,13 +1,14 @@
-import 'package:book_adapter/data/constants.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/item.dart';
-import 'package:book_adapter/features/library/data/series_item.dart';
-import 'package:book_adapter/features/library/library_view_controller.dart';
-import 'package:book_adapter/features/reader/current_book.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../../data/constants.dart';
+import '../../reader/current_book.dart';
+import '../data/book_item.dart';
+import '../data/item.dart';
+import '../data/series_item.dart';
+import '../library_view_controller.dart';
 
 class ItemListTileWidget extends ConsumerWidget {
   const ItemListTileWidget({

@@ -1,6 +1,7 @@
-import 'package:book_adapter/features/library/data/book_collection.dart';
-import 'package:book_adapter/features/library/data/item.dart';
 import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
+
+import 'book_collection.dart';
+import 'item.dart';
 
 ///Section model example
 ///

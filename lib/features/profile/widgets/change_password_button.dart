@@ -1,5 +1,6 @@
-import 'package:book_adapter/features/profile/change_password_view.dart';
 import 'package:flutter/material.dart';
+
+import '../change_password_view.dart';
 
 class ChangePasswordButton extends StatelessWidget {
   const ChangePasswordButton({

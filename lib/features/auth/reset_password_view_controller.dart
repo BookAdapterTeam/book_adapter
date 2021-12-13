@@ -1,9 +1,10 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../controller/firebase_controller.dart';
+import '../../data/failure.dart';
 
 final resetPasswordViewController = StateNotifierProvider<ResetPasswordViewController, ResetPasswordViewData>((ref) {
   return ResetPasswordViewController(ref.read);

@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:app_installer/app_installer.dart';
-import 'package:book_adapter/features/in_app_update/data/update_data.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../data/update_data.dart';
 
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/utils/common.dart
 

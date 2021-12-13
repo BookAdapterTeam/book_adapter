@@ -1,19 +1,18 @@
 import 'dart:async';
 
-import 'package:book_adapter/data/app_exception.dart';
-import 'package:book_adapter/data/constants.dart';
-import 'package:book_adapter/data/failure.dart';
-import 'package:book_adapter/features/library/data/book_collection.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/series_item.dart';
-import 'package:book_adapter/service/firebase_service_auth_mixin.dart';
-import 'package:book_adapter/service/firebase_service_storage_mixin.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:uuid/uuid.dart';
+
+import '../data/app_exception.dart';
+import '../data/constants.dart';
+import '../data/failure.dart';
+import '../features/library/data/book_collection.dart';
+import '../features/library/data/book_item.dart';
+import '../features/library/data/series_item.dart';
+import 'firebase_service_auth_mixin.dart';
+import 'firebase_service_storage_mixin.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
 final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {
@@ -199,7 +198,7 @@ class FirebaseService
         name: collectionName,
         userId: userId,
       );
-      await _collectionsRef.doc(bookCollection.id).set(bookCollection);
+      unawaited(_collectionsRef.doc(bookCollection.id).set(bookCollection));
 
       // Return the shelf to the caller in case they care
       return Right(bookCollection);
@@ -230,7 +229,8 @@ class FirebaseService
             getDefaultCollectionName(currentUserUid!);
         collectionIds.add(defaultCollection);
       }
-      await _booksRef.doc(bookId).update({'collectionIds': collectionIds});
+
+      return _booksRef.doc(bookId).update({'collectionIds': collectionIds});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -261,7 +261,8 @@ class FirebaseService
             getDefaultCollectionName(currentUserUid!);
         collectionIds.add(defaultCollection);
       }
-      await _seriesRef.doc(seriesId).update({'collectionIds': collectionIds});
+
+      return _seriesRef.doc(seriesId).update({'collectionIds': collectionIds});
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -276,12 +277,7 @@ class FirebaseService
   ///
   /// Throws AppException if the book does not exist in Firestore
   Future<void> updateBookSeries(String bookId, String? seriesId) async {
-    final bookDocumentSnaphot = await _booksRef.doc(bookId).get();
-    if (!bookDocumentSnaphot.exists) {
-      throw AppException(bookId + 'does not exist');
-    }
-
-    await _booksRef.doc(bookId).update({'seriesId': seriesId});
+    return _booksRef.doc(bookId).update({'seriesId': seriesId});
   }
 
   // Series *********************************************
@@ -302,15 +298,14 @@ class FirebaseService
       }
 
       // Create a shelf with a custom id so that it can easily be referenced later
-      final String id = uuid.v4();
       final series = Series(
-          id: id,
+          id: uuid.v4(),
           userId: userId,
           title: name,
           description: description,
           imageUrl: imageUrl,
           collectionIds: collectionIds ?? {'$userId-Default'});
-      await _seriesRef.doc(id).set(series);
+      unawaited(_seriesRef.doc(series.id).set(series));
 
       // Return the shelf to the caller in case they care
       return series;
@@ -333,7 +328,7 @@ class FirebaseService
     required Set<String> collectionIds,
   }) async {
     try {
-      await _booksRef.doc(bookId).update(
+      return _booksRef.doc(bookId).update(
         {
           'seriesId': seriesId,
           'collectionIds': collectionIds.toList(),
@@ -354,7 +349,7 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteCollectionDocument(String collectionId) async {
     try {
-      await deleteDocument('$kCollectionsCollectionName/$collectionId');
+      return deleteDocument('$kCollectionsCollectionName/$collectionId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -370,7 +365,7 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteBookDocument(String bookId) async {
     try {
-      await deleteDocument('$kBooksCollectionName/$bookId');
+      return deleteDocument('$kBooksCollectionName/$bookId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -386,7 +381,7 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteSeriesDocument(String seriesId) async {
     try {
-      await deleteDocument('$kSeriesCollectionName/$seriesId');
+      return deleteDocument('$kSeriesCollectionName/$seriesId');
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -402,7 +397,7 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteDocument(String path) async {
     try {
-      await _firestore.doc(path).delete();
+      return _firestore.doc(path).delete();
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {

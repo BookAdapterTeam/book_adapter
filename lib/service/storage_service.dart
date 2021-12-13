@@ -1,11 +1,6 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/controller/storage_controller.dart';
-import 'package:book_adapter/data/app_exception.dart';
-import 'package:book_adapter/data/constants.dart';
-import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -13,6 +8,12 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../controller/firebase_controller.dart';
+import '../controller/storage_controller.dart';
+import '../data/app_exception.dart';
+import '../data/constants.dart';
+import '../data/failure.dart';
 
 final storageServiceInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
@@ -211,9 +212,8 @@ class StorageService {
     bool withReadStream = false,
   }) async {
     try {
+      // Clear cache because it is buggy and will confuse files of similar filenames
       if (io.Platform.isIOS || io.Platform.isAndroid) {
-        // Should be fine to ignore unawaited_futures because its only a cache
-        // ignore: unawaited_futures
         await FilePicker.platform.clearTemporaryFiles();
       }
 

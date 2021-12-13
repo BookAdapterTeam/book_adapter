@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:book_adapter/features/in_app_update/util/common.dart';
-import 'package:book_adapter/features/in_app_update/util/http_utils.dart';
-import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_update_dialog/flutter_update_dialog.dart';
 
 import 'data/update_data.dart';
 import 'update.dart';
+import 'util/common.dart';
+import 'util/http_utils.dart';
+import 'util/toast_utils.dart';
 
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/update/update_prompter.dart
 

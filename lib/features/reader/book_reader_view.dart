@@ -1,14 +1,15 @@
-import 'package:book_adapter/controller/storage_controller.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/reader/book_reader_view_controller.dart';
-import 'package:book_adapter/features/reader/current_book.dart';
-import 'package:book_adapter/features/reader/epub_controller.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../controller/storage_controller.dart';
+import '../library/data/book_item.dart';
+import 'book_reader_view_controller.dart';
+import 'current_book.dart';
+import 'epub_controller.dart';
 
 /// Displays detailed information about a BookItem.
 class BookReaderView extends HookConsumerWidget {
