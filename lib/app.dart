@@ -1,16 +1,17 @@
-import 'package:book_adapter/features/auth/auth_checker.dart';
-import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/features/library/library_view.dart';
-import 'package:book_adapter/features/library/series_view.dart';
-import 'package:book_adapter/features/profile/change_password_view.dart';
-import 'package:book_adapter/features/profile/edit_profile_view.dart';
-import 'package:book_adapter/features/profile/profile_view.dart';
-import 'package:book_adapter/features/reader/book_reader_view.dart';
-import 'package:book_adapter/features/widgets/init_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:i18n_extension/i18n_widget.dart';
+
+import 'features/auth/auth_checker.dart';
+import 'features/in_app_update/util/toast_utils.dart';
+import 'features/library/library_view.dart';
+import 'features/library/series_view.dart';
+import 'features/profile/change_password_view.dart';
+import 'features/profile/edit_profile_view.dart';
+import 'features/profile/profile_view.dart';
+import 'features/reader/book_reader_view.dart';
+import 'features/widgets/init_widget.dart';
 
 /// The Widget that configures your application.
 class MyApp extends ConsumerStatefulWidget {

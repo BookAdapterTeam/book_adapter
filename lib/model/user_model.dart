@@ -1,10 +1,11 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/controller/storage_controller.dart';
-import 'package:book_adapter/data/app_exception.dart';
-import 'package:book_adapter/data/user_data.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/model/queue_model.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../controller/firebase_controller.dart';
+import '../controller/storage_controller.dart';
+import '../data/app_exception.dart';
+import '../data/user_data.dart';
+import '../features/library/data/book_item.dart';
+import 'queue_model.dart';
 
 final userModelProvider =
     StateNotifierProvider.autoDispose<UserModel, UserData>((ref) {

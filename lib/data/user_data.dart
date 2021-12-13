@@ -1,6 +1,7 @@
-import 'package:book_adapter/features/library/data/book_item.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+
+import '../features/library/data/book_item.dart';
 
 @immutable
 class UserData extends Equatable {

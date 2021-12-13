@@ -1,7 +1,8 @@
 //Handles password change action
 
-import 'package:book_adapter/features/auth/reset_password_view.dart';
 import 'package:flutter/material.dart';
+
+import '../auth/reset_password_view.dart';
 
 class ChangePasswordView extends StatelessWidget {
   const ChangePasswordView({Key? key}) : super(key: key);

@@ -1,14 +1,15 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/data/app_exception.dart';
-import 'package:book_adapter/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:epub_view/epub_view.dart';
 import 'package:epubx/epubx.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
+
+import '../data/app_exception.dart';
+import '../data/failure.dart';
 
 mixin FirebaseServiceStorageMixin {
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;

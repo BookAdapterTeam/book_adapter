@@ -1,13 +1,14 @@
 // Handles Profile edit action
 
-import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/data/constants.dart';
-import 'package:book_adapter/features/profile/edit_profile_view_controller.dart';
-import 'package:book_adapter/features/profile/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../controller/firebase_controller.dart';
+import '../../data/constants.dart';
+import 'edit_profile_view_controller.dart';
+import 'widgets/profile_widget.dart';
 
 class EditProfileView extends HookConsumerWidget {
   const EditProfileView({Key? key}) : super(key: key);

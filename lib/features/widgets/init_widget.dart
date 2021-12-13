@@ -1,12 +1,13 @@
-import 'package:book_adapter/features/in_app_update/update.dart';
-import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/features/widgets/async_value_widget.dart';
-import 'package:book_adapter/service/storage_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../service/storage_service.dart';
+import '../in_app_update/update.dart';
+import '../in_app_update/util/toast_utils.dart';
+import 'async_value_widget.dart';
 
 class InitFirebaseWidget extends ConsumerWidget {
   const InitFirebaseWidget({Key? key, required this.child}) : super(key: key);

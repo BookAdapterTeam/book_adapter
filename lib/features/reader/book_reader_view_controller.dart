@@ -1,8 +1,9 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
-import 'package:book_adapter/data/failure.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../controller/firebase_controller.dart';
+import '../../data/failure.dart';
 
 final readerViewControllerProvider =
     StateNotifierProvider.autoDispose<ReaderViewController, ReaderViewData>(

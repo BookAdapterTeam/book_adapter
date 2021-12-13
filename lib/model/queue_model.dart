@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:book_adapter/controller/storage_controller.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/item.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../controller/storage_controller.dart';
+import '../features/library/data/book_item.dart';
+import '../features/library/data/item.dart';
 
 /// A queue that will process the items in the queue
 /// whenever it is not empty

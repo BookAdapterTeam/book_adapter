@@ -1,5 +1,6 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../controller/firebase_controller.dart';
 
 final editProfileViewController = StateNotifierProvider<EditProfileViewController, EditProfileViewData>((ref) {
   return EditProfileViewController(ref.read);
