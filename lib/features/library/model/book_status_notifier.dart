@@ -1,10 +1,10 @@
 import 'dart:io' as io;
 
-import 'package:book_adapter/service/storage_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:watcher/watcher.dart';
 
 import '../../../controller/storage_controller.dart';
+import '../../../service/storage_service.dart';
 import '../data/book_item.dart';
 
 final bookStatusProvider = StateNotifierProvider.family
