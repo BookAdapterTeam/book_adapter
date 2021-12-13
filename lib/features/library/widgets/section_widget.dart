@@ -44,7 +44,7 @@ class _SectionWidgetState extends State<SectionWidget>
   void initState() {
     super.initState();
     _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+        vsync: this, duration: kTransitionDuration);
     _iconTurns =
         _controller.drive(_halfTween.chain(CurveTween(curve: Curves.easeIn)));
     _heightFactor = _controller.drive(CurveTween(curve: Curves.easeIn));

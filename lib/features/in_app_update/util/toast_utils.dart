@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 
-const defaultToastDuration = Duration(seconds: 2);
+import '../../../data/constants.dart';
+
 const defaultToastColor = Color(0xFF424242);
 
 // From https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/utils/toast.dart
@@ -23,13 +24,13 @@ class ToastUtils {
       dismissOtherOnShow: true,
       textPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
       child: child,
-      duration: defaultToastDuration,
+      duration: kSnackBarDuration,
     );
   }
 
   static void toast(
     String msg, {
-    Duration duration = defaultToastDuration,
+    Duration duration = kSnackBarDuration,
     Color color = defaultToastColor,
   }) {
     showToast(
@@ -42,7 +43,7 @@ class ToastUtils {
 
   static void waring(
     String msg, {
-    Duration duration = defaultToastDuration,
+    Duration duration = kSnackBarDuration,
   }) {
     showToast(
       msg,
@@ -54,7 +55,7 @@ class ToastUtils {
 
   static void error(
     String msg, {
-    Duration duration = defaultToastDuration,
+    Duration duration = kSnackBarDuration,
   }) {
     showToast(
       msg,
@@ -66,7 +67,7 @@ class ToastUtils {
 
   static void success(
     String msg, {
-    Duration duration = defaultToastDuration,
+    Duration duration = kSnackBarDuration,
   }) {
     showToast(
       msg,

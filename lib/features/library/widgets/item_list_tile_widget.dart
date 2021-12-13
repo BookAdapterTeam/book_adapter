@@ -42,7 +42,7 @@ class ItemListTileWidget extends ConsumerWidget {
               AnimatedSwitcher(
                 switchInCurve: Curves.easeInCubic,
                 switchOutCurve: Curves.easeOutCubic,
-                duration: const Duration(milliseconds: 250),
+                duration: kTransitionDuration,
                 child: _ItemListTile(
                   key: ValueKey(
                       'ItemListTile' + item.id + isSelected.toString()),
@@ -66,7 +66,7 @@ class ItemListTileWidget extends ConsumerWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 15000),
+          duration: kTransitionDuration,
           color: isSelected ? Colors.white30 : null,
           child: Stack(
             alignment: Alignment.center,
@@ -90,7 +90,7 @@ class ItemListTileWidget extends ConsumerWidget {
     return AnimatedSwitcher(
       switchInCurve: Curves.easeInCubic,
       switchOutCurve: Curves.easeOutCubic,
-      duration: const Duration(milliseconds: 250),
+      duration: kTransitionDuration,
       child: child,
     );
   }
@@ -215,7 +215,7 @@ class _ItemListTile extends ConsumerWidget {
         trailing: AnimatedSwitcher(
           switchInCurve: Curves.easeInCubic,
           switchOutCurve: Curves.easeOutCubic,
-          duration: const Duration(milliseconds: 350),
+          duration: kTransitionDuration,
           child: trailing,
         ),
         disableSelect: disableSelect,

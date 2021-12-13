@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../controller/firebase_controller.dart';
+import '../../data/constants.dart';
 import '../widgets/async_value_widget.dart';
 import 'login_view.dart';
 
@@ -19,7 +20,7 @@ class AuthChecker extends ConsumerWidget {
         data: (data) => AnimatedSwitcher(
           switchInCurve: Curves.easeInCubic,
           switchOutCurve: Curves.easeOutCubic,
-          duration: const Duration(milliseconds: 500),
+          duration: kTransitionDuration,
           child: data == null
           ? LoginView(key: const ValueKey('login'),)
           : child,  

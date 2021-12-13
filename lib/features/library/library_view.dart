@@ -127,7 +127,7 @@ class LibraryScrollView extends HookConsumerWidget {
 
             final snackBar = SnackBar(
               content: Text(failure.message),
-              duration: const Duration(seconds: 2),
+              duration: kSnackBarDuration,
             );
             log.e(failure.message);
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -140,7 +140,7 @@ class LibraryScrollView extends HookConsumerWidget {
               (failure) {
                 final snackBar = SnackBar(
                   content: Text(failure.message),
-                  duration: const Duration(seconds: 2),
+                  duration: kSnackBarDuration,
                 );
                 log.e(failure.message);
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -148,7 +148,7 @@ class LibraryScrollView extends HookConsumerWidget {
               (collection) {
                 final snackBar = SnackBar(
                   content: Text('Successfully created ${collection.name}'),
-                  duration: const Duration(seconds: 2),
+                  duration: kSnackBarDuration,
                 );
                 log.i('Successfully created ${collection.name}');
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -169,7 +169,7 @@ class LibraryScrollView extends HookConsumerWidget {
               (failure) {
                 final snackBar = SnackBar(
                   content: Text(failure.message),
-                  duration: const Duration(seconds: 2),
+                  duration: kSnackBarDuration,
                 );
                 log.e(failure.message);
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -249,7 +249,7 @@ class LibraryScrollView extends HookConsumerWidget {
         slivers: [
           SliverAnimatedSwitcher(
             child: appBar,
-            duration: const Duration(milliseconds: 250),
+            duration: kTransitionDuration,
           ),
 
           // List of collections
