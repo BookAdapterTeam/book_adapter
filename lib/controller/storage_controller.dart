@@ -122,4 +122,16 @@ class StorageController {
 
     return await _read(storageServiceProvider).getFileInMemory(bookPath);
   }
+
+  bool fileExists(String filename) {
+    final userId = _read(firebaseControllerProvider).currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
+
+    return _read(storageServiceProvider).appFileExistsSync(
+      userId: userId,
+      filename: filename,
+    );
+  }
 }

@@ -277,6 +277,16 @@ class StorageService {
     return false;
   }
 
+  /// Check if a file exists on the device given the filename
+  bool appFileExistsSync(
+      {required String userId, required String filename}) {
+    final String path = getPathFromFilename(userId: userId, filename: filename);
+    if (io.File(path).existsSync()) {
+      return true;
+    }
+    return false;
+  }
+
   Future<io.File> writeMemoryToFile({
     required Uint8List data,
     required String filepath,

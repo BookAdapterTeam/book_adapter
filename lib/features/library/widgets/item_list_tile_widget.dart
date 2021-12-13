@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
+import '../../../controller/storage_controller.dart';
 import '../../../data/constants.dart';
 import '../../reader/current_book.dart';
 import '../data/book_item.dart';
@@ -303,7 +304,10 @@ class _CustomListTileWidget extends ConsumerWidget {
           return;
         }
 
-        if (item is Book && status == BookStatus.downloaded) {
+        if (item is Book &&
+            ref
+                .read(storageControllerProvider)
+                .fileExists((item as Book).filename)) {
           final controller = ref.read(currentBookProvider.state);
           controller.state = item as Book;
           Navigator.restorablePushNamed(
