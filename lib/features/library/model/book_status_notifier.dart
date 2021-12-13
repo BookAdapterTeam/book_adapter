@@ -116,9 +116,13 @@ enum BookStatus {
   downloadWaiting,
 
   /// The book is waiting to upload
+  /// 
+  /// TODO: Upload Waiting Icon doesn't work
   uploadWaiting,
 
   /// The book file is currently uploading to the server
+  /// 
+  /// TODO: Uploading Icon doesn't work
   uploading,
 
   /// The book file is not downloaded to this device

@@ -325,6 +325,8 @@ class FirebaseController {
   /// - Returns type `AsyncValue<BookStatus>`
   ///
   /// Use new Dart isolate groups, create a new isolate in the books group for every book
+  /// 
+  /// 0. Add placeholder document first with only filename and upload waiting icon
   /// 1. Create Isolate 1
   /// 2. Pass list of book filepaths to Isolate 1
   /// 3. Isolate 1 uses compute() to create a new isolate in same group for every book to upload
