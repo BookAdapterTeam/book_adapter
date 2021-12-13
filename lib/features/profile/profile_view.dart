@@ -1,13 +1,14 @@
 // Handles profile page information
 
+import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:package_info/package_info.dart';
+
 import '../../controller/firebase_controller.dart';
 import 'edit_profile_view.dart';
 import 'widgets/change_password_button.dart';
 import 'widgets/log_out_button.dart';
 import 'widgets/profile_widget.dart';
-import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:package_info/package_info.dart';
 
 class ProfileView extends ConsumerWidget {
   const ProfileView({Key? key}) : super(key: key);

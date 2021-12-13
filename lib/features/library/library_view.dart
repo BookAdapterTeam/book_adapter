@@ -1,6 +1,15 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
+import 'package:sliver_tools/sliver_tools.dart';
+import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
+
 import '../../data/constants.dart';
+import '../../localization/app.i18n.dart';
 import '../in_app_update/util/toast_utils.dart';
 import 'data/book_collection.dart';
 import 'data/collection_section.dart';
@@ -12,14 +21,6 @@ import 'widgets/merge_to_series.dart';
 import 'widgets/overflow_library_appbar_popup_menu_button.dart';
 import 'widgets/profile_button.dart';
 import 'widgets/section_widget.dart';
-import '../../localization/app.i18n.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:logger/logger.dart';
-import 'package:sliver_tools/sliver_tools.dart';
-import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 
 /// Displays a list of BookItems.
 class LibraryView extends ConsumerWidget {
