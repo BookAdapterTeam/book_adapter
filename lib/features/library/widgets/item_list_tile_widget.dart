@@ -196,7 +196,7 @@ class _ItemListTile extends ConsumerWidget {
       final isSelecting = data.isSelecting;
 
       trailing = icon == null
-          ? const SizedBox(width: 24)
+          ? SizedBox(width: IconTheme.of(context).size)
           : IconButton(
               key: ValueKey('ListTile Button' +
                   book.id +
