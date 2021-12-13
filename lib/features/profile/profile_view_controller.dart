@@ -1,5 +1,6 @@
-import 'package:book_adapter/controller/firebase_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../controller/firebase_controller.dart';
 
 final profileViewController = StateNotifierProvider<ProfileViewController, bool>((ref) {
   return ProfileViewController(ref.read);

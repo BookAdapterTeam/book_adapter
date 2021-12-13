@@ -1,6 +1,7 @@
-import 'package:book_adapter/features/profile/profile_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../profile_view_controller.dart';
 
 class LogOutButton extends ConsumerWidget {
   const LogOutButton({

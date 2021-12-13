@@ -1,11 +1,9 @@
-import 'package:book_adapter/controller/storage_controller.dart';
-import 'package:book_adapter/data/constants.dart';
 // ignore: unused_import
-import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/features/library/data/book_item.dart';
-import 'package:book_adapter/features/library/data/collection_section.dart';
-import 'package:book_adapter/features/library/data/item.dart';
-import 'package:book_adapter/features/library/library_view_controller.dart';
+import '../../in_app_update/util/toast_utils.dart';
+import '../data/book_item.dart';
+import '../data/collection_section.dart';
+import '../data/item.dart';
+import '../library_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -13,6 +11,8 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 
+import '../../../controller/storage_controller.dart';
+import '../../../data/constants.dart';
 import 'item_list_tile_widget.dart';
 
 class SectionWidget extends StatefulWidget {

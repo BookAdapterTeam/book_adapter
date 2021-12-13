@@ -1,18 +1,18 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:book_adapter/data/constants.dart';
-import 'package:book_adapter/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/features/library/data/book_collection.dart';
-import 'package:book_adapter/features/library/data/collection_section.dart';
-import 'package:book_adapter/features/library/data/item.dart';
-import 'package:book_adapter/features/library/library_view_controller.dart';
-import 'package:book_adapter/features/library/widgets/add_book_button.dart';
-import 'package:book_adapter/features/library/widgets/add_to_collection_button.dart';
-import 'package:book_adapter/features/library/widgets/merge_to_series.dart';
-import 'package:book_adapter/features/library/widgets/overflow_library_appbar_popup_menu_button.dart';
-import 'package:book_adapter/features/library/widgets/profile_button.dart';
-import 'package:book_adapter/features/library/widgets/section_widget.dart';
-import 'package:book_adapter/localization/app.i18n.dart';
+import '../../data/constants.dart';
+import '../in_app_update/util/toast_utils.dart';
+import 'data/book_collection.dart';
+import 'data/collection_section.dart';
+import 'data/item.dart';
+import 'library_view_controller.dart';
+import 'widgets/add_book_button.dart';
+import 'widgets/add_to_collection_button.dart';
+import 'widgets/merge_to_series.dart';
+import 'widgets/overflow_library_appbar_popup_menu_button.dart';
+import 'widgets/profile_button.dart';
+import 'widgets/section_widget.dart';
+import '../../localization/app.i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';

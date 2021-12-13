@@ -1,9 +1,10 @@
-import 'package:book_adapter/data/constants.dart';
-import 'package:book_adapter/data/failure.dart';
-import 'package:book_adapter/features/auth/reset_password_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../data/constants.dart';
+import '../../data/failure.dart';
+import 'reset_password_view_controller.dart';
 
 final _formKey = GlobalKey<FormState>();
 
