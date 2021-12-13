@@ -7,12 +7,10 @@ import '../features/library/data/book_item.dart';
 class UserData extends Equatable {
   const UserData({
     this.books,
-    this.downloadedFiles,
   });
 
   // In the future, this would contain other data about Users, such as Collections, Series, etc
   final List<Book>? books;
-  final List<String>? downloadedFiles;
 
   // The following was generated with VSCode extention "Dart Data Class Generator"
   UserData copyWith({
@@ -21,7 +19,6 @@ class UserData extends Equatable {
   }) {
     return UserData(
       books: books ?? this.books,
-      downloadedFiles: downloadedFiles ?? this.downloadedFiles,
     );
   }
 
@@ -31,6 +28,5 @@ class UserData extends Equatable {
   @override
   List<Object> get props => [
         books ?? 'No books set',
-        downloadedFiles ?? 'No files set',
       ];
 }

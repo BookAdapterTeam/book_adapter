@@ -67,28 +67,6 @@ class StorageController {
     });
   }
 
-  /// Get the list of files on downloaded to the device
-  ///
-  /// Returns a list of string filenames
-  List<String> getDownloadedFilenames() {
-    final String? userId = _read(firebaseControllerProvider).currentUser?.uid;
-    if (userId == null) {
-      throw AppException('User not logged in');
-    }
-
-    try {
-      final filesPaths =
-          _read(storageServiceProvider).listFiles(userId: userId);
-      return filesPaths.map((file) => file.path.split('/').last).toList();
-    } on io.FileSystemException catch (e, st) {
-      log.e(e.message, e, st);
-      return [];
-    } on Exception catch (e, st) {
-      log.e(e.toString(), e, st);
-      return [];
-    }
-  }
-
   /// Delete a library item permamently
   ///
   /// Arguments

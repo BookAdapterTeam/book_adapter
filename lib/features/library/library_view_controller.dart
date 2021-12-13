@@ -345,37 +345,6 @@ class LibraryViewData {
     );
   }
 
-  /// Get the current status of a book to determine what icon to show on the book tile
-  ///
-  /// TODO: Determine if the book is uploading, or an error downloading/uploading
-  BookStatus getBookStatus(Book book) {
-    final BookStatus status;
-    if (queueData.queue
-        .toSet()
-        .difference(queueData.queueListItems.toSet())
-        .contains(book)) {
-      // TODO: Fix, this function doesn't get called when queueData gets updated
-      status = BookStatus.downloading;
-    } else if (queueData.queueListItems
-        .toSet()
-        .difference(queueData.queue.toSet())
-        .contains(book)) {
-      // TODO: Fix, this function doesn't get called when queueData gets updated
-      status = BookStatus.waiting;
-    } else {
-      final bool exists =
-          userData.downloadedFiles?.contains(book.filepath.split('/').last) ??
-              false;
-
-      if (exists) {
-        status = BookStatus.downloaded;
-      } else {
-        status = BookStatus.notDownloaded;
-      }
-    }
-    return status;
-  }
-
   List<Item> getCollectionItems(String collectionId) {
     final List<Item> items = books
             ?.where((book) => book.collectionIds.contains(collectionId))
