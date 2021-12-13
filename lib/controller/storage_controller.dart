@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io' as io;
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:watcher/watcher.dart';
@@ -56,6 +57,7 @@ class StorageController {
   Future<void> downloadFile(
     Book book, {
     FutureOr<void> Function(String)? whenDone,
+    FutureOr<TaskSnapshot> Function(TaskSnapshot, StackTrace)? handleError,
   }) async {
     final appBookAdaptPath =
         _read(storageServiceProvider).appBookAdaptDirectory.path;
@@ -80,7 +82,7 @@ class StorageController {
       throw AppException('User not logged in');
     }
     final deletedFirebaseBooks =
-        await _read(firebaseControllerProvider).deleteItemsPermanently(
+        _read(firebaseControllerProvider).deleteItemsPermanently(
       itemsToDelete: itemsToDelete,
       allBooks: allBooks,
     );
@@ -105,7 +107,7 @@ class StorageController {
       final exists = await _read(storageServiceProvider)
           .appFileExists(userId: userId, filename: filename);
       if (exists) {
-        await io.File(fullFilePath).delete();
+        unawaited(io.File(fullFilePath).delete());
         deletedFilenames.add(filename);
       } else {
         deletedFilenames.add(filename);

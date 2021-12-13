@@ -19,6 +19,7 @@ import '../features/library/data/book_collection.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
 import '../features/library/data/series_item.dart';
+import '../features/library/model/book_status_notifier.dart';
 import '../service/firebase_service.dart';
 import '../service/storage_service.dart';
 
@@ -84,13 +85,15 @@ final firebaseControllerProvider =
   final firebaseService = ref.watch(firebaseServiceProvider);
   final storageService = ref.watch(storageServiceProvider);
   return FirebaseController(
+    ref.read,
     firebaseService: firebaseService,
     storageService: storageService,
   );
 });
 
 class FirebaseController {
-  FirebaseController({
+  FirebaseController(
+    this._read, {
     required FirebaseService firebaseService,
     required StorageService storageService,
   })  : _firebaseService = firebaseService,
@@ -100,6 +103,7 @@ class FirebaseController {
   final StorageService _storageService;
   final log = Logger();
   static const uuid = Uuid();
+  final Reader _read;
 
   // Authentication
 
@@ -416,7 +420,10 @@ class FirebaseController {
       final firestoreRes = await _firebaseService.addBookToFirestore(
         book: bookWithImage,
       );
+      _read(bookStatusProvider(book).notifier).setUploadWaiting();
+
       if (firestoreRes.isLeft()) {
+        _read(bookStatusProvider(book).notifier).setErrorUploading();
         return firestoreRes.fold(
           (failure) => Left(Failure(
               'Could not add book ${book.filename} to Firestore: ${failure.message}')),
@@ -425,11 +432,13 @@ class FirebaseController {
       }
 
       // Upload book to storage
+      _read(bookStatusProvider(book).notifier).setUploading();
       final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(
         firebaseFilePath: book.filepath,
         localFilePath: localFilePath,
       );
       if (uploadRes.isLeft()) {
+        _read(bookStatusProvider(book).notifier).setErrorUploading();
         return uploadRes.fold(
           (failure) => Left(Failure(
               'Could not add book to Firebase Storage: ${failure.message}')),
@@ -644,31 +653,31 @@ class FirebaseController {
   ///
   /// Arguments
   /// `items` - Items to be deleted
-  Future<List<Book>> deleteItemsPermanently({
+  List<Book> deleteItemsPermanently({
     required List<Item> itemsToDelete,
     required List<Book> allBooks,
-  }) async {
+  }) {
     final deletedBooks = <Book>[];
     for (final item in itemsToDelete) {
       if (item is Book) {
         // Delete the book document in firebase
-        await _firebaseService.deleteBookDocument(item.id);
+        unawaited(_firebaseService.deleteBookDocument(item.id));
         // Delete the book files on firebase storage
-        await _deleteFirebaseStorageBookFiles(item.filepath);
+        unawaited(_deleteFirebaseStorageBookFiles(item.filepath));
         deletedBooks.add(item);
       } else if (item is Series) {
         // Delete all books in the series
         final seriesItems = _getSeriesItems(item, allBooks);
         for (final itemInSeries in seriesItems) {
-          await _firebaseService.deleteBookDocument(itemInSeries.id);
+          unawaited(_firebaseService.deleteBookDocument(itemInSeries.id));
           deletedBooks.add(itemInSeries);
         }
 
         // Delete the series document in firebase
-        await _firebaseService.deleteSeriesDocument(item.id);
+        unawaited(_firebaseService.deleteSeriesDocument(item.id));
 
         for (final itemInSeries in seriesItems) {
-          await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
+          unawaited(_deleteFirebaseStorageBookFiles(itemInSeries.filepath));
         }
       }
     }
