@@ -54,7 +54,9 @@ class StorageController {
     return _read(storageServiceProvider).getAppFilePath(userId);
   }
 
-  Future<void> downloadFile(
+  
+
+  Future<void> downloadBookFile(
     Book book, {
     FutureOr<void> Function(String)? whenDone,
     FutureOr<TaskSnapshot> Function(TaskSnapshot, StackTrace)? handleError,

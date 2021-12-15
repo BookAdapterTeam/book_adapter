@@ -26,7 +26,7 @@ final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
     },
     processItem: (book) async {
       ref.read(bookStatusProvider(book).notifier).setDownloading();
-      await storageController.downloadFile(
+      await storageController.downloadBookFile(
         book,
       );
     },
