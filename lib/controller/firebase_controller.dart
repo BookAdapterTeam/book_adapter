@@ -317,10 +317,10 @@ class FirebaseController {
         return Left(Failure('User not logged in'));
       }
 
-      final localFilePath = file.path;
-      if (localFilePath == null) {
+      final cacheFilePath = file.path;
+      if (cacheFilePath == null) {
         return Left(
-            Failure('File path was null, cannot add book ${file.name}'));
+            Failure('Cache File path was null, cannot add book ${file.name}'));
       }
 
       final readStream = file.readStream;
@@ -397,7 +397,7 @@ class FirebaseController {
       _read(bookStatusProvider(book).notifier).setUploading();
       final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(
         firebaseFilePath: book.filepath,
-        localFilePath: localFilePath,
+        localFilePath: cacheFilePath,
       );
       if (uploadRes.isLeft()) {
         _read(bookStatusProvider(book).notifier).setErrorUploading();
