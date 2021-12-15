@@ -203,22 +203,22 @@ class StorageService {
       }
 
       if (allowMultiple) {
-        return Right(handleMultiple(result));
+        return Right(_handleMultiple(result));
       } else {
-        return Right(handleSingle(result));
+        return Right(_handleSingle(result));
       }
     } on Exception catch (e) {
       return Left(Failure(e.toString()));
     }
   }
 
-  List<PlatformFile> handleSingle(FilePickerResult result) {
+  List<PlatformFile> _handleSingle(FilePickerResult result) {
     final PlatformFile file = result.files.first;
 
     return [file];
   }
 
-  List<PlatformFile> handleMultiple(FilePickerResult result) {
+  List<PlatformFile> _handleMultiple(FilePickerResult result) {
     final List<PlatformFile> files = result.files;
     return files;
   }
