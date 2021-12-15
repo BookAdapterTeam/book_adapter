@@ -323,4 +323,10 @@ class MockFirebaseService implements FirebaseService {
     // TODO: implement deleteSeriesDocument
     throw UnimplementedError();
   }
+
+  @override
+  Future<bool> fileHashExists({required String md5, required String sha1}) {
+    // TODO: implement fileHashExists
+    throw UnimplementedError();
+  }
 }

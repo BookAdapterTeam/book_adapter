@@ -148,6 +148,19 @@ class FirebaseService
     }
   }
 
+  /// Check if a file has been uploaded by checking book documents for its hash
+  Future<bool> fileHashExists({required String md5, required String sha1}) async {
+    // Check books for duplicates, return Failure if any are found
+    final duplicatesQuerySnapshot = await _booksRef
+        .where('md5', isEqualTo: md5)
+        .where('sha1', isEqualTo: sha1)
+        .get();
+
+    final duplicates = duplicatesQuerySnapshot.docs;
+
+    return duplicates.isNotEmpty;
+  }
+
   /// Add a book to Firebase Firestore
   Future<Either<Failure, Book>> addBookToFirestore({required Book book}) async {
     try {

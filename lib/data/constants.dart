@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// 'BookAdapter-downloadedBooks'
-const kDownloadedFilesHiveBox = 'BookAdapter-downloadedFiles';
+/// 'BookAdapt-UploadQueue'
+const kUploadQueueBox = 'BookAdapt-UploadQueue';
 
 /// 'books'
 const kBooksCollectionName = 'books';

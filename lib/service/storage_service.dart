@@ -3,11 +3,13 @@ import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../data/app_exception.dart';
+import '../data/constants.dart';
 import '../data/failure.dart';
 
 final storageServiceInitProvider = FutureProvider<void>((ref) async {
@@ -23,11 +25,19 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 class StorageService {
   StorageService();
 
-  late io.Directory appDir;
+  late final io.Directory appDir;
 
-  late io.Directory appBookAdaptDirectory;
+  late final io.Directory appBookAdaptDirectory;
 
   final _log = Logger();
+
+  late final Box<Map<String, dynamic>> _uploadQueueBox;
+
+  static const kFilepathKey = 'filename';
+  static const kMD5 = 'md5';
+  static const kSHA1 = 'sha1';
+  static const kIsDocumentUploadedKey = 'isDocumentUploaded';
+  static const kIsFileUploaded = 'isFileUploaded';
 
   /// Initilize the class
   ///
@@ -37,10 +47,75 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
+      _uploadQueueBox = await Hive.openBox(kUploadQueueBox);
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
     }
+  }
+
+  List<Map<String, dynamic>> get uploadQueueItemList {
+    return _uploadQueueBox.values.toList();
+  }
+
+  Map<String, dynamic>? getUploadQueueItem(String filepath) {
+    return _uploadQueueBox.get(filepath);
+  }
+
+  /// Adds a file to the upload queue box with `filepath` as the key
+  void boxAddToUploadQueue(
+    String filepath, {
+    required String md5,
+    required String sha1,
+    bool isDocumentUploaded = false,
+    bool isFileUploaded = false,
+  }) {
+    _uploadQueueBox.put(filepath, {
+      kFilepathKey: filepath,
+      kMD5: md5,
+      kSHA1: sha1,
+      kIsDocumentUploadedKey: isDocumentUploaded,
+      kIsFileUploaded: isFileUploaded,
+    });
+  }
+
+  void boxSetDocumentUploadedInUploadQueue(
+    String filepath,
+  ) {
+    final queueMap = getUploadQueueItem(filepath);
+    if (queueMap == null) return;
+
+    final md5 = queueMap[kMD5];
+    final sha1 = queueMap[kSHA1];
+
+    boxAddToUploadQueue(
+      filepath,
+      md5: md5,
+      sha1: sha1,
+      isDocumentUploaded: true,
+    );
+  }
+
+  void boxSetFileUploadedInUploadQueue(
+    String filepath,
+  ) {
+    final queueMap = getUploadQueueItem(filepath);
+    if (queueMap == null) return;
+
+    final md5 = queueMap[kMD5];
+    final sha1 = queueMap[kSHA1];
+
+    boxAddToUploadQueue(
+      filepath,
+      md5: md5,
+      sha1: sha1,
+      isFileUploaded: true,
+    );
+  }
+
+  /// Removes a file to the upload queue box
+  void boxRemoveFromUploadQueue(String filepath) async {
+    return await _uploadQueueBox.delete(filepath);
   }
 
   String getAppFilePath(String filepath) =>
@@ -170,7 +245,7 @@ class StorageService {
   /// other platforms.
   ///
   /// The result is wrapped in a `Either` which contains either a left `Failure` or right `List<PlatformFile>`.
-  Future<Either<Failure, List<PlatformFile>>> pickFile({
+  Future<List<PlatformFile>> pickFile({
     String? dialogTitle,
     FileType type = FileType.any,
     List<String>? allowedExtensions,
@@ -180,35 +255,31 @@ class StorageService {
     bool withData = false,
     bool withReadStream = false,
   }) async {
-    try {
-      // Clear cache because it is buggy and will confuse files of similar filenames
-      if (io.Platform.isIOS || io.Platform.isAndroid) {
-        await FilePicker.platform.clearTemporaryFiles();
-      }
+    // Clear cache because it is buggy and will confuse files of similar filenames
+    if (io.Platform.isIOS || io.Platform.isAndroid) {
+      await FilePicker.platform.clearTemporaryFiles();
+    }
 
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
-        dialogTitle: dialogTitle,
-        type: type,
-        allowedExtensions: allowedExtensions,
-        onFileLoading: onFileLoading,
-        allowCompression: allowCompression,
-        allowMultiple: allowMultiple,
-        withData: withData,
-        withReadStream: withReadStream,
-      );
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      dialogTitle: dialogTitle,
+      type: type,
+      allowedExtensions: allowedExtensions,
+      onFileLoading: onFileLoading,
+      allowCompression: allowCompression,
+      allowMultiple: allowMultiple,
+      withData: withData,
+      withReadStream: withReadStream,
+    );
 
-      if (result == null) {
-        // User canceled the picker
-        return Left(Failure('User canceled the file picker'));
-      }
+    if (result == null) {
+      // User canceled the picker
+      return [];
+    }
 
-      if (allowMultiple) {
-        return Right(_handleMultiple(result));
-      } else {
-        return Right(_handleSingle(result));
-      }
-    } on Exception catch (e) {
-      return Left(Failure(e.toString()));
+    if (allowMultiple) {
+      return _handleMultiple(result);
+    } else {
+      return _handleSingle(result);
     }
   }
 
@@ -278,8 +349,7 @@ class StorageService {
   }
 
   /// Check if a file exists on the device given the filename
-  bool appFileExistsSync(
-      {required String userId, required String filename}) {
+  bool appFileExistsSync({required String userId, required String filename}) {
     final String path = getPathFromFilename(userId: userId, filename: filename);
     if (io.File(path).existsSync()) {
       return true;

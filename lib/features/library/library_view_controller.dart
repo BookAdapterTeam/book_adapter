@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
@@ -11,8 +10,6 @@ import '../../data/failure.dart';
 import '../../data/user_data.dart';
 import '../../model/queue_model.dart';
 import '../../model/user_model.dart';
-import '../../service/storage_service.dart';
-import '../in_app_update/util/toast_utils.dart';
 import 'data/book_collection.dart';
 import 'data/book_item.dart';
 import 'data/item.dart';
@@ -47,32 +44,35 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   final log = Logger();
 
   Future<void> addBooks() async {
-    // Make storage service call to pick books
-    final sRes = await _read(storageServiceProvider).pickFile(
-      type: FileType.custom,
-      allowedExtensions: ['epub'],
-      allowMultiple: true,
-      withReadStream: true,
-    );
+    await for (final _
+        in _read(storageControllerProvider).uploadMultipleBooks()) {}
 
-    if (sRes.isLeft()) {
-      return;
-    }
+    // // Make storage service call to pick books
+    // final sRes = await _read(storageServiceProvider).pickFile(
+    //   type: FileType.custom,
+    //   allowedExtensions: ['epub'],
+    //   allowMultiple: true,
+    //   withReadStream: true,
+    // );
 
-    final platformFiles = sRes.getOrElse(() => []);
+    // if (sRes.isLeft()) {
+    //   return;
+    // }
 
-    final uploadedBooks = <Book>[];
-    for (final file in platformFiles) {
-      // Add book to firebase
-      final fRes = await _read(firebaseControllerProvider).addBook(file);
-      fRes.fold(
-        (failure) {
-          log.e(failure.message);
-          ToastUtils.error(failure.message);
-        },
-        (book) => uploadedBooks.add(book),
-      );
-    }
+    // final platformFiles = sRes.getOrElse(() => []);
+
+    // final uploadedBooks = <Book>[];
+    // for (final file in platformFiles) {
+    //   // Add book to firebase
+    //   final fRes = await _read(firebaseControllerProvider).addBook(file);
+    //   fRes.fold(
+    //     (failure) {
+    //       log.e(failure.message);
+    //       ToastUtils.error(failure.message);
+    //     },
+    //     (book) => uploadedBooks.add(book),
+    //   );
+    // }
   }
 
   Future<void> deleteBook(String bookId) {
