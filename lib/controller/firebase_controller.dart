@@ -298,113 +298,40 @@ class FirebaseController {
     return await _firebaseService.getAllBooks();
   }
 
-  /// Add a book to the user's library
-  // Future<Either<Failure, Book>> addBook(
-  //   PlatformFile file, {
-  //   AppCollection? collection,
-  // }) async {
-  //   try {
-  //     final userId = _firebaseService.currentUser?.uid;
-  //     if (userId == null) {
-  //       return Left(Failure('User not logged in'));
-  //     }
+  Future<UploadTask?> uploadCoverImage({
+    required String firebaseFilepath,
+    required List<int> data,
+  }) async {
+    return await _firebaseService.uploadCoverPhoto(
+      uploadToPath: firebaseFilepath,
+      bytes: data,
+    );
+  }
 
-  //     final cacheFilePath = file.path;
-  //     if (cacheFilePath == null) {
-  //       return Left(
-  //           Failure('Cache File path was null, cannot add book ${file.name}'));
-  //     }
+  Future<void> uploadBookDocument(Book book) async {
+    return await _firebaseService.addBookToFirestore(book: book);
+  }
 
-  //     final readStream = file.readStream;
-  //     if (readStream == null) {
-  //       return Left(
-  //           Failure('File read stream was null, cannot add book ${file.name}'));
-  //     }
-  //     // Get the book stream into memory for upload
-  //     final stream = http.ByteStream(readStream);
+  Future<UploadTask?> uploadBookFile({
+    required String userId,
+    required String cacheFilepath,
+    required String firebaseFilepath,
+    required String md_5,
+    required String sha_1,
+  }) async {
+    return await _firebaseService.uploadBookToFirebaseStorage(
+      firebaseFilePath: firebaseFilepath,
+      localFilePath: cacheFilepath,
+      customMetadata: {
+        StorageService.kMD5Key: md_5,
+        StorageService.kSHA1Key: sha_1
+      },
+    );
+  }
 
-  //     // Open book takes a future so it does not block the UI loading all the data
-  //     final EpubBookRef openedBook =
-  //         await EpubReader.openBook(stream.toBytes());
-
-  //     final title = openedBook.Title ?? '';
-  //     final subtitle =
-  //         openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
-  //     final filesize = file.size;
-
-  //     // Max filename is 127 characters
-  //     final filesizeLength = filesize.toString().length;
-  //     final startingInt = max(0, file.name.length - (127 - filesizeLength));
-  //     final tempFilename = file.name.substring(startingInt, file.name.length);
-  //     final filename = '$filesize-$tempFilename';
-  //     final firebaseFilePath = '$userId/$filename';
-  //     final collectionName = collection?.name ?? 'Default';
-
-  //     // TODO: Check for duplicates first (already checking in _firebaseService.addBookToFirestore())
-
-  //     final String id = uuid.v4();
-  //     final book = Book(
-  //       id: id,
-  //       userId: userId,
-  //       title: title,
-  //       subtitle: subtitle,
-  //       addedDate: DateTime.now().toUtc(),
-  //       filepath: firebaseFilePath,
-  //       filesize: filesize,
-  //       collectionIds: {
-  //         '$userId-$collectionName',
-  //       },
-  //     );
-
-  //     // Upload cover image to storage
-  //     final res = await _firebaseService.uploadCoverPhoto(
-  //       openedBook: openedBook,
-  //       uploadToPath: '$firebaseFilePath.jpg',
-  //     );
-  //     final String? imageUrl = res.fold(
-  //       (failure) {
-  //         log.w('Could not upload cover photo');
-  //         return;
-  //       },
-  //       (url) => url,
-  //     );
-  //     final bookWithImage = book.copyWith(imageUrl: imageUrl);
-
-  //     // Upload to Firestore
-  //     final firestoreRes = await _firebaseService.addBookToFirestore(
-  //       book: bookWithImage,
-  //     );
-  //     _read(bookStatusProvider(book).notifier).setUploadWaiting();
-
-  //     if (firestoreRes.isLeft()) {
-  //       return firestoreRes.fold(
-  //         (failure) => Left(Failure(
-  //             'Could not add book ${book.filename} to Firestore: ${failure.message}')),
-  //         (right) => Left(Failure('')), // Wont ever be returned
-  //       );
-  //     }
-
-  //     // Upload book to storage
-  //     _read(bookStatusProvider(book).notifier).setUploading();
-  //     try {
-  //       final _ = await _firebaseService.uploadBookToFirebaseStorage(
-  //         firebaseFilePath: book.filepath,
-  //         localFilePath: cacheFilePath,
-  //       );
-
-  //       // TODO: Add bookUrl to firebase book document
-  //       // final String? bookUrl = res.getOrElse(() => '');
-
-  //       return firestoreRes;
-  //     } on Exception catch (e, st) {
-  //       log.e(e.toString(), e, st);
-  //       _read(bookStatusProvider(book).notifier).setErrorUploading();
-  //       rethrow;
-  //     }
-  //   } on Exception catch (e) {
-  //     return Left(Failure(e.toString()));
-  //   }
-  // }
+  Future<bool> fileHashExists(String md5, String sha1) async {
+    return await _firebaseService.fileHashExists(md5: md5, sha1: sha1);
+  }
 
   /// Create a collection
   Future<Either<Failure, AppCollection>> addCollection(String name) async {

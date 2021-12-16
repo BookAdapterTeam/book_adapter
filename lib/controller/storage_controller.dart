@@ -16,7 +16,6 @@ import '../data/app_exception.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
 import '../features/parser/epub_service.dart';
-import '../service/firebase_service.dart';
 import '../service/storage_service.dart';
 import 'firebase_controller.dart';
 
@@ -140,7 +139,8 @@ class StorageController {
     final List<Map<String, dynamic>> fileMapList = [];
 
     //1. Get File Hash
-    await for (final fileMap in _sendAndReceiveFileHash(filepathList)) {
+    final stream = sendAndReceive<String, Map<String, dynamic>>(filepathList);
+    await for (final fileMap in stream) {
       final String filepath = fileMap[StorageService.kFilepathKey];
       final String md_5 = fileMap[StorageService.kMD5Key];
       final String sha_1 = fileMap[StorageService.kSHA1Key];
@@ -151,7 +151,8 @@ class StorageController {
       // TODO: Uncomment
       // 2. Check Firestore for user books with same MD5 and SHA1
       //     -   If book found, dont upload and show snack bar with message "Book already uploaded",
-      final bool exists = await _fileHashExists(md_5, sha_1);
+      final bool exists =
+          await _read(firebaseControllerProvider).fileHashExists(md_5, sha_1);
       if (exists) {
         yield 'File ${filepath.split('/').last} already uploaded';
         continue;
@@ -203,7 +204,7 @@ class StorageController {
       );
 
       log.i('Starting File Upload:  ${cacheFilepath.split('/').last}');
-      final task = await _uploadBookFile(
+      final task = await _read(firebaseControllerProvider).uploadBookFile(
         userId: userId,
         cacheFilepath: cacheFilepath,
         firebaseFilepath: firebaseFilepath,
@@ -233,7 +234,7 @@ class StorageController {
               'Starting File Upload:  ${coverImageFirebaseFilepath.split('/').last}');
           final uploadTask = coverData == null
               ? null
-              : await _uploadCoverImage(
+              : await _read(firebaseControllerProvider).uploadCoverImage(
                   firebaseFilepath: coverImageFirebaseFilepath,
                   data: coverData,
                 );
@@ -262,51 +263,31 @@ class StorageController {
           firebaseCoverImagePath: coverImageFirebaseFilepath,
         );
 
-        await _uploadBookDocument(book);
+        await _read(firebaseControllerProvider).uploadBookDocument(book);
         _read(storageServiceProvider)
             .boxSetDocumentUploadedInUploadQueue(cacheFilepath);
       });
     }
   }
 
-  Future<void> _uploadBookDocument(Book book) async {
-    await _read(firebaseServiceProvider).addBookToFirestore(book: book);
-  }
-
-  Future<UploadTask?> _uploadCoverImage({
-    required String firebaseFilepath,
-    required List<int> data,
-  }) async {
-    return await _read(firebaseServiceProvider).uploadCoverPhoto(
-      uploadToPath: firebaseFilepath,
-      bytes: data,
-    );
-  }
-
-  Future<UploadTask?> _uploadBookFile({
-    required String userId,
-    required String cacheFilepath,
-    required String firebaseFilepath,
-    required String md_5,
-    required String sha_1,
-  }) async {
-    return await _read(firebaseServiceProvider).uploadBookToFirebaseStorage(
-      firebaseFilePath: firebaseFilepath,
-      localFilePath: cacheFilepath,
-      customMetadata: {
-        StorageService.kMD5Key: md_5,
-        StorageService.kSHA1Key: sha_1
-      },
-    );
-  }
-
-  /// Spawns an isolate and asynchronously sends a list of filenames for it to
+  /// Spawns an isolate and asynchronously sends List<T> for it to
   /// read and decode. Waits for the response containing the file hash
   /// before sending the next.
   ///
-  /// Returns a stream that emits the file hash of each file.
-  Stream<Map<String, dynamic>> _sendAndReceiveFileHash(
-    List<String> filenames,
+  /// Returns a stream that emits R.
+  ///
+  /// T and R may be any of the following types:
+  ///   - [Null]
+  ///   - [bool]
+  ///   - [int]
+  ///   - [double]
+  ///   - [String]
+  ///   - [List] or [Map] (whose elements are any of these)
+  ///   - [TransferableTypedData]
+  ///   - [SendPort]
+  ///   - [Capability]
+  Stream<R> sendAndReceive<T, R>(
+    List<T> list,
   ) async* {
     final p = ReceivePort();
     await Isolate.spawn(_readAndHashFileService, p.sendPort);
@@ -320,12 +301,12 @@ class StorageController {
     // used to communicate with the spawned isolate.
     final SendPort sendPort = await events.next;
 
-    for (var filename in filenames) {
+    for (var item in list) {
       // Send the next filename to be read and parsed
-      sendPort.send(filename);
+      sendPort.send(item);
 
       // Receive the loaded bytes and upload
-      final Map<String, dynamic> message = await events.next;
+      final R message = await events.next;
 
       // Add the result to the stream returned by this async* function.
       yield message;
@@ -336,11 +317,6 @@ class StorageController {
 
     // Dispose the StreamQueue.
     await events.cancel();
-  }
-
-  Future<bool> _fileHashExists(String md5, String sha1) async {
-    return await _read(firebaseServiceProvider)
-        .fileHashExists(md5: md5, sha1: sha1);
   }
 
   Future<void> downloadBookFile(
