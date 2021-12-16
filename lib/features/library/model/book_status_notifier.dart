@@ -55,11 +55,6 @@ class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
     state = const AsyncValue.data(BookStatus.downloadWaiting);
   }
 
-  /// Set BookStatus as waiting to upload
-  void setUploadWaiting() {
-    state = const AsyncValue.data(BookStatus.uploadWaiting);
-  }
-
   /// Set BookStatus as currently downloading the book file
   void setDownloading() {
     state = const AsyncValue.data(BookStatus.downloading);
@@ -73,16 +68,6 @@ class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
   /// the file on the server is corrupted.
   void setErrorDownloading() {
     state = const AsyncValue.data(BookStatus.errorDownloading);
-  }
-
-  /// Set the book as currently uploading to the server
-  void setUploading() {
-    state = const AsyncValue.data(BookStatus.uploading);
-  }
-
-  /// Set that an error occured during upload
-  void setErrorUploading() {
-    state = const AsyncValue.data(BookStatus.errorUploading);
   }
 
   /// Update the status to whether the book is downloaded or not
@@ -115,23 +100,8 @@ enum BookStatus {
   /// The book is waiting to download
   downloadWaiting,
 
-  /// The book is waiting to upload
-  /// 
-  /// TODO: Upload Waiting Icon doesn't work
-  uploadWaiting,
-
-  /// The book file is currently uploading to the server
-  /// 
-  /// TODO: Uploading Icon doesn't work
-  uploading,
-
   /// The book file is not downloaded to this device
   notDownloaded,
-
-  /// An error occured during upload
-  ///
-  /// The upload was likely interrupted
-  errorUploading,
 
   /// An error occured during download
   ///

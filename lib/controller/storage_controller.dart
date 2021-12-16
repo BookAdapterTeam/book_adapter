@@ -148,7 +148,6 @@ class StorageController {
         'Received Hash for ${filepath.split('/').last}: md5 $md_5 and sha1 $sha_1',
       );
 
-      // TODO: Uncomment
       // 2. Check Firestore for user books with same MD5 and SHA1
       //     -   If book found, dont upload and show snack bar with message "Book already uploaded",
       final bool exists =
