@@ -37,7 +37,7 @@ mixin FirebaseServiceStorageMixin {
     try {
       final res = await uploadFile(
         contentType: epubContentType,
-        firebaseFilePath: firebaseFilePath,
+        firebaseFileUploadPath: firebaseFilePath,
         localFilePath: localFilePath,
       );
 
@@ -151,17 +151,17 @@ mixin FirebaseServiceStorageMixin {
   }
 
   /// Upload a file to FirebaseStorage
-  ///
-  /// Thorws `AppException` if it fails
-  Future<Either<Failure, String>> uploadFile({
+  Future<UploadTask?> uploadFile({
     required String contentType,
-    required String firebaseFilePath,
+    required String firebaseFileUploadPath,
     required String localFilePath,
+    Map<String, String>? customMetadata,
   }) async {
     try {
       // Check if file exists, exit if it does
-      final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
-      return Right(url);
+      await _firebaseStorage.ref(firebaseFileUploadPath).getDownloadURL();
+
+      return null;
     } on FirebaseException catch (e, st) {
       if (e.code != 'unauthorized') {
         _log.e('${e.code} + ${e.message ?? ''}', e, st);
@@ -170,27 +170,15 @@ mixin FirebaseServiceStorageMixin {
 
       // File does not exist, continue uploading
       try {
-        // File does not exist, continue uploading
-        final bytes = io.File(localFilePath).readAsBytesSync();
-        final digestSha1 = sha1.convert(bytes);
-        final digestMd5 = md5.convert(bytes);
-        final TaskSnapshot taskSnapshot =
-            await _firebaseStorage.ref(firebaseFilePath).putFile(
+        final UploadTask task = _firebaseStorage.ref(firebaseFileUploadPath).putFile(
                   io.File(localFilePath),
                   SettableMetadata(
                     contentType: contentType,
-                    customMetadata: {
-                      'sha1': digestSha1.toString(),
-                      'md5': digestMd5.toString(),
-                    },
+                    customMetadata: customMetadata,
                   ),
                 );
 
-        // TODO: Somehow expose this to UI for upload progress
-        // final TaskSnapshot snapshot = await uploadTask;
-
-        final url = await taskSnapshot.ref.getDownloadURL();
-        return Right(url);
+        return task;
       } on FirebaseException catch (e, st) {
         _log.e('${e.code} + ${e.message ?? ''}', e, st);
         rethrow;

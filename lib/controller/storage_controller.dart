@@ -3,6 +3,8 @@ import 'dart:io' as io;
 import 'dart:isolate';
 
 import 'package:async/async.dart';
+import 'package:book_adapter/features/parser/epub_service.dart';
+import 'package:book_adapter/service/firebase_service.dart';
 import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -125,7 +127,7 @@ class StorageController {
             file.path!) // Will never be null since this won't run on web
         .toList();
 
-    final List<Map<String, dynamic>> fileMaps = List.empty();
+    final List<Map<String, dynamic>> fileMapList = List.empty();
 
     //1. Get File Hash
     await for (final fileMap in _sendAndReceiveFileHash(filepathList)) {
@@ -144,7 +146,7 @@ class StorageController {
         continue;
       }
 
-      fileMaps.add(fileMap);
+      fileMapList.add(fileMap);
     }
 
     // TODO(@getBoolean): 2-1. Show number of processing books to UI
@@ -153,7 +155,7 @@ class StorageController {
     // This allows the upload to be resumed on app start (and logged in) if interrupted
     // Update item values when document and file uploaded
     // Remove items from box after upload completed
-    for (final fileMap in fileMaps) {
+    for (final fileMap in fileMapList) {
       final String filepath = fileMap[StorageService.kFilepathKey];
       final String md5 = fileMap[StorageService.kMD5];
       final String sha1 = fileMap[StorageService.kSHA1];
@@ -165,22 +167,48 @@ class StorageController {
       );
     }
 
-    // 3. Grab Book Cover Image
-    //     -   If no cover image exists, put null in book document for the cover image url.
-    //
-    //         In the app, a default image will be shown included in the assets if image url is null
-    final coverBytes = EPUBService().getCoverImage(bytes);
+    for (final fileMap in fileMapList) {
+      final String filepath = fileMap[StorageService.kFilepathKey];
+      final String md5 = fileMap[StorageService.kMD5];
+      final String sha1 = fileMap[StorageService.kSHA1];
 
-    // 4. Upload Book Cover Image
-    //     -   Don't upload if null
-    final coverImageFirebaseStorageUrl = _uploadCoverImage(coverBytes);
+      // 3. Grab Book Cover Image
+      //     -   If no cover image exists, put null in book document for the cover image url.
+      //
+      //         In the app, a default image will be shown included in the assets if image url is null
+      final coverData = await _read(epubServiceProvider).getCoverImage(
+        await io.File(filepath).readAsBytes(),
+      );
 
-    // 5. Upload Book Document with Cover Image URL, MD5, and SHA1
-    final book = BookService().fromFile(filepath, md5, sha1);
-    _uploadBookDocument(book);
+      // TODO: Upload book file
+      // On completion, upload book document and cover image
 
-    // 6. Upload Book File with MD5 and SHA1 in metadata
-    _uploadBookFile(filepath, md5, sha1);
+      // 4. Upload Book File with MD5 and SHA1 in metadata
+      final task = await _uploadBookFile(filepath, md5, sha1);
+      await task.whenComplete(() {
+        // 5. Upload Book Cover Image
+        //     -   Don't upload if null
+        final coverImageFirebaseStorageUrl = _uploadCoverImage(coverData);
+
+        // 6. Upload Book Document with Cover Image URL, MD5, and SHA1
+        final book = _read(epubServiceProvider).uploadFromFile(filepath, md5, sha1);
+        _uploadBookDocument(book);
+
+        return null;
+      });
+    }
+  }
+
+  Future<UploadTask> _uploadBookFile(
+    String filepath,
+    String md5,
+    String sha1,
+  ) async {
+    _read(firebaseServiceProvider).uploadFile(
+      contentType: contentType,
+      firebaseFileUploadPath: firebaseFilePath,
+      localFilePath: localFilePath,
+    );
   }
 
   /// Spawns an isolate and asynchronously sends a list of filenames for it to
