@@ -165,18 +165,8 @@ class _ItemListTile extends ConsumerWidget {
               return const Icon(Icons.downloading_outlined);
             case BookStatus.downloadWaiting:
               return const Icon(Icons.circle_outlined);
-            case BookStatus.uploadWaiting:
-              return const Icon(Icons.cloud_off_outlined);
-            case BookStatus.uploading:
-              return const RotatedBox(
-                quarterTurns: 2,
-                child: Icon(Icons.downloading_outlined),
-              );
             case BookStatus.notDownloaded:
               return const Icon(Icons.cloud_outlined);
-            case BookStatus.errorUploading:
-              // TODO: Find better icon
-              return const Icon(Icons.error_outline);
             case BookStatus.errorDownloading:
               // TODO: Find better icon
               return const Icon(Icons.error_outline);
@@ -199,16 +189,8 @@ class _ItemListTile extends ConsumerWidget {
               return () {
                 // TODO: Cancel download before download starts
               };
-            case BookStatus.uploadWaiting:
-              return null;
-            case BookStatus.uploading:
-              return null;
             case BookStatus.notDownloaded:
               return null;
-            case BookStatus.errorUploading:
-              return () {
-                // TODO: Make firebase call to try upload book again
-              };
             case BookStatus.errorDownloading:
               return () {
                 // TODO: Make firebase call to try download book again. Delete file if it exists (could be corrupt or partial)
