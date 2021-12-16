@@ -1,16 +1,10 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
-import 'package:dartz/dartz.dart';
-import 'package:epub_view/epub_view.dart';
-import 'package:epubx/epubx.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
 
 import '../data/app_exception.dart';
-import '../data/failure.dart';
 
 mixin FirebaseServiceStorageMixin {
   final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
@@ -28,97 +22,49 @@ mixin FirebaseServiceStorageMixin {
   }
 
   /// Upload a book to Firebase Storage
-  Future<Either<Failure, String>> uploadBookToFirebaseStorage({
+  Future<UploadTask?> uploadBookToFirebaseStorage({
     required String firebaseFilePath,
     required String localFilePath,
+    Map<String, String>? customMetadata,
   }) async {
     const String epubContentType = 'application/epub+zip';
 
-    try {
-      final res = await uploadFile(
-        contentType: epubContentType,
-        firebaseFileUploadPath: firebaseFilePath,
-        localFilePath: localFilePath,
-      );
+    final uploadTask = await uploadFile(
+      contentType: epubContentType,
+      firebaseFileUploadPath: firebaseFilePath,
+      localFilePath: localFilePath,
+      customMetadata: customMetadata,
+    );
 
-      return res;
-    } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Upload Book',
-          e.code));
-    } on Exception catch (e) {
-      return Left(Failure(e.toString()));
-    }
+    return uploadTask;
   }
 
   /// Upload a book cover photo to Firebase Storage
-  Future<Either<Failure, String>> uploadCoverPhoto({
-    required EpubBookRef openedBook,
+  Future<UploadTask?> uploadCoverPhoto({
+    required List<int> bytes,
     required String uploadToPath,
   }) async {
     const imageContentType = 'image/jpeg';
-    try {
-      Image? image = await openedBook.readCover();
 
-      if (image == null) {
-        // No cover image, use the first image instead
-        final imagesRef = openedBook.Content?.Images;
+    final uploadTask = await uploadBytes(
+      bytes: Uint8List.fromList(bytes),
+      contentType: imageContentType,
+      firebaseFilePath: uploadToPath,
+    );
 
-        if (imagesRef == null) {
-          // images from epub is null
-          return Left(Failure('Book has no images'));
-        }
-
-        // Use the first image that has a height greater than width to avoid using banners and copyright notices
-        for (final imageRef in imagesRef.values) {
-          final imageContent = await imageRef.readContent();
-          final img.Image? cover = img.decodeImage(imageContent);
-          if (cover != null && cover.height > cover.width) {
-            image = cover;
-            break;
-          }
-        }
-
-        // If no applicable image found above, use the first image
-        if (image == null) {
-          final imageContent = await imagesRef.values.first.readContent();
-          image = img.decodeImage(imageContent);
-        }
-      }
-
-      if (image == null) {
-        return Left(Failure('Could not get cover image for upload'));
-      }
-
-      final bytes = img.encodeJpg(image);
-
-      final res = await uploadBytes(
-        bytes: Uint8List.fromList(bytes),
-        contentType: imageContentType,
-        firebaseFilePath: uploadToPath,
-      );
-
-      return res;
-    } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Upload Book',
-          e.code));
-    } on Exception catch (e) {
-      return Left(Failure(e.toString()));
-    } catch (e) {
-      return Left(Failure(e.toString()));
-    }
+    return uploadTask;
   }
 
-  Future<Either<Failure, String>> uploadBytes({
+  Future<UploadTask?> uploadBytes({
     required String contentType,
     required String firebaseFilePath,
     required Uint8List bytes,
+    Map<String, String>? customMetadata,
   }) async {
     try {
       // Check if file exists, return url if it does
-      final url = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
-      return Right(url);
+      final _ = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
+      return null;
     } on FirebaseException catch (e, st) {
       if (e.code != 'unauthorized') {
         _log.e('${e.code} + ${e.message ?? ''}', e, st);
@@ -127,22 +73,16 @@ mixin FirebaseServiceStorageMixin {
 
       try {
         // File does not exist, continue uploading
-        final digestSha1 = sha1.convert(bytes);
-        final digestMd5 = md5.convert(bytes);
 
-        final TaskSnapshot taskSnapshot =
-            await _firebaseStorage.ref(firebaseFilePath).putData(
+        final UploadTask uploadTask =
+            _firebaseStorage.ref(firebaseFilePath).putData(
                   bytes,
                   SettableMetadata(
                     contentType: contentType,
-                    customMetadata: {
-                      'sha1': digestSha1.toString(),
-                      'md5': digestMd5.toString(),
-                    },
+                    customMetadata: customMetadata,
                   ),
                 );
-        final url = await taskSnapshot.ref.getDownloadURL();
-        return Right(url);
+        return uploadTask;
       } on FirebaseException catch (e, st) {
         _log.e('${e.code} + ${e.message ?? ''}', e, st);
         rethrow;
@@ -170,7 +110,8 @@ mixin FirebaseServiceStorageMixin {
 
       // File does not exist, continue uploading
       try {
-        final UploadTask task = _firebaseStorage.ref(firebaseFileUploadPath).putFile(
+        final UploadTask task =
+            _firebaseStorage.ref(firebaseFileUploadPath).putFile(
                   io.File(localFilePath),
                   SettableMetadata(
                     contentType: contentType,
@@ -184,6 +125,10 @@ mixin FirebaseServiceStorageMixin {
         rethrow;
       }
     }
+  }
+
+  Future<String> getFileDownloadUrl(String storagePath) async {
+    return await _firebaseStorage.ref(storagePath).getDownloadURL();
   }
 
   /// Download a file to memory

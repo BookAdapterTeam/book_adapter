@@ -16,6 +16,11 @@ import 'data/item.dart';
 import 'data/series_item.dart';
 import 'model/book_status_notifier.dart';
 
+final fileUrlProvider =
+    FutureProvider.family<String, String>((ref, firebasePath) async {
+  return ref.read(libraryViewControllerProvider.notifier).getFileDownloadUrl(firebasePath);
+});
+
 final libraryViewControllerProvider =
     StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>(
         (ref) {
@@ -44,8 +49,10 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   final log = Logger();
 
   Future<void> addBooks() async {
-    await for (final _
-        in _read(storageControllerProvider).uploadMultipleBooks()) {}
+    await for (final message
+        in _read(storageControllerProvider).uploadMultipleBooks()) {
+      log.i(message);
+    }
 
     // // Make storage service call to pick books
     // final sRes = await _read(storageServiceProvider).pickFile(
@@ -238,6 +245,11 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     final collections = state.collections;
     final names = collections!.map((collection) => collection.name);
     return names.contains(name);
+  }
+
+  Future<String> getFileDownloadUrl(String firebasePath) async {
+    return await _read(firebaseControllerProvider)
+        .getFileDownloadUrl(firebasePath);
   }
 
   Future<Either<Failure, void>> queueDownloadBook(Book book) async {

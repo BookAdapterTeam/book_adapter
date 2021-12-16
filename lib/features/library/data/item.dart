@@ -6,6 +6,7 @@ abstract class Item extends Equatable {
   final String title;
   final String? subtitle;
   final String? imageUrl;
+  final String? firebaseCoverImagePath;
   final Set<String> collectionIds;
 
   String get routeTo;
@@ -16,6 +17,7 @@ abstract class Item extends Equatable {
     required this.title,
     this.subtitle,
     this.imageUrl,
+    this.firebaseCoverImagePath,
     required this.collectionIds,
   });
 

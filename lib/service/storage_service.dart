@@ -33,10 +33,19 @@ class StorageService {
 
   late final Box<Map<String, dynamic>> _uploadQueueBox;
 
-  static const kFilepathKey = 'filename';
-  static const kMD5 = 'md5';
-  static const kSHA1 = 'sha1';
+  /// 'filepath'
+  static const kFilepathKey = 'filepath';
+
+  /// 'md_5'
+  static const kMD5Key = 'md_5';
+
+  /// 'sha_1'
+  static const kSHA1Key = 'sha_1';
+
+  /// 'isDocumentUploaded'
   static const kIsDocumentUploadedKey = 'isDocumentUploaded';
+
+  /// 'isFileUploaded'
   static const kIsFileUploaded = 'isFileUploaded';
 
   /// Initilize the class
@@ -72,8 +81,8 @@ class StorageService {
   }) {
     _uploadQueueBox.put(filepath, {
       kFilepathKey: filepath,
-      kMD5: md5,
-      kSHA1: sha1,
+      kMD5Key: md5,
+      kSHA1Key: sha1,
       kIsDocumentUploadedKey: isDocumentUploaded,
       kIsFileUploaded: isFileUploaded,
     });
@@ -85,8 +94,8 @@ class StorageService {
     final queueMap = getUploadQueueItem(filepath);
     if (queueMap == null) return;
 
-    final md5 = queueMap[kMD5];
-    final sha1 = queueMap[kSHA1];
+    final md5 = queueMap[kMD5Key];
+    final sha1 = queueMap[kSHA1Key];
 
     boxAddToUploadQueue(
       filepath,
@@ -102,8 +111,8 @@ class StorageService {
     final queueMap = getUploadQueueItem(filepath);
     if (queueMap == null) return;
 
-    final md5 = queueMap[kMD5];
-    final sha1 = queueMap[kSHA1];
+    final md5 = queueMap[kMD5Key];
+    final sha1 = queueMap[kSHA1Key];
 
     boxAddToUploadQueue(
       filepath,

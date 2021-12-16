@@ -1,8 +1,10 @@
 import 'dart:async';
 
+import 'package:book_adapter/service/storage_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/app_exception.dart';
@@ -25,7 +27,7 @@ class FirebaseService
   FirebaseService() : super();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static const uuid = Uuid();
+  static const _uuid = Uuid();
 
   String getDefaultCollectionName(String userUid) => '$userUid-Default';
 
@@ -149,48 +151,46 @@ class FirebaseService
   }
 
   /// Check if a file has been uploaded by checking book documents for its hash
-  Future<bool> fileHashExists({required String md5, required String sha1}) async {
-    // Check books for duplicates, return Failure if any are found
-    final duplicatesQuerySnapshot = await _booksRef
-        .where('md5', isEqualTo: md5)
-        .where('sha1', isEqualTo: sha1)
-        .get();
-
-    final duplicates = duplicatesQuerySnapshot.docs;
-
-    return duplicates.isNotEmpty;
-  }
-
-  /// Add a book to Firebase Firestore
-  Future<Either<Failure, Book>> addBookToFirestore({required Book book}) async {
+  Future<bool> fileHashExists({
+    required String md5,
+    required String sha1,
+  }) async {
+    final log = Logger();
+    // Check books for duplicates, return if any are found
     try {
-      // Check books for duplicates, return Failure if any are found
       final duplicatesQuerySnapshot = await _booksRef
-          .where('userId', isEqualTo: book.userId)
-          .where('title', isEqualTo: book.title)
-          .where('filepath', isEqualTo: book.filepath)
-          .where('filesize', isEqualTo: book.filesize)
+          .where('userId', isEqualTo: currentUserUid)
+          .where('md_5', isEqualTo: md5)
+          .where('sha_1', isEqualTo: sha1)
           .get();
 
       final duplicates = duplicatesQuerySnapshot.docs;
 
-      if (duplicates.isNotEmpty) {
-        return Left(Failure('Book has already been uploaded'));
-      }
-
-      // Add book to Firestore
-      await _booksRef.doc(book.id).set(book);
-
-      // Return our books to the caller in case they care
-      // ignore: prefer_const_constructors
-      return Right(book);
-    } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Upload Book',
-          e.code));
-    } on Exception catch (_) {
-      return Left(Failure('Unexpected Exception, Could Not Upload Book'));
+      return duplicates.isNotEmpty;
+    } on FirebaseException catch (e, st) {
+      log.e('${e.code}-${e.message}', e, st);
+      rethrow;
     }
+  }
+
+  /// Add a book to Firebase Firestore
+  Future<void> addBookToFirestore({required Book book}) async {
+    // Check books for duplicates, return Failure if any are found
+    final duplicatesQuerySnapshot = await _booksRef
+        .where('userId', isEqualTo: book.userId)
+        .where('title', isEqualTo: book.title)
+        .where('filepath', isEqualTo: book.filepath)
+        .where('filesize', isEqualTo: book.filesize)
+        .get();
+
+    final duplicates = duplicatesQuerySnapshot.docs;
+
+    if (duplicates.isNotEmpty) {
+      throw AppException('Book has already been uploaded');
+    }
+
+    // Add book to Firestore
+    unawaited(_booksRef.doc(book.id).set(book));
   }
 
   // BookCollections ********************************************************************************************
@@ -312,7 +312,7 @@ class FirebaseService
 
       // Create a shelf with a custom id so that it can easily be referenced later
       final series = Series(
-          id: uuid.v4(),
+          id: _uuid.v4(),
           userId: userId,
           title: name,
           description: description,

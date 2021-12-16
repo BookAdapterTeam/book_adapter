@@ -3,19 +3,20 @@ import 'dart:io' as io;
 import 'dart:isolate';
 
 import 'package:async/async.dart';
-import 'package:book_adapter/features/parser/epub_service.dart';
-import 'package:book_adapter/service/firebase_service.dart';
 import 'package:crypto/crypto.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:uuid/uuid.dart';
 import 'package:watcher/watcher.dart';
 
 import '../data/app_exception.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
+import '../features/parser/epub_service.dart';
+import '../service/firebase_service.dart';
 import '../service/storage_service.dart';
 import 'firebase_controller.dart';
 
@@ -51,7 +52,7 @@ class StorageController {
   StorageController(this._read);
 
   final Reader _read;
-  final log = Logger();
+  static const _uuid = Uuid();
 
   String getUserDirectory() {
     final userId = _read(firebaseControllerProvider).currentUser?.uid;
@@ -104,10 +105,16 @@ class StorageController {
   ///     -   Don't upload if null
   /// 5. Upload Book Document with Cover Image URL, MD5, and SHA1
   /// 6. Upload Book File with MD5 and SHA1 in metadata
-  Stream<String> uploadMultipleBooks() async* {
+  Stream<String> uploadMultipleBooks(
+      [String collectionName = 'Default']) async* {
     if (kIsWeb) {
       throw AppException(
           'StorageController.uploadMultipleBooks does not work on web');
+    }
+
+    final userId = _read(firebaseControllerProvider).currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
     }
 
     final log = Logger();
@@ -127,20 +134,24 @@ class StorageController {
             file.path!) // Will never be null since this won't run on web
         .toList();
 
-    final List<Map<String, dynamic>> fileMapList = List.empty();
+    // Exit if no files chosen
+    if (filepathList.isEmpty) return;
+
+    final List<Map<String, dynamic>> fileMapList = [];
 
     //1. Get File Hash
     await for (final fileMap in _sendAndReceiveFileHash(filepathList)) {
       final String filepath = fileMap[StorageService.kFilepathKey];
-      final String md5 = fileMap[StorageService.kMD5];
-      final String sha1 = fileMap[StorageService.kSHA1];
+      final String md_5 = fileMap[StorageService.kMD5Key];
+      final String sha_1 = fileMap[StorageService.kSHA1Key];
       log.i(
-        'Received Hash for ${filepath.split('/').last}: md5 $md5 and sha1 $sha1',
+        'Received Hash for ${filepath.split('/').last}: md5 $md_5 and sha1 $sha_1',
       );
 
+      // TODO: Uncomment
       // 2. Check Firestore for user books with same MD5 and SHA1
-      //     -   If book found, stop uploading and show snack bar with message "Book already uploaded",
-      final bool exists = await _fileHashExists(md5, sha1);
+      //     -   If book found, dont upload and show snack bar with message "Book already uploaded",
+      final bool exists = await _fileHashExists(md_5, sha_1);
       if (exists) {
         yield 'File ${filepath.split('/').last} already uploaded';
         continue;
@@ -157,67 +168,146 @@ class StorageController {
     // Remove items from box after upload completed
     for (final fileMap in fileMapList) {
       final String filepath = fileMap[StorageService.kFilepathKey];
-      final String md5 = fileMap[StorageService.kMD5];
-      final String sha1 = fileMap[StorageService.kSHA1];
+      final String md_5 = fileMap[StorageService.kMD5Key];
+      final String sha_1 = fileMap[StorageService.kSHA1Key];
 
       _read(storageServiceProvider).boxAddToUploadQueue(
         filepath,
-        md5: md5,
-        sha1: sha1,
+        md5: md_5,
+        sha1: sha_1,
       );
     }
 
     for (final fileMap in fileMapList) {
-      final String filepath = fileMap[StorageService.kFilepathKey];
-      final String md5 = fileMap[StorageService.kMD5];
-      final String sha1 = fileMap[StorageService.kSHA1];
+      final String cacheFilepath = fileMap[StorageService.kFilepathKey];
+      final String md_5 = fileMap[StorageService.kMD5Key];
+      final String sha_1 = fileMap[StorageService.kSHA1Key];
+
+      final bytes = await io.File(cacheFilepath).readAsBytes();
 
       // 3. Grab Book Cover Image
       //     -   If no cover image exists, put null in book document for the cover image url.
       //
       //         In the app, a default image will be shown included in the assets if image url is null
-      final coverData = await _read(epubServiceProvider).getCoverImage(
-        await io.File(filepath).readAsBytes(),
-      );
-
-      // TODO: Upload book file
-      // On completion, upload book document and cover image
+      final coverData = await _read(epubServiceProvider).getCoverImage(bytes);
 
       // 4. Upload Book File with MD5 and SHA1 in metadata
-      final task = await _uploadBookFile(filepath, md5, sha1);
-      await task.whenComplete(() {
+      // On completion, upload book document and cover image
+
+      final id = _uuid.v4();
+      final firebaseFilepath = _read(epubServiceProvider).getFirebaseFilepath(
+        cacheFilePath: cacheFilepath,
+        data: bytes,
+        id: id,
+        userId: userId,
+      );
+
+      log.i('Starting File Upload:  ${cacheFilepath.split('/').last}');
+      final task = await _uploadBookFile(
+        userId: userId,
+        cacheFilepath: cacheFilepath,
+        firebaseFilepath: firebaseFilepath,
+        md_5: md_5,
+        sha_1: sha_1,
+      );
+      if (task == null) {
+        log.i('Unable to upload file: ${cacheFilepath.split('/').last}');
+        yield 'Unable to upload file: ${cacheFilepath.split('/').last}';
+        _read(storageServiceProvider).boxRemoveFromUploadQueue(cacheFilepath);
+        continue;
+      }
+
+      await task.whenComplete(() async {
+        log.i('Finished File Upload: ${cacheFilepath.split('/').last}');
+        _read(storageServiceProvider)
+            .boxSetFileUploadedInUploadQueue(cacheFilepath);
+
         // 5. Upload Book Cover Image
         //     -   Don't upload if null
-        final coverImageFirebaseStorageUrl = _uploadCoverImage(coverData);
+        //     -   If upload fails, set cover image path to null
+        final String coverFilename = _read(epubServiceProvider)
+            .getCoverFilename(cacheFilepath, id, 'jpg');
+        String? coverImageFirebaseFilepath = '$userId/$coverFilename';
+        try {
+          log.i(
+              'Starting File Upload:  ${coverImageFirebaseFilepath.split('/').last}');
+          final uploadTask = coverData == null
+              ? null
+              : await _uploadCoverImage(
+                  firebaseFilepath: coverImageFirebaseFilepath,
+                  data: coverData,
+                );
+          await uploadTask;
+          log.i(
+              'Finished File Upload: ${coverImageFirebaseFilepath.split('/').last}');
+        } on Exception catch (e, st) {
+          log.i(
+              'Unable to upload file: ${coverImageFirebaseFilepath.split('/').last}');
+          log.w(e.toString(), e, st);
+          coverImageFirebaseFilepath = null;
+        }
 
-        // 6. Upload Book Document with Cover Image URL, MD5, and SHA1
-        final book = _read(epubServiceProvider).uploadFromFile(filepath, md5, sha1);
-        _uploadBookDocument(book);
+        // 6. Upload Book Document with Cover Image Filepath, MD5, and SHA1
+        final parsedBook = await _read(epubServiceProvider).parseDetails(
+          bytes,
+          cacheFilePath: cacheFilepath,
+          collectionName: collectionName,
+          userId: userId,
+          id: id,
+        );
 
-        return null;
+        final book = parsedBook.copyWith(
+          md_5: md_5,
+          sha_1: sha_1,
+          firebaseCoverImagePath: coverImageFirebaseFilepath,
+        );
+
+        await _uploadBookDocument(book);
+        _read(storageServiceProvider)
+            .boxSetDocumentUploadedInUploadQueue(cacheFilepath);
       });
     }
   }
 
-  Future<UploadTask> _uploadBookFile(
-    String filepath,
-    String md5,
-    String sha1,
-  ) async {
-    _read(firebaseServiceProvider).uploadFile(
-      contentType: contentType,
-      firebaseFileUploadPath: firebaseFilePath,
-      localFilePath: localFilePath,
+  Future<void> _uploadBookDocument(Book book) async {
+    await _read(firebaseServiceProvider).addBookToFirestore(book: book);
+  }
+
+  Future<UploadTask?> _uploadCoverImage({
+    required String firebaseFilepath,
+    required List<int> data,
+  }) async {
+    return await _read(firebaseServiceProvider).uploadCoverPhoto(
+      uploadToPath: firebaseFilepath,
+      bytes: data,
+    );
+  }
+
+  Future<UploadTask?> _uploadBookFile({
+    required String userId,
+    required String cacheFilepath,
+    required String firebaseFilepath,
+    required String md_5,
+    required String sha_1,
+  }) async {
+    return await _read(firebaseServiceProvider).uploadBookToFirebaseStorage(
+      firebaseFilePath: firebaseFilepath,
+      localFilePath: cacheFilepath,
+      customMetadata: {
+        StorageService.kMD5Key: md_5,
+        StorageService.kSHA1Key: sha_1
+      },
     );
   }
 
   /// Spawns an isolate and asynchronously sends a list of filenames for it to
-  /// read and decode. Waits for the response containing the decoded JSON
+  /// read and decode. Waits for the response containing the file hash
   /// before sending the next.
   ///
-  /// Returns a stream that emits the byte contents of each file.
+  /// Returns a stream that emits the file hash of each file.
   Stream<Map<String, dynamic>> _sendAndReceiveFileHash(
-      List<String> filenames) async* {
+    List<String> filenames,
+  ) async* {
     final p = ReceivePort();
     await Isolate.spawn(_readAndHashFileService, p.sendPort);
 
@@ -360,8 +450,8 @@ Future<void> _readAndHashFileService(SendPort p) async {
       // Send the result to the main isolate.
       p.send({
         StorageService.kFilepathKey: message,
-        StorageService.kMD5: md5Hash,
-        StorageService.kSHA1: sha1Hash,
+        StorageService.kMD5Key: md5Hash,
+        StorageService.kSHA1Key: sha1Hash,
       });
     } else if (message == null) {
       // Exit if the main isolate sends a null message, indicating there are no

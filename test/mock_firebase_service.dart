@@ -7,7 +7,6 @@ import 'package:book_adapter/features/library/data/series_item.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:epubx/epubx.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -215,42 +214,6 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<Either<Failure, String>> uploadBookToFirebaseStorage({
-    required String firebaseFilePath,
-    required String localFilePath,
-  }) {
-    // TODO: implement uploadBookToFirebaseStorage
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, String>> uploadBytes(
-      {required String contentType,
-      required String firebaseFilePath,
-      required Uint8List bytes}) {
-    // TODO: implement uploadBytes
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, String>> uploadCoverPhoto({
-    required EpubBookRef openedBook,
-    required String uploadToPath,
-  }) {
-    // TODO: implement uploadCoverPhoto
-    throw UnimplementedError();
-  }
-
-  @override
-  Future<Either<Failure, String>> uploadFile(
-      {required String contentType,
-      required String firebaseFileUploadPath,
-      required String localFilePath}) {
-    // TODO: implement uploadFile
-    throw UnimplementedError();
-  }
-
-  @override
   Future<void> saveLastReadCfiLocation({
     required String lastReadCfiLocation,
     required String bookId,
@@ -327,6 +290,36 @@ class MockFirebaseService implements FirebaseService {
   @override
   Future<bool> fileHashExists({required String md5, required String sha1}) {
     // TODO: implement fileHashExists
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UploadTask?> uploadBookToFirebaseStorage({required String firebaseFilePath, required String localFilePath, Map<String, String>? customMetadata}) {
+    // TODO: implement uploadBookToFirebaseStorage
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UploadTask?> uploadFile({required String contentType, required String firebaseFileUploadPath, required String localFilePath, Map<String, String>? customMetadata}) {
+    // TODO: implement uploadFile
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UploadTask?> uploadBytes({required String contentType, required String firebaseFilePath, required Uint8List bytes, Map<String, String>? customMetadata}) {
+    // TODO: implement uploadBytes
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<UploadTask?> uploadCoverPhoto({required List<int> bytes, required String uploadToPath}) {
+    // TODO: implement uploadCoverPhoto
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<String> getFileDownloadUrl(String storagePath) {
+    // TODO: implement getFileDownloadUrl
     throw UnimplementedError();
   }
 }

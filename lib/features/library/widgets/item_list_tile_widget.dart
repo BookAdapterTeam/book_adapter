@@ -110,14 +110,21 @@ class _ItemListTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final log = Logger();
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final imageUrl = item.imageUrl;
+    final firebaseCoverImagePath = item.firebaseCoverImagePath;
     final subtitle = item.subtitle != null ? Text(item.subtitle!) : null;
     final isSelected = data.selectedItems.contains(item);
     final bookStatus =
         item is Book ? ref.watch(bookStatusProvider(item as Book)) : null;
 
-    final Widget? image = imageUrl != null
+    final bool legacyImage = imageUrl != null && firebaseCoverImagePath == null;
+    final asyncV = firebaseCoverImagePath == null
+        ? null
+        : ref.watch(fileUrlProvider(firebaseCoverImagePath));
+
+    final Widget? image = legacyImage
         ? ClipRRect(
             child: CachedNetworkImage(
               imageUrl: imageUrl,
@@ -125,7 +132,25 @@ class _ItemListTile extends ConsumerWidget {
             ),
             borderRadius: BorderRadius.circular(4),
           )
-        : null;
+        : asyncV?.when(
+            data: (data) => ClipRRect(
+              child: CachedNetworkImage(
+                imageUrl: data,
+                width: 40,
+              ),
+              borderRadius: BorderRadius.circular(4),
+            ),
+            error: (error, st) {
+              log.e(error.toString(), error, st);
+              return const Icon(
+                Icons.error_outline,
+                size: 40,
+              );
+            },
+            loading: () => const SizedBox(
+              width: 40,
+            ),
+          );
 
     if (item is Book) {
       final book = item as Book;
