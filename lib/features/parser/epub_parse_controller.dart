@@ -153,7 +153,7 @@ class EPUBParseController {
 
     final encodeImageFuture =
         IsolateService.sendSingleAndReceive<Image, Uint8List>(
-      coverImage!,
+      coverImage,
       receiveAndReturnService: IsolateService.readAndEncodeImageService,
     );
     log.i('Encoding Image');
