@@ -254,7 +254,7 @@ class StorageService {
   /// other platforms.
   ///
   /// The result is wrapped in a `Either` which contains either a left `Failure` or right `List<PlatformFile>`.
-  static Future<List<PlatformFile>> pickFile({
+  Future<List<PlatformFile>> pickFile({
     String? dialogTitle,
     FileType type = FileType.any,
     List<String>? allowedExtensions,
@@ -292,13 +292,13 @@ class StorageService {
     }
   }
 
-  static List<PlatformFile> _handleSingle(FilePickerResult result) {
+  List<PlatformFile> _handleSingle(FilePickerResult result) {
     final PlatformFile file = result.files.first;
 
     return [file];
   }
 
-  static List<PlatformFile> _handleMultiple(FilePickerResult result) {
+  List<PlatformFile> _handleMultiple(FilePickerResult result) {
     final List<PlatformFile> files = result.files;
     return files;
   }

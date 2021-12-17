@@ -118,7 +118,7 @@ class StorageController {
     final log = Logger();
 
     // Open file picker
-    final platformFileList = await StorageService.pickFile(
+    final platformFileList = await _read(storageServiceProvider).pickFile(
       type: FileType.custom,
       allowedExtensions: ['epub'],
       allowMultiple: true,
