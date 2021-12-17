@@ -5,6 +5,7 @@ import 'package:async/async.dart';
 import 'package:crypto/crypto.dart';
 // ignore: implementation_imports
 import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
 
@@ -43,7 +44,71 @@ class IsolateService {
   /// Apart from those exceptions any object can be sent. Objects that are
   /// identified as immutable (e.g. strings) will be shared whereas all other
   /// objects will be copied.
-  static Stream<R> sendAndReceive<T, R>(
+  static Future<R> sendSingleAndReceive<T, R>(
+    T item, {
+    required Future<void> Function(SendPort) receiveAndReturnService,
+  }) async {
+    final p = ReceivePort();
+    await Isolate.spawn(receiveAndReturnService, p.sendPort);
+
+    // Convert the ReceivePort into a StreamQueue to receive messages from the
+    // spawned isolate using a pull-based interface. Events are stored in this
+    // queue until they are accessed by `events.next`.
+    final events = StreamQueue<dynamic>(p);
+
+    // The first message from the spawned isolate is a SendPort. This port is
+    // used to communicate with the spawned isolate.
+    final SendPort sendPort = await events.next;
+
+    // Send the next filename to be read and parsed
+    sendPort.send(item);
+
+    // Receive the loaded bytes and upload
+    final R message = await events.next;
+
+    // Add the result to the stream returned by this async* function.
+    // Send a signal to the spawned isolate indicating that it should exit.
+    sendPort.send(null);
+
+    // Dispose the StreamQueue.
+    await events.cancel();
+
+    return message;
+  }
+
+  /// Spawns an isolate and asynchronously sends List<T> for it to
+  /// read and decode. Waits for the response containing the file hash
+  /// before sending the next.
+  ///
+  /// Returns a stream that emits R.
+  ///
+  /// T and R may be any of the following types:
+  ///   - [Null]
+  ///   - [bool]
+  ///   - [int]
+  ///   - [double]
+  ///   - [String]
+  ///   - [List] or [Map] (whose elements are any of these)
+  ///   - [TransferableTypedData]
+  ///   - [SendPort]
+  ///   - [Capability]
+  ///
+  /// Additiionally, T and R can contain any object, with the following exceptions:
+  ///
+  ///   - Objects with native resources (subclasses of e.g.
+  ///     `NativeFieldWrapperClass1`). A [Socket] object for example referrs
+  ///     internally to objects that have native resources attached and can
+  ///     therefore not be sent.
+  ///   - [ReceivePort]
+  ///   - [DynamicLibrary]
+  ///   - [Pointer]
+  ///   - [UserTag]
+  ///   - `MirrorReference`
+  ///
+  /// Apart from those exceptions any object can be sent. Objects that are
+  /// identified as immutable (e.g. strings) will be shared whereas all other
+  /// objects will be copied.
+  static Stream<R> sendListAndReceive<T, R>(
     List<T> list, {
     required Future<void> Function(SendPort) receiveAndReturnService,
   }) async* {
@@ -166,6 +231,43 @@ class IsolateService {
 
         // Send the result to the main isolate.
         p.send(bytes);
+      } else if (message == null) {
+        // Exit if the main isolate sends a null message, indicating there are no
+        // more files to read and parse.
+        break;
+      }
+    }
+
+    log.i('Spawned isolate finished.');
+    Isolate.exit();
+  }
+
+  /// The entrypoint that runs on the spawned isolate. Receives a command from
+  /// the main isolate, opens the file picker, and returns [List<PlatformFile>]
+  static Future<void> pickFilesService(SendPort p) async {
+    final log = Logger();
+    log.i('Spawned isolate started.');
+
+    // Send a SendPort to the main isolate so that it can send JSON strings to
+    // this isolate.
+    final commandPort = ReceivePort();
+    p.send(commandPort.sendPort);
+
+    // Wait for messages from the main isolate.
+    await for (final message in commandPort) {
+      if (message is String && message == 'pickFile') {
+        // Read and decode the file.
+        final platformFileList = await StorageService.pickFile(
+          type: FileType.custom,
+          allowedExtensions: ['epub'],
+          allowMultiple: true,
+          withReadStream: false,
+          withData: false,
+          allowCompression: false,
+        );
+
+        // Send the result to the main isolate.
+        p.send(platformFileList);
       } else if (message == null) {
         // Exit if the main isolate sends a null message, indicating there are no
         // more files to read and parse.

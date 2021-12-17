@@ -118,7 +118,7 @@ class StorageController {
     final log = Logger();
 
     // Open file picker
-    final platformFileList = await _read(storageServiceProvider).pickFile(
+    final platformFileList = await StorageService.pickFile(
       type: FileType.custom,
       allowedExtensions: ['epub'],
       allowMultiple: true,
@@ -138,7 +138,7 @@ class StorageController {
     final List<Map<String, dynamic>> fileMapList = [];
 
     //1. Get File Hash
-    final stream = IsolateService.sendAndReceive<String, Map<String, dynamic>>(
+    final stream = IsolateService.sendListAndReceive<String, Map<String, dynamic>>(
       filepathList,
       receiveAndReturnService: IsolateService.readAndHashFileService,
     );

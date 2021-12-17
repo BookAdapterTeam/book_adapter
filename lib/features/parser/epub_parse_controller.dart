@@ -121,7 +121,7 @@ class EPUBParseController {
       // Use the first image that has a height greater than width to avoid using banners and copyright notices
       log.i('Decoding Images');
       final imagesStream =
-          IsolateService.sendAndReceive<EpubByteContentFileRef, Image?>(
+          IsolateService.sendListAndReceive<EpubByteContentFileRef, Image?>(
         imagesRef.values.toList(),
         receiveAndReturnService: IsolateService.readAndDecodeImageService,
       );
@@ -136,7 +136,7 @@ class EPUBParseController {
       log.i('Decoding Images Done');
 
       final firstImageStream =
-          IsolateService.sendAndReceive<EpubByteContentFileRef, Image?>(
+          IsolateService.sendListAndReceive<EpubByteContentFileRef, Image?>(
         [imagesRef.values.first],
         receiveAndReturnService: IsolateService.readAndDecodeImageService,
       );
@@ -152,12 +152,12 @@ class EPUBParseController {
       return null;
     }
 
-    final firstImageStream = IsolateService.sendAndReceive<Image, List<int>>(
-      [coverImage],
+    final firstImageFuture = IsolateService.sendSingleAndReceive<Image, List<int>>(
+      coverImage,
       receiveAndReturnService: IsolateService.readAndEncodeImageService,
     );
     log.i('Encoding Image');
-    final bytes = await firstImageStream.first;
+    final bytes = await firstImageFuture;
     log.i('Encoding Image Done');
 
     return bytes;
