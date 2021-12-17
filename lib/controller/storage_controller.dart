@@ -138,7 +138,8 @@ class StorageController {
     final List<Map<String, dynamic>> fileMapList = [];
 
     //1. Get File Hash
-    final stream = IsolateService.sendListAndReceive<String, Map<String, dynamic>>(
+    final stream =
+        IsolateService.sendListAndReceive<String, Map<String, dynamic>>(
       filepathList,
       receiveAndReturnService: IsolateService.readAndHashFileService,
     );
