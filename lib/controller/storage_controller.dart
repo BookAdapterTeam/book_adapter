@@ -171,6 +171,8 @@ class StorageController {
       final String md_5 = fileMap[StorageService.kMD5Key];
       final String sha_1 = fileMap[StorageService.kSHA1Key];
 
+      log.i('${filepath.split('/').last} Queued For Upload');
+
       _read(storageServiceProvider).boxAddToUploadQueue(
         filepath,
         md5: md_5,
@@ -178,12 +180,15 @@ class StorageController {
       );
     }
 
+    log.i('Starting Uploading of Books');
     for (final fileMap in fileMapList) {
       final String cacheFilepath = fileMap[StorageService.kFilepathKey];
       final String md_5 = fileMap[StorageService.kMD5Key];
       final String sha_1 = fileMap[StorageService.kSHA1Key];
 
+      log.i('Read As Bytes: ${cacheFilepath.split('/').last}');
       final bytes = await io.File(cacheFilepath).readAsBytes();
+      log.i('Read As Bytes Done: ${cacheFilepath.split('/').last}');
 
       // 3. Grab Book Cover Image
       //     -   If no cover image exists, put null in book document for the cover image url.
@@ -197,15 +202,14 @@ class StorageController {
       final id = _uuid.v4();
       final firebaseFilepath = _read(epubServiceProvider).getFirebaseFilepath(
         cacheFilePath: cacheFilepath,
-        data: bytes,
         id: id,
         userId: userId,
       );
 
       log.i('Starting File Upload:  ${cacheFilepath.split('/').last}');
-      final task = await _read(firebaseControllerProvider).uploadBookFile(
+      final task = await _read(firebaseControllerProvider).uploadBookData(
         userId: userId,
-        cacheFilepath: cacheFilepath,
+        bytes: bytes,
         firebaseFilepath: firebaseFilepath,
         md_5: md_5,
         sha_1: sha_1,

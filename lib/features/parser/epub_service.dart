@@ -92,7 +92,6 @@ class EPUBService {
   }
 
   String getFirebaseFilepath({
-    required Uint8List data,
     required String userId,
     required String cacheFilePath,
     required String id,

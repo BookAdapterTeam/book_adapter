@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
@@ -312,6 +313,23 @@ class FirebaseController {
     return await _firebaseService.addBookToFirestore(book: book);
   }
 
+  Future<UploadTask?> uploadBookData({
+    required String userId,
+    required Uint8List bytes,
+    required String firebaseFilepath,
+    required String md_5,
+    required String sha_1,
+  }) async {
+    return await _firebaseService.uploadBookDataToFirebaseStorage(
+      firebaseFilePath: firebaseFilepath,
+      bytes: bytes,
+      customMetadata: {
+        StorageService.kMD5Key: md_5,
+        StorageService.kSHA1Key: sha_1
+      },
+    );
+  }
+
   Future<UploadTask?> uploadBookFile({
     required String userId,
     required String cacheFilepath,
@@ -319,7 +337,7 @@ class FirebaseController {
     required String md_5,
     required String sha_1,
   }) async {
-    return await _firebaseService.uploadBookToFirebaseStorage(
+    return await _firebaseService.uploadBookFileToFirebaseStorage(
       firebaseFilePath: firebaseFilepath,
       localFilePath: cacheFilepath,
       customMetadata: {

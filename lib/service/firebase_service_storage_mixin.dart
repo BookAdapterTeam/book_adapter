@@ -22,7 +22,25 @@ mixin FirebaseServiceStorageMixin {
   }
 
   /// Upload a book to Firebase Storage
-  Future<UploadTask?> uploadBookToFirebaseStorage({
+  Future<UploadTask?> uploadBookDataToFirebaseStorage({
+    required String firebaseFilePath,
+    required Uint8List bytes,
+    Map<String, String>? customMetadata,
+  }) async {
+    const String epubContentType = 'application/epub+zip';
+
+    final uploadTask = await uploadBytes(
+      contentType: epubContentType,
+      firebaseFilePath: firebaseFilePath,
+      bytes: bytes,
+      customMetadata: customMetadata,
+    );
+
+    return uploadTask;
+  }
+
+  /// Upload a book to Firebase Storage
+  Future<UploadTask?> uploadBookFileToFirebaseStorage({
     required String firebaseFilePath,
     required String localFilePath,
     Map<String, String>? customMetadata,
@@ -31,7 +49,7 @@ mixin FirebaseServiceStorageMixin {
 
     final uploadTask = await uploadFile(
       contentType: epubContentType,
-      firebaseFileUploadPath: firebaseFilePath,
+      firebaseFilePath: firebaseFilePath,
       localFilePath: localFilePath,
       customMetadata: customMetadata,
     );
@@ -93,13 +111,13 @@ mixin FirebaseServiceStorageMixin {
   /// Upload a file to FirebaseStorage
   Future<UploadTask?> uploadFile({
     required String contentType,
-    required String firebaseFileUploadPath,
+    required String firebaseFilePath,
     required String localFilePath,
     Map<String, String>? customMetadata,
   }) async {
     try {
       // Check if file exists, exit if it does
-      await _firebaseStorage.ref(firebaseFileUploadPath).getDownloadURL();
+      await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
 
       return null;
     } on FirebaseException catch (e, st) {
@@ -111,7 +129,7 @@ mixin FirebaseServiceStorageMixin {
       // File does not exist, continue uploading
       try {
         final UploadTask task =
-            _firebaseStorage.ref(firebaseFileUploadPath).putFile(
+            _firebaseStorage.ref(firebaseFilePath).putFile(
                   io.File(localFilePath),
                   SettableMetadata(
                     contentType: contentType,
