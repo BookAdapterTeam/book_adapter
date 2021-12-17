@@ -124,7 +124,7 @@ class IsolateService {
     // used to communicate with the spawned isolate.
     final SendPort sendPort = await events.next;
 
-    for (var item in list) {
+    for (final item in list) {
       // Send the next filename to be read and parsed
       sendPort.send(item);
 
