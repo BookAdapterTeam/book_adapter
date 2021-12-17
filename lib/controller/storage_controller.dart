@@ -102,8 +102,9 @@ class StorageController {
   ///     -   Don't upload if null
   /// 5. Upload Book Document with Cover Image URL, MD5, and SHA1
   /// 6. Upload Book File with MD5 and SHA1 in metadata
-  Stream<String> uploadMultipleBooks(
-      [String collectionName = 'Default']) async* {
+  Stream<String> uploadMultipleBooks([
+    String collectionName = 'Default',
+  ]) async* {
     if (kIsWeb) {
       throw AppException(
           'StorageController.uploadMultipleBooks does not work on web');
