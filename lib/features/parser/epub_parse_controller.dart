@@ -126,8 +126,6 @@ class EPUBParseController {
         receiveAndReturnService: IsolateService.readAndDecodeImageService,
       );
       await for (final cover in imagesStream) {
-        // final imageContent = await imageRef.readContent();
-        // final img.Image? cover = img.decodeImage(imageContent);
         if (cover != null && cover.height > cover.width) {
           coverImage = cover;
           break;
