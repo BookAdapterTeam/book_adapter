@@ -301,11 +301,11 @@ class FirebaseController {
 
   Future<UploadTask?> uploadCoverImage({
     required String firebaseFilepath,
-    required List<int> data,
+    required Uint8List bytes,
   }) async {
     return await _firebaseService.uploadCoverPhoto(
       uploadToPath: firebaseFilepath,
-      bytes: data,
+      bytes: bytes,
     );
   }
 

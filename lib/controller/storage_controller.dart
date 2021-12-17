@@ -244,7 +244,7 @@ class StorageController {
               ? null
               : await _read(firebaseControllerProvider).uploadCoverImage(
                   firebaseFilepath: coverImageFirebaseFilepath,
-                  data: coverData,
+                  bytes: coverData,
                 );
           await uploadTask;
           log.i(

@@ -59,13 +59,13 @@ mixin FirebaseServiceStorageMixin {
 
   /// Upload a book cover photo to Firebase Storage
   Future<UploadTask?> uploadCoverPhoto({
-    required List<int> bytes,
+    required Uint8List bytes,
     required String uploadToPath,
   }) async {
     const imageContentType = 'image/jpeg';
 
     final uploadTask = await uploadBytes(
-      bytes: Uint8List.fromList(bytes),
+      bytes: bytes,
       contentType: imageContentType,
       firebaseFilePath: uploadToPath,
     );

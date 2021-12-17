@@ -1,5 +1,6 @@
 import 'dart:io' as io;
 import 'dart:isolate';
+import 'dart:typed_data';
 
 import 'package:async/async.dart';
 import 'package:crypto/crypto.dart';
@@ -226,7 +227,8 @@ class IsolateService {
     await for (final message in commandPort) {
       if (message is img.Image) {
         // Read and decode the file.
-        final bytes = img.encodeJpg(message);
+        final dataList = img.encodeJpg(message);
+        final bytes = Uint8List.fromList(dataList);
 
         // Send the result to the main isolate.
         p.send(bytes);

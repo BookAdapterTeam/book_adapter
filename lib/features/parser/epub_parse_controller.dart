@@ -104,9 +104,9 @@ class EPUBParseController {
     return firebaseFilePath;
   }
 
-  Future<List<int>?> getCoverImage(Uint8List data) async {
+  Future<Uint8List?> getCoverImage(Uint8List bookBytes) async {
     final log = Logger();
-    final openedBook = await EpubReader.openBook(List.from(data));
+    final openedBook = await EpubReader.openBook(bookBytes);
     Image? coverImage = await openedBook.readCover();
 
     if (coverImage == null) {
@@ -153,14 +153,14 @@ class EPUBParseController {
     }
 
     final encodeImageFuture =
-        IsolateService.sendSingleAndReceive<Image, List<int>>(
+        IsolateService.sendSingleAndReceive<Image, Uint8List>(
       coverImage,
       receiveAndReturnService: IsolateService.readAndEncodeImageService,
     );
     log.i('Encoding Image');
-    final bytes = await encodeImageFuture;
+    final imageBytes = await encodeImageFuture;
     log.i('Encoding Image Done');
 
-    return bytes;
+    return imageBytes;
   }
 }
