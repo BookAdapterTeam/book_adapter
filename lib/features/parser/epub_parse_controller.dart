@@ -86,7 +86,7 @@ class EPUBParseController {
       filename = '$ioFilename-$id.$ext';
     } else {
       // has file extension, remove it and add new one
-      filename = '${ioFilename.replaceAll(extension, '')}-$id.$ext';
+      filename = '${ioFilename.replaceAll('.$extension', '')}-$id.$ext';
     }
 
     final startingIndex = max(0, filename.length - 127);
