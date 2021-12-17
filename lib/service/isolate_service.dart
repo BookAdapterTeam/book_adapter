@@ -241,41 +241,4 @@ class IsolateService {
     log.i('Spawned isolate finished.');
     Isolate.exit();
   }
-
-  /// The entrypoint that runs on the spawned isolate. Receives a command from
-  /// the main isolate, opens the file picker, and returns [List<PlatformFile>]
-  static Future<void> pickFilesService(SendPort p) async {
-    final log = Logger();
-    log.i('Spawned isolate started.');
-
-    // Send a SendPort to the main isolate so that it can send JSON strings to
-    // this isolate.
-    final commandPort = ReceivePort();
-    p.send(commandPort.sendPort);
-
-    // Wait for messages from the main isolate.
-    await for (final message in commandPort) {
-      if (message is String && message == 'pickFile') {
-        // Read and decode the file.
-        final platformFileList = await StorageService.pickFile(
-          type: FileType.custom,
-          allowedExtensions: ['epub'],
-          allowMultiple: true,
-          withReadStream: false,
-          withData: false,
-          allowCompression: false,
-        );
-
-        // Send the result to the main isolate.
-        p.send(platformFileList);
-      } else if (message == null) {
-        // Exit if the main isolate sends a null message, indicating there are no
-        // more files to read and parse.
-        break;
-      }
-    }
-
-    log.i('Spawned isolate finished.');
-    Isolate.exit();
-  }
 }
