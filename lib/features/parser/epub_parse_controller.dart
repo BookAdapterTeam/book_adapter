@@ -5,17 +5,18 @@ import 'dart:typed_data';
 import 'package:epubx/epubx.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image/image.dart' as img;
+import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
 import '../library/data/book_item.dart';
 
-final epubServiceProvider = Provider<EPUBService>((ref) {
-  return EPUBService();
+final epubServiceProvider = Provider<EPUBParseController>((ref) {
+  return EPUBParseController();
 });
 
 /// A utility class to handle all Firebase calls
-class EPUBService {
-  EPUBService();
+class EPUBParseController {
+  EPUBParseController();
 
   static const _uuid = Uuid();
 
@@ -102,6 +103,7 @@ class EPUBService {
   }
 
   Future<List<int>?> getCoverImage(Uint8List data) async {
+    final log = Logger();
     final openedBook = await EpubReader.openBook(List.from(data));
     Image? coverImage = await openedBook.readCover();
 
@@ -115,6 +117,7 @@ class EPUBService {
       }
 
       // Use the first image that has a height greater than width to avoid using banners and copyright notices
+      log.i('Decoding Images');
       for (final imageRef in imagesRef.values) {
         final imageContent = await imageRef.readContent();
         final img.Image? cover = img.decodeImage(imageContent);
@@ -123,11 +126,14 @@ class EPUBService {
           break;
         }
       }
+      log.i('Decoding Images Done');
 
       // If no applicable image found above, use the first image
       if (coverImage == null) {
         final imageContent = await imagesRef.values.first.readContent();
+        log.i('Decoding Image');
         coverImage = img.decodeImage(imageContent);
+        log.i('Decoding Image Done');
       }
     }
 
@@ -136,7 +142,9 @@ class EPUBService {
       return null;
     }
 
+    log.i('Encoding Image');
     final bytes = img.encodeJpg(coverImage);
+    log.i('Encoding Image Done');
 
     return bytes;
   }
