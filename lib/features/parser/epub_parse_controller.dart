@@ -3,11 +3,14 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:epubx/epubx.dart';
+// ignore: implementation_imports
+import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../service/isolate_service.dart';
 import '../library/data/book_item.dart';
 
 final epubServiceProvider = Provider<EPUBParseController>((ref) {
@@ -118,9 +121,14 @@ class EPUBParseController {
 
       // Use the first image that has a height greater than width to avoid using banners and copyright notices
       log.i('Decoding Images');
-      for (final imageRef in imagesRef.values) {
-        final imageContent = await imageRef.readContent();
-        final img.Image? cover = img.decodeImage(imageContent);
+      final imagesStream =
+          IsolateService.sendAndReceive<EpubByteContentFileRef, Image?>(
+        imagesRef.values.toList(),
+        receiveAndReturnService: IsolateService.readAndDecodeImageService,
+      );
+      await for (final cover in imagesStream) {
+        // final imageContent = await imageRef.readContent();
+        // final img.Image? cover = img.decodeImage(imageContent);
         if (cover != null && cover.height > cover.width) {
           coverImage = cover;
           break;
@@ -128,13 +136,16 @@ class EPUBParseController {
       }
       log.i('Decoding Images Done');
 
-      // If no applicable image found above, use the first image
-      if (coverImage == null) {
-        final imageContent = await imagesRef.values.first.readContent();
-        log.i('Decoding Image');
-        coverImage = img.decodeImage(imageContent);
-        log.i('Decoding Image Done');
+      final firstImageStream =
+          IsolateService.sendAndReceive<EpubByteContentFileRef, Image?>(
+        [imagesRef.values.first],
+        receiveAndReturnService: IsolateService.readAndDecodeImageService,
+      );
+      log.i('Decoding Image');
+      await for (final cover in firstImageStream) {
+        coverImage = cover;
       }
+      log.i('Decoding Image Done');
     }
 
     if (coverImage == null) {

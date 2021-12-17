@@ -3,6 +3,9 @@ import 'dart:isolate';
 
 import 'package:async/async.dart';
 import 'package:crypto/crypto.dart';
+// ignore: implementation_imports
+import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
+import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
 
 import 'storage_service.dart';
@@ -24,11 +27,28 @@ class IsolateService {
   ///   - [TransferableTypedData]
   ///   - [SendPort]
   ///   - [Capability]
+  ///
+  /// Additiionally, T and R can contain any object, with the following exceptions:
+  ///
+  ///   - Objects with native resources (subclasses of e.g.
+  ///     `NativeFieldWrapperClass1`). A [Socket] object for example referrs
+  ///     internally to objects that have native resources attached and can
+  ///     therefore not be sent.
+  ///   - [ReceivePort]
+  ///   - [DynamicLibrary]
+  ///   - [Pointer]
+  ///   - [UserTag]
+  ///   - `MirrorReference`
+  ///
+  /// Apart from those exceptions any object can be sent. Objects that are
+  /// identified as immutable (e.g. strings) will be shared whereas all other
+  /// objects will be copied.
   static Stream<R> sendAndReceive<T, R>(
-    List<T> list,
-  ) async* {
+    List<T> list, {
+    required Future<void> Function(SendPort) receiveAndReturnService,
+  }) async* {
     final p = ReceivePort();
-    await Isolate.spawn(readAndHashFileService, p.sendPort);
+    await Isolate.spawn(receiveAndReturnService, p.sendPort);
 
     // Convert the ReceivePort into a StreamQueue to receive messages from the
     // spawned isolate using a pull-based interface. Events are stored in this
@@ -85,6 +105,37 @@ class IsolateService {
           StorageService.kMD5Key: md5Hash,
           StorageService.kSHA1Key: sha1Hash,
         });
+      } else if (message == null) {
+        // Exit if the main isolate sends a null message, indicating there are no
+        // more files to read and parse.
+        break;
+      }
+    }
+
+    log.i('Spawned isolate finished.');
+    Isolate.exit();
+  }
+
+  /// The entrypoint that runs on the spawned isolate. Receives images from
+  /// the main isolate, decodes the images, and returns it
+  static Future<void> readAndDecodeImageService(SendPort p) async {
+    final log = Logger();
+    log.i('Spawned isolate started.');
+
+    // Send a SendPort to the main isolate so that it can send JSON strings to
+    // this isolate.
+    final commandPort = ReceivePort();
+    p.send(commandPort.sendPort);
+
+    // Wait for messages from the main isolate.
+    await for (final message in commandPort) {
+      if (message is EpubByteContentFileRef) {
+        // Read and decode the file.
+        final imageContent = await message.readContent();
+        final img.Image? cover = img.decodeImage(imageContent);
+
+        // Send the result to the main isolate.
+        p.send(cover);
       } else if (message == null) {
         // Exit if the main isolate sends a null message, indicating there are no
         // more files to read and parse.

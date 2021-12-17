@@ -138,7 +138,9 @@ class StorageController {
 
     //1. Get File Hash
     final stream = IsolateService.sendAndReceive<String, Map<String, dynamic>>(
-        filepathList);
+      filepathList,
+      receiveAndReturnService: IsolateService.readAndHashFileService,
+    );
     await for (final fileMap in stream) {
       final String filepath = fileMap[StorageService.kFilepathKey];
       final String md_5 = fileMap[StorageService.kMD5Key];
