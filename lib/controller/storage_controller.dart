@@ -139,7 +139,7 @@ class StorageController {
 
     //1. Get File Hash
     final stream =
-        IsolateService.sendListAndReceive<String, Map<String, dynamic>>(
+        IsolateService.sendListAndReceiveStream<String, Map<String, dynamic>>(
       filepathList,
       receiveAndReturnService: IsolateService.readAndHashFileService,
     );
