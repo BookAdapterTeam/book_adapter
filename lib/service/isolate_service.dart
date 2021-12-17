@@ -5,7 +5,6 @@ import 'package:async/async.dart';
 import 'package:crypto/crypto.dart';
 // ignore: implementation_imports
 import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
 
