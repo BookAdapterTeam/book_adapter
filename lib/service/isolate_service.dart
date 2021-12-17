@@ -146,4 +146,34 @@ class IsolateService {
     log.i('Spawned isolate finished.');
     Isolate.exit();
   }
+
+  /// The entrypoint that runs on the spawned isolate. Receives an image from
+  /// the main isolate, encodes the images, and returns the bytes
+  static Future<void> readAndEncodeImageService(SendPort p) async {
+    final log = Logger();
+    log.i('Spawned isolate started.');
+
+    // Send a SendPort to the main isolate so that it can send JSON strings to
+    // this isolate.
+    final commandPort = ReceivePort();
+    p.send(commandPort.sendPort);
+
+    // Wait for messages from the main isolate.
+    await for (final message in commandPort) {
+      if (message is img.Image) {
+        // Read and decode the file.
+        final bytes = img.encodeJpg(message);
+
+        // Send the result to the main isolate.
+        p.send(bytes);
+      } else if (message == null) {
+        // Exit if the main isolate sends a null message, indicating there are no
+        // more files to read and parse.
+        break;
+      }
+    }
+
+    log.i('Spawned isolate finished.');
+    Isolate.exit();
+  }
 }

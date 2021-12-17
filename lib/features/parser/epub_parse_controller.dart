@@ -6,7 +6,6 @@ import 'package:epubx/epubx.dart';
 // ignore: implementation_imports
 import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
@@ -153,8 +152,12 @@ class EPUBParseController {
       return null;
     }
 
+    final firstImageStream = IsolateService.sendAndReceive<Image, List<int>>(
+      [coverImage],
+      receiveAndReturnService: IsolateService.readAndEncodeImageService,
+    );
     log.i('Encoding Image');
-    final bytes = img.encodeJpg(coverImage);
+    final bytes = await firstImageStream.first;
     log.i('Encoding Image Done');
 
     return bytes;
