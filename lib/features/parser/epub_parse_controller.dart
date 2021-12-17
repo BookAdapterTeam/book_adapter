@@ -135,16 +135,16 @@ class EPUBParseController {
       }
       log.i('Decoding Images Done');
 
-      final firstImageStream =
-          IsolateService.sendListAndReceive<EpubByteContentFileRef, Image?>(
-        [imagesRef.values.first],
-        receiveAndReturnService: IsolateService.readAndDecodeImageService,
-      );
-      log.i('Decoding Image');
-      await for (final cover in firstImageStream) {
-        coverImage = cover;
+      if (coverImage == null) {
+        final firstImageFuture =
+            IsolateService.sendSingleAndReceive<EpubByteContentFileRef, Image?>(
+          imagesRef.values.first,
+          receiveAndReturnService: IsolateService.readAndDecodeImageService,
+        );
+        log.i('Decoding First Image');
+        coverImage = await firstImageFuture;
+        log.i('Decoding First Image Done');
       }
-      log.i('Decoding Image Done');
     }
 
     if (coverImage == null) {
@@ -152,12 +152,13 @@ class EPUBParseController {
       return null;
     }
 
-    final firstImageFuture = IsolateService.sendSingleAndReceive<Image, List<int>>(
+    final encodeImageFuture =
+        IsolateService.sendSingleAndReceive<Image, List<int>>(
       coverImage,
       receiveAndReturnService: IsolateService.readAndEncodeImageService,
     );
     log.i('Encoding Image');
-    final bytes = await firstImageFuture;
+    final bytes = await encodeImageFuture;
     log.i('Encoding Image Done');
 
     return bytes;
