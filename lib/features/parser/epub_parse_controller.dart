@@ -60,34 +60,36 @@ class EPUBParseController {
 
   String _getFilename(String cacheFilePath, String id) {
     final ioFilename = cacheFilePath.split('/').last;
-    final extension = ioFilename.split('.').last;
 
-    final String filename;
-    if (extension == ioFilename) {
-      // No file extension
-      filename = '$ioFilename-$id';
-    } else {
-      // has file extension
-      filename = '${ioFilename.replaceAll(extension, '')}-$id.$extension';
-    }
+    // No extension
+    final splitFilename = ioFilename.split('.');
+    if (splitFilename.length == 1) return '$ioFilename-$id';
+
+    final extension = splitFilename.last;
+    final String filename = '${_removeExtension(ioFilename)}-$id.$extension';
 
     final startingIndex = max(0, filename.length - 127);
     final cutFilename = filename.substring(startingIndex, filename.length);
     return cutFilename;
   }
 
-  String getCoverFilename(String cacheFilePath, String id, String ext) {
-    final ioFilename = cacheFilePath.split('/').last;
-    final extension = ioFilename.split('.').last;
+  String _removeExtension(String filePath) {
+    final List<String> splitString = filePath.split('.');
 
-    final String filename;
-    if (extension == ioFilename) {
-      // No file extension, add new one
-      filename = '$ioFilename-$id.$ext';
-    } else {
-      // has file extension, remove it and add new one
-      filename = '${ioFilename.replaceAll('.$extension', '')}-$id.$ext';
-    }
+    // No extension
+    if (splitString.length == 1) return filePath;
+
+    splitString.removeLast();
+
+    final stringWithoutExtension = splitString.join('.');
+
+    return stringWithoutExtension;
+  }
+
+  String getCoverFilename(String cacheFilePath, String id, String extension) {
+    final ioFilename = cacheFilePath.split('/').last;
+
+    final String filename = '${_removeExtension(ioFilename)}-$id.$extension';
 
     final startingIndex = max(0, filename.length - 127);
     final cutFilename = filename.substring(startingIndex, filename.length);
