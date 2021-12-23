@@ -65,9 +65,11 @@ class EPUBParseController {
     final splitFilename = ioFilename.split('.');
     if (splitFilename.length == 1) return '$ioFilename-$id';
 
+    // Put the ID before the extension
     final extension = splitFilename.last;
     final String filename = '${_removeExtension(ioFilename)}-$id.$extension';
 
+    // Make sure the filename is not too long for android
     final startingIndex = max(0, filename.length - 127);
     final cutFilename = filename.substring(startingIndex, filename.length);
     return cutFilename;
@@ -80,7 +82,6 @@ class EPUBParseController {
     if (splitString.length == 1) return filePath;
 
     splitString.removeLast();
-
     final stringWithoutExtension = splitString.join('.');
 
     return stringWithoutExtension;
@@ -89,8 +90,10 @@ class EPUBParseController {
   String getCoverFilename(String cacheFilePath, String id, String extension) {
     final ioFilename = cacheFilePath.split('/').last;
 
+    // Put the ID before the extension
     final String filename = '${_removeExtension(ioFilename)}-$id.$extension';
 
+    // Make sure the filename is not too long for android
     final startingIndex = max(0, filename.length - 127);
     final cutFilename = filename.substring(startingIndex, filename.length);
     return cutFilename;
