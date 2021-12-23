@@ -176,11 +176,11 @@ class StorageController {
 
       log.i('${filepath.split('/').last} Queued For Upload');
 
-      _read(storageServiceProvider).boxAddToUploadQueue(
+      unawaited(_read(storageServiceProvider).boxAddToUploadQueue(
         filepath,
         md5: md_5,
         sha1: sha_1,
-      );
+      ));
     }
 
     log.i('Starting Uploading of Books');
@@ -222,14 +222,14 @@ class StorageController {
       if (task == null) {
         log.i('Unable to upload file: ${cacheFilepath.split('/').last}');
         yield 'Unable to upload file: ${cacheFilepath.split('/').last}';
-        _read(storageServiceProvider).boxRemoveFromUploadQueue(cacheFilepath);
+        unawaited(_read(storageServiceProvider).boxRemoveFromUploadQueue(cacheFilepath));
         continue;
       }
 
       await task.whenComplete(() async {
         log.i('Finished File Upload: ${cacheFilepath.split('/').last}');
-        _read(storageServiceProvider)
-            .boxSetFileUploadedInUploadQueue(cacheFilepath);
+        unawaited(_read(storageServiceProvider)
+            .boxSetFileUploadedInUploadQueue(cacheFilepath));
 
         // 5. Upload Book Cover Image
         //     -   Don't upload if null
@@ -272,7 +272,7 @@ class StorageController {
         );
 
         await _read(firebaseControllerProvider).uploadBookDocument(book);
-        _read(storageServiceProvider)
+        await _read(storageServiceProvider)
             .boxSetDocumentUploadedInUploadQueue(cacheFilepath);
       });
     }

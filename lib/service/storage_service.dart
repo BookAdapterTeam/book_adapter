@@ -72,14 +72,14 @@ class StorageService {
   }
 
   /// Adds a file to the upload queue box with `filepath` as the key
-  void boxAddToUploadQueue(
+  Future<void> boxAddToUploadQueue(
     String filepath, {
     required String md5,
     required String sha1,
     bool isDocumentUploaded = false,
     bool isFileUploaded = false,
-  }) {
-    _uploadQueueBox.put(filepath, {
+  }) async {
+    await _uploadQueueBox.put(filepath, {
       kFilepathKey: filepath,
       kMD5Key: md5,
       kSHA1Key: sha1,
@@ -88,16 +88,16 @@ class StorageService {
     });
   }
 
-  void boxSetDocumentUploadedInUploadQueue(
+  Future<void> boxSetDocumentUploadedInUploadQueue(
     String filepath,
-  ) {
+  ) async {
     final queueMap = getUploadQueueItem(filepath);
     if (queueMap == null) return;
 
     final md5 = queueMap[kMD5Key];
     final sha1 = queueMap[kSHA1Key];
 
-    boxAddToUploadQueue(
+    await boxAddToUploadQueue(
       filepath,
       md5: md5,
       sha1: sha1,
@@ -105,16 +105,16 @@ class StorageService {
     );
   }
 
-  void boxSetFileUploadedInUploadQueue(
+  Future<void> boxSetFileUploadedInUploadQueue(
     String filepath,
-  ) {
+  ) async {
     final queueMap = getUploadQueueItem(filepath);
     if (queueMap == null) return;
 
     final md5 = queueMap[kMD5Key];
     final sha1 = queueMap[kSHA1Key];
 
-    boxAddToUploadQueue(
+    await boxAddToUploadQueue(
       filepath,
       md5: md5,
       sha1: sha1,
@@ -123,7 +123,7 @@ class StorageService {
   }
 
   /// Removes a file to the upload queue box
-  void boxRemoveFromUploadQueue(String filepath) async {
+  Future<void> boxRemoveFromUploadQueue(String filepath) async {
     return await _uploadQueueBox.delete(filepath);
   }
 
