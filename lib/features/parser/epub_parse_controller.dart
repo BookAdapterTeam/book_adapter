@@ -125,19 +125,13 @@ class EPUBParseController {
 
       // Use the first image that has a height greater than width to avoid using banners and copyright notices
       log.i('Decoding Images');
-      final imagesFuture =
-          IsolateService.sendListAndReceiveList<EpubByteContentFileRef, Image?>(
+      final imageFuture =
+          IsolateService.sendListAndReceiveSingle<EpubByteContentFileRef, Image?>(
         imagesRef.values.toList(),
         receiveAndReturnService: IsolateService.readAndDecodeImageService,
       );
 
-      final images = await imagesFuture;
-
-      for (final cover in images) {
-        if (coverImage == null && cover != null && cover.height > cover.width) {
-          coverImage = cover;
-        }
-      }
+      coverImage = await imageFuture;
 
       log.i('Decoding Images Done');
 

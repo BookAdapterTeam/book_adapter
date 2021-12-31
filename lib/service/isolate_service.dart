@@ -176,6 +176,70 @@ class IsolateService {
   /// Apart from those exceptions any object can be sent. Objects that are
   /// identified as immutable (e.g. strings) will be shared whereas all other
   /// objects will be copied.
+  static Future<R> sendListAndReceiveSingle<T, R>(
+    List<T> list, {
+    required Future<void> Function(SendPort) receiveAndReturnService,
+  }) async {
+    final p = ReceivePort();
+    await Isolate.spawn(receiveAndReturnService, p.sendPort);
+
+    // Convert the ReceivePort into a StreamQueue to receive messages from the
+    // spawned isolate using a pull-based interface. Events are stored in this
+    // queue until they are accessed by `events.next`.
+    final events = StreamQueue<dynamic>(p);
+
+    // The first message from the spawned isolate is a SendPort. This port is
+    // used to communicate with the spawned isolate.
+    final SendPort sendPort = await events.next;
+
+    sendPort.send(list);
+
+    // Receive the loaded bytes and return
+    final R message = await events.next;
+
+    // Send a signal to the spawned isolate indicating that it should exit.
+    sendPort.send(null);
+
+    p.close();
+
+    // Dispose the StreamQueue.
+    await events.cancel();
+
+    return message;
+  }
+
+  /// Spawns an isolate and asynchronously sends List<T> for it to
+  /// read and decode. Waits for the response containing the file hash
+  /// before sending the next.
+  ///
+  /// Returns a future that returns List<R>.
+  ///
+  /// T and R may be any of the following types:
+  ///   - [Null]
+  ///   - [bool]
+  ///   - [int]
+  ///   - [double]
+  ///   - [String]
+  ///   - [List] or [Map] (whose elements are any of these)
+  ///   - [TransferableTypedData]
+  ///   - [SendPort]
+  ///   - [Capability]
+  ///
+  /// Additiionally, T and R can contain any object, with the following exceptions:
+  ///
+  ///   - Objects with native resources (subclasses of e.g.
+  ///     `NativeFieldWrapperClass1`). A [Socket] object for example referrs
+  ///     internally to objects that have native resources attached and can
+  ///     therefore not be sent.
+  ///   - [ReceivePort]
+  ///   - [DynamicLibrary]
+  ///   - [Pointer]
+  ///   - [UserTag]
+  ///   - `MirrorReference`
+  ///
+  /// Apart from those exceptions any object can be sent. Objects that are
+  /// identified as immutable (e.g. strings) will be shared whereas all other
+  /// objects will be copied.
   static Future<List<R>> sendListAndReceiveList<T, R>(
     List<T> list, {
     required Future<void> Function(SendPort) receiveAndReturnService,
@@ -267,13 +331,25 @@ class IsolateService {
 
     // Wait for messages from the main isolate.
     await for (final message in commandPort) {
-      if (message is EpubByteContentFileRef) {
-        // Read and decode the file.
-        final imageContent = await message.readContent();
-        final img.Image? cover = img.decodeImage(imageContent);
+      if (message is List<EpubByteContentFileRef>) {
+        final fileRefs = message;
+        img.Image? coverImage;
+
+        for (final fileRef in fileRefs) {
+          // Read and decode the file.
+          final imageContent = await fileRef.readContent();
+          final img.Image? cover = img.decodeImage(imageContent);
+
+          if (coverImage == null &&
+              cover != null &&
+              cover.height > cover.width) {
+            coverImage = cover;
+          }
+        }
 
         // Send the result to the main isolate.
-        p.send(cover);
+        // Use Isolate.exit instead of p.send for large pieces of data so that dart does not copy the values
+        Isolate.exit(p, coverImage);
       } else if (message == null) {
         // Exit if the main isolate sends a null message, indicating there are no
         // more files to read and parse.
@@ -304,7 +380,8 @@ class IsolateService {
         final bytes = Uint8List.fromList(dataList);
 
         // Send the result to the main isolate.
-        p.send(bytes);
+        // Use Isolate.exit instead of p.send for large pieces of data so that dart does not copy the values
+        Isolate.exit(p, bytes);
       } else if (message == null) {
         // Exit if the main isolate sends a null message, indicating there are no
         // more files to read and parse.
