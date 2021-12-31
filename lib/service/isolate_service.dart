@@ -340,10 +340,12 @@ class IsolateService {
           final imageContent = await fileRef.readContent();
           final img.Image? cover = img.decodeImage(imageContent);
 
+          // Use the first image that has the correct dimensions
           if (coverImage == null &&
               cover != null &&
               cover.height > cover.width) {
             coverImage = cover;
+            break;
           }
         }
 
