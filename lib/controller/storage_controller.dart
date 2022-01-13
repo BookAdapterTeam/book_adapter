@@ -129,6 +129,7 @@ class StorageController {
     );
 
     // TODO(@getBoolean): Add books to upload queue and process books in upload queue similar to how the delete file queue works
+    // TODO(getBoolean): Copy book file to local storage and then upload Firestore book document for immediate reading
 
     final filepathList = platformFileList
         .map((file) =>
