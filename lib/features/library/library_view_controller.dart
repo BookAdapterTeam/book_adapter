@@ -53,33 +53,6 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         in _read(storageControllerProvider).uploadMultipleBooks()) {
       log.i(message);
     }
-
-    // // Make storage service call to pick books
-    // final sRes = await _read(storageServiceProvider).pickFile(
-    //   type: FileType.custom,
-    //   allowedExtensions: ['epub'],
-    //   allowMultiple: true,
-    //   withReadStream: true,
-    // );
-
-    // if (sRes.isLeft()) {
-    //   return;
-    // }
-
-    // final platformFiles = sRes.getOrElse(() => []);
-
-    // final uploadedBooks = <Book>[];
-    // for (final file in platformFiles) {
-    //   // Add book to firebase
-    //   final fRes = await _read(firebaseControllerProvider).addBook(file);
-    //   fRes.fold(
-    //     (failure) {
-    //       log.e(failure.message);
-    //       ToastUtils.error(failure.message);
-    //     },
-    //     (book) => uploadedBooks.add(book),
-    //   );
-    // }
   }
 
   Future<void> deleteBook(String bookId) {
