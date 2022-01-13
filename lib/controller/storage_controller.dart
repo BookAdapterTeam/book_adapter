@@ -128,7 +128,7 @@ class StorageController {
       allowCompression: false,
     );
 
-    // TODO(@getBoolean): If a book is currently uploading, add to upload queue instead
+    // TODO(@getBoolean): Add books to upload queue and process books in upload queue similar to how the delete file queue works
 
     final filepathList = platformFileList
         .map((file) =>
