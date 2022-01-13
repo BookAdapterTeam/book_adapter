@@ -11,6 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import '../data/app_exception.dart';
 import '../data/constants.dart';
 import '../data/failure.dart';
+import '../data/file_hash.dart';
 
 final storageServiceInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
@@ -33,20 +34,14 @@ class StorageService {
 
   late final Box<Map<String, dynamic>> _uploadQueueBox;
 
-  /// 'filepath'
-  static const kFilepathKey = 'filepath';
-
-  /// 'md_5'
-  static const kMD5Key = 'md_5';
-
-  /// 'sha_1'
-  static const kSHA1Key = 'sha_1';
-
   /// 'isDocumentUploaded'
   static const kIsDocumentUploadedKey = 'isDocumentUploaded';
 
   /// 'isFileUploaded'
   static const kIsFileUploaded = 'isFileUploaded';
+
+  /// 'fileHashKey'
+  static const kFileHashKey = 'fileHashKey';
 
   /// Initilize the class
   ///
@@ -56,6 +51,7 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
+      Hive.registerAdapter(FileHashAdapter());
       _uploadQueueBox = await Hive.openBox(kUploadQueueBox);
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
@@ -74,15 +70,12 @@ class StorageService {
   /// Adds a file to the upload queue box with `filepath` as the key
   Future<void> boxAddToUploadQueue(
     String filepath, {
-    required String md5,
-    required String sha1,
+    required FileHash fileHash,
     bool isDocumentUploaded = false,
     bool isFileUploaded = false,
   }) async {
     await _uploadQueueBox.put(filepath, {
-      kFilepathKey: filepath,
-      kMD5Key: md5,
-      kSHA1Key: sha1,
+      kFileHashKey: fileHash,
       kIsDocumentUploadedKey: isDocumentUploaded,
       kIsFileUploaded: isFileUploaded,
     });
@@ -94,13 +87,11 @@ class StorageService {
     final queueMap = getUploadQueueItem(filepath);
     if (queueMap == null) return;
 
-    final md5 = queueMap[kMD5Key];
-    final sha1 = queueMap[kSHA1Key];
+    final FileHash fileHash = queueMap[kFileHashKey];
 
     await boxAddToUploadQueue(
       filepath,
-      md5: md5,
-      sha1: sha1,
+      fileHash: fileHash,
       isDocumentUploaded: true,
     );
   }
@@ -111,13 +102,11 @@ class StorageService {
     final queueMap = getUploadQueueItem(filepath);
     if (queueMap == null) return;
 
-    final md5 = queueMap[kMD5Key];
-    final sha1 = queueMap[kSHA1Key];
+    final FileHash fileHash = queueMap[kFileHashKey];
 
     await boxAddToUploadQueue(
       filepath,
-      md5: md5,
-      sha1: sha1,
+      fileHash: fileHash,
       isFileUploaded: true,
     );
   }
@@ -265,9 +254,10 @@ class StorageService {
     bool withReadStream = false,
   }) async {
     // Clear cache because it is buggy and will confuse files of similar filenames
-    if (io.Platform.isIOS || io.Platform.isAndroid) {
-      await FilePicker.platform.clearTemporaryFiles();
-    }
+    // TODO(@getBoolean): Commented out because adding files consequetively will cause the previous upload to fail. Test if different files with the same name will get confused
+    // if (io.Platform.isIOS || io.Platform.isAndroid) {
+    //   await FilePicker.platform.clearTemporaryFiles();
+    // }
 
     final FilePickerResult? result = await FilePicker.platform.pickFiles(
       dialogTitle: dialogTitle,

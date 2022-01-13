@@ -10,6 +10,7 @@ import 'package:uuid/uuid.dart';
 import 'package:watcher/watcher.dart';
 
 import '../data/app_exception.dart';
+import '../data/file_hash.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
 import '../features/parser/epub_parse_controller.dart';
@@ -127,6 +128,8 @@ class StorageController {
       allowCompression: false,
     );
 
+    // TODO(@getBoolean): If a book is currently uploading, add to upload queue instead
+
     final filepathList = platformFileList
         .map((file) =>
             file.path!) // Will never be null since this won't run on web
@@ -135,32 +138,31 @@ class StorageController {
     // Exit if no files chosen
     if (filepathList.isEmpty) return;
 
-    final List<Map<String, dynamic>> fileMapList = [];
+    final List<FileHash> fileHashList = [];
 
     //1. Get File Hash
-    final stream =
-        IsolateService.sendListAndReceiveStream<String, Map<String, dynamic>>(
+    final stream = IsolateService.sendListAndReceiveStream<String, FileHash>(
       filepathList,
       receiveAndReturnService: IsolateService.readAndHashFileService,
     );
-    await for (final fileMap in stream) {
-      final String filepath = fileMap[StorageService.kFilepathKey];
-      final String md_5 = fileMap[StorageService.kMD5Key];
-      final String sha_1 = fileMap[StorageService.kSHA1Key];
+    await for (final fileHash in stream) {
+      final String filepath = fileHash.filepath;
+      final String md5 = fileHash.md5;
+      final String sha1 = fileHash.sha1;
       log.i(
-        'Received Hash for ${filepath.split('/').last}: md5 $md_5 and sha1 $sha_1',
+        'Received Hash for ${filepath.split('/').last}: md5 $md5 and sha1 $sha1',
       );
 
       // 2. Check Firestore for user books with same MD5 and SHA1
       //     -   If book found, dont upload and show snack bar with message "Book already uploaded",
       final bool exists =
-          await _read(firebaseControllerProvider).fileHashExists(md_5, sha_1);
+          await _read(firebaseControllerProvider).fileHashExists(md5, sha1);
       if (exists) {
         yield 'File ${filepath.split('/').last} already uploaded';
         continue;
       }
 
-      fileMapList.add(fileMap);
+      fileHashList.add(fileHash);
     }
 
     // TODO(@getBoolean): 2-1. Show number of processing books to UI
@@ -170,25 +172,20 @@ class StorageController {
     // This allows the upload to be resumed on app start (and logged in) if interrupted
     // Update item values when document and file uploaded
     // Remove items from box after upload completed
-    for (final fileMap in fileMapList) {
-      final String filepath = fileMap[StorageService.kFilepathKey];
-      final String md_5 = fileMap[StorageService.kMD5Key];
-      final String sha_1 = fileMap[StorageService.kSHA1Key];
+    for (final fileHash in fileHashList) {
+      final String filepath = fileHash.filepath;
 
       log.i('${filepath.split('/').last} Queued For Upload');
 
       unawaited(_read(storageServiceProvider).boxAddToUploadQueue(
         filepath,
-        md5: md_5,
-        sha1: sha_1,
+        fileHash: fileHash,
       ));
     }
 
     log.i('Starting Uploading of Books');
-    for (final fileMap in fileMapList) {
-      final String cacheFilepath = fileMap[StorageService.kFilepathKey];
-      final String md_5 = fileMap[StorageService.kMD5Key];
-      final String sha_1 = fileMap[StorageService.kSHA1Key];
+    for (final fileHash in fileHashList) {
+      final String cacheFilepath = fileHash.filepath;
 
       log.i('Read As Bytes: ${cacheFilepath.split('/').last}');
       final bytes = await io.File(cacheFilepath).readAsBytes();
@@ -211,19 +208,20 @@ class StorageController {
         id: id,
         userId: userId,
       );
+      final firebaseFileHash = fileHash.copyWith(filepath: firebaseFilepath);
 
       log.i('Starting File Upload:  ${cacheFilepath.split('/').last}');
       final task = await _read(firebaseControllerProvider).uploadBookData(
         userId: userId,
         bytes: bytes,
         firebaseFilepath: firebaseFilepath,
-        md_5: md_5,
-        sha_1: sha_1,
+        fileHash: firebaseFileHash,
       );
       if (task == null) {
         log.i('Unable to upload file: ${cacheFilepath.split('/').last}');
         yield 'Unable to upload file: ${cacheFilepath.split('/').last}';
-        unawaited(_read(storageServiceProvider).boxRemoveFromUploadQueue(cacheFilepath));
+        unawaited(_read(storageServiceProvider)
+            .boxRemoveFromUploadQueue(cacheFilepath));
         continue;
       }
 
@@ -267,8 +265,7 @@ class StorageController {
         );
 
         final book = parsedBook.copyWith(
-          md_5: md_5,
-          sha_1: sha_1,
+          fileHash: firebaseFileHash,
           firebaseCoverImagePath: coverImageFirebaseFilepath,
         );
 

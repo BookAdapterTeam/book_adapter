@@ -75,6 +75,7 @@ flutter_gen:
     flutter_svg: true
 
 flutter:
+  # Disable generate when using build_runner
   generate: true
   uses-material-design: true
 

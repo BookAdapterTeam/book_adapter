@@ -9,7 +9,7 @@ import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
 import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
 
-import 'storage_service.dart';
+import '../data/file_hash.dart';
 
 class IsolateService {
   /// Spawns an isolate and asynchronously sends List<T> for it to
@@ -294,6 +294,7 @@ class IsolateService {
     await for (final message in commandPort) {
       if (message is String) {
         // Read and decode the file.
+        final filepath = message;
         final bytes = await io.File(message).readAsBytes();
         final bytesList = List<int>.from(bytes);
 
@@ -302,11 +303,11 @@ class IsolateService {
         final sha1Hash = sha1.convert(bytesList).toString();
 
         // Send the result to the main isolate.
-        p.send({
-          StorageService.kFilepathKey: message,
-          StorageService.kMD5Key: md5Hash,
-          StorageService.kSHA1Key: sha1Hash,
-        });
+        p.send(FileHash(
+          filepath: filepath,
+          md5: md5Hash,
+          sha1: sha1Hash,
+        ));
       } else if (message == null) {
         // Exit if the main isolate sends a null message, indicating there are no
         // more files to read and parse.

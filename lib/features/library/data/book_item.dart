@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../data/file_hash.dart';
 import '../../reader/book_reader_view.dart';
 import 'item.dart';
 
@@ -35,8 +36,7 @@ class Book implements Item {
   final String? seriesId;
   final String? lastReadCfiLocation;
   final bool finished;
-  final String? md_5;
-  final String? sha_1;
+  final FileHash? fileHash;
 
   bool get hasSeries => seriesId != null;
 
@@ -65,8 +65,7 @@ class Book implements Item {
     this.seriesId,
     this.lastReadCfiLocation,
     this.finished = false,
-    this.md_5,
-    this.sha_1,
+    this.fileHash,
   });
 
   @override
@@ -94,8 +93,7 @@ class Book implements Item {
     String? seriesId,
     String? lastReadCfiLocation,
     bool? finished,
-    String? md_5,
-    String? sha_1,
+    FileHash? fileHash,
   }) {
     return Book(
       id: id ?? this.id,
@@ -119,8 +117,7 @@ class Book implements Item {
       seriesId: seriesId ?? this.seriesId,
       lastReadCfiLocation: lastReadCfiLocation ?? this.lastReadCfiLocation,
       finished: finished ?? this.finished,
-      md_5: md_5 ?? this.md_5,
-      sha_1: sha_1 ?? this.sha_1,
+      fileHash: fileHash ?? this.fileHash,
     );
   }
 
@@ -147,8 +144,7 @@ class Book implements Item {
       'seriesId': seriesId,
       'lastReadCfiLocation': lastReadCfiLocation,
       'finished': finished,
-      'md_5': md_5,
-      'sha_1': sha_1,
+      'fileHash': fileHash,
     };
   }
 
@@ -177,8 +173,7 @@ class Book implements Item {
       seriesId: map['seriesId'],
       lastReadCfiLocation: map['lastReadCfiLocation'],
       finished: map['finished'] ?? false,
-      md_5: map['md_5'],
-      sha_1: map['sha_1'],
+      fileHash: FileHash.fromMap(map['fileHash']),
     );
   }
 
@@ -205,8 +200,7 @@ class Book implements Item {
       'seriesId': seriesId,
       'lastReadCfiLocation': lastReadCfiLocation,
       'finished': finished,
-      'md_5': md_5.toString(),
-      'sha_1': sha_1.toString(),
+      'fileHash': fileHash?.toMap(),
     };
   }
 
@@ -232,8 +226,7 @@ class Book implements Item {
       seriesId: map['seriesId'],
       lastReadCfiLocation: map['lastReadCfiLocation'],
       finished: map['finished'] ?? false,
-      md_5: map['md_5'],
-      sha_1: map['sha_1'],
+      fileHash: map['fileHash'] == null ? null : FileHash.fromMap(map['fileHash']),
     );
   }
 
@@ -267,8 +260,7 @@ class Book implements Item {
       collectionIds,
       lastReadCfiLocation ?? 'No last read CFI location',
       finished,
-      md_5 ?? 'No MD5',
-      sha_1 ?? 'No SHA1',
+      fileHash ?? 'No FileHash',
     ];
   }
 }
