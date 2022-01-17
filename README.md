@@ -5,7 +5,7 @@
 
 A new Flutter app for reading ePub books, built for android and iOS.
 
-![Screenshot_20211127-212230](https://user-images.githubusercontent.com/19920697/149728749-eb069c40-5833-47ba-af0b-3202d5fb472a.png)
+<img src="https://user-images.githubusercontent.com/19920697/149728749-eb069c40-5833-47ba-af0b-3202d5fb472a.png" width="300"/>
 
 ## Architecture
 
