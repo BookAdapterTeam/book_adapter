@@ -128,8 +128,22 @@ class StorageController {
       allowCompression: false,
     );
 
+    // TODO(@getBoolean): Copy book files to local storage and then upload Firestore book document with temporary values for immediate reading
+    /**
+     * uploadQueue = BookUploadQueue<BookUpload>()
+     *   BookUpload(id, localFilePath, uploadStatus) // localFilePath is the path to the file copied to the app directory
+     * 
+     * For all selected files
+     *   Copy book to app directory
+     *   Upload Firestore document with temporary values (filename, use placeholder local cover image asset)
+     *     Cover image on older app versions will load from url, newer app versions will see the url and use the image stored on the device already
+     *   Add BookUpload to uploadQueue
+     * ****
+     * In BookUploadQueue.processing()
+     * while queue.isNotEmpty
+     *   
+     */
     // TODO(@getBoolean): Add books to upload queue and process books in upload queue similar to how the delete file queue works
-    // TODO(@getBoolean): Copy book file to local storage and then upload Firestore book document for immediate reading
 
     final filepathList = platformFileList
         .map((file) =>
