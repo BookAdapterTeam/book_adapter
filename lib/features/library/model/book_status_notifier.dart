@@ -12,8 +12,8 @@ final bookStatusProvider = StateNotifierProvider.family
   final asyncWatchEvent = ref.watch(fileStreamProvider(book));
 
   final AsyncValue<BookStatus> status = asyncWatchEvent.map(
-    data: (data) {
-      final changeType = data.value.type;
+    data: (fileChangeData) {
+      final changeType = fileChangeData.value.type;
       switch (changeType) {
         case ChangeType.ADD:
           return const AsyncData(BookStatus.downloaded);
