@@ -58,7 +58,6 @@ class EditProfileView extends HookConsumerWidget {
                 //   label: 'Email',
                 //   text: user.email ?? 'Signed in anonymously',
                 //   onChanged: (email) {
-                //     // TODO: Save email in controller
                 //   },
                 // ),
                 const _SubmitButton()
