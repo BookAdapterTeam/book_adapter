@@ -11,6 +11,7 @@ import 'package:watcher/watcher.dart';
 
 import '../data/app_exception.dart';
 import '../data/file_hash.dart';
+import '../features/in_app_update/util/toast_utils.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
 import '../features/library/model/book_status_notifier.dart';
@@ -53,7 +54,13 @@ class StorageController {
   static const _uuid = Uuid();
 
   Future<void> startBookUploads() async {
+    final log = Logger();
     final fileHashList = _read(storageServiceProvider).uploadQueueFileHashList;
+    await for (final message in handleUploadFromFileHashList(fileHashList)) {
+      // Messages are only received if a book upload fails
+      log.i(message);
+      ToastUtils.warning(message);
+    }
   }
 
   String getUserDirectory() {
@@ -126,13 +133,13 @@ class StorageController {
     _read(storageServiceProvider).saveToUploadQueueBox(fileHashList);
 
     log.i('Starting Uploading of Books');
-    await for (final message in handleUploadFromHashList(fileHashList)) {
+    await for (final message in handleUploadFromFileHashList(fileHashList)) {
       yield message;
     }
   }
 
   /// Upload books in file hash list and return a stream of files that could not be uploaded
-  Stream<String> handleUploadFromHashList(
+  Stream<String> handleUploadFromFileHashList(
     List<FileHash> fileHashList,
   ) async* {
     final userId = _read(firebaseControllerProvider).currentUser?.uid;

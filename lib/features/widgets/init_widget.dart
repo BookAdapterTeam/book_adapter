@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -6,6 +8,7 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../controller/firebase_controller.dart';
+import '../../controller/storage_controller.dart';
 import '../../data/constants.dart';
 import '../../service/storage_service.dart';
 import '../in_app_update/update.dart';
@@ -17,6 +20,7 @@ final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield 'Initializing Local Database...';
   await ref.watch(storageServiceProvider).init();
   yield null;
+  unawaited(ref.read(storageControllerProvider).startBookUploads());
 });
 
 class InitWidget extends ConsumerWidget {
