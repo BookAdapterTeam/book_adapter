@@ -246,13 +246,13 @@ class StorageController {
       final firebaseFileHash = fileHash.copyWith(filepath: firebaseFilepath);
 
       log.i('Starting File Upload:  ${cacheFilepath.split('/').last}');
-      final task = await _read(firebaseControllerProvider).uploadBookData(
+      final uploadBookTask = await _read(firebaseControllerProvider).uploadBookData(
         userId: userId,
         bytes: bytes,
         firebaseFilepath: firebaseFilepath,
         fileHash: firebaseFileHash,
       );
-      if (task == null) {
+      if (uploadBookTask == null) {
         log.i('Unable to upload file: ${cacheFilepath.split('/').last}');
         yield 'Unable to upload file: ${cacheFilepath.split('/').last}';
         unawaited(_read(storageServiceProvider)
@@ -260,7 +260,7 @@ class StorageController {
         continue;
       }
 
-      await task.whenComplete(() async {
+      await uploadBookTask.whenComplete(() async {
         log.i('Finished File Upload: ${cacheFilepath.split('/').last}');
         unawaited(_read(storageServiceProvider)
             .boxSetFileUploadedInUploadQueue(cacheFilepath));
