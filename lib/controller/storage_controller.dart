@@ -129,43 +129,6 @@ class StorageController {
       allowCompression: false,
     );
 
-    // TODO(@getBoolean): Upload book queue and support immediate reading
-    /**
-     * Add bookFileUploaded and bookCoverUploaded to Book()
-     * uploadQueue = BookUploadQueue<BookUpload>()
-     *   BookUpload(id, localFilePath, uploadStatus) // localFilePath is the path to the file copied to the app directory
-     * 
-     * For all selected files
-     *   Copy book to app directory
-     *   Upload Firestore document with temporary values (filename, use placeholder local cover image asset, bookFileUploaded & bookCoverUploaded set to false)
-     *     Cover image on older app versions will load from url, newer app versions will see the url and use the image stored on the device already
-     *   Add BookUpload to uploadQueue
-     * ****
-     * In BookUploadQueue.processing()
-     * while queue.isNotEmpty
-     *   Load book into memory
-     *   Get Book title, author, etc
-     *   Update Firebase book document with title, author, etc
-     *   Get Book cover
-     *   Copy book cover to local book folder
-     *   Update Firebase book document with relativeCoverImagePath
-     *   Start cover image upload
-     *     When finished, update Firestore document book's bookCoverUploaded to true
-     *   Start book file upload
-     *     When finished, update Firestore document book's bookFileUploaded to true
-     * ****
-     * In LibraryView
-     *   if books' bookCoverUploaded is false, don't show image
-     * 
-     *   If book cover image exists on device
-     *     Load file into memory from path appDirectoryPath + book's relativeCoverImagePath
-     *     Show image in UI
-     *   else
-     *     Download cover image from Firebase at path specified in book's relativeCoverImagePath
-     *     Show image in UI
-     *     Save cover image to device local app directory at path appDirectoryPath + relativeCoverImagePath
-     */
-
     final filepathList = platformFileList
         .map((file) =>
             file.path!) // Will never be null since this won't run on web
