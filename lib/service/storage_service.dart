@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
@@ -394,5 +395,18 @@ class StorageService {
       receiveAndReturnService: IsolateService.readAndHashFileService,
     );
     return fileHashStream;
+  }
+
+  void saveToUploadQueueBox(List<FileHash> fileHashList) {
+    for (final fileHash in fileHashList) {
+      final String filepath = fileHash.filepath;
+    
+      _log.i('${filepath.split('/').last} Queued For Upload');
+    
+      unawaited(boxAddToUploadQueue(
+        filepath,
+        fileHash: fileHash,
+      ));
+    }
   }
 }

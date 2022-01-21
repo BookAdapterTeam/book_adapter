@@ -125,16 +125,7 @@ class StorageController {
     // This allows the upload to be resumed on app start (and logged in) if interrupted
     // Update item values when document and file uploaded
     // Remove items from box after upload completed
-    for (final fileHash in fileHashList) {
-      final String filepath = fileHash.filepath;
-
-      log.i('${filepath.split('/').last} Queued For Upload');
-
-      unawaited(_read(storageServiceProvider).boxAddToUploadQueue(
-        filepath,
-        fileHash: fileHash,
-      ));
-    }
+    _read(storageServiceProvider).saveToUploadQueueBox(fileHashList);
 
     log.i('Starting Uploading of Books');
     for (final fileHash in fileHashList) {
