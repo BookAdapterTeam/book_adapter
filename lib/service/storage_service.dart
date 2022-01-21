@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:hive/hive.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
@@ -51,6 +51,7 @@ class StorageService {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
+      await Hive.initFlutter('BookAdapterData');
       Hive.registerAdapter(FileHashAdapter());
       _uploadQueueBox = await Hive.openBox(kUploadQueueBox);
     } on Exception catch (e, st) {

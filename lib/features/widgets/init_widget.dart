@@ -3,76 +3,144 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 
+import '../../controller/firebase_controller.dart';
+import '../../data/constants.dart';
 import '../../service/storage_service.dart';
 import '../in_app_update/update.dart';
 import '../in_app_update/util/toast_utils.dart';
-import 'async_value_widget.dart';
 
-class InitFirebaseWidget extends ConsumerWidget {
-  const InitFirebaseWidget({Key? key, required this.child}) : super(key: key);
+final providerForInitStream = StreamProvider<String?>((ref) async* {
+  yield 'Initializing Firebase...';
+  await Firebase.initializeApp().timeout(const Duration(seconds: 5));
+  yield 'Initializing Local Database...';
+  await ref.watch(storageServiceProvider).init();
+  yield null;
+});
+
+final providerForLoadingMessage = StateProvider<String>((ref) {
+  return '';
+});
+
+class InitWidget extends ConsumerWidget {
+  const InitWidget({Key? key, required this.child}) : super(key: key);
 
   final Widget child;
 
+  Widget buildLoading(String? message) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            AnimatedSwitcher(
+              key: ValueKey(message ?? ''),
+              switchInCurve: Curves.easeInCubic,
+              switchOutCurve: Curves.easeOutCubic,
+              duration: kTransitionDuration,
+              child: Text(message ?? ''),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Future<FirebaseApp> _initialization =
-        Firebase.initializeApp().timeout(const Duration(seconds: 5));
+    final asyncValue = ref.watch(providerForInitStream);
     final log = Logger();
-    return FutureBuilder<FirebaseApp>(
-      future: _initialization,
-      builder: (BuildContext context, AsyncSnapshot<FirebaseApp> snapshot) {
-        if (snapshot.hasError) {
-          log.e('Warning: Running in Offline Mode', snapshot.error,
-              snapshot.stackTrace);
+
+    return asyncValue.map(
+      data: (asyncData) {
+        String? message = asyncData.value;
+        if (message == null) {
+          final userStreamAsyncValue = ref.watch(authStateChangesProvider);
+          final user = userStreamAsyncValue.asData?.value;
+          message = 'Authenticating...';
+          if (user != null) return child;
+        }
+
+        return buildLoading(message);
+      },
+      error: (asyncError) {
+        final error = asyncError.error;
+        final stackTrace = asyncError.stackTrace;
+        if (error is FirebaseException) {
+          log.e(
+            'Warning: Running in Offline Mode\n${error.code} - ${error.message}',
+            error,
+            stackTrace,
+          );
           ToastUtils.waring(
-            'Warning: Running in Offline Mode - ${snapshot.error.toString()}',
+            'Warning: Running in Offline Mode',
           );
           return child;
         }
-        if (snapshot.connectionState == ConnectionState.done) {
-          return child;
+
+        if (error is MissingPlatformDirectoryException) {
+          log.e(error.message + ' ' + error.toString(), error, stackTrace);
+          return Scaffold(
+            body: Center(
+              child: Text(
+                error.message,
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .copyWith(color: Colors.red),
+              ),
+            ),
+          );
         }
 
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      },
-    );
-  }
-}
+        if (error is HiveError) {
+          log.e(error.message + ' ' + error.toString(), error, stackTrace);
+          return Scaffold(
+            body: Center(
+              child: Text(
+                error.message,
+                style: Theme.of(context)
+                    .textTheme
+                    .headline6!
+                    .copyWith(color: Colors.red),
+              ),
+            ),
+          );
+        }
 
-class InitStorageServiceWidget extends ConsumerWidget {
-  const InitStorageServiceWidget({Key? key, required this.child})
-      : super(key: key);
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncValue = ref.watch(storageServiceInitProvider);
-    final log = Logger();
-
-    return AsyncValueWidget(
-      value: asyncValue,
-      data: (_) => child,
-      loading: () => const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (e, st) {
-        log.e(e.toString(), e, st);
+        log.e(error.toString(), error, stackTrace);
         return Scaffold(
           body: Center(
             child: Text(
-              e.toString(),
+              error.toString(),
               style: Theme.of(context)
                   .textTheme
                   .headline6!
                   .copyWith(color: Colors.red),
+            ),
+          ),
+        );
+      },
+      loading: (loading) {
+        return Scaffold(
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                AnimatedSwitcher(
+                  switchInCurve: Curves.easeInCubic,
+                  switchOutCurve: Curves.easeOutCubic,
+                  duration: kTransitionDuration,
+                  child: Text(ref.watch(providerForLoadingMessage)),
+                ),
+              ],
             ),
           ),
         );
@@ -102,45 +170,5 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   @override
   Widget build(BuildContext context) {
     return widget.child;
-  }
-}
-
-final hiveInitFutureProvider = FutureProvider<void>((ref) async {
-  await Hive.initFlutter('BookAdapterData');
-});
-
-class InitHiveWidget extends ConsumerWidget {
-  const InitHiveWidget({Key? key, required this.child}) : super(key: key);
-
-  final Widget child;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final asyncValue = ref.watch(hiveInitFutureProvider);
-    final log = Logger();
-
-    return AsyncValueWidget(
-      value: asyncValue,
-      data: (_) => child,
-      loading: () => const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (e, st) {
-        log.e(e.toString(), e, st);
-        return Scaffold(
-          body: Center(
-            child: Text(
-              e.toString(),
-              style: Theme.of(context)
-                  .textTheme
-                  .headline6!
-                  .copyWith(color: Colors.red),
-            ),
-          ),
-        );
-      },
-    );
   }
 }
