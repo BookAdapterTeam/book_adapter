@@ -100,11 +100,11 @@ class StorageController {
     final List<FileHash> fileHashList = [];
 
     //1. Get File Hash
-    final stream = IsolateService.sendListAndReceiveStream<String, FileHash>(
+    final fileHashStream = IsolateService.sendListAndReceiveStream<String, FileHash>(
       filepathList,
       receiveAndReturnService: IsolateService.readAndHashFileService,
     );
-    await for (final fileHash in stream) {
+    await for (final fileHash in fileHashStream) {
       final String filepath = fileHash.filepath;
       final String md5 = fileHash.md5;
       final String sha1 = fileHash.sha1;
