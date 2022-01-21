@@ -72,7 +72,7 @@ class InitWidget extends ConsumerWidget {
             error,
             stackTrace,
           );
-          ToastUtils.waring(
+          ToastUtils.warning(
             'Warning: Running in Offline Mode',
           );
           return child;

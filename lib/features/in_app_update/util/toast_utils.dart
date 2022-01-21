@@ -41,7 +41,7 @@ class ToastUtils {
     );
   }
 
-  static void waring(
+  static void warning(
     String msg, {
     Duration duration = kSnackBarDuration,
   }) {
