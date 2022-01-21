@@ -15,7 +15,6 @@ import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
 import '../features/library/model/book_status_notifier.dart';
 import '../features/parser/epub_parse_controller.dart';
-import '../service/isolate_service.dart';
 import '../service/storage_service.dart';
 import 'firebase_controller.dart';
 
@@ -53,6 +52,10 @@ class StorageController {
   final Reader _read;
   static const _uuid = Uuid();
 
+  Future<void> startBookUploads() async {
+    final fileHashList = _read(storageServiceProvider).uploadQueueFileHashList;
+  }
+
   String getUserDirectory() {
     final userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
@@ -70,11 +73,6 @@ class StorageController {
     if (kIsWeb) {
       throw AppException(
           'StorageController.uploadMultipleBooks does not work on web');
-    }
-
-    final userId = _read(firebaseControllerProvider).currentUser?.uid;
-    if (userId == null) {
-      throw AppException('User not logged in');
     }
 
     final log = Logger();
@@ -118,7 +116,7 @@ class StorageController {
         continue;
       }
 
-      fileHashList.add(fileHash);
+      fileHashList.add(fileHash.copyWith(collectionName: collectionName));
     }
 
     // Save all to Hive box with filepath and filehash
@@ -128,6 +126,21 @@ class StorageController {
     _read(storageServiceProvider).saveToUploadQueueBox(fileHashList);
 
     log.i('Starting Uploading of Books');
+    await for (final message in handleUploadFromHashList(fileHashList)) {
+      yield message;
+    }
+  }
+
+  /// Upload books in file hash list and return a stream of files that could not be uploaded
+  Stream<String> handleUploadFromHashList(
+    List<FileHash> fileHashList,
+  ) async* {
+    final userId = _read(firebaseControllerProvider).currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
+
+    final log = Logger();
     for (final fileHash in fileHashList) {
       final String cacheFilepath = fileHash.filepath;
 
@@ -165,6 +178,7 @@ class StorageController {
       if (uploadBookTask == null) {
         log.i('Unable to upload file: ${cacheFilepath.split('/').last}');
         yield 'Unable to upload file: ${cacheFilepath.split('/').last}';
+        // TODO(@getBoolean): Show upload error in UI also
         unawaited(_read(storageServiceProvider)
             .boxRemoveFromUploadQueue(cacheFilepath));
         continue;
@@ -204,7 +218,7 @@ class StorageController {
         final parsedBook = await _read(epubServiceProvider).parseDetails(
           bytes,
           cacheFilePath: cacheFilepath,
-          collectionName: collectionName,
+          collectionName: fileHash.collectionName,
           userId: userId,
           id: id,
         );

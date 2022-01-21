@@ -18,6 +18,7 @@ class FileHashAdapter extends TypeAdapter<FileHash> {
     };
     return FileHash(
       filepath: fields[0] as String,
+      collectionName: fields[3] as String,
       md5: fields[1] as String,
       sha1: fields[2] as String,
     );
@@ -26,9 +27,11 @@ class FileHashAdapter extends TypeAdapter<FileHash> {
   @override
   void write(BinaryWriter writer, FileHash obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.filepath)
+      ..writeByte(3)
+      ..write(obj.collectionName)
       ..writeByte(1)
       ..write(obj.md5)
       ..writeByte(2)
