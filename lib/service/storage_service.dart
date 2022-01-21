@@ -54,6 +54,7 @@ class StorageService {
       await Hive.initFlutter('BookAdapterData');
       Hive.registerAdapter(FileHashAdapter());
       _uploadQueueBox = await Hive.openBox(kUploadQueueBox);
+      // TODO(@getBoolean): Start uploading items in upload queue
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;

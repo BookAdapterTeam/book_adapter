@@ -125,7 +125,6 @@ class StorageController {
     }
 
     // TODO(@getBoolean): 2-1. Show number of processing books to UI
-    // TODO(@getBoolean): 2-2. Upload books in book upload queue on app start.
     // Save all to Hive box
     //   filename, isDocumentUploaded, isFileUploaded
     // This allows the upload to be resumed on app start (and logged in) if interrupted
