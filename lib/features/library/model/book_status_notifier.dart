@@ -25,7 +25,7 @@ final bookStatusProvider = StateNotifierProvider.family
       }
     },
     error: (error) => AsyncError(error),
-    loading: (loading) => const AsyncValue.loading(),
+    loading: (loading) => const AsyncLoading(),
   );
 
   return BookStatusNotifier(

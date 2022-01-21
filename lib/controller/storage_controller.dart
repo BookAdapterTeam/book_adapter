@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io' as io;
 
+import 'package:book_adapter/features/library/model/book_status_notifier.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -246,7 +247,8 @@ class StorageController {
       final firebaseFileHash = fileHash.copyWith(filepath: firebaseFilepath);
 
       log.i('Starting File Upload:  ${cacheFilepath.split('/').last}');
-      final uploadBookTask = await _read(firebaseControllerProvider).uploadBookData(
+      final uploadBookTask =
+          await _read(firebaseControllerProvider).uploadBookData(
         userId: userId,
         bytes: bytes,
         firebaseFilepath: firebaseFilepath,
@@ -314,16 +316,24 @@ class StorageController {
   Future<void> downloadBookFile(
     Book book, {
     FutureOr<void> Function(String)? whenDone,
-    FutureOr<TaskSnapshot> Function(TaskSnapshot, StackTrace)? handleError,
   }) async {
+    final log = Logger();
     final appBookAdaptPath =
         _read(storageServiceProvider).appBookAdaptDirectory.path;
     final task = _read(firebaseControllerProvider)
         .downloadFile(book.filepath, '$appBookAdaptPath/${book.filepath}');
 
-    await task.whenComplete(() async {
-      await whenDone?.call(book.filename);
-    });
+    try {
+      await task.whenComplete(() async {
+        await whenDone?.call(book.filename);
+      });
+    } on FirebaseException catch (e, st) {
+      log.e('[StorageController.downloadBookFile] ${e.code}-${e.message}', e, st);
+      _read(bookStatusProvider(book).notifier).setErrorDownloading();
+    } on Exception catch (e, st) {
+      log.e('[StorageController.downloadBookFile] ' + e.toString(), e, st);
+      _read(bookStatusProvider(book).notifier).setErrorDownloading();
+    }
   }
 
   /// Delete a library item permamently
