@@ -1,6 +1,7 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
+import 'package:book_adapter/service/isolate_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -358,6 +359,7 @@ class StorageService {
     return false;
   }
 
+  /// Save byte data to a file on the device
   Future<io.File> writeMemoryToFile({
     required Uint8List data,
     required String filepath,
@@ -378,8 +380,19 @@ class StorageService {
     }
   }
 
+  /// Load a file into memory and return the bytes
   Future<Uint8List> getFileInMemory(String filepath) {
     final file = io.File(filepath);
     return file.readAsBytes();
+  }
+
+  /// Takes a list of files and calculates the hash of each.
+  Stream<FileHash> hashFileList(List<String> filePathList) {
+    final fileHashStream =
+        IsolateService.sendListAndReceiveStream<String, FileHash>(
+      filePathList,
+      receiveAndReturnService: IsolateService.readAndHashFileService,
+    );
+    return fileHashStream;
   }
 }

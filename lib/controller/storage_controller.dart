@@ -89,21 +89,18 @@ class StorageController {
       allowCompression: false,
     );
 
-    final filepathList = platformFileList
+    final filePathList = platformFileList
         .map((file) =>
             file.path!) // Will never be null since this won't run on web
         .toList();
 
     // Exit if no files chosen
-    if (filepathList.isEmpty) return;
+    if (filePathList.isEmpty) return;
 
+    //1. Get file hashes and filter out files that have already been uploaded
+    final fileHashStream =
+        _read(storageServiceProvider).hashFileList(filePathList);
     final List<FileHash> fileHashList = [];
-
-    //1. Get File Hash
-    final fileHashStream = IsolateService.sendListAndReceiveStream<String, FileHash>(
-      filepathList,
-      receiveAndReturnService: IsolateService.readAndHashFileService,
-    );
     await for (final fileHash in fileHashStream) {
       final String filepath = fileHash.filepath;
       final String md5 = fileHash.md5;
@@ -159,7 +156,7 @@ class StorageController {
       // On completion, upload book document and cover image
 
       final id = _uuid.v4();
-      final firebaseFilepath = _read(epubServiceProvider).getFirebaseFilepath(
+      final firebaseFilepath = _read(epubServiceProvider).getRelativeFilepath(
         cacheFilePath: cacheFilepath,
         id: id,
         userId: userId,
@@ -248,7 +245,11 @@ class StorageController {
         await whenDone?.call(book.filename);
       });
     } on FirebaseException catch (e, st) {
-      log.e('[StorageController.downloadBookFile] ${e.code}-${e.message}', e, st);
+      log.e(
+        '[StorageController.downloadBookFile] ${e.code}-${e.message}',
+        e,
+        st,
+      );
       _read(bookStatusProvider(book).notifier).setErrorDownloading();
     } on Exception catch (e, st) {
       log.e('[StorageController.downloadBookFile] ' + e.toString(), e, st);
