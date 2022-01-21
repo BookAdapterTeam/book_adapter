@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/service/isolate_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -14,6 +13,7 @@ import '../data/app_exception.dart';
 import '../data/constants.dart';
 import '../data/failure.dart';
 import '../data/file_hash.dart';
+import 'isolate_service.dart';
 
 final storageServiceInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
@@ -56,19 +56,25 @@ class StorageService {
       await Hive.initFlutter('BookAdapterData');
       Hive.registerAdapter(FileHashAdapter());
       _uploadQueueBox = await Hive.openBox(kUploadQueueBox);
-      // TODO(@getBoolean): Start uploading items in upload queue
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
     }
   }
 
-  List<Map<String, dynamic>> get uploadQueueItemList {
-    return _uploadQueueBox.values.toList();
+  /// Retrieve the books in the upload queue and return as a list of [FileHash] objects
+  List<FileHash> get uploadQueueFileHashList {
+    return _uploadQueueBox.values
+        .map((item) => FileHash.fromMap(item))
+        .toList();
   }
 
-  Map<String, dynamic>? getUploadQueueItem(String filepath) {
-    return _uploadQueueBox.get(filepath);
+  /// Get a [FileHash] object from the upload queue box by the filepath
+  FileHash? getUploadQueueItem(String filepath) {
+    final itemMap = _uploadQueueBox.get(filepath);
+    if (itemMap == null) return null;
+
+    return FileHash.fromMap(itemMap);
   }
 
   /// Adds a file to the upload queue box with `filepath` as the key
@@ -88,10 +94,8 @@ class StorageService {
   Future<void> boxSetDocumentUploadedInUploadQueue(
     String filepath,
   ) async {
-    final queueMap = getUploadQueueItem(filepath);
-    if (queueMap == null) return;
-
-    final FileHash fileHash = queueMap[kFileHashKey];
+    final fileHash = getUploadQueueItem(filepath);
+    if (fileHash == null) return;
 
     await boxAddToUploadQueue(
       filepath,
@@ -103,10 +107,8 @@ class StorageService {
   Future<void> boxSetFileUploadedInUploadQueue(
     String filepath,
   ) async {
-    final queueMap = getUploadQueueItem(filepath);
-    if (queueMap == null) return;
-
-    final FileHash fileHash = queueMap[kFileHashKey];
+    final fileHash = getUploadQueueItem(filepath);
+    if (fileHash == null) return;
 
     await boxAddToUploadQueue(
       filepath,
@@ -400,9 +402,9 @@ class StorageService {
   void saveToUploadQueueBox(List<FileHash> fileHashList) {
     for (final fileHash in fileHashList) {
       final String filepath = fileHash.filepath;
-    
+
       _log.i('${filepath.split('/').last} Queued For Upload');
-    
+
       unawaited(boxAddToUploadQueue(
         filepath,
         fileHash: fileHash,
