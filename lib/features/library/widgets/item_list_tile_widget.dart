@@ -326,19 +326,16 @@ class _CustomListTileWidget extends ConsumerWidget {
 
         if (item is Book && status == BookStatus.notDownloaded) {
           try {
-            final res = await ref
+            final failure = await ref
                 .read(libraryViewControllerProvider.notifier)
                 .queueDownloadBook(item as Book);
-            res.fold(
-              (failure) {
-                log.e(failure.message);
-                final SnackBar snackBar = SnackBar(
-                  content: Text(failure.message),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              },
-              (_) => null,
+            if (failure == null) return;
+
+            log.e(failure.message);
+            final SnackBar snackBar = SnackBar(
+              content: Text(failure.message),
             );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
             return;
           } on Exception catch (e) {
             log.e(e.toString());
