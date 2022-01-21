@@ -229,7 +229,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     // TODO: Fix only able to download one book at a time
 
     try {
-      // TODO: Check that book is not already downloaded
+      // Check that book is not already downloaded
       final bookStatus = _read(bookStatusProvider(book)).asData?.value;
 
       if (bookStatus == BookStatus.downloaded) {
