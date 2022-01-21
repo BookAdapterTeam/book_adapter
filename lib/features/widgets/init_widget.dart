@@ -19,10 +19,6 @@ final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield null;
 });
 
-final providerForLoadingMessage = StateProvider<String>((ref) {
-  return '';
-});
-
 class InitWidget extends ConsumerWidget {
   const InitWidget({Key? key, required this.child}) : super(key: key);
 
@@ -131,14 +127,15 @@ class InitWidget extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
-              children: [
-                const CircularProgressIndicator(),
-                const SizedBox(height: 16),
+              children: const [
+                CircularProgressIndicator(),
+                SizedBox(height: 16),
                 AnimatedSwitcher(
+                  key: ValueKey('Loading...'),
                   switchInCurve: Curves.easeInCubic,
                   switchOutCurve: Curves.easeOutCubic,
                   duration: kTransitionDuration,
-                  child: Text(ref.watch(providerForLoadingMessage)),
+                  child: Text('Loading...'),
                 ),
               ],
             ),

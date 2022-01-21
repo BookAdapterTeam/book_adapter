@@ -82,7 +82,7 @@ class _MyAppState extends ConsumerState<MyApp> {
                 child: UpdateChecker(
                   child: InitWidget(
                     key: const ValueKey('Initialize App'),
-                      child: page,
+                    child: page,
                   ),
                 ),
               );
