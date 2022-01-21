@@ -22,6 +22,16 @@ class EPUBParseController {
 
   static const _uuid = Uuid();
 
+  /// Open an EPUB book and return [Book] with the following entered
+  /// 
+  /// - id
+  /// - userId
+  /// - title
+  /// - subtitle (authors)
+  /// - addedDate
+  /// - filepath
+  /// - filesize
+  /// - collectionIds
   Future<Book> parseDetails(
     Uint8List bytes, {
     required String cacheFilePath,
@@ -75,6 +85,7 @@ class EPUBParseController {
     return cutFilename;
   }
 
+  /// Remove file extension from a string
   String _removeExtension(String filePath) {
     final List<String> splitString = filePath.split('.');
 
@@ -87,6 +98,7 @@ class EPUBParseController {
     return stringWithoutExtension;
   }
 
+  /// Create filename for cover image
   String getCoverFilename(String cacheFilePath, String id, String extension) {
     final ioFilename = cacheFilePath.split('/').last;
 
@@ -99,7 +111,8 @@ class EPUBParseController {
     return cutFilename;
   }
 
-  String getFirebaseFilepath({
+  /// Get the relative filepath that can be used for Firestore or inside the app's local storage folder
+  String getRelativeFilepath({
     required String userId,
     required String cacheFilePath,
     required String id,
@@ -109,6 +122,7 @@ class EPUBParseController {
     return firebaseFilePath;
   }
 
+  /// Read the cover image of an EPUB into memory. If one cannot be found, null is returned.
   Future<Uint8List?> getCoverImage(Uint8List bookBytes) async {
     final log = Logger();
     final openedBook = await EpubReader.openBook(bookBytes);
