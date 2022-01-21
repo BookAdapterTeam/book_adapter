@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io' as io;
 
-import 'package:book_adapter/features/library/model/book_status_notifier.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
@@ -14,6 +13,7 @@ import '../data/app_exception.dart';
 import '../data/file_hash.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
+import '../features/library/model/book_status_notifier.dart';
 import '../features/parser/epub_parse_controller.dart';
 import '../service/isolate_service.dart';
 import '../service/storage_service.dart';
