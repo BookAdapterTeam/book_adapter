@@ -80,7 +80,7 @@ mixin FirebaseServiceStorageMixin {
     Map<String, String>? customMetadata,
   }) async {
     try {
-      // Check if file exists, return url if it does
+      // Check if file exists, return null if it does
       final _ = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
       return null;
     } on FirebaseException catch (e, st) {
@@ -91,7 +91,6 @@ mixin FirebaseServiceStorageMixin {
 
       try {
         // File does not exist, continue uploading
-
         final UploadTask uploadTask =
             _firebaseStorage.ref(firebaseFilePath).putData(
                   bytes,
