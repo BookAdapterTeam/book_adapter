@@ -284,6 +284,7 @@ class SliverCollectionsList extends StatefulWidget {
 class _SliverCollectionsListState extends State<SliverCollectionsList> {
   @override
   Widget build(BuildContext context) {
+    // TODO(@getBoolean): Show number of processing books to UI
     return SliverExpandableList(
       builder: SliverExpandableChildDelegate<Item, CollectionSection>(
         sectionList: widget.sectionList,

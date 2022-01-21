@@ -124,9 +124,7 @@ class StorageController {
       fileHashList.add(fileHash);
     }
 
-    // TODO(@getBoolean): 2-1. Show number of processing books to UI
-    // Save all to Hive box
-    //   filename, isDocumentUploaded, isFileUploaded
+    // Save all to Hive box with filepath and filehash
     // This allows the upload to be resumed on app start (and logged in) if interrupted
     // Update item values when document and file uploaded
     // Remove items from box after upload completed
