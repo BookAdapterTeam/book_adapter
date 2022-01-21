@@ -32,7 +32,7 @@ void main() {
     // The first frame is a loading state.
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
 
-    // Re-render. libraryControllerProvider should have finished fetching the books by now
+    // Re-render.
     await tester.pump();
 
     // No-longer loading
