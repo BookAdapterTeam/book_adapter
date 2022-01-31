@@ -48,6 +48,7 @@ dependencies:
   sticky_and_expandable_list: ^1.0.2
   crypto: ^3.0.1
   watcher: ^1.0.1
+  auto_size_text: ^3.0.0
 
 dev_dependencies:
   build_runner: ^2.1.2

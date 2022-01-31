@@ -1,3 +1,4 @@
+import 'package:book_adapter/features/library/widgets/default_item_image.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -129,28 +130,48 @@ class _ItemListTile extends ConsumerWidget {
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               width: 40,
+              placeholder: (context, url) => DefaultItemImage(
+                title: item.title,
+                subtitle: item.subtitle,
+                width: 40,
+              ),
             ),
             borderRadius: BorderRadius.circular(4),
           )
         : asyncV?.when(
-            data: (data) => ClipRRect(
-              child: CachedNetworkImage(
-                imageUrl: data,
+              data: (data) => ClipRRect(
+                child: CachedNetworkImage(
+                  imageUrl: data,
+                  width: 40,
+                  placeholder: (context, url) => DefaultItemImage(
+                    title: item.title,
+                    subtitle: item.subtitle,
+                    width: 40,
+                  ),
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              error: (error, st) {
+                log.e(error.toString(), error, st);
+                return const Icon(
+                  Icons.error_outline,
+                  size: 40,
+                );
+              },
+              loading: () => DefaultItemImage(
+                title: item.title,
+                subtitle: item.subtitle,
                 width: 40,
               ),
+            ) ??
+            ClipRRect(
               borderRadius: BorderRadius.circular(4),
-            ),
-            error: (error, st) {
-              log.e(error.toString(), error, st);
-              return const Icon(
-                Icons.error_outline,
-                size: 40,
-              );
-            },
-            loading: () => const SizedBox(
-              width: 40,
-            ),
-          );
+              child: DefaultItemImage(
+                title: item.title,
+                subtitle: item.subtitle,
+                width: 40,
+              ),
+            );
 
     if (item is Book) {
       final book = item as Book;
