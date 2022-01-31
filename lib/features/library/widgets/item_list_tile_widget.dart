@@ -125,15 +125,17 @@ class _ItemListTile extends ConsumerWidget {
         ? null
         : ref.watch(fileUrlProvider(firebaseCoverImagePath));
 
-    final Widget? image = legacyImage
+    const width = 40.0;
+
+    final Widget image = legacyImage
         ? ClipRRect(
             child: CachedNetworkImage(
               imageUrl: imageUrl,
-              width: 40,
+              width: width,
               placeholder: (context, url) => DefaultItemImage(
                 title: item.title,
                 subtitle: item.subtitle,
-                width: 40,
+                width: width,
               ),
             ),
             borderRadius: BorderRadius.circular(4),
@@ -142,11 +144,11 @@ class _ItemListTile extends ConsumerWidget {
               data: (data) => ClipRRect(
                 child: CachedNetworkImage(
                   imageUrl: data,
-                  width: 40,
+                  width: width,
                   placeholder: (context, url) => DefaultItemImage(
                     title: item.title,
                     subtitle: item.subtitle,
-                    width: 40,
+                    width: width,
                   ),
                 ),
                 borderRadius: BorderRadius.circular(4),
@@ -155,13 +157,13 @@ class _ItemListTile extends ConsumerWidget {
                 log.e(error.toString(), error, st);
                 return const Icon(
                   Icons.error_outline,
-                  size: 40,
+                  size: width,
                 );
               },
               loading: () => DefaultItemImage(
                 title: item.title,
                 subtitle: item.subtitle,
-                width: 40,
+                width: width,
               ),
             ) ??
             ClipRRect(
@@ -169,7 +171,7 @@ class _ItemListTile extends ConsumerWidget {
               child: DefaultItemImage(
                 title: item.title,
                 subtitle: item.subtitle,
-                width: 40,
+                width: width,
               ),
             );
 
