@@ -30,6 +30,7 @@
 .pub-cache/
 .pub/
 /build/
+.fvm/
 GoogleService-Info.plist
 google-services.json
 
