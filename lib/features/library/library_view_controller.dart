@@ -18,7 +18,9 @@ import 'model/book_status_notifier.dart';
 
 final fileUrlProvider =
     FutureProvider.family<String, String>((ref, firebasePath) async {
-  return ref.read(libraryViewControllerProvider.notifier).getFileDownloadUrl(firebasePath);
+  return ref
+      .read(libraryViewControllerProvider.notifier)
+      .getFileDownloadUrl(firebasePath);
 });
 
 final libraryViewControllerProvider =
@@ -152,6 +154,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         collection: collection,
         collectionItems: collectionItems,
       );
+
+      return null;
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
@@ -168,6 +172,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
           selectedBooks.map((book) => book.filename).toList();
       await _read(storageControllerProvider)
           .deleteFiles(filenameList: selectedFilenameList);
+
+      return null;
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
@@ -183,6 +189,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         itemsToDelete: selectedItems.toList(),
         allBooks: state.books ?? [],
       );
+
+      return null;
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
@@ -196,6 +204,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         items: items.toList(),
         collectionIds: collectionIds,
       );
+
+      return null;
     } on FirebaseException catch (e, st) {
       log.e(e.code + e.message.toString(), e, st);
       return FirebaseFailure(e.message.toString(), e.code);

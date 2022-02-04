@@ -133,6 +133,8 @@ class _VerifyPasswordTextField extends ConsumerWidget {
         if (verifyPassword != data.password) {
           return 'Passwords are not the same';
         }
+
+        return null;
       },
       onChanged: (verifyPasswordValue) {
         ref
@@ -172,6 +174,8 @@ class _PasswordTextField extends ConsumerWidget {
         if (passwordValue.length < 6) {
           return 'Password must be 6 or more characters';
         }
+
+        return null;
       },
       onChanged: (passwordValue) {
         ref
