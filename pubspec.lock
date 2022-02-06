@@ -786,7 +786,7 @@ packages:
       name: multi_screen_layout
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.0.0"
+    version: "3.1.0"
   nested:
     dependency: transitive
     description:
