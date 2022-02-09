@@ -53,5 +53,47 @@ linter:
     unawaited_futures: true
 
     prefer_relative_imports: true
+
+    cast_nullable_to_non_nullable: true
+
+    avoid_annotating_with_dynamic: true
+
+    lines_longer_than_80_chars: true
+
+    prefer_interpolation_to_compose_strings: true
+
+    unnecessary_await_in_return: true
+
+    unnecessary_lambdas: true
+
+    unnecessary_late: true
+
+    unnecessary_null_aware_assignments: true
+
+    unnecessary_null_checks: true
+
+    unnecessary_nullable_for_final_variable_declarations: true
+
+    unnecessary_parenthesis: true
+
+    unnecessary_raw_strings: true
+
+    use_decorated_box: true
+
+    use_is_even_rather_than_modulo: true
+
+    use_late_for_private_fields_and_variables: true
+
+    use_string_buffers: true
+
+    use_test_throws_matchers: true
+
+    void_checks: true
+
+    use_to_and_as_if_applicable: true
+
+    depend_on_referenced_packages: true
+
+    secure_pubspec_urls: true
 # Additional information about this file can be found at
 # https://dart.dev/guides/language/analysis-options
