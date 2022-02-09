@@ -35,7 +35,8 @@ class UpdateInfo {
   /// 更新的状态
   final int updateStatus;
 
-  /// The latest version number [according to the version number to determine whether you need to upgrade]
+  /// The latest version number [according to the version number to
+  /// determine whether you need to upgrade]
   ///
   /// 最新版本号[根据版本号来判别是否需要升级]
   final int versionCode;
@@ -125,6 +126,10 @@ class UpdateInfo {
 
   @override
   String toString() {
-    return 'UpdateInfo Code: $code, Msg: $msg, UpdateStatus: $updateStatus, VersionCode: $versionCode, VersionName: $versionName, UploadTime: $uploadTime, ModifyContent: $modifyContent, DownloadUrl: $androidDownloadUrl, GithubReleaseUrl: $githubReleaseUrl, ApkMd5: $apkMd5, ApkSize: $apkSize';
+    return 'UpdateInfo(Code: $code, Msg: $msg, UpdateStatus: $updateStatus, '
+    'VersionCode: $versionCode, VersionName: $versionName, '
+    'UploadTime: $uploadTime, ModifyContent: $modifyContent, '
+    'DownloadUrl: $androidDownloadUrl, GithubReleaseUrl: $githubReleaseUrl, '
+    'ApkMd5: $apkMd5, ApkSize: $apkSize)';
   }
 }

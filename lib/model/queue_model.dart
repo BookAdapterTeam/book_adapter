@@ -65,7 +65,8 @@ class QueueNotifier<T extends Item>
     state.queue.add(item);
     state.queueListItems.add(item);
     log.i(
-        'Updated Book Queue: ${state.queueListItems.map((item) => item.title)}');
+      'Updated Book Queue: ${state.queueListItems.map((item) => item.title)}',
+    );
 
     // Start downloading
     if (isEmpty) process();
@@ -78,8 +79,8 @@ class QueueNotifier<T extends Item>
 
     processing = true;
     while (state.queue.isNotEmpty) {
-      log.i(
-          'Current Book Queue: ${state.queueListItems.map((item) => item.title)}');
+      log.i('Current Book Queue: '
+          '${state.queueListItems.map((item) => item.title)}');
 
       // Process the item, for example: download a file
       // and save to device storage

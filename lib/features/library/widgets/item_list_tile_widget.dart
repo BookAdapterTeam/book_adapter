@@ -33,7 +33,7 @@ class ItemListTileWidget extends ConsumerWidget {
 
     final tile = isBook
         ? _ItemListTile(
-            key: ValueKey('ItemListTile' + item.id + isSelected.toString()),
+            key: ValueKey('ItemListTile${item.id}$isSelected'),
             item: item,
             disableSelect: disableSelect,
             isBook: true,
@@ -45,8 +45,7 @@ class ItemListTileWidget extends ConsumerWidget {
                 switchOutCurve: Curves.easeOutCubic,
                 duration: kTransitionDuration,
                 child: _ItemListTile(
-                  key: ValueKey(
-                      'ItemListTile' + item.id + isSelected.toString()),
+                  key: ValueKey('ItemListTile${item.id}$isSelected'),
                   item: item,
                   disableSelect: disableSelect,
                   isBook: false,
@@ -58,11 +57,8 @@ class ItemListTileWidget extends ConsumerWidget {
           );
 
     final child = Padding(
-      key: ValueKey('ItemListTileWidget Padding' +
-          item.id +
-          isSelected.toString() +
-          isBook.toString() +
-          disableSelect.toString()),
+      key: ValueKey('ItemListTileWidget Padding${item.id}'
+          '$isSelected$isBook$disableSelect'),
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
@@ -216,7 +212,8 @@ class _ItemListTile extends ConsumerWidget {
               return null;
             case BookStatus.errorDownloading:
               return () {
-                // TODO: Make firebase call to try download book again. Delete file if it exists (could be corrupt or partial)
+                // TODO: Make firebase call to try download book again. 
+                // Delete file if it exists (could be corrupt or partial)
               };
           }
         },
@@ -229,11 +226,8 @@ class _ItemListTile extends ConsumerWidget {
       trailing = icon == null
           ? SizedBox(width: IconTheme.of(context).size)
           : IconButton(
-              key: ValueKey('ListTile Button' +
-                  book.id +
-                  isSelected.toString() +
-                  bookStatus.toString() +
-                  icon.toString()),
+              key: ValueKey('ListTile Button${book.id}'
+              '$isSelected$bookStatus$icon'),
               onPressed: isSelecting ? null : onPressed,
               icon: icon,
             );

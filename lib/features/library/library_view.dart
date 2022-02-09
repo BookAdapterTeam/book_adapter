@@ -58,7 +58,8 @@ class MergeIntoSeriesButton extends ConsumerWidget {
                   context: context,
                   builder: (context) {
                     // Could sort the list before using choosig the title.
-                    // Without soring, it will use the title of the first book selected.
+                    // Without soring, it will use the title of the first
+                    //   book selected.
                     // final selectedItemsList = selectedItems.toList()
                     //   ..sort((a, b) => a.title.compareTo(b.title));
                     // final initialText = selectedItemsList.first.title;
@@ -115,7 +116,7 @@ class LibraryScrollView extends HookConsumerWidget {
       systemOverlayStyle: SystemUiOverlayStyle.light,
       elevation: 3.0,
       leading: BackButton(
-        onPressed: () => viewController.deselectAllItems(),
+        onPressed: viewController.deselectAllItems,
       ),
       actions: [
         AddToCollectionButton(
@@ -157,7 +158,8 @@ class LibraryScrollView extends HookConsumerWidget {
           },
         ),
 
-        // Disable button until more than one book selected so that the user does not create series with only one book in it
+        // Disable button until more than one book selected so that the user
+        // does not create series with only one book in it
         MergeIntoSeriesButton(
           isDisabled: data.selectedItems.length <= 1,
           onMerge: (seriesName) async {
@@ -262,7 +264,8 @@ class LibraryScrollView extends HookConsumerWidget {
 
 /// Collection List View
 ///
-/// Collection headers can be expanded and the top header is pinned to the screen
+/// Collection headers can be expanded and the top header is
+/// pinned to the screen
 ///
 /// The implementation is based on the below examples.
 ///
@@ -315,7 +318,8 @@ class _SliverCollectionsListState extends State<SliverCollectionsList> {
           }
         });
       },
-      // @getBoolean: Disabled because it would mean the collection can't be collapsed
+      // @getBoolean: Disabled because it would mean the
+      // collection can't be collapsed
       hideHeader: false,
       // hideHeader: widget.sectionList.length == 1,
     );

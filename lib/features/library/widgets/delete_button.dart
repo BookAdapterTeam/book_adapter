@@ -21,7 +21,8 @@ class DeleteButton extends ConsumerWidget {
             return AlertDialog(
               title: const Text('Remove Downloads'),
               content: const Text(
-                  'Are you sure you remove the downloads of all selected books?'),
+                'Are you sure you remove the downloads of all selected books?',
+              ),
 //               title: const Text('Permanently Delete Selected Items'),
 //               content: const Text('''
 // Are you sure you want to permanently delete all selected Books and Series?

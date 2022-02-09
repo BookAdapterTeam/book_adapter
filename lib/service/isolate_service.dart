@@ -29,7 +29,8 @@ class IsolateService {
   ///   - [SendPort]
   ///   - [Capability]
   ///
-  /// Additiionally, T and R can contain any object, with the following exceptions:
+  /// Additiionally, T and R can contain any object,
+  /// with the following exceptions:
   ///
   ///   - Objects with native resources (subclasses of e.g.
   ///     `NativeFieldWrapperClass1`). A [Socket] object for example referrs
@@ -93,7 +94,8 @@ class IsolateService {
   ///   - [SendPort]
   ///   - [Capability]
   ///
-  /// Additiionally, T and R can contain any object, with the following exceptions:
+  /// Additiionally, T and R can contain any object,
+  /// with the following exceptions:
   ///
   ///   - Objects with native resources (subclasses of e.g.
   ///     `NativeFieldWrapperClass1`). A [Socket] object for example referrs
@@ -161,7 +163,8 @@ class IsolateService {
   ///   - [SendPort]
   ///   - [Capability]
   ///
-  /// Additiionally, T and R can contain any object, with the following exceptions:
+  /// Additiionally, T and R can contain any object,
+  /// with the following exceptions:
   ///
   ///   - Objects with native resources (subclasses of e.g.
   ///     `NativeFieldWrapperClass1`). A [Socket] object for example referrs
@@ -225,7 +228,8 @@ class IsolateService {
   ///   - [SendPort]
   ///   - [Capability]
   ///
-  /// Additiionally, T and R can contain any object, with the following exceptions:
+  /// Additiionally, T and R can contain any object,
+  /// with the following exceptions:
   ///
   ///   - Objects with native resources (subclasses of e.g.
   ///     `NativeFieldWrapperClass1`). A [Socket] object for example referrs
@@ -309,8 +313,9 @@ class IsolateService {
           sha1: sha1Hash,
         ));
       } else if (message == null) {
-        // Exit if the main isolate sends a null message, indicating there are no
-        // more files to read and parse.
+        // Exit if the main isolate sends a
+        // null message, indicating there are
+        // no more files to read and parse.
         break;
       }
     }
@@ -351,11 +356,12 @@ class IsolateService {
         }
 
         // Send the result to the main isolate.
-        // Use Isolate.exit instead of p.send for large pieces of data so that dart does not copy the values
+        // Use Isolate.exit instead of p.send for large pieces of 
+        // data so that dart does not copy the values
         Isolate.exit(p, coverImage);
       } else if (message == null) {
-        // Exit if the main isolate sends a null message, indicating there are no
-        // more files to read and parse.
+        // Exit if the main isolate sends a null message, 
+        // indicating there are no more files to read and parse.
         break;
       }
     }
@@ -383,11 +389,13 @@ class IsolateService {
         final bytes = Uint8List.fromList(dataList);
 
         // Send the result to the main isolate.
-        // Use Isolate.exit instead of p.send for large pieces of data so that dart does not copy the values
+        // Use Isolate.exit instead of p.send for large pieces
+        // of data so that dart does not copy the values
         Isolate.exit(p, bytes);
       } else if (message == null) {
-        // Exit if the main isolate sends a null message, indicating there are no
-        // more files to read and parse.
+        // Exit if the main isolate sends a
+        // null message, indicating there are
+        // no more files to read and parse.
         break;
       }
     }

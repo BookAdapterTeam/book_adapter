@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
 import '../../controller/firebase_controller.dart';
@@ -107,8 +107,9 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     }
   }
 
-  // Pass in Reader because was getting an error after unmerging then merging a series
-  // _AssertionError ('package:riverpod/src/framework/provider_base.dart': Failed assertion: line 645 pos 7: '_debugDidChangeDependency == false': Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt)
+  // Pass in Reader because was getting an error after
+  //     unmerging then merging a series
+  // `_AssertionError ('package:riverpod/src/framework/provider_base.dart': Failed assertion: line 645 pos 7: '_debugDidChangeDependency == false': Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt)`
   Future<Either<Failure, Series>> mergeIntoSeries(
     Reader read, [
     String? name,
@@ -221,7 +222,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       return Left(Failure('Collection Already Exists'));
     }
 
-    return await _read(firebaseControllerProvider).addCollection(name);
+    return _read(firebaseControllerProvider).addCollection(name);
   }
 
   bool collectionExist(String name) {
@@ -231,7 +232,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   Future<String> getFileDownloadUrl(String firebasePath) async {
-    return await _read(firebaseControllerProvider)
+    return _read(firebaseControllerProvider)
         .getFileDownloadUrl(firebasePath);
   }
 

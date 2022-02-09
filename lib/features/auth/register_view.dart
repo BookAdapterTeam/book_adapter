@@ -35,7 +35,7 @@ class RegisterView extends ConsumerWidget {
                       SizedBox(
                         height: MediaQuery.of(context).size.height * 1 / 9,
                       ),
-                      // TODO: Add image picker for profile image, upload to Firebase Storage
+                      // TODO: Add pfp image picker, upload to Firebase Storage
 
                       // Enter username
                       _UsernameTextField(data: data),
@@ -183,7 +183,7 @@ class _PasswordTextField extends ConsumerWidget {
             .updateData(password: passwordValue);
       },
       autofillHints: const [AutofillHints.password],
-      onEditingComplete: () => TextInput.finishAutofillContext(),
+      onEditingComplete: TextInput.finishAutofillContext,
       textInputAction: TextInputAction.next,
     );
   }

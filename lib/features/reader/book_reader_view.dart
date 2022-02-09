@@ -65,10 +65,10 @@ class BookReaderView extends HookConsumerWidget {
           log.i('isLoaded: $document');
         },
         onExternalLinkPressed: (link) async {
-          log.i('Attempting to open link: ' + link);
+          log.i('Attempting to open link: $link');
 
           await launch(link);
-          log.i('Launched link: ' + link);
+          log.i('Launched link: $link');
         },
         onChange: (value) => onChange(
           context,
@@ -113,7 +113,7 @@ class BookReaderView extends HookConsumerWidget {
 
       final fail = await read(readerViewControllerProvider.notifier)
           .saveLastReadLocation(cfi, bookId: book.id);
-      log.i('Saved last read cfi location: ' + cfi);
+      log.i('Saved last read cfi location: $cfi');
 
       // Show snackbar with error if there is an error
       if (fail == null) return;

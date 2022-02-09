@@ -72,7 +72,8 @@ class InitWidget extends ConsumerWidget {
         final stackTrace = asyncError.stackTrace;
         if (error is FirebaseException) {
           log.e(
-            'Warning: Running in Offline Mode\n${error.code} - ${error.message}',
+            'Warning: Running in Offline Mode\n'
+            '${error.code} - ${error.message}',
             error,
             stackTrace,
           );
@@ -83,7 +84,7 @@ class InitWidget extends ConsumerWidget {
         }
 
         if (error is MissingPlatformDirectoryException) {
-          log.e(error.message + ' ' + error.toString(), error, stackTrace);
+          log.e('${error.message} $error', error, stackTrace);
           return Scaffold(
             body: Center(
               child: Text(
@@ -98,7 +99,7 @@ class InitWidget extends ConsumerWidget {
         }
 
         if (error is HiveError) {
-          log.e(error.message + ' ' + error.toString(), error, stackTrace);
+          log.e('${error.message} $error', error, stackTrace);
           return Scaffold(
             body: Center(
               child: Text(

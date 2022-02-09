@@ -111,11 +111,13 @@ class StorageController {
       final String md5 = fileHash.md5;
       final String sha1 = fileHash.sha1;
       log.i(
-        'Received Hash for ${filepath.split('/').last}: md5 $md5 and sha1 $sha1',
+        'Received Hash for ${filepath.split('/').last}: '
+        'md5 $md5 and sha1 $sha1',
       );
 
       // 2. Check Firestore for user books with same MD5 and SHA1
-      //     -   If book found, dont upload and show snack bar with message "Book already uploaded",
+      //     -   If book found, dont upload and show snack bar with message
+      //         "Book already uploaded",
       final bool exists =
           await _read(firebaseControllerProvider).fileHashExists(md5, sha1);
       if (exists) {
@@ -127,7 +129,8 @@ class StorageController {
     }
 
     // Save all to Hive box with filepath and filehash
-    // This allows the upload to be resumed on app start (and logged in) if interrupted
+    // This allows the upload to be resumed on app start
+    //   (and logged in) if interrupted
     // Update item values when document and file uploaded
     // Remove items from box after upload completed
     _read(storageServiceProvider).saveToUploadQueueBox(fileHashList);
@@ -138,7 +141,8 @@ class StorageController {
     }
   }
 
-  /// Upload books in file hash list and return a stream of files that could not be uploaded
+  /// Upload books in file hash list and return a stream of files
+  /// that could not be uploaded
   Stream<String> handleUploadFromFileHashList(
     List<FileHash> fileHashList,
   ) async* {
@@ -156,9 +160,11 @@ class StorageController {
       log.i('Read As Bytes Done: ${cacheFilepath.split('/').last}');
 
       // 3. Grab Book Cover Image
-      //     -   If no cover image exists, put null in book document for the cover image url.
+      //     -   If no cover image exists, put null in book document for
+      //         the cover image url.
       //
-      //         In the app, a default image will be shown included in the assets if image url is null
+      //         In the app, a default image will be shown included in
+      //         the assets if image url is null
       log.i('Reading Cover: ${cacheFilepath.split('/').last}');
       final coverData = await _read(epubServiceProvider).getCoverImage(bytes);
       log.i('Reading Cover Done: ${cacheFilepath.split('/').last}');
@@ -204,7 +210,8 @@ class StorageController {
         String? coverImageFirebaseFilepath = '$userId/$coverFilename';
         try {
           log.i(
-              'Starting File Upload:  ${coverImageFirebaseFilepath.split('/').last}');
+              'Starting File Upload:  '
+              '${coverImageFirebaseFilepath.split('/').last}');
           final uploadTask = coverData == null
               ? null
               : await _read(firebaseControllerProvider).uploadCoverImage(
@@ -213,10 +220,12 @@ class StorageController {
                 );
           await uploadTask;
           log.i(
-              'Finished File Upload: ${coverImageFirebaseFilepath.split('/').last}');
+              'Finished File Upload: '
+              '${coverImageFirebaseFilepath.split('/').last}');
         } on Exception catch (e, st) {
           log.i(
-              'Unable to upload file: ${coverImageFirebaseFilepath.split('/').last}');
+              'Unable to upload file: '
+              '${coverImageFirebaseFilepath.split('/').last}');
           log.w(e.toString(), e, st);
           coverImageFirebaseFilepath = null;
         }
@@ -264,7 +273,7 @@ class StorageController {
       );
       _read(bookStatusProvider(book).notifier).setErrorDownloading();
     } on Exception catch (e, st) {
-      log.e('[StorageController.downloadBookFile] ' + e.toString(), e, st);
+      log.e('[StorageController.downloadBookFile] ${e.toString()}', e, st);
       _read(bookStatusProvider(book).notifier).setErrorDownloading();
     }
   }
@@ -291,7 +300,8 @@ class StorageController {
     await deleteFiles(filenameList: deletedFirebaseFilenameList);
   }
 
-  // Delete downloaded books files from device if they are removed from Firebase Storage
+  // Delete downloaded books files from device if they are removed
+  // from Firebase Storage
   Future<List<String>> deleteFiles({required List<String> filenameList}) async {
     final String? userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
@@ -320,7 +330,7 @@ class StorageController {
     final bookPath =
         _read(storageServiceProvider).getAppFilePath(book.filepath);
 
-    return await _read(storageServiceProvider).getFileInMemory(bookPath);
+    return _read(storageServiceProvider).getFileInMemory(bookPath);
   }
 
   bool fileExists(String filename) {

@@ -37,7 +37,8 @@ class ProfileView extends ConsumerWidget {
                 applicationVersion: version,
                 applicationIcon: const FlutterLogo(),
                 applicationLegalese:
-                    '(Temporary logo above) By using this app, you agree to only use it with books you own.',
+                    '(Temporary logo above) By using this app, you agree to '
+                    'only use it with books you own.',
               );
             },
           ),

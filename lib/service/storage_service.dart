@@ -47,7 +47,8 @@ class StorageService {
 
   /// Initilize the class
   ///
-  /// Throws a `MissingPlatformDirectoryException` if the system is unable to provide the directory.
+  /// Throws a `MissingPlatformDirectoryException`
+  /// if the system is unable to provide the directory.
   Future<void> init() async {
     try {
       appDir = await _getAppDirectory();
@@ -62,11 +63,10 @@ class StorageService {
     }
   }
 
-  /// Retrieve the books in the upload queue and return as a list of [FileHash] objects
+  /// Retrieve the books in the upload queue
+  /// and return as a list of [FileHash] objects
   List<FileHash> get uploadQueueFileHashList {
-    return _uploadQueueBox.values
-        .map((item) => FileHash.fromMap(item))
-        .toList();
+    return _uploadQueueBox.values.map(FileHash.fromMap).toList();
   }
 
   /// Get a [FileHash] object from the upload queue box by the filepath
@@ -119,17 +119,17 @@ class StorageService {
 
   /// Removes a file to the upload queue box
   Future<void> boxRemoveFromUploadQueue(String filepath) async {
-    return await _uploadQueueBox.delete(filepath);
+    return _uploadQueueBox.delete(filepath);
   }
 
   String getAppFilePath(String filepath) =>
-      appBookAdaptDirectory.path + '/' + filepath;
+      '${appBookAdaptDirectory.path}/$filepath';
 
   String getPathFromFilename({
     required String userId,
     required String filename,
   }) =>
-      appBookAdaptDirectory.path + '/' + userId + '/' + filename;
+      '${appBookAdaptDirectory.path}/$userId/$filename';
 
   /// Method to create a directory for the user when they login
   Future<io.Directory> createUserDirectory(String userId) async {
@@ -163,7 +163,7 @@ class StorageService {
 
     // Android only
     // getExternalStorageDirectory();
-    // TODO: Use below to ask user preffered location. Books will need to be moved.
+    // TODO: Use below to ask user preffered location. Books will be moved.
     // getExternalStorageDirectories(type: StorageDirectory.documents);
     // getExternalCacheDirectories();
 
@@ -172,10 +172,11 @@ class StorageService {
 
   /// Selects a directory and returns its absolute path.
   ///
-  /// On Android, this requires to be running on SDK 21 or above, else won't work.
+  /// On Android, this requires to be running on SDK 21 or above
   /// Returns `null` if folder path couldn't be resolved.
   ///
-  /// `dialogTitle` can be set to display a custom title on desktop platforms. It will be ignored on Web & IO.
+  /// `dialogTitle` can be set to display a custom title on desktop platforms.
+  /// It will be ignored on Web & IO.
   ///
   /// Note: Some Android paths are protected, hence can't be accessed and will return `/` instead.
   Future<Either<Failure, String>> pickDirectory({String? dialogTitle}) async {
@@ -190,7 +191,8 @@ class StorageService {
     return Right(selectedDirectory);
   }
 
-  /// Check if files exist on device on app start, then check for a book if it exists before opening it
+  /// Check if files exist on device on app start,
+  /// then check for a book if it exists before opening it
   ///
   /// Returns a list of the filenames
   List<io.FileSystemEntity> listFiles({
@@ -228,27 +230,38 @@ class StorageService {
   /// Retrieves the file(s) from the underlying platform
   ///
   /// Default `type` set to [FileType.any] with `allowMultiple` set to `false`.
-  /// Optionally, `allowedExtensions` might be provided (e.g. `[pdf, svg, jpg]`.).
+  /// Optionally, `allowedExtensions` may be provided (e.g. `[pdf, svg, jpg]`.).
   ///
-  /// If `withData` is set, picked files will have its byte data immediately available on memory as `Uint8List`
-  /// which can be useful if you are picking it for server upload or similar. However, have in mind that
-  /// enabling this on IO (iOS & Android) may result in out of memory issues if you allow multiple picks or
-  /// pick huge files. Use `withReadStream` instead. Defaults to `true` on web, `false` otherwise.
+  /// If `withData` is set, picked files will have its byte
+  /// data immediately available on memory as `Uint8List`
+  /// which can be useful if you are picking it for server
+  /// upload or similar. However, have in mind that
+  /// enabling this on IO (iOS & Android) may result in
+  /// out of memory issues if you allow multiple picks or
+  /// pick huge files. Use `withReadStream` instead.
+  /// Defaults to `true` on web, `false` otherwise.
   ///
-  /// If `withReadStream` is set, picked files will have its byte data available as a `Stream<List<int>>`
-  /// which can be useful for uploading and processing large files. Defaults to `false`.
+  /// If `withReadStream` is set, picked files will have
+  /// its byte data available as a `Stream<List<int>>`
+  /// which can be useful for uploading and processing
+  /// large files. Defaults to `false`.
   ///
-  /// If you want to track picking status, for example, because some files may take some time to be
-  /// cached (particularly those picked from cloud providers), you may want to set [onFileLoading] handler
+  /// If you want to track picking status, for example,
+  /// because some files may take some time to be
+  /// cached (particularly those picked from cloud
+  /// providers), you may want to set [onFileLoading] handler
   /// that will give you the current status of picking.
   ///
-  /// If `allowCompression` is set, it will allow media to apply the default OS compression.
+  /// If `allowCompression` is set, it will allow media
+  /// to apply the default OS compression.
   /// Defaults to `true`.
   ///
-  /// `dialogTitle` can be optionally set on desktop platforms to set the modal window title. It will be ignored on
+  /// `dialogTitle` can be optionally set on desktop
+  /// platforms to set the modal window title. It will be ignored on
   /// other platforms.
   ///
-  /// The result is wrapped in a `Either` which contains either a left `Failure` or right `List<PlatformFile>`.
+  /// The result is wrapped in a `Either` which contains
+  /// either a left `Failure` or right `List<PlatformFile>`.
   Future<List<PlatformFile>> pickFile({
     String? dialogTitle,
     FileType type = FileType.any,
@@ -259,8 +272,12 @@ class StorageService {
     bool withData = false,
     bool withReadStream = false,
   }) async {
-    // Clear cache because it is buggy and will confuse files of similar filenames
-    // TODO(@getBoolean): Commented out because adding files consequetively will cause the previous upload to fail. Test if different files with the same name will get confused
+    // Clear cache because it is buggy and will confuse
+    // files of similar filenames+
+
+    // TODO(@getBoolean): Test if diff files with the same name get confused
+    // Commented out because adding files consequetively will
+    // cause the previous upload to fail.
     // if (io.Platform.isIOS || io.Platform.isAndroid) {
     //   await FilePicker.platform.clearTemporaryFiles();
     // }
@@ -299,27 +316,30 @@ class StorageService {
     return files;
   }
 
-  // / Opens a save file dialog which lets the user select a file path and a file
-  // / name to save a file.
-  // /
-  // / This function does not actually save a file. It only opens the dialog to
-  // / let the user choose a location and file name. This function only returns
-  // / the **path** to this (non-existing) file.
-  // /
-  // / This method is only available on desktop platforms (Linux, macOS &
-  // / Windows).
-  // /
-  // / [dialogTitle] can be set to display a custom title on desktop platforms.
-  // / [fileName] can be set to a non-empty string to provide a default file
-  // / name.
-  // / The file type filter [type] defaults to [FileType.any]. Optionally,
-  // / [allowedExtensions] might be provided (e.g. `[pdf, svg, jpg]`.). Both
-  // / parameters are just a proposal to the user as the save file dialog does
-  // / not enforce these restrictions.
-  // /
-  // / Returns Either a left `Failure` if aborted or a right `String` which resolves to
-  // / the absolute path of the selected file, if the user selected a file.
-  // Future<Either<Failure, String>> saveFileDialog({String dialogTitle = 'Please select an output file:', String fileName = 'output-file.pdf'}) async {
+  // /// Opens a save file dialog which lets the user select a file path and a file
+  // /// name to save a file.
+  // ///
+  // /// This function does not actually save a file. It only opens the dialog to
+  // /// let the user choose a location and file name. This function only returns
+  // /// the **path** to this (non-existing) file.
+  // ///
+  // /// This method is only available on desktop platforms (Linux, macOS &
+  // /// Windows).
+  // ///
+  // /// [dialogTitle] can be set to display a custom title on desktop platforms.
+  // /// [fileName] can be set to a non-empty string to provide a default file
+  // /// name.
+  // /// The file type filter [type] defaults to [FileType.any]. Optionally,
+  // /// [allowedExtensions] might be provided (e.g. `[pdf, svg, jpg]`.). Both
+  // /// parameters are just a proposal to the user as the save file dialog does
+  // /// not enforce these restrictions.
+  // ///
+  // /// Returns Either a left `Failure` if aborted or a right `String` which resolves to
+  // /// the absolute path of the selected file, if the user selected a file.
+  // Future<Either<Failure, String>> saveFileDialog({
+  //   String dialogTitle = 'Please select an output file:',
+  //   String fileName = 'output-file.pdf',
+  // }) async {
   //   final String? outputFile = await FilePicker.platform.saveFile(
   //     dialogTitle: dialogTitle,
   //     fileName: fileName,

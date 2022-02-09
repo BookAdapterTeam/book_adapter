@@ -11,7 +11,7 @@ mixin FirebaseServiceStorageMixin {
 
   final _log = Logger();
 
-  // Storage *****************************************************************************************
+  // Storage *******************************************************************
 
   /// List the files the user has uploaded to their folder
   Future<List<String>> listFilenames(String userId) async {
@@ -145,7 +145,7 @@ mixin FirebaseServiceStorageMixin {
   }
 
   Future<String> getFileDownloadUrl(String storagePath) async {
-    return await _firebaseStorage.ref(storagePath).getDownloadURL();
+    return _firebaseStorage.ref(storagePath).getDownloadURL();
   }
 
   /// Download a file to memory

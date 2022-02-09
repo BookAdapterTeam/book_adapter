@@ -138,8 +138,8 @@ class _SendResetEmailButton extends StatelessWidget {
           },
           (succcess) {
             final snackBar = SnackBar(
-              content: Text(
-                  'Reset email was sent to ${data.email} from noreply@bookadapter.firebaseapp.com'),
+              content: Text('''
+Reset email was sent to ${data.email} from noreply@bookadapter.firebaseapp.com'''),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
@@ -168,7 +168,7 @@ class _EmailTextField extends StatelessWidget {
         border: UnderlineInputBorder(),
         labelText: 'Email',
       ),
-      validator: (email) => viewController.validate(email),
+      validator: viewController.validate,
       onChanged: (emailValue) => viewController.updateData(email: emailValue),
       autofillHints: const [AutofillHints.email],
     );

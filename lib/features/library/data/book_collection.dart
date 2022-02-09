@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:equatable/equatable.dart';
 
 class AppCollection extends Equatable {
-
   final String id;
   final String userId;
   final String name;
@@ -44,7 +43,8 @@ class AppCollection extends Equatable {
     );
   }
 
-  factory AppCollection.fromJson(String source) => AppCollection.fromMap(json.decode(source));
+  factory AppCollection.fromJson(String source) =>
+      AppCollection.fromMap(json.decode(source));
 
   @override
   bool get stringify => true;

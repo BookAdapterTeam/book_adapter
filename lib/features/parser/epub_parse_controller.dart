@@ -23,7 +23,7 @@ class EPUBParseController {
   static const _uuid = Uuid();
 
   /// Open an EPUB book and return [Book] with the following entered
-  /// 
+  ///
   /// - id
   /// - userId
   /// - title
@@ -111,7 +111,8 @@ class EPUBParseController {
     return cutFilename;
   }
 
-  /// Get the relative filepath that can be used for Firestore or inside the app's local storage folder
+  /// Get the relative filepath that can be used for Firestore or
+  /// inside the app's local storage folder
   String getRelativeFilepath({
     required String userId,
     required String cacheFilePath,
@@ -122,7 +123,8 @@ class EPUBParseController {
     return firebaseFilePath;
   }
 
-  /// Read the cover image of an EPUB into memory. If one cannot be found, null is returned.
+  /// Read the cover image of an EPUB into memory. If one cannot be found,
+  /// null is returned.
   Future<Uint8List?> getCoverImage(Uint8List bookBytes) async {
     final log = Logger();
     final openedBook = await EpubReader.openBook(bookBytes);
@@ -137,10 +139,11 @@ class EPUBParseController {
         return null;
       }
 
-      // Use the first image that has a height greater than width to avoid using banners and copyright notices
+      // Use the first image that has a height greater than width
+      // to avoid using banners and copyright notices
       log.i('Decoding Images');
-      final imageFuture =
-          IsolateService.sendListAndReceiveSingle<EpubByteContentFileRef, Image?>(
+      final imageFuture = IsolateService.sendListAndReceiveSingle<
+          EpubByteContentFileRef, Image?>(
         imagesRef.values.toList(),
         receiveAndReturnService: IsolateService.readAndDecodeImageService,
       );

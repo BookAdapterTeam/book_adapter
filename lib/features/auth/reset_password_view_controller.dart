@@ -1,18 +1,21 @@
 import 'package:dartz/dartz.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../controller/firebase_controller.dart';
 import '../../data/failure.dart';
 
-final resetPasswordViewController = StateNotifierProvider<ResetPasswordViewController, ResetPasswordViewData>((ref) {
+final resetPasswordViewController =
+    StateNotifierProvider<ResetPasswordViewController, ResetPasswordViewData>(
+        (ref) {
   return ResetPasswordViewController(ref.read);
 });
 
 // State is if the view is loading
 class ResetPasswordViewController extends StateNotifier<ResetPasswordViewData> {
-  ResetPasswordViewController(this._read) : super(const ResetPasswordViewData());
+  ResetPasswordViewController(this._read)
+      : super(const ResetPasswordViewData());
 
   final Reader _read;
 
@@ -34,11 +37,11 @@ class ResetPasswordViewController extends StateNotifier<ResetPasswordViewData> {
     return null;
   }
 
-
   Future<Either<Failure, void>> sendResetEmail() async {
-    final res = await _read(firebaseControllerProvider).resetPassword(state.email);
+    final res =
+        await _read(firebaseControllerProvider).resetPassword(state.email);
     return res.fold(
-      (failure) => Left(failure),
+      Left.new,
       (_) => const Right(null),
     );
   }

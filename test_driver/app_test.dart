@@ -27,6 +27,7 @@ void main() {
       await driver.close();
     });
 
+    // ignore: lines_longer_than_80_chars
     // TODO: Add tests for navigating app routes (e.g.: Library -> Library Details -> Book Reader)
   });
 }

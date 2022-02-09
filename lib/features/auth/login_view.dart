@@ -127,7 +127,7 @@ class _PasswordTextField extends ConsumerWidget {
           ref.read(loginViewController.notifier).validatePassword(password),
       autofillHints: const [AutofillHints.password],
       textInputAction: TextInputAction.done,
-      onEditingComplete: () => TextInput.finishAutofillContext(),
+      onEditingComplete: TextInput.finishAutofillContext,
     );
   }
 }

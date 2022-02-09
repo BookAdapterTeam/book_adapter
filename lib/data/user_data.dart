@@ -9,13 +9,14 @@ class UserData extends Equatable {
     this.books,
   });
 
-  // In the future, this would contain other data about Users, such as Collections, Series, etc
+  // In the future, this would contain other data about Users,
+  // such as Collections, Series, etc
   final List<Book>? books;
 
-  // The following was generated with VSCode extention "Dart Data Class Generator"
+  // The following was generated with VSCode extention
+  // "Dart Data Class Generator"
   UserData copyWith({
     List<Book>? books,
-    List<String>? downloadedFiles,
   }) {
     return UserData(
       books: books ?? this.books,

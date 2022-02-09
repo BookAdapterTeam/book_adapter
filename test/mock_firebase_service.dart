@@ -137,10 +137,12 @@ class MockFirebaseService implements FirebaseService {
   Stream<User?> get userChanges => throw UnimplementedError();
 
   @override
-  Future<Series> addSeries(String name,
-      {required String imageUrl,
-      String description = '',
-      Set<String>? collectionIds}) {
+  Future<Series> addSeries(
+    String name, {
+    required String imageUrl,
+    String description = '',
+    Set<String>? collectionIds,
+  }) {
     // TODO: implement addSeries
     throw UnimplementedError();
   }
@@ -294,19 +296,32 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<UploadTask?> uploadFile({required String contentType, required String firebaseFilePath, required String localFilePath, Map<String, String>? customMetadata}) {
+  Future<UploadTask?> uploadFile({
+    required String contentType,
+    required String firebaseFilePath,
+    required String localFilePath,
+    Map<String, String>? customMetadata,
+  }) {
     // TODO: implement uploadFile
     throw UnimplementedError();
   }
 
   @override
-  Future<UploadTask?> uploadBytes({required String contentType, required String firebaseFilePath, required Uint8List bytes, Map<String, String>? customMetadata}) {
+  Future<UploadTask?> uploadBytes({
+    required String contentType,
+    required String firebaseFilePath,
+    required Uint8List bytes,
+    Map<String, String>? customMetadata,
+  }) {
     // TODO: implement uploadBytes
     throw UnimplementedError();
   }
 
   @override
-  Future<UploadTask?> uploadCoverPhoto({required List<int> bytes, required String uploadToPath}) {
+  Future<UploadTask?> uploadCoverPhoto({
+    required List<int> bytes,
+    required String uploadToPath,
+  }) {
     // TODO: implement uploadCoverPhoto
     throw UnimplementedError();
   }
@@ -318,13 +333,21 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<UploadTask?> uploadBookDataToFirebaseStorage({required String firebaseFilePath, required Uint8List bytes, Map<String, String>? customMetadata}) {
+  Future<UploadTask?> uploadBookDataToFirebaseStorage({
+    required String firebaseFilePath,
+    required Uint8List bytes,
+    Map<String, String>? customMetadata,
+  }) {
     // TODO: implement uploadBookDataToFirebaseStorage
     throw UnimplementedError();
   }
 
   @override
-  Future<UploadTask?> uploadBookFileToFirebaseStorage({required String firebaseFilePath, required String localFilePath, Map<String, String>? customMetadata}) {
+  Future<UploadTask?> uploadBookFileToFirebaseStorage({
+    required String firebaseFilePath,
+    required String localFilePath,
+    Map<String, String>? customMetadata,
+  }) {
     // TODO: implement uploadBookFileToFirebaseStorage
     throw UnimplementedError();
   }

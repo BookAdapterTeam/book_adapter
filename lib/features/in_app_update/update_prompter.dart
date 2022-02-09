@@ -40,7 +40,6 @@ class UpdatePrompter {
       _apkFile = await CommonUtils.getApkFileByUpdateData(updateData);
     }
 
-
     if (_apkFile != null && _apkFile!.existsSync()) {
       _dialog = UpdateDialog.showUpdate(
         context,
@@ -109,6 +108,7 @@ class UpdatePrompter {
   /// 安装
   void doInstall() {
     _dialog?.dismiss();
-    onInstall.call(_apkFile != null ? _apkFile!.path : updateData.androidDownloadUrl);
+    onInstall.call(
+        _apkFile != null ? _apkFile!.path : updateData.androidDownloadUrl);
   }
 }

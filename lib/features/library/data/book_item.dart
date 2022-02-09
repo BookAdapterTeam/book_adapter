@@ -226,7 +226,8 @@ class Book implements Item {
       seriesId: map['seriesId'],
       lastReadCfiLocation: map['lastReadCfiLocation'],
       finished: map['finished'] ?? false,
-      fileHash: map['fileHash'] == null ? null : FileHash.fromMap(map['fileHash']),
+      fileHash:
+          map['fileHash'] == null ? null : FileHash.fromMap(map['fileHash']),
     );
   }
 

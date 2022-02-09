@@ -107,6 +107,10 @@ class UpdateData {
 
   @override
   String toString() {
-    return 'UpdateEntity hasUpdate: $hasUpdate, isForce: $isForce, isIgnorable: $isIgnorable, versionCode: $versionCode, versionName: $versionName, updateContent: $updateContent, downloadUrl: $androidDownloadUrl, githubReleaseUrl: $githubReleaseUrl, apkSize: $apkSize, apkMd5: $apkMd5';
+    return 'UpdateEntity(hasUpdate: $hasUpdate, isForce: $isForce, '
+    'isIgnorable: $isIgnorable, versionCode: $versionCode, '
+    'versionName: $versionName, updateContent: $updateContent, '
+    'downloadUrl: $androidDownloadUrl, githubReleaseUrl: $githubReleaseUrl, '
+    'apkSize: $apkSize, apkMd5: $apkMd5)';
   }
 }

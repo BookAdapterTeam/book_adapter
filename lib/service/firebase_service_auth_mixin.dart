@@ -41,7 +41,7 @@ mixin FirebaseServiceAuthMixin {
   /// - **invalid-email**:
   ///  - Returned if the email address is not valid.
   /// - **user-disabled**:
-  ///  - Returned if the user corresponding to the given email has been disabled.
+  ///  - Returned if the user corresponding to the given email has been disabled
   /// - **user-not-found**:
   ///  - Returned if there is no user corresponding to the given email.
   /// - **wrong-password**:
@@ -76,7 +76,8 @@ mixin FirebaseServiceAuthMixin {
   ///
   /// Left [FirebaseFailure] maybe returned with the following error code:
   /// - **email-already-in-use**:
-  ///  - Returned if there already exists an account with the given email address.
+  ///  - Returned if there already exists an account with the given
+  ///    email address.
   /// - **invalid-email**:
   ///  - Returned if the email address is not valid.
   /// - **operation-not-allowed**:

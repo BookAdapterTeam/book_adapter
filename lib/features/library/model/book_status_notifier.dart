@@ -24,7 +24,7 @@ final bookStatusProvider = StateNotifierProvider.family
           return const AsyncData(BookStatus.notDownloaded);
       }
     },
-    error: (error) => AsyncError(error),
+    error: AsyncError.new,
     loading: (loading) => const AsyncLoading(),
   );
 
@@ -44,7 +44,8 @@ class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
   final Book book;
   final Reader _read;
 
-  /// Set BookStatus is unknown. Downloaded or not downloaded status will be automatically checked.
+  /// Set BookStatus is unknown. Downloaded or not downloaded
+  /// status will be automatically checked.
   void setLoading() {
     state = const AsyncValue.loading();
     updateStatus();

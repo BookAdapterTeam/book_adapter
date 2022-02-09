@@ -142,7 +142,7 @@ class FirebaseController {
   /// - **invalid-email**:
   ///  - Returned if the email address is not valid.
   /// - **user-disabled**:
-  ///  - Returned if the user corresponding to the given email has been disabled.
+  ///  - Returned if the user corresponding to the given email has been disabled
   /// - **user-not-found**:
   ///  - Returned if there is no user corresponding to the given email.
   /// - **wrong-password**:
@@ -175,7 +175,7 @@ class FirebaseController {
     // If sign in failed, return the failure object
     // If sign in is successful, return the user object in case the caller cares
     return await res.fold(
-      (failure) => Left(failure),
+      Left.new,
       (userCred) async {
         final User? user = userCred.user;
         if (user == null) {
@@ -196,7 +196,8 @@ class FirebaseController {
   ///
   /// Left [FirebaseFailure] maybe returned with the following error code:
   /// - **email-already-in-use**:
-  ///  - Returned if there already exists an account with the given email address.
+  ///  - Returned if there already exists an account with the given
+  ///    email address.
   /// - **invalid-email**:
   ///  - Returned if the email address is not valid.
   /// - **operation-not-allowed**:
@@ -232,7 +233,7 @@ class FirebaseController {
     // If sign up failed, return the failure object
     // If sign up is successful, return the user object, update the username
     return await res.fold(
-      (failure) => Left(failure),
+      Left.new,
       (userCred) async {
         final User? user = userCred.user;
         if (user == null) {
@@ -253,12 +254,12 @@ class FirebaseController {
   ///
   /// If successful, it also update the stream [authStateChange]
   Future<void> signOut() async {
-    return await _firebaseService.signOut();
+    return _firebaseService.signOut();
   }
 
   /// Send reset password email
   Future<Either<Failure, void>> resetPassword(String email) async {
-    return await _firebaseService.resetPassword(email);
+    return _firebaseService.resetPassword(email);
   }
 
   /// Set display name
@@ -266,7 +267,7 @@ class FirebaseController {
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   Future<bool> setDisplayName(String name) async {
-    return await _firebaseService.setDisplayName(name);
+    return _firebaseService.setDisplayName(name);
   }
 
   /// Set profile photo
@@ -274,7 +275,7 @@ class FirebaseController {
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   Future<bool> setProfilePhoto(String photoURL) async {
-    return await _firebaseService.setProfilePhoto(photoURL);
+    return _firebaseService.setProfilePhoto(photoURL);
   }
 
   // Database
@@ -289,7 +290,7 @@ class FirebaseController {
     required String cfi,
     required String bookId,
   }) async {
-    return await _firebaseService.saveLastReadCfiLocation(
+    return _firebaseService.saveLastReadCfiLocation(
       lastReadCfiLocation: cfi,
       bookId: bookId,
     );
@@ -297,21 +298,21 @@ class FirebaseController {
 
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
-    return await _firebaseService.getAllBooks();
+    return _firebaseService.getAllBooks();
   }
 
   Future<UploadTask?> uploadCoverImage({
     required String firebaseFilepath,
     required Uint8List bytes,
   }) async {
-    return await _firebaseService.uploadCoverPhoto(
+    return _firebaseService.uploadCoverPhoto(
       uploadToPath: firebaseFilepath,
       bytes: bytes,
     );
   }
 
   Future<void> uploadBookDocument(Book book) async {
-    return await _firebaseService.addBookToFirestore(book: book);
+    return _firebaseService.addBookToFirestore(book: book);
   }
 
   Future<UploadTask?> uploadBookData({
@@ -320,7 +321,7 @@ class FirebaseController {
     required String firebaseFilepath,
     required FileHash fileHash,
   }) async {
-    return await _firebaseService.uploadBookDataToFirebaseStorage(
+    return _firebaseService.uploadBookDataToFirebaseStorage(
       firebaseFilePath: firebaseFilepath,
       bytes: bytes,
       customMetadata: {
@@ -335,7 +336,7 @@ class FirebaseController {
     required String firebaseFilepath,
     required FileHash fileHash,
   }) async {
-    return await _firebaseService.uploadBookFileToFirebaseStorage(
+    return _firebaseService.uploadBookFileToFirebaseStorage(
       firebaseFilePath: firebaseFilepath,
       localFilePath: cacheFilepath,
       customMetadata: {
@@ -345,7 +346,7 @@ class FirebaseController {
   }
 
   Future<bool> fileHashExists(String md5, String sha1) async {
-    return await _firebaseService.fileHashExists(md5: md5, sha1: sha1);
+    return _firebaseService.fileHashExists(md5: md5, sha1: sha1);
   }
 
   /// Create a collection
@@ -509,7 +510,7 @@ class FirebaseController {
   }
 
   Future<String> getFileDownloadUrl(String storagePath) async {
-    return await _firebaseService.getFileDownloadUrl(storagePath);
+    return _firebaseService.getFileDownloadUrl(storagePath);
   }
 
   /// Download a file and copy it to documents
@@ -534,7 +535,7 @@ class FirebaseController {
   ///
   /// Throws `AppException` if user is not logged in
   Future<bool> fileExists(String firebaseFilePath) async {
-    return await _firebaseService.fileExists(firebaseFilePath);
+    return _firebaseService.fileExists(firebaseFilePath);
   }
 
   /// List the files the user has uploaded to their folder

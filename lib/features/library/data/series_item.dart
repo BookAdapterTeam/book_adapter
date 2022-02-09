@@ -51,7 +51,8 @@ class Series implements Item {
       title: title ?? this.title,
       subtitle: subtitle ?? this.subtitle,
       imageUrl: imageUrl ?? this.imageUrl,
-      firebaseCoverImagePath: firebaseCoverImagePath ?? this.firebaseCoverImagePath,
+      firebaseCoverImagePath:
+          firebaseCoverImagePath ?? this.firebaseCoverImagePath,
       description: description ?? this.description,
       collectionIds: collectionIds ?? this.collectionIds,
     );
@@ -92,11 +93,20 @@ class Series implements Item {
   @override
   String toJsonFirebase() => json.encode(toMapFirebase());
 
-  factory Series.fromJsonFirebase(String source) => Series.fromMapFirebase(json.decode(source));
+  factory Series.fromJsonFirebase(String source) =>
+      Series.fromMapFirebase(json.decode(source));
 
   @override
   bool get stringify => true;
 
   @override
-  List<Object> get props => [id, userId, title, subtitle ?? 'No subtitle', imageUrl ?? 'No image', description, collectionIds];
+  List<Object> get props => [
+        id,
+        userId,
+        title,
+        subtitle ?? 'No subtitle',
+        imageUrl ?? 'No image',
+        description,
+        collectionIds
+      ];
 }

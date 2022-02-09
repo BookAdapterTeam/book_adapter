@@ -30,7 +30,7 @@ class FirebaseService
 
   String getDefaultCollectionName(String userUid) => '$userUid-Default';
 
-  // Database ************************************************************************************************
+  // Database ******************************************************************
 
   /// Firestore BookCollections reference
   CollectionReference<AppCollection> get _collectionsRef => _firestore
@@ -101,7 +101,7 @@ class FirebaseService
   Future<Series?> getSeriesById(String seriesId) async =>
       (await _seriesRef.doc(seriesId).get()).data();
 
-  // Books *****************************************************************************************************
+  // Books *********************************************************************
 
   /// Save a cfi to lastReadCfiLocation on a book document in Firestore
   Future<void> saveLastReadCfiLocation({
@@ -192,7 +192,7 @@ class FirebaseService
     unawaited(_booksRef.doc(book.id).set(book));
   }
 
-  // BookCollections ********************************************************************************************
+  // BookCollections ***********************************************************
 
   /// Create a shelf in firestore
   Future<Either<Failure, AppCollection>> addCollection(
@@ -204,7 +204,8 @@ class FirebaseService
         return Left(Failure('User not logged in'));
       }
 
-      // Create a shelf with a custom id so that it can easily be referenced later
+      // Create a shelf with a custom id so that it can easily be
+      // referenced later
       final bookCollection = AppCollection(
         id: '$userId-$collectionName',
         name: collectionName,
@@ -225,7 +226,8 @@ class FirebaseService
   ///
   /// Takes a book and adds the collectionIds to it.
   ///
-  /// If a book does not have any collections, it will move it to the default collection
+  /// If a book does not have any collections, it will
+  /// move it to the default collection
   ///
   /// Throws [AppException] if it fails.
   Future<void> updateBookCollections({
@@ -257,7 +259,8 @@ class FirebaseService
   ///
   /// Takes a series and adds the series id to it
   ///
-  /// If a book does not have any collections, it will move it to the default collection
+  /// If a book does not have any collections, it
+  /// will move it to the default collection
   ///
   /// Throws [AppException] if it fails.
   Future<void> updateSeriesCollections({
@@ -309,7 +312,8 @@ class FirebaseService
         throw AppException('user-null');
       }
 
-      // Create a shelf with a custom id so that it can easily be referenced later
+      // Create a shelf with a custom id so
+      // that it can easily be referenced later
       final series = Series(
           id: _uuid.v4(),
           userId: userId,

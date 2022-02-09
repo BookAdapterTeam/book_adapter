@@ -150,12 +150,11 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
             key: const ValueKey('selecting_series_app_bar'),
             pinned: true,
             title: Text('Selected: $numberSelected'),
-            // backgroundColor: Theme.of(context).buttonTheme.colorScheme?.primary,
             backgroundColor: kSelectingAppBarColor,
             systemOverlayStyle: SystemUiOverlayStyle.light,
             elevation: 3.0,
             leading: BackButton(
-              onPressed: () => viewController.deselectAllItems(),
+              onPressed: viewController.deselectAllItems,
             ),
             actions: [
               OverflowLibraryAppBarPopupMenuButton(

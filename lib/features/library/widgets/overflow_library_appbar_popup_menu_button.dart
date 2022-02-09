@@ -84,7 +84,8 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
                     return AlertDialog(
                       title: const Text('Delete Permanently'),
                       content: const Text(
-                          'Are you sure you want to delete all selected books and series? This cannot be undone.'),
+                          'Are you sure you want to delete all selected books '
+                          'and series? This cannot be undone.'),
                       actions: [
                         TextButton(
                           onPressed: () {
