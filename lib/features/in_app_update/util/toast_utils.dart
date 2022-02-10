@@ -13,7 +13,7 @@ class ToastUtils {
   /// Initialize Toast configuration globally, child is MaterialApp
   ///
   /// 全局初始化Toast配置, child为MaterialApp
-  static init({required Widget child}) {
+  static Widget init({required Widget child}) {
     return OKToast(
       /// Front Size
       ///

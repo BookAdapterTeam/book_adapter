@@ -17,7 +17,7 @@ class UpdateManager {
   /// Global initialization
   ///
   /// 全局初始化
-  static init({
+  static void init({
     String baseUrl = '',
     int timeout = 5000,
     Map<String, dynamic>? headers,
