@@ -56,6 +56,7 @@ class StorageService {
       await appBookAdaptDirectory.create();
       await Hive.initFlutter('BookAdapterData');
       Hive.registerAdapter(FileHashAdapter());
+      // TODO(@getBoolean): Make per user and init only this when logged in
       _uploadQueueBox = await Hive.openBox(kUploadQueueBox);
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);

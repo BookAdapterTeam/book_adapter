@@ -53,7 +53,15 @@ class StorageController {
   final Reader _read;
   static const _uuid = Uuid();
 
+  bool get loggedIn {
+    return _read(firebaseControllerProvider).currentUser == null ? false : true;
+  }
+
   Future<void> startBookUploads() async {
+    final userId = _read(firebaseControllerProvider).currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
     final log = Logger();
     final fileHashList = _read(storageServiceProvider).uploadQueueFileHashList;
     await for (final message in handleUploadFromFileHashList(fileHashList)) {
@@ -209,8 +217,7 @@ class StorageController {
             .getCoverFilename(cacheFilepath, id, 'jpg');
         String? coverImageFirebaseFilepath = '$userId/$coverFilename';
         try {
-          log.i(
-              'Starting File Upload:  '
+          log.i('Starting File Upload:  '
               '${coverImageFirebaseFilepath.split('/').last}');
           final uploadTask = coverData == null
               ? null
@@ -219,12 +226,10 @@ class StorageController {
                   bytes: coverData,
                 );
           await uploadTask;
-          log.i(
-              'Finished File Upload: '
+          log.i('Finished File Upload: '
               '${coverImageFirebaseFilepath.split('/').last}');
         } on Exception catch (e, st) {
-          log.i(
-              'Unable to upload file: '
+          log.i('Unable to upload file: '
               '${coverImageFirebaseFilepath.split('/').last}');
           log.w(e.toString(), e, st);
           coverImageFirebaseFilepath = null;

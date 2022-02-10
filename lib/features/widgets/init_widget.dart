@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -11,8 +12,10 @@ import '../../controller/firebase_controller.dart';
 import '../../controller/storage_controller.dart';
 import '../../data/constants.dart';
 import '../../service/storage_service.dart';
+import '../auth/login_view.dart';
 import '../in_app_update/update.dart';
 import '../in_app_update/util/toast_utils.dart';
+import 'async_value_widget.dart';
 
 final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield 'Initializing Firebase...';
@@ -20,7 +23,10 @@ final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield 'Initializing Local Database...';
   await ref.watch(storageServiceProvider).init();
   yield null;
-  unawaited(ref.read(storageControllerProvider).startBookUploads());
+  // TODO(@getBoolean): Move to home so it only starts when user is logged in
+  if (ref.read(storageControllerProvider).loggedIn) {
+    unawaited(ref.read(storageControllerProvider).startBookUploads());
+  }
 });
 
 class InitWidget extends ConsumerWidget {
@@ -58,11 +64,26 @@ class InitWidget extends ConsumerWidget {
     return asyncValue.map(
       data: (asyncData) {
         String? message = asyncData.value;
+        // Done loading when null is sent
         if (message == null) {
           final userStreamAsyncValue = ref.watch(authStateChangesProvider);
-          final user = userStreamAsyncValue.asData?.value;
           message = 'Authenticating...';
-          if (user != null) return child;
+          return Scaffold(
+            body: AsyncValueWidget<User?>(
+              value: userStreamAsyncValue,
+              loading: () => buildLoading(message),
+              data: (data) => AnimatedSwitcher(
+                switchInCurve: Curves.easeInCubic,
+                switchOutCurve: Curves.easeOutCubic,
+                duration: kTransitionDuration,
+                child: data == null
+                    ? LoginView(
+                        key: const ValueKey('login'),
+                      )
+                    : child,
+              ),
+            ),
+          );
         }
 
         return buildLoading(message);

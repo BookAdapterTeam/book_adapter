@@ -79,9 +79,9 @@ class _MyAppState extends ConsumerState<MyApp> {
 
               return I18n(
                 key: const ValueKey('I18n Initialization'),
-                child: UpdateChecker(
-                  child: InitWidget(
-                    key: const ValueKey('Initialize App'),
+                child: InitWidget(
+                  key: const ValueKey('Initialize App'),
+                  child: UpdateChecker(
                     child: page,
                   ),
                 ),
