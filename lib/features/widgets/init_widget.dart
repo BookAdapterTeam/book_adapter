@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -8,14 +7,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../controller/firebase_controller.dart';
 import '../../controller/storage_controller.dart';
 import '../../data/constants.dart';
 import '../../service/storage_service.dart';
-import '../auth/login_view.dart';
 import '../in_app_update/update.dart';
 import '../in_app_update/util/toast_utils.dart';
-import 'async_value_widget.dart';
 
 final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield 'Initializing Firebase...';
@@ -30,31 +26,18 @@ final providerForInitStream = StreamProvider<String?>((ref) async* {
 });
 
 class InitWidget extends ConsumerWidget {
-  const InitWidget({Key? key, required this.child}) : super(key: key);
+  const InitWidget({
+    Key? key,
+    required this.child,
+    this.loading,
+  }) : super(key: key);
 
   final Widget child;
 
-  Widget buildLoading(String? message) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            AnimatedSwitcher(
-              key: ValueKey(message ?? ''),
-              switchInCurve: Curves.easeInCubic,
-              switchOutCurve: Curves.easeOutCubic,
-              duration: kTransitionDuration,
-              child: Text(message ?? ''),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  /// Page to show when loading. You should include a Scaffold.
+  ///
+  /// When `message` is null, the
+  final Widget Function(String message)? loading;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -63,30 +46,13 @@ class InitWidget extends ConsumerWidget {
 
     return asyncValue.map(
       data: (asyncData) {
-        String? message = asyncData.value;
+        final String? message = asyncData.value;
         // Done loading when null is sent
         if (message == null) {
-          final userStreamAsyncValue = ref.watch(authStateChangesProvider);
-          message = 'Authenticating...';
-          return Scaffold(
-            body: AsyncValueWidget<User?>(
-              value: userStreamAsyncValue,
-              loading: () => buildLoading(message),
-              data: (data) => AnimatedSwitcher(
-                switchInCurve: Curves.easeInCubic,
-                switchOutCurve: Curves.easeOutCubic,
-                duration: kTransitionDuration,
-                child: data == null
-                    ? LoginView(
-                        key: const ValueKey('login'),
-                      )
-                    : child,
-              ),
-            ),
-          );
+          return child;
         }
 
-        return buildLoading(message);
+        return loading?.call(message) ?? _LoadingPage(message: message);
       },
       error: (asyncError) {
         final error = asyncError.error;
@@ -148,26 +114,54 @@ class InitWidget extends ConsumerWidget {
         );
       },
       loading: (loading) {
-        return Scaffold(
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: const [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                AnimatedSwitcher(
-                  key: ValueKey('Loading...'),
-                  switchInCurve: Curves.easeInCubic,
-                  switchOutCurve: Curves.easeOutCubic,
-                  duration: kTransitionDuration,
-                  child: Text('Loading...'),
-                ),
-              ],
-            ),
-          ),
-        );
+        return const _LoadingPage(message: 'Loading...');
       },
+    );
+  }
+}
+
+class _LoadingPage extends StatelessWidget {
+  const _LoadingPage({
+    Key? key,
+    required this.message,
+  }) : super(key: key);
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            const CircularProgressIndicator(),
+            const SizedBox(height: 16),
+            _LoadingMessageWidget(message: message),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _LoadingMessageWidget extends StatelessWidget {
+  const _LoadingMessageWidget({
+    Key? key,
+    required this.message,
+  }) : super(key: key);
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSwitcher(
+      key: ValueKey(message),
+      switchInCurve: Curves.easeInCubic,
+      switchOutCurve: Curves.easeOutCubic,
+      duration: kTransitionDuration,
+      child: Text(message),
     );
   }
 }
