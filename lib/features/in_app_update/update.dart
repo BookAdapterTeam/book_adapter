@@ -39,7 +39,7 @@ class UpdateManager {
           UpdatePrompter(
             updateData: data,
             onIgnore: onIgnore,
-            onClose: onClose
+            onClose: onClose,
             onInstall: (String filePath) {
               CommonUtils.installAPP(
                 filePath: filePath,

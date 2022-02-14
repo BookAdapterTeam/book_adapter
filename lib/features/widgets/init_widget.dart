@@ -191,7 +191,12 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   void initState() {
     super.initState();
     if (!widget.ignoreUpdate) {
-      UpdateManager.checkUpdate(context, _updateUrl, widget.onIgnore, widget.onClose);
+      UpdateManager.checkUpdate(
+        context,
+        _updateUrl,
+        widget.onIgnore,
+        widget.onClose,
+      );
     }
   }
 
