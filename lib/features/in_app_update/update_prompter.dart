@@ -20,6 +20,7 @@ class UpdatePrompter {
   final InstallCallback onInstall;
 
   final VoidCallback? onIgnore;
+  final VoidCallback? onClose;
   UpdateDialog? _dialog;
 
   double _progress = 0.0;
@@ -30,6 +31,7 @@ class UpdatePrompter {
     required this.updateData,
     required this.onInstall,
     required this.onIgnore,
+    required this.onClose,
   });
 
   void show(BuildContext context) async {
@@ -57,6 +59,7 @@ class UpdatePrompter {
         isForce: updateData.isForce,
         onUpdate: doInstall,
         onIgnore: onIgnore,
+        onClose: onClose,
       );
     } else {
       _dialog = UpdateDialog.showUpdate(
@@ -70,6 +73,7 @@ class UpdatePrompter {
         isForce: updateData.isForce,
         onUpdate: onUpdate,
         onIgnore: onIgnore,
+        onClose: onClose,
       );
     }
   }

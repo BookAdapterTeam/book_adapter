@@ -87,6 +87,9 @@ class _MyAppState extends ConsumerState<MyApp> {
                   onIgnore: () {
                     ignoreUpdate = true;
                   },
+                  onClose: () {
+                    ignoreUpdate = true;
+                  },
                   child: InitWidget(
                     key: const ValueKey('Initialize App'),
                     child: AuthChecker(child: page),

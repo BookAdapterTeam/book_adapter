@@ -172,10 +172,12 @@ class UpdateChecker extends StatefulWidget {
     required this.child,
     this.ignoreUpdate = false,
     required this.onIgnore,
+    required this.onClose,
   }) : super(key: key);
 
   final Widget child;
   final VoidCallback? onIgnore;
+  final VoidCallback? onClose;
   final bool ignoreUpdate;
 
   @override
@@ -189,7 +191,7 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   void initState() {
     super.initState();
     if (!widget.ignoreUpdate) {
-      UpdateManager.checkUpdate(context, _updateUrl, widget.onIgnore);
+      UpdateManager.checkUpdate(context, _updateUrl, widget.onIgnore, widget.onClose);
     }
   }
 

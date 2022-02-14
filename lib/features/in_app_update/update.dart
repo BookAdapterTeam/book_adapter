@@ -29,6 +29,7 @@ class UpdateManager {
     BuildContext context,
     String url,
     final VoidCallback? onIgnore,
+    final VoidCallback? onClose,
   ) {
     HttpUtils.get(url).then((response) {
       UpdateParser.parseJson(json.encode(response)).then(
@@ -38,6 +39,7 @@ class UpdateManager {
           UpdatePrompter(
             updateData: data,
             onIgnore: onIgnore,
+            onClose: onClose
             onInstall: (String filePath) {
               CommonUtils.installAPP(
                 filePath: filePath,
