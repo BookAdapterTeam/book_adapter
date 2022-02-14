@@ -1,7 +1,7 @@
 name: book_adapter
 description: A new Flutter project.
 publish_to: "none"
-version: 0.4.2+9
+version: 0.4.2+7
 
 environment:
   sdk: ">=2.16.0 <3.0.0"
@@ -39,7 +39,8 @@ dependencies:
   flutter_hooks: ^0.18.0
   sliver_tools: ^0.2.5
   url_launcher: ^6.0.12
-  flutter_update_dialog: ^2.0.0
+  flutter_update_dialog:
+    path: ./packages/flutter_update_dialog
   package_info: ^2.0.2
   oktoast: ^3.1.5
   app_installer: ^1.1.0
