@@ -4,7 +4,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:i18n_extension/i18n_widget.dart';
 
 import 'features/auth/auth_checker.dart';
-import 'features/auth/login_view.dart';
 import 'features/in_app_update/util/toast_utils.dart';
 import 'features/library/library_view.dart';
 import 'features/library/series_view.dart';
