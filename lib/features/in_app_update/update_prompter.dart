@@ -57,7 +57,6 @@ class UpdatePrompter {
         isForce: updateData.isForce,
         onUpdate: doInstall,
         onIgnore: onIgnore,
-        onClose: onIgnore,
       );
     } else {
       _dialog = UpdateDialog.showUpdate(
@@ -70,7 +69,6 @@ class UpdatePrompter {
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
         onUpdate: onUpdate,
-        onClose: onIgnore,
         onIgnore: onIgnore,
       );
     }

@@ -47,7 +47,10 @@ class UpdateDialog {
       radius: radius,
       themeColor: themeColor,
       progressBackgroundColor: progressBackgroundColor,
-      onIgnore: onIgnore,
+      onIgnore: () {
+        dismiss();
+        onIgnore?.call();
+      },
       isForce: isForce,
       updateButtonText: updateButtonText ?? '更新',
       ignoreButtonText: ignoreButtonText ?? '忽略此版本',
@@ -304,6 +307,7 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       // Title
                       Container(
