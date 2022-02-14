@@ -268,30 +268,28 @@ class _UpdateWidgetState extends State<UpdateWidget> {
   Widget build(BuildContext context) {
     final double dialogWidth =
         widget.width <= 0 ? getFitWidth(context) * 0.618 : widget.width;
-    final double dialogHeight;
-    if (widget.isForce) {
-      dialogHeight = MediaQuery.of(context).size.height - 80;
-    } else {
-      dialogHeight = MediaQuery.of(context).size.height;
-    }
     return Material(
         type: MaterialType.transparency,
-        child: Container(
-          child: SizedBox(
-            width: dialogWidth,
-            height: dialogHeight,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                SizedBox(
+        child: SizedBox(
+          width: dialogWidth,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // Top Image
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: SizedBox(
                   width: dialogWidth,
                   child: widget.topImage ??
                       Image.asset('assets/update_bg_app_top.png',
                           package: 'flutter_update_dialog', fit: BoxFit.fill),
                 ),
-                Container(
+              ),
+              // Dialog Body
+              Expanded(
+                child: Container(
                   width: dialogWidth,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.only(
@@ -304,96 +302,103 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                           bottomRight: Radius.circular(widget.radius)),
                     ),
                   ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: <Widget>[
-                        Container(
-                          padding: EdgeInsets.only(top: widget.extraHeight),
-                          child: Text(
-                            widget.title,
-                            style: TextStyle(
-                                fontSize: widget.titleTextSize,
-                                color: Colors.black),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      // Title
+                      Container(
+                        padding: EdgeInsets.only(top: widget.extraHeight),
+                        child: Text(
+                          widget.title,
+                          style: TextStyle(
+                              fontSize: widget.titleTextSize,
+                              color: Colors.black),
+                        ),
+                      ),
+                      // Update Details
+                      Expanded(
+                        child: SingleChildScrollView(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: SelectableText(
+                              widget.updateContent,
+                              style: TextStyle(
+                                  fontSize: widget.contentTextSize,
+                                  color: const Color(0xFF666666)),
+                            ),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          child: Text(
-                            widget.updateContent,
-                            style: TextStyle(
-                                fontSize: widget.contentTextSize,
-                                color: const Color(0xFF666666)),
+                      ),
+                      // Update Button and Progress
+                      if (widget.progress < 0)
+                        Column(children: <Widget>[
+                          FractionallySizedBox(
+                            widthFactor: 1,
+                            child: ElevatedButton(
+                              style: ButtonStyle(
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                textStyle: MaterialStateProperty.all(
+                                    TextStyle(fontSize: widget.buttonTextSize)),
+                                foregroundColor:
+                                    MaterialStateProperty.all(Colors.white),
+                                shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(5))),
+                                elevation: MaterialStateProperty.all(0),
+                                backgroundColor: MaterialStateProperty.all(
+                                    widget.themeColor),
+                              ),
+                              child: Text(widget.updateButtonText),
+                              onPressed: widget.onUpdate,
+                            ),
                           ),
-                        ),
-                        if (widget.progress < 0)
-                          Column(children: <Widget>[
+                          if (!widget.isForce && widget.onIgnore != null)
                             FractionallySizedBox(
                               widthFactor: 1,
-                              child: ElevatedButton(
+                              child: TextButton(
                                 style: ButtonStyle(
                                   tapTargetSize:
                                       MaterialTapTargetSize.shrinkWrap,
                                   textStyle: MaterialStateProperty.all(
                                       TextStyle(
                                           fontSize: widget.buttonTextSize)),
-                                  foregroundColor:
-                                      MaterialStateProperty.all(Colors.white),
+                                  foregroundColor: MaterialStateProperty.all(
+                                      const Color(0xFF666666)),
                                   shape: MaterialStateProperty.all(
                                       RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(5))),
-                                  elevation: MaterialStateProperty.all(0),
-                                  backgroundColor: MaterialStateProperty.all(
-                                      widget.themeColor),
                                 ),
-                                child: Text(widget.updateButtonText),
-                                onPressed: widget.onUpdate,
+                                child: Text(widget.ignoreButtonText),
+                                onPressed: widget.onIgnore,
                               ),
-                            ),
-                            if (!widget.isForce && widget.onIgnore != null)
-                              FractionallySizedBox(
-                                widthFactor: 1,
-                                child: TextButton(
-                                  style: ButtonStyle(
-                                    tapTargetSize:
-                                        MaterialTapTargetSize.shrinkWrap,
-                                    textStyle: MaterialStateProperty.all(
-                                        TextStyle(
-                                            fontSize: widget.buttonTextSize)),
-                                    foregroundColor: MaterialStateProperty.all(
-                                        const Color(0xFF666666)),
-                                    shape: MaterialStateProperty.all(
-                                        RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(5))),
-                                  ),
-                                  child: Text(widget.ignoreButtonText),
-                                  onPressed: widget.onIgnore,
-                                ),
-                              )
-                            else
-                              const SizedBox()
-                          ])
-                        else
-                          NumberProgress(
-                            value: widget.progress,
-                            backgroundColor: widget.progressBackgroundColor,
-                            valueColor: widget.themeColor,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                          )
-                      ],
-                    ),
+                            )
+                          else
+                            const SizedBox()
+                        ])
+                      else
+                        NumberProgress(
+                          value: widget.progress,
+                          backgroundColor: widget.progressBackgroundColor,
+                          valueColor: widget.themeColor,
+                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        )
+                    ],
                   ),
                 ),
-                if (!widget.isForce) ...<Widget>[
-                  const SizedBox(
-                      width: 1.5,
-                      height: 50,
-                      child: DecoratedBox(
-                          decoration: BoxDecoration(color: Colors.white))),
-                  IconButton(
+              ),
+
+              // Close Button
+              if (!widget.isForce) ...<Widget>[
+                const SizedBox(
+                    width: 1.5,
+                    height: 50,
+                    child: DecoratedBox(
+                        decoration: BoxDecoration(color: Colors.white))),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: IconButton(
                     iconSize: 30,
                     constraints:
                         const BoxConstraints(maxHeight: 30, maxWidth: 30),
@@ -401,11 +406,11 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                     icon: Image.asset('assets/update_ic_close.png',
                         package: 'flutter_update_dialog'),
                     onPressed: widget.onClose,
-                  )
-                ] else
-                  const SizedBox()
-              ],
-            ),
+                  ),
+                )
+              ] else
+                const SizedBox()
+            ],
           ),
         ));
   }

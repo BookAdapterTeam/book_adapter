@@ -35,7 +35,7 @@ class UpdateParser {
       isForce: updateInfo.updateStatus == haveNewVersionForcedUpload,
       versionCode: updateInfo.versionCode,
       versionName: updateInfo.versionName,
-      updateContent: updateInfo.modifyContent * 6,
+      updateContent: updateInfo.modifyContent,
       androidDownloadUrl: updateInfo.androidDownloadUrl,
       githubReleaseUrl: updateInfo.githubReleaseUrl,
       apkSize: updateInfo.apkSize,
