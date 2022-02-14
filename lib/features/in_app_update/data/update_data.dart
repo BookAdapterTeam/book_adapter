@@ -21,7 +21,7 @@ class UpdateData {
   /// Can this version be ignored
   ///
   /// 是否可忽略该版本
-  final bool isIgnorable;
+   bool get isIgnorable => !isForce;
 
   //===========Update information - 升级的信息=============//
 
@@ -61,7 +61,6 @@ class UpdateData {
   UpdateData({
     required this.hasUpdate,
     this.isForce = false,
-    this.isIgnorable = false,
     required this.versionCode,
     required this.versionName,
     required this.updateContent,
@@ -75,7 +74,6 @@ class UpdateData {
     return {
       'hasUpdate': hasUpdate,
       'isForce': isForce,
-      'isIgnorable': isIgnorable,
       'versionCode': versionCode,
       'versionName': versionName,
       'updateContent': updateContent,
@@ -90,7 +88,6 @@ class UpdateData {
     return UpdateData(
       hasUpdate: map['hasUpdate'],
       isForce: map['isForce'],
-      isIgnorable: map['isIgnorable'],
       versionCode: map['versionCode']?.toInt(),
       versionName: map['versionName'],
       updateContent: map['updateContent'],
@@ -108,7 +105,7 @@ class UpdateData {
   @override
   String toString() {
     return 'UpdateEntity(hasUpdate: $hasUpdate, isForce: $isForce, '
-    'isIgnorable: $isIgnorable, versionCode: $versionCode, '
+    'versionCode: $versionCode, '
     'versionName: $versionName, updateContent: $updateContent, '
     'downloadUrl: $androidDownloadUrl, githubReleaseUrl: $githubReleaseUrl, '
     'apkSize: $apkSize, apkMd5: $apkMd5)';
