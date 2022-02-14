@@ -53,7 +53,10 @@ class UpdateDialog {
       isForce: isForce,
       updateButtonText: updateButtonText ?? '更新',
       ignoreButtonText: ignoreButtonText ?? '忽略此版本',
-      onClose: onClose ?? () => dismiss(),
+      onClose: () {
+        dismiss();
+        onClose?.call();
+      },
     );
   }
 
@@ -123,29 +126,33 @@ class UpdateDialog {
     Color themeColor = Colors.red,
     bool enableIgnore = false,
     VoidCallback? onIgnore,
+    VoidCallback? onClose,
     String? updateButtonText,
     String? ignoreButtonText,
     bool isForce = false,
   }) {
-    final UpdateDialog dialog = UpdateDialog(context,
-        width: width,
-        title: title,
-        updateContent: updateContent,
-        onUpdate: onUpdate,
-        titleTextSize: titleTextSize,
-        contentTextSize: contentTextSize,
-        buttonTextSize: buttonTextSize,
-        progress: progress,
-        topImage: topImage,
-        extraHeight: extraHeight,
-        radius: radius,
-        themeColor: themeColor,
-        progressBackgroundColor: progressBackgroundColor,
-        enableIgnore: enableIgnore,
-        isForce: isForce,
-        updateButtonText: updateButtonText,
-        ignoreButtonText: ignoreButtonText,
-        onIgnore: onIgnore);
+    final UpdateDialog dialog = UpdateDialog(
+      context,
+      width: width,
+      title: title,
+      updateContent: updateContent,
+      onUpdate: onUpdate,
+      titleTextSize: titleTextSize,
+      contentTextSize: contentTextSize,
+      buttonTextSize: buttonTextSize,
+      progress: progress,
+      topImage: topImage,
+      extraHeight: extraHeight,
+      radius: radius,
+      themeColor: themeColor,
+      progressBackgroundColor: progressBackgroundColor,
+      enableIgnore: enableIgnore,
+      isForce: isForce,
+      updateButtonText: updateButtonText,
+      ignoreButtonText: ignoreButtonText,
+      onIgnore: onIgnore,
+      onClose: onClose,
+    );
     dialog.show();
     return dialog;
   }
