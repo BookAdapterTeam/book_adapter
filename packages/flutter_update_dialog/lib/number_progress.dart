@@ -2,6 +2,18 @@ import 'package:flutter/material.dart';
 
 /// 带进度文字的圆角进度条
 class NumberProgress extends StatelessWidget {
+  const NumberProgress({
+    Key? key,
+    this.height = 10.0,
+    this.value = 0.0,
+    this.backgroundColor,
+    this.valueColor = Colors.blue,
+    this.textColor = Colors.white,
+    this.textSize = 8.0,
+    this.padding = EdgeInsets.zero,
+    this.textAlignment = Alignment.center,
+  }) : super(key: key);
+
   /// 进度条的高度
   final double height;
 
@@ -25,18 +37,6 @@ class NumberProgress extends StatelessWidget {
 
   /// 边距
   final EdgeInsetsGeometry padding;
-
-  NumberProgress(
-      {Key? key,
-      this.height = 10.0,
-      this.value = 0.0,
-      this.backgroundColor,
-      this.valueColor = Colors.blue,
-      this.textColor = Colors.white,
-      this.textSize = 8.0,
-      this.padding = EdgeInsets.zero,
-      this.textAlignment = Alignment.center})
-      : super(key: key);
 
   @override
   Widget build(BuildContext context) {

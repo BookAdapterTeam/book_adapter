@@ -216,28 +216,29 @@ class UpdateWidget extends StatefulWidget {
   /// 忽略按钮内容
   final String ignoreButtonText;
 
-  UpdateWidget(
-      {Key? key,
-      this.width = 0.0,
-      required this.title,
-      required this.updateContent,
-      required this.onUpdate,
-      this.titleTextSize = 16.0,
-      this.contentTextSize = 14.0,
-      this.buttonTextSize = 14.0,
-      this.progress = -1.0,
-      this.progressBackgroundColor = const Color(0xFFFFCDD2),
-      this.topImage,
-      this.extraHeight = 5.0,
-      this.radius = 4.0,
-      this.themeColor = Colors.red,
-      this.enableIgnore = false,
-      this.onIgnore,
-      this.isForce = false,
-      this.updateButtonText = '更新',
-      this.ignoreButtonText = '忽略此版本',
-      this.onClose})
-      : super(key: key);
+  // ignore: sort_constructors_first
+  UpdateWidget({
+    Key? key,
+    this.width = 0.0,
+    required this.title,
+    required this.updateContent,
+    required this.onUpdate,
+    this.titleTextSize = 16.0,
+    this.contentTextSize = 14.0,
+    this.buttonTextSize = 14.0,
+    this.progress = -1.0,
+    this.progressBackgroundColor = const Color(0xFFFFCDD2),
+    this.topImage,
+    this.extraHeight = 5.0,
+    this.radius = 4.0,
+    this.themeColor = Colors.red,
+    this.enableIgnore = false,
+    this.onIgnore,
+    this.isForce = false,
+    this.updateButtonText = '更新',
+    this.ignoreButtonText = '忽略此版本',
+    this.onClose,
+  }) : super(key: key);
 
   final _UpdateWidgetState _state = _UpdateWidgetState();
 

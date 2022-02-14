@@ -18,13 +18,13 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Update Dialog Demo Page'),
+      home: const MyHomePage(title: 'Update Dialog Demo Page'),
     ));
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, this.title = ''}) : super(key: key);
+  const MyHomePage({Key? key, this.title = ''}) : super(key: key);
 
   final String title;
 
