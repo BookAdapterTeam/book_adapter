@@ -247,6 +247,7 @@ class UpdateWidget extends StatefulWidget {
   }
 
   @override
+  // ignore: no_logic_in_create_state
   _UpdateWidgetState createState() => _state;
 }
 
