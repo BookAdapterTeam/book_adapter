@@ -20,7 +20,6 @@ class UpdatePrompter {
   final InstallCallback onInstall;
 
   final VoidCallback? onIgnore;
-
   UpdateDialog? _dialog;
 
   double _progress = 0.0;
@@ -58,6 +57,7 @@ class UpdatePrompter {
         isForce: updateData.isForce,
         onUpdate: doInstall,
         onIgnore: onIgnore,
+        onClose: onIgnore
       );
     } else {
       _dialog = UpdateDialog.showUpdate(
@@ -70,10 +70,8 @@ class UpdatePrompter {
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
         onUpdate: onUpdate,
-        onIgnore: () {
-          print("IGNORED");
-          onIgnore?.call();
-        },
+        onClose: onIgnore,
+        onIgnore: onIgnore,
       );
     }
   }
