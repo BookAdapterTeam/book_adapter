@@ -22,6 +22,8 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  bool ignoreUpdate = false;
+
   @override
   Widget build(BuildContext context) {
     return ToastUtils.init(
@@ -81,6 +83,10 @@ class _MyAppState extends ConsumerState<MyApp> {
               return I18n(
                 key: const ValueKey('I18n Initialization'),
                 child: UpdateChecker(
+                  ignoreUpdate: ignoreUpdate,
+                  onIgnore: () {
+                    ignoreUpdate = true;
+                  },
                   child: InitWidget(
                     key: const ValueKey('Initialize App'),
                     child: AuthChecker(child: page),

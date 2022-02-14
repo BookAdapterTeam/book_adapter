@@ -19,13 +19,19 @@ class UpdatePrompter {
 
   final InstallCallback onInstall;
 
+  final VoidCallback? onIgnore;
+
   UpdateDialog? _dialog;
 
   double _progress = 0.0;
 
   File? _apkFile;
 
-  UpdatePrompter({required this.updateData, required this.onInstall});
+  UpdatePrompter({
+    required this.updateData,
+    required this.onInstall,
+    required this.onIgnore,
+  });
 
   void show(BuildContext context) async {
     if (_dialog != null && _dialog!.isShowing()) {
@@ -51,6 +57,7 @@ class UpdatePrompter {
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
         onUpdate: doInstall,
+        onIgnore: onIgnore,
       );
     } else {
       _dialog = UpdateDialog.showUpdate(
@@ -63,6 +70,10 @@ class UpdatePrompter {
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
         onUpdate: onUpdate,
+        onIgnore: () {
+          print("IGNORED");
+          onIgnore?.call();
+        },
       );
     }
   }

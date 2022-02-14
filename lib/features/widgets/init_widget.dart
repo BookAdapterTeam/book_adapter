@@ -167,9 +167,16 @@ class _LoadingMessageWidget extends StatelessWidget {
 }
 
 class UpdateChecker extends StatefulWidget {
-  const UpdateChecker({Key? key, required this.child}) : super(key: key);
+  const UpdateChecker({
+    Key? key,
+    required this.child,
+    this.ignoreUpdate = false,
+    required this.onIgnore,
+  }) : super(key: key);
 
   final Widget child;
+  final VoidCallback? onIgnore;
+  final bool ignoreUpdate;
 
   @override
   _UpdateCheckerState createState() => _UpdateCheckerState();
@@ -181,7 +188,9 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   @override
   void initState() {
     super.initState();
-    UpdateManager.checkUpdate(context, _updateUrl);
+    if (!widget.ignoreUpdate) {
+      UpdateManager.checkUpdate(context, _updateUrl, widget.onIgnore);
+    }
   }
 
   @override

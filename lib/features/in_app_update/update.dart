@@ -25,7 +25,11 @@ class UpdateManager {
     HttpUtils.init(baseUrl: baseUrl, timeout: timeout, headers: headers);
   }
 
-  static void checkUpdate(BuildContext context, String url) {
+  static void checkUpdate(
+    BuildContext context,
+    String url,
+    final VoidCallback? onIgnore,
+  ) {
     HttpUtils.get(url).then((response) {
       UpdateParser.parseJson(json.encode(response)).then(
         (data) {
@@ -33,6 +37,7 @@ class UpdateManager {
 
           UpdatePrompter(
             updateData: data,
+            onIgnore: onIgnore,
             onInstall: (String filePath) {
               CommonUtils.installAPP(
                 filePath: filePath,
