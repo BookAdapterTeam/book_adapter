@@ -30,7 +30,7 @@ flutter_ios_podfile_setup
 target 'Runner' do
   # Use compiled version of FirebaseFirestore to save time
   # https://firebase.flutter.dev/docs/overview#improve-ios-build-times
-  pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '8.9.1'
+  pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '8.12.1'
   use_frameworks!
   use_modular_headers!
   
