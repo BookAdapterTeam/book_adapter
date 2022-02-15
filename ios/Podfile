@@ -33,6 +33,9 @@ target 'Runner' do
   # 
   # Get version # from this github
   # https://github.com/FirebaseExtended/flutterfire/blob/master/packages/firebase_core/firebase_core/ios/firebase_sdk_version.rb
+  # 
+  # Run this command in the `ios` folder after changing the version
+  # `pod update Firebase/Firestore`
   pod 'FirebaseFirestore', :git => 'https://github.com/invertase/firestore-ios-sdk-frameworks.git', :tag => '8.11.0'
   use_frameworks!
   use_modular_headers!
