@@ -25,7 +25,8 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 // For Firebase
-apply plugin: 'com.google.gms.google-services'  // Google Services plugin
+// No longer needed https://firebase.flutter.dev/docs/manual-installation/
+// apply plugin: 'com.google.gms.google-services'  // Google Services plugin
 
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
