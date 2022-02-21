@@ -51,7 +51,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.book_adapter_team.book_adapter"
+        applicationId "com.bookadapterteam.bookadapter"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode flutterVersionCode.toInteger()
