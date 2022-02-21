@@ -9,13 +9,16 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../controller/storage_controller.dart';
 import '../../data/constants.dart';
+import '../../firebase_options.dart';
 import '../../service/storage_service.dart';
 import '../in_app_update/update.dart';
 import '../in_app_update/util/toast_utils.dart';
 
 final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield 'Initializing Firebase...';
-  await Firebase.initializeApp().timeout(const Duration(seconds: 5));
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  ); //.timeout(const Duration(seconds: 5));
   yield 'Initializing Local Database...';
   await ref.watch(storageServiceProvider).init();
   yield null;
