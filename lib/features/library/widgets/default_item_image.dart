@@ -88,35 +88,3 @@ class _CustomBackground extends StatelessWidget {
     );
   }
 }
-
-class _CustomImageTitle extends StatelessWidget {
-  const _CustomImageTitle({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  Widget build(BuildContext context) {
-    return AutoSizeText(
-      title,
-      maxLines: 3,
-    );
-  }
-}
-
-class _CustomImageSubtitle extends StatelessWidget {
-  const _CustomImageSubtitle({Key? key, required this.subtitle})
-      : super(key: key);
-
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Opacity(
-      opacity: 0.8,
-      child: AutoSizeText(
-        subtitle,
-        maxLines: 3,
-      ),
-    );
-  }
-}
