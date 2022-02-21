@@ -16,9 +16,11 @@ class DefaultItemImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double height = width * 3;
+
     return SizedBox(
       width: width,
-      height: width * 3,
+      height: height,
       child: Stack(
         alignment: Alignment.center,
         children: [
@@ -26,19 +28,33 @@ class DefaultItemImage extends StatelessWidget {
             seed: title.hashCode,
           ),
           Padding(
-            padding: const EdgeInsets.all(2.0),
+            padding: const EdgeInsets.all(4.0),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _CustomImageTitle(
-                  title: title,
-                ),
-                if (subtitle != null) ...[
-                  _CustomImageSubtitle(
-                    subtitle: subtitle!,
+                Expanded(
+                  flex: 3,
+                  child: AutoSizeText(
+                    title,
+                    maxLines: 4,
+                    textAlign: TextAlign.center,
+                    minFontSize: 4,
+                    softWrap: true,
                   ),
-                ]
+                ),
+                SizedBox(height: height / 10),
+                Expanded(
+                  flex: 2,
+                  child: Opacity(
+                    opacity: 0.8,
+                    child: AutoSizeText(
+                      subtitle ?? 'Unknown Author',
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                      minFontSize: 4,
+                      softWrap: true,
+                    ),
+                  ),
+                ),
               ],
             ),
           )
@@ -97,11 +113,9 @@ class _CustomImageSubtitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Opacity(
       opacity: 0.8,
-      child: FittedBox(
-        child: AutoSizeText(
-          subtitle,
-          maxLines: 3,
-        ),
+      child: AutoSizeText(
+        subtitle,
+        maxLines: 3,
       ),
     );
   }
