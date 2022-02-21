@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -274,8 +273,11 @@ class _UpdateWidgetState extends State<UpdateWidget> {
     final double dialogWidth =
         widget.width <= 0 ? getFitWidth(context) * 0.618 : widget.width;
 
-    final Image image = Image.asset('assets/update_bg_app_top.png',
-        package: 'flutter_update_dialog', fit: BoxFit.fill);
+    final Image image = Image.asset(
+      'assets/update_bg_app_top.png',
+      package: 'flutter_update_dialog',
+      fit: BoxFit.fill,
+    );
 
     return Material(
         type: MaterialType.transparency,
@@ -284,18 +286,58 @@ class _UpdateWidgetState extends State<UpdateWidget> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: SizedBox(
-                  width: dialogWidth,
-                  child: widget.topImage ?? image,
+              // ignore: hack
+              // HACK: Wrap widgets with AnimatedSwitcher to get rid of gray line between them
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: SizedBox(
+                    width: dialogWidth,
+                    child: widget.topImage ?? image,
+                  ),
                 ),
               ),
               // Dialog Body
+              // Title
+              Container(
+                width: dialogWidth,
+                color: Colors.white,
+                padding: EdgeInsets.only(
+                    top: widget.extraHeight, left: 16, right: 16),
+                child: Text(
+                  widget.title,
+                  style: TextStyle(
+                      fontSize: widget.titleTextSize, color: Colors.black),
+                ),
+              ),
+              // Update Details
               Flexible(
-                flex: 3,
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 250),
+                  child: Container(
+                    width: dialogWidth,
+                    color: Colors.white,
+                    padding: EdgeInsets.only(
+                        top: widget.extraHeight, left: 16, right: 16),
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 16),
+                        child: Text(
+                          widget.updateContent,
+                          style: TextStyle(
+                              fontSize: widget.contentTextSize,
+                              color: const Color(0xFF666666)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
                 child: Container(
                   width: dialogWidth,
                   alignment: Alignment.center,
@@ -313,35 +355,6 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      // Title
-                      Container(
-                        padding: EdgeInsets.only(
-                            top: widget.extraHeight, left: 16, right: 16),
-                        child: Text(
-                          widget.title,
-                          style: TextStyle(
-                              fontSize: widget.titleTextSize,
-                              color: Colors.black),
-                        ),
-                      ),
-                      // Update Details
-                      Expanded(
-                        child: SingleChildScrollView(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 16),
-                            child: Text(
-                              widget.updateContent,
-                              style: TextStyle(
-                                  fontSize: widget.contentTextSize,
-                                  color: const Color(0xFF666666)),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 8,
-                      ),
                       // Update Button and Progress
                       if (widget.progress < 0)
                         if (getScreenHeight(context) >= 400)
@@ -472,6 +485,9 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                 ),
               ),
 
+              const SizedBox(
+                height: 8,
+              ),
               // Removed since it can cause RenderFlex overflow when screenheight is small
               // Close Button
               // if (!widget.isForce) ...<Widget>[
