@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:math';
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 
@@ -271,6 +273,10 @@ class _UpdateWidgetState extends State<UpdateWidget> {
   Widget build(BuildContext context) {
     final double dialogWidth =
         widget.width <= 0 ? getFitWidth(context) * 0.618 : widget.width;
+
+    final Image image = Image.asset('assets/update_bg_app_top.png',
+        package: 'flutter_update_dialog', fit: BoxFit.fill);
+
     return Material(
         type: MaterialType.transparency,
         child: SizedBox(
@@ -280,23 +286,21 @@ class _UpdateWidgetState extends State<UpdateWidget> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              // Top Image
               Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: SizedBox(
                   width: dialogWidth,
-                  child: widget.topImage ??
-                      Image.asset('assets/update_bg_app_top.png',
-                          package: 'flutter_update_dialog', fit: BoxFit.fill),
+                  child: widget.topImage ?? image,
                 ),
               ),
               // Dialog Body
-              Expanded(
+              Flexible(
+                flex: 3,
                 child: Container(
                   width: dialogWidth,
                   alignment: Alignment.center,
-                  padding: const EdgeInsets.only(
-                      left: 16, right: 16, top: 8, bottom: 8),
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  margin: const EdgeInsets.only(bottom: 8),
                   decoration: ShapeDecoration(
                     color: Colors.white,
                     shape: RoundedRectangleBorder(
@@ -306,12 +310,13 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                     ),
                   ),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
                       // Title
                       Container(
-                        padding: EdgeInsets.only(top: widget.extraHeight),
+                        padding: EdgeInsets.only(
+                            top: widget.extraHeight, left: 16, right: 16),
                         child: Text(
                           widget.title,
                           style: TextStyle(
@@ -323,8 +328,9 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                       Expanded(
                         child: SingleChildScrollView(
                           child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            child: SelectableText(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 10, horizontal: 16),
+                            child: Text(
                               widget.updateContent,
                               style: TextStyle(
                                   fontSize: widget.contentTextSize,
@@ -333,87 +339,161 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                           ),
                         ),
                       ),
+                      const SizedBox(
+                        height: 8,
+                      ),
                       // Update Button and Progress
                       if (widget.progress < 0)
-                        Column(children: <Widget>[
-                          FractionallySizedBox(
-                            widthFactor: 1,
-                            child: ElevatedButton(
-                              style: ButtonStyle(
-                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                textStyle: MaterialStateProperty.all(
-                                    TextStyle(fontSize: widget.buttonTextSize)),
-                                foregroundColor:
-                                    MaterialStateProperty.all(Colors.white),
-                                shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(5))),
-                                elevation: MaterialStateProperty.all(0),
-                                backgroundColor: MaterialStateProperty.all(
-                                    widget.themeColor),
-                              ),
-                              child: Text(widget.updateButtonText),
-                              onPressed: widget.onUpdate,
-                            ),
-                          ),
-                          if (!widget.isForce && widget.onIgnore != null)
-                            FractionallySizedBox(
-                              widthFactor: 1,
-                              child: TextButton(
-                                style: ButtonStyle(
-                                  tapTargetSize:
-                                      MaterialTapTargetSize.shrinkWrap,
-                                  textStyle: MaterialStateProperty.all(
-                                      TextStyle(
-                                          fontSize: widget.buttonTextSize)),
-                                  foregroundColor: MaterialStateProperty.all(
-                                      const Color(0xFF666666)),
-                                  shape: MaterialStateProperty.all(
-                                      RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(5))),
+                        if (getScreenHeight(context) >= 400)
+                          Column(children: <Widget>[
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                              child: FractionallySizedBox(
+                                widthFactor: 1,
+                                child: ElevatedButton(
+                                  style: ButtonStyle(
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    textStyle: MaterialStateProperty.all(
+                                        TextStyle(
+                                            fontSize: widget.buttonTextSize)),
+                                    foregroundColor:
+                                        MaterialStateProperty.all(Colors.white),
+                                    shape: MaterialStateProperty.all(
+                                        RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(5))),
+                                    elevation: MaterialStateProperty.all(0),
+                                    backgroundColor: MaterialStateProperty.all(
+                                        widget.themeColor),
+                                  ),
+                                  child: Text(widget.updateButtonText),
+                                  onPressed: widget.onUpdate,
                                 ),
-                                child: Text(widget.ignoreButtonText),
-                                onPressed: widget.onIgnore,
                               ),
-                            )
-                          else
-                            const SizedBox()
-                        ])
+                            ),
+                            if (!widget.isForce && widget.onIgnore != null)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                child: FractionallySizedBox(
+                                  widthFactor: 1,
+                                  child: TextButton(
+                                    style: ButtonStyle(
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      textStyle: MaterialStateProperty.all(
+                                          TextStyle(
+                                              fontSize: widget.buttonTextSize)),
+                                      foregroundColor:
+                                          MaterialStateProperty.all(
+                                              const Color(0xFF666666)),
+                                      shape: MaterialStateProperty.all(
+                                          RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5))),
+                                    ),
+                                    child: Text(widget.ignoreButtonText),
+                                    onPressed: widget.onIgnore,
+                                  ),
+                                ),
+                              )
+                            else
+                              const SizedBox()
+                          ])
+                        else
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: <Widget>[
+                                if (!widget.isForce && widget.onIgnore != null)
+                                  Flexible(
+                                    child: TextButton(
+                                      style: ButtonStyle(
+                                        tapTargetSize:
+                                            MaterialTapTargetSize.shrinkWrap,
+                                        textStyle: MaterialStateProperty.all(
+                                            TextStyle(
+                                                fontSize:
+                                                    widget.buttonTextSize)),
+                                        foregroundColor:
+                                            MaterialStateProperty.all(
+                                                const Color(0xFF666666)),
+                                        shape: MaterialStateProperty.all(
+                                            RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(5))),
+                                      ),
+                                      child: Text(widget.ignoreButtonText),
+                                      onPressed: widget.onIgnore,
+                                    ),
+                                  ),
+                                Flexible(
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      textStyle: MaterialStateProperty.all(
+                                          TextStyle(
+                                              fontSize: widget.buttonTextSize)),
+                                      foregroundColor:
+                                          MaterialStateProperty.all(
+                                              Colors.white),
+                                      shape: MaterialStateProperty.all(
+                                          RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(5))),
+                                      elevation: MaterialStateProperty.all(0),
+                                      backgroundColor:
+                                          MaterialStateProperty.all(
+                                              widget.themeColor),
+                                    ),
+                                    child: Text(widget.updateButtonText),
+                                    onPressed: widget.onUpdate,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
                       else
-                        NumberProgress(
-                          value: widget.progress,
-                          backgroundColor: widget.progressBackgroundColor,
-                          valueColor: widget.themeColor,
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: NumberProgress(
+                            value: widget.progress,
+                            backgroundColor: widget.progressBackgroundColor,
+                            valueColor: widget.themeColor,
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                          ),
                         )
                     ],
                   ),
                 ),
               ),
 
+              // Removed since it can cause RenderFlex overflow when screenheight is small
               // Close Button
-              if (!widget.isForce) ...<Widget>[
-                const SizedBox(
-                    width: 1.5,
-                    height: 50,
-                    child: DecoratedBox(
-                        decoration: BoxDecoration(color: Colors.white))),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: IconButton(
-                    iconSize: 30,
-                    constraints:
-                        const BoxConstraints(maxHeight: 30, maxWidth: 30),
-                    padding: EdgeInsets.zero,
-                    icon: Image.asset('assets/update_ic_close.png',
-                        package: 'flutter_update_dialog'),
-                    onPressed: widget.onClose,
-                  ),
-                )
-              ] else
-                const SizedBox()
+              // if (!widget.isForce) ...<Widget>[
+              //   const SizedBox(
+              //       width: 1.5,
+              //       height: 50,
+              //       child: DecoratedBox(
+              //           decoration: BoxDecoration(color: Colors.white))),
+              //   Padding(
+              //     padding: const EdgeInsets.only(bottom: 8.0),
+              //     child: IconButton(
+              //       iconSize: 30,
+              //       constraints:
+              //           const BoxConstraints(maxHeight: 30, maxWidth: 30),
+              //       padding: EdgeInsets.zero,
+              //       icon: Image.asset('assets/update_ic_close.png',
+              //           package: 'flutter_update_dialog'),
+              //       onPressed: widget.onClose,
+              //     ),
+              //   )
+              // ] else
+              //   const SizedBox()
             ],
           ),
         ));
