@@ -16,6 +16,7 @@ import '../in_app_update/util/toast_utils.dart';
 
 final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield 'Initializing Firebase...';
+  // FlutterFire setup: https://firebase.flutter.dev/docs/cli/
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ); //.timeout(const Duration(seconds: 5));
