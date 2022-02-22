@@ -166,6 +166,8 @@ class StorageController {
 
   /// Upload books in file hash list and return a stream of files
   /// that could not be uploaded
+  ///
+  /// TODO(@getBoolean): Display streamed messages in UI
   Stream<String> handleUploadFromFileHashList(
     List<FileHash> fileHashList,
   ) async* {
