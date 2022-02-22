@@ -183,8 +183,13 @@ class StorageController {
       try {
         bytes = await io.File(cacheFilepath).readAsBytes();
       } on io.IOException catch (e, st) {
-        log.i('Unable to upload file: ${cacheFilepath.split('/').last}', e, st);
-        yield 'Unable to upload file: ${cacheFilepath.split('/').last}';
+        log.i(
+            'Unable to upload file "${cacheFilepath.split('/').last}", '
+            'it may not exist',
+            e,
+            st);
+        yield 'Unable to upload file "${cacheFilepath.split('/').last}", '
+            'it may not exist';
         unawaited(_read(storageServiceProvider)
             .boxRemoveFromUploadQueue(cacheFilepath));
         continue;
