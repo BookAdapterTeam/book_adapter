@@ -12,7 +12,6 @@ import 'package:watcher/watcher.dart';
 
 import '../data/app_exception.dart';
 import '../data/file_hash.dart';
-import '../features/in_app_update/util/toast_utils.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
 import '../features/library/model/book_status_notifier.dart';
