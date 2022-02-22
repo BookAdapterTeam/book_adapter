@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io' as io;
+import 'dart:typed_data';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -178,7 +179,16 @@ class StorageController {
       final String cacheFilepath = fileHash.filepath;
 
       log.i('Read As Bytes: ${cacheFilepath.split('/').last}');
-      final bytes = await io.File(cacheFilepath).readAsBytes();
+      final Uint8List bytes;
+      try {
+        bytes = await io.File(cacheFilepath).readAsBytes();
+      } on io.IOException catch (e, st) {
+        log.i('Unable to upload file: ${cacheFilepath.split('/').last}', e, st);
+        yield 'Unable to upload file: ${cacheFilepath.split('/').last}';
+        unawaited(_read(storageServiceProvider)
+            .boxRemoveFromUploadQueue(cacheFilepath));
+        continue;
+      }
       log.i('Read As Bytes Done: ${cacheFilepath.split('/').last}');
 
       // 3. Grab Book Cover Image
