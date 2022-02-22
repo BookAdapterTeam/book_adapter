@@ -57,7 +57,7 @@ class StorageController {
     return _read(firebaseControllerProvider).currentUser == null ? false : true;
   }
 
-  Future<void> startBookUploads() async {
+  Future<void> startBookUploadsFromStoredQueue() async {
     final userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
