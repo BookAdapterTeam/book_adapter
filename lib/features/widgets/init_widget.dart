@@ -25,7 +25,8 @@ final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield null;
   // TODO(@getBoolean): Move to home so it only starts when user is logged in
   if (ref.read(storageControllerProvider).loggedIn) {
-    unawaited(ref.read(storageControllerProvider).startBookUploadsFromStoredQueue());
+    unawaited(
+        ref.read(storageControllerProvider).startBookUploadsFromStoredQueue());
   }
 });
 
