@@ -128,6 +128,7 @@ class _ItemListTile extends ConsumerWidget {
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               width: width,
+              fit: BoxFit.cover,
               placeholder: (context, url) => DefaultItemImage(
                 title: item.title,
                 subtitle: item.subtitle,
@@ -141,6 +142,7 @@ class _ItemListTile extends ConsumerWidget {
                 child: CachedNetworkImage(
                   imageUrl: data,
                   width: width,
+                  fit: BoxFit.cover,
                   placeholder: (context, url) => DefaultItemImage(
                     title: item.title,
                     subtitle: item.subtitle,
@@ -212,7 +214,7 @@ class _ItemListTile extends ConsumerWidget {
               return null;
             case BookStatus.errorDownloading:
               return () {
-                // TODO: Make firebase call to try download book again. 
+                // TODO: Make firebase call to try download book again.
                 // Delete file if it exists (could be corrupt or partial)
               };
           }
@@ -227,7 +229,7 @@ class _ItemListTile extends ConsumerWidget {
           ? SizedBox(width: IconTheme.of(context).size)
           : IconButton(
               key: ValueKey('ListTile Button${book.id}'
-              '$isSelected$bookStatus$icon'),
+                  '$isSelected$bookStatus$icon'),
               onPressed: isSelecting ? null : onPressed,
               icon: icon,
             );
