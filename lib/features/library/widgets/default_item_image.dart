@@ -69,7 +69,8 @@ class _CustomBackground extends StatelessWidget {
   final int? seed;
 
   Color generateRandomColor() {
-    // Define all colors you want here
+    // Define all colors to be randomly picked
+    // TODO: Pick better colors
     final predefinedColors = [
       Colors.red[900]!,
       Colors.green[900]!,
