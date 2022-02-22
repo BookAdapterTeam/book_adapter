@@ -179,24 +179,45 @@ class StorageController {
     final log = Logger();
     for (final fileHash in fileHashList) {
       final String cacheFilepath = fileHash.filepath;
+      final String cachedFilename = cacheFilepath.split('/').last;
 
-      log.i('Read As Bytes: ${cacheFilepath.split('/').last}');
+      // TODO(@getBoolean): Check for duplicates
+
+      final bool fileExists;
+      try {
+        fileExists = await _read(firebaseControllerProvider)
+            .fileHashExists(fileHash.md5, fileHash.sha1);
+      } on FirebaseException catch (e, st) {
+        log.i(
+            'Unable to check for duplicates: "$cachedFilename"',
+            e,
+            st);
+        yield 'Unable to check for duplicates: "$cachedFilename"';
+        continue;
+      }
+
+      if (fileExists) {
+        log.i('File already uploaded: $cachedFilename');
+        yield 'File already uploaded: "$cachedFilename"';
+      }
+
+      log.i('Read As Bytes: $cachedFilename');
       final Uint8List bytes;
       try {
         bytes = await io.File(cacheFilepath).readAsBytes();
       } on io.IOException catch (e, st) {
         log.i(
-            'Unable to upload file "${cacheFilepath.split('/').last}", '
+            'Unable to upload file "$cachedFilename", '
             'it may not exist',
             e,
             st);
-        yield 'Unable to upload file "${cacheFilepath.split('/').last}", '
+        yield 'Unable to upload file "$cachedFilename", '
             'it may not exist';
         unawaited(_read(storageServiceProvider)
             .boxRemoveFromUploadQueue(cacheFilepath));
         continue;
       }
-      log.i('Read As Bytes Done: ${cacheFilepath.split('/').last}');
+      log.i('Read As Bytes Done: $cachedFilename');
 
       // 3. Grab Book Cover Image
       //     -   If no cover image exists, put null in book document for
@@ -204,9 +225,9 @@ class StorageController {
       //
       //         In the app, a default image will be shown included in
       //         the assets if image url is null
-      log.i('Reading Cover: ${cacheFilepath.split('/').last}');
+      log.i('Reading Cover: $cachedFilename');
       final coverData = await _read(epubServiceProvider).getCoverImage(bytes);
-      log.i('Reading Cover Done: ${cacheFilepath.split('/').last}');
+      log.i('Reading Cover Done: $cachedFilename');
 
       // 4. Upload Book File with MD5 and SHA1 in metadata
       // On completion, upload book document and cover image
@@ -221,7 +242,7 @@ class StorageController {
 
       // TODO(@getBoolean): Copy book data to device
       // TODO(@getBoolean): Upload book details document and cover image first
-      log.i('Starting File Upload:  ${cacheFilepath.split('/').last}');
+      log.i('Starting File Upload:  $cachedFilename');
       final uploadBookTask =
           await _read(firebaseControllerProvider).uploadBookData(
         userId: userId,
@@ -230,8 +251,8 @@ class StorageController {
         fileHash: firebaseFileHash,
       );
       if (uploadBookTask == null) {
-        log.i('Unable to upload file: ${cacheFilepath.split('/').last}');
-        yield 'Unable to upload file: ${cacheFilepath.split('/').last}';
+        log.i('Unable to upload file: $cachedFilename');
+        yield 'Unable to upload file: $cachedFilename';
         // TODO(@getBoolean): Show upload error in UI also
         unawaited(_read(storageServiceProvider)
             .boxRemoveFromUploadQueue(cacheFilepath));
@@ -239,7 +260,7 @@ class StorageController {
       }
 
       await uploadBookTask.whenComplete(() async {
-        log.i('Finished File Upload: ${cacheFilepath.split('/').last}');
+        log.i('Finished File Upload: $cachedFilename');
         unawaited(_read(storageServiceProvider)
             .boxSetFileUploadedInUploadQueue(cacheFilepath));
 
@@ -249,9 +270,10 @@ class StorageController {
         final String coverFilename = _read(epubServiceProvider)
             .getCoverFilename(cacheFilepath, id, 'jpg');
         String? coverImageFirebaseFilepath = '$userId/$coverFilename';
+        final String coverImageFirebaseFilename = coverImageFirebaseFilepath.split('/').last;
         try {
           log.i('Starting File Upload:  '
-              '${coverImageFirebaseFilepath.split('/').last}');
+              '$coverImageFirebaseFilename');
           final uploadTask = coverData == null
               ? null
               : await _read(firebaseControllerProvider).uploadCoverImage(
@@ -260,10 +282,10 @@ class StorageController {
                 );
           await uploadTask;
           log.i('Finished File Upload: '
-              '${coverImageFirebaseFilepath.split('/').last}');
+              '$coverImageFirebaseFilename');
         } on Exception catch (e, st) {
           log.i('Unable to upload file: '
-              '${coverImageFirebaseFilepath.split('/').last}');
+              '$coverImageFirebaseFilename');
           log.w(e.toString(), e, st);
           coverImageFirebaseFilepath = null;
         }
