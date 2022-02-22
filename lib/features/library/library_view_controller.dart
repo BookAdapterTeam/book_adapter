@@ -52,7 +52,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
   Future<void> addBooks() async {
     await for (final message
-        in _read(storageControllerProvider).uploadMultipleBooks()) {
+        in _read(storageControllerProvider).pickAndUploadMultipleBooks()) {
       log.i(message);
     }
   }

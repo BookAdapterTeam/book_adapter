@@ -82,7 +82,7 @@ class StorageController {
   /// Add a list of new books
   ///
   /// WILL NOT RUN ON WEB
-  Stream<String> uploadMultipleBooks([
+  Stream<String> pickAndUploadMultipleBooks([
     String collectionName = 'Default',
   ]) async* {
     if (kIsWeb) {
