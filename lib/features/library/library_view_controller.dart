@@ -232,8 +232,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   Future<String> getFileDownloadUrl(String firebasePath) async {
-    return _read(firebaseControllerProvider)
-        .getFileDownloadUrl(firebasePath);
+    return _read(firebaseControllerProvider).getFileDownloadUrl(firebasePath);
   }
 
   Future<Failure?> queueDownloadBook(Book book) async {
