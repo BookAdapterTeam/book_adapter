@@ -34,7 +34,9 @@ class StorageService {
 
   final _log = Logger();
 
-  late final Box<Map<String, dynamic>> _uploadQueueBox;
+  Box<Map<String, dynamic>>? _uploadQueueBox;
+
+  Box<Map<String, dynamic>>? get uploadQueueBox => _uploadQueueBox;
 
   /// 'isDocumentUploaded'
   static const kIsDocumentUploadedKey = 'isDocumentUploaded';
@@ -56,23 +58,33 @@ class StorageService {
       await appBookAdaptDirectory.create();
       await Hive.initFlutter('BookAdapterData');
       Hive.registerAdapter(FileHashAdapter());
-      // TODO(@getBoolean): Make per user and init only this when logged in
-      _uploadQueueBox = await Hive.openBox(kUploadQueueBox);
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
     }
   }
 
+  Future<void> initQueueBox(String userId) async {
+    _uploadQueueBox = await Hive.openBox('$userId-$kUploadQueueBox');
+  }
+
   /// Retrieve the books in the upload queue
   /// and return as a list of [FileHash] objects
   List<FileHash> get uploadQueueFileHashList {
-    return _uploadQueueBox.values.map(FileHash.fromMap).toList();
+    if (_uploadQueueBox == null) {
+      throw AppException('_uploadQueueBox not initialized');
+    }
+
+    return _uploadQueueBox!.values.map(FileHash.fromMap).toList();
   }
 
   /// Get a [FileHash] object from the upload queue box by the filepath
   FileHash? getUploadQueueItem(String filepath) {
-    final itemMap = _uploadQueueBox.get(filepath);
+    if (_uploadQueueBox == null) {
+      throw AppException('_uploadQueueBox not initialized');
+    }
+
+    final itemMap = _uploadQueueBox!.get(filepath);
     if (itemMap == null) return null;
 
     return FileHash.fromMap(itemMap);
@@ -85,7 +97,11 @@ class StorageService {
     bool isDocumentUploaded = false,
     bool isFileUploaded = false,
   }) async {
-    await _uploadQueueBox.put(filepath, {
+    if (_uploadQueueBox == null) {
+      throw AppException('_uploadQueueBox not initialized');
+    }
+
+    await _uploadQueueBox!.put(filepath, {
       kFileHashKey: fileHash,
       kIsDocumentUploadedKey: isDocumentUploaded,
       kIsFileUploaded: isFileUploaded,
@@ -120,7 +136,11 @@ class StorageService {
 
   /// Removes a file to the upload queue box
   Future<void> boxRemoveFromUploadQueue(String filepath) async {
-    return _uploadQueueBox.delete(filepath);
+    if (_uploadQueueBox == null) {
+      throw AppException('_uploadQueueBox not initialized');
+    }
+
+    return _uploadQueueBox!.delete(filepath);
   }
 
   String getAppFilePath(String filepath) =>

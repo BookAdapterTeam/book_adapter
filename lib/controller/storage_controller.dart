@@ -62,6 +62,11 @@ class StorageController {
     if (userId == null) {
       throw AppException('User not logged in');
     }
+
+    if (_read(storageServiceProvider).uploadQueueBox == null) {
+      await _read(storageServiceProvider).initQueueBox(userId);
+    }
+
     final log = Logger();
     final fileHashList = _read(storageServiceProvider).uploadQueueFileHashList;
     await for (final message in handleUploadFromFileHashList(fileHashList)) {
@@ -88,6 +93,15 @@ class StorageController {
     if (kIsWeb) {
       throw AppException(
           'StorageController.uploadMultipleBooks does not work on web');
+    }
+    
+    final userId = _read(firebaseControllerProvider).currentUser?.uid;
+    if (userId == null) {
+      throw AppException('User not logged in');
+    }
+
+    if (_read(storageServiceProvider).uploadQueueBox == null) {
+      await _read(storageServiceProvider).initQueueBox(userId);
     }
 
     final log = Logger();

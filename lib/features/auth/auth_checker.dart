@@ -12,6 +12,7 @@ class AuthChecker extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final userStreamAsyncValue = ref.watch(authStateChangesProvider);
+
     return Scaffold(
       body: AsyncValueWidget<User?>(
         value: userStreamAsyncValue,

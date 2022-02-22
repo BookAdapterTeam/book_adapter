@@ -23,11 +23,6 @@ final providerForInitStream = StreamProvider<String?>((ref) async* {
   yield 'Initializing Local Database...';
   await ref.watch(storageServiceProvider).init();
   yield null;
-  // TODO(@getBoolean): Move to home so it only starts when user is logged in
-  if (ref.read(storageControllerProvider).loggedIn) {
-    unawaited(
-        ref.read(storageControllerProvider).startBookUploadsFromStoredQueue());
-  }
 });
 
 class InitWidget extends ConsumerWidget {
@@ -40,8 +35,6 @@ class InitWidget extends ConsumerWidget {
   final Widget child;
 
   /// Page to show when loading. You should include a Scaffold.
-  ///
-  /// When `message` is null, the
   final Widget Function(String message)? loading;
 
   @override
