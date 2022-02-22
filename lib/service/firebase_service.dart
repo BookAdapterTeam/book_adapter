@@ -159,8 +159,8 @@ class FirebaseService
     try {
       final duplicatesQuerySnapshot = await _booksRef
           .where('userId', isEqualTo: currentUserUid)
-          .where('md_5', isEqualTo: md5)
-          .where('sha_1', isEqualTo: sha1)
+          .where('fileHash.md5', isEqualTo: md5)
+          .where('fileHash.sha1', isEqualTo: sha1)
           .get();
 
       final duplicates = duplicatesQuerySnapshot.docs;
