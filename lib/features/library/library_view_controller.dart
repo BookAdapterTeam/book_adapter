@@ -50,10 +50,11 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   final Reader _read;
   final log = Logger();
 
-  Future<void> addBooks() async {
+  Stream<String> addBooks() async* {
     await for (final message
         in _read(storageControllerProvider).pickAndUploadMultipleBooks()) {
       log.i(message);
+      yield message;
     }
   }
 

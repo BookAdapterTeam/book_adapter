@@ -58,7 +58,7 @@ class StorageController {
     return _read(firebaseControllerProvider).currentUser == null ? false : true;
   }
 
-  Future<void> startBookUploadsFromStoredQueue() async {
+  Stream<String> startBookUploadsFromStoredQueue() async* {
     final userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
@@ -73,7 +73,7 @@ class StorageController {
     await for (final message in handleUploadFromFileHashList(fileHashList)) {
       // Messages are only received if a book upload fails
       log.i(message);
-      ToastUtils.warning(message);
+      yield message;
     }
   }
 
@@ -144,7 +144,7 @@ class StorageController {
       final bool exists =
           await _read(firebaseControllerProvider).fileHashExists(md5, sha1);
       if (exists) {
-        yield 'File ${filepath.split('/').last} already uploaded';
+        yield 'File already uploaded: ${filepath.split('/').last}';
         continue;
       }
 
@@ -188,10 +188,7 @@ class StorageController {
         fileExists = await _read(firebaseControllerProvider)
             .fileHashExists(fileHash.md5, fileHash.sha1);
       } on FirebaseException catch (e, st) {
-        log.i(
-            'Unable to check for duplicates: "$cachedFilename"',
-            e,
-            st);
+        log.i('Unable to check for duplicates: "$cachedFilename"', e, st);
         yield 'Unable to check for duplicates: "$cachedFilename"';
         continue;
       }
@@ -270,7 +267,8 @@ class StorageController {
         final String coverFilename = _read(epubServiceProvider)
             .getCoverFilename(cacheFilepath, id, 'jpg');
         String? coverImageFirebaseFilepath = '$userId/$coverFilename';
-        final String coverImageFirebaseFilename = coverImageFirebaseFilepath.split('/').last;
+        final String coverImageFirebaseFilename =
+            coverImageFirebaseFilepath.split('/').last;
         try {
           log.i('Starting File Upload:  '
               '$coverImageFirebaseFilename');

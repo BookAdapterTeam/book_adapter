@@ -11,7 +11,7 @@ import '../../service/storage_service.dart';
 import '../in_app_update/update.dart';
 import '../in_app_update/util/toast_utils.dart';
 
-final providerForInitStream = StreamProvider<String?>((ref) async* {
+final providerForInitStream = StreamProvider.autoDispose<String?>((ref) async* {
   yield 'Initializing Firebase...';
   // FlutterFire setup: https://firebase.flutter.dev/docs/cli/
   await Firebase.initializeApp(

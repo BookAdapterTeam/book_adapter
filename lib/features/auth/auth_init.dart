@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -8,11 +6,14 @@ import '../../service/storage_service.dart';
 import '../widgets/async_value_widget.dart';
 
 final providerForAuthInitFuture =
-    FutureProvider.family<void, String>((ref, userId) async* {
+    StreamProvider.family.autoDispose<String, String>((ref, userId) async* {
   await ref.watch(storageServiceProvider).initQueueBox(userId);
   if (ref.read(storageControllerProvider).loggedIn) {
-    unawaited(
-        ref.read(storageControllerProvider).startBookUploadsFromStoredQueue());
+    await for (final message in ref
+        .read(storageControllerProvider)
+        .startBookUploadsFromStoredQueue()) {
+      yield message;
+    }
   }
 });
 
@@ -32,9 +33,11 @@ class AuthInitWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncValue = ref.watch(providerForAuthInitFuture(userId));
-    return AsyncValueWidget<void>(
+    return AsyncValueWidget<String?>(
       value: asyncValue,
-      data: (_) {
+      data: (message) {
+        final SnackBar snackBar = SnackBar(content: Text(message!));
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
         return child;
       },
     );

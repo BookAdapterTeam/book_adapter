@@ -101,8 +101,14 @@ class LibraryScrollView extends HookConsumerWidget {
       systemOverlayStyle: SystemUiOverlayStyle.light,
       actions: [
         AddBookButton(
-          onAdd: () =>
-              ref.read(libraryViewControllerProvider.notifier).addBooks(),
+          onAdd: () async {
+            await for (final message in ref
+                .read(libraryViewControllerProvider.notifier)
+                .addBooks()) {
+              final SnackBar snackBar = SnackBar(content: Text(message));
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
+          },
         ),
         const ProfileButton(),
       ],
