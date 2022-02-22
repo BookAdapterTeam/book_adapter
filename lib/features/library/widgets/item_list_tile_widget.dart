@@ -181,7 +181,9 @@ class _ItemListTile extends ConsumerWidget {
           final bookStatus = data.value;
           switch (bookStatus) {
             case BookStatus.downloaded:
-              return null;
+              return SizedBox(
+                width: IconTheme.of(context).size ?? 24,
+              );
             case BookStatus.downloading:
               return const Icon(Icons.downloading_outlined);
             case BookStatus.downloadWaiting:
