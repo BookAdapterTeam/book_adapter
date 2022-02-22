@@ -94,7 +94,7 @@ class StorageController {
       throw AppException(
           'StorageController.uploadMultipleBooks does not work on web');
     }
-    
+
     final userId = _read(firebaseControllerProvider).currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
@@ -202,6 +202,8 @@ class StorageController {
       );
       final firebaseFileHash = fileHash.copyWith(filepath: firebaseFilepath);
 
+      // TODO(@getBoolean): Copy book data to device
+      // TODO(@getBoolean): Upload book details document and cover image first
       log.i('Starting File Upload:  ${cacheFilepath.split('/').last}');
       final uploadBookTask =
           await _read(firebaseControllerProvider).uploadBookData(
