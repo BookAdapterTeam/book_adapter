@@ -12,13 +12,11 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('end-to-end test', () {
-    testWidgets('find the loading indicator',
-        (WidgetTester tester) async {
+    testWidgets('find the loading text', (WidgetTester tester) async {
       app.main();
+      await tester.pump();
+      expect(find.text('Loading...'), findsOneWidget);
       await tester.pumpAndSettle();
-
-      // Verify the counter starts at 0.
-      expect(find.byWidget(const CircularProgressIndicator()), findsOneWidget);
     });
   });
 }
