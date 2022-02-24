@@ -23,7 +23,7 @@ jobs:
           channel: "stable"
       - run: flutter pub get
       - run: flutter analyze
-      # - run: flutter test
+      - run: flutter test
 
   build_ios_without_signing:
     name: Build Flutter (iOS) Without Signing
