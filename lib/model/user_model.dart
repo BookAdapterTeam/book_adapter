@@ -1,7 +1,6 @@
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../controller/firebase_controller.dart';
-import '../controller/storage_controller.dart';
 import '../data/app_exception.dart';
 import '../data/user_data.dart';
 import '../features/library/data/book_item.dart';
@@ -33,27 +32,10 @@ class UserModel extends StateNotifier<UserData> {
 
   Future<void> updateDownloadedFilenames() async {
     final firebaseController = _read(firebaseControllerProvider);
-    final storageController = _read(storageControllerProvider);
 
     final String? userId = firebaseController.currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
     }
-    state = state.copyWith(
-      downloadedFiles: storageController.getDownloadedFilenames(),
-    );
-  }
-
-  void addDownloadedFilename(String filename) {
-    state = state.copyWith(downloadedFiles: [
-      ...?state.downloadedFiles,
-      filename,
-    ]);
-  }
-
-  void removeDownloadedFilename(String filename) {
-    state = state.copyWith(downloadedFiles: [
-      ...?state.downloadedFiles?..remove(filename),
-    ]);
   }
 }

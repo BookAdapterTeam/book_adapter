@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../controller/firebase_controller.dart';
 import '../../data/failure.dart';

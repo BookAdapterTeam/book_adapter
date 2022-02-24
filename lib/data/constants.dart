@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// 'BookAdapter-downloadedBooks'
-const kDownloadedFilesHiveBox = 'BookAdapter-downloadedFiles';
+/// 'BookAdapt-UploadQueue'
+const kUploadQueueBox = 'BookAdapt-UploadQueue';
 
 /// 'books'
 const kBooksCollectionName = 'books';
@@ -26,3 +26,7 @@ const kDefaultImage =
 
 /// Default corner radius for menus and other widgets
 const kCornerRadius = 8.0;
+
+const kTransitionDuration = Duration(milliseconds: 350);
+
+const kSnackBarDuration = Duration(seconds: 2);

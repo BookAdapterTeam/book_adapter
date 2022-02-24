@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../data/file_hash.dart';
 import '../../reader/book_reader_view.dart';
 import 'item.dart';
 
@@ -19,6 +20,9 @@ class Book implements Item {
   final String? imageUrl;
   @override
   final Set<String> collectionIds;
+  @override
+  final String? firebaseCoverImagePath;
+
   final DateTime addedDate;
   final String description;
   final String filepath;
@@ -32,6 +36,7 @@ class Book implements Item {
   final String? seriesId;
   final String? lastReadCfiLocation;
   final bool finished;
+  final FileHash? fileHash;
 
   bool get hasSeries => seriesId != null;
 
@@ -49,6 +54,7 @@ class Book implements Item {
     required this.filepath,
     required this.filesize,
     this.imageUrl,
+    this.firebaseCoverImagePath,
     this.genre = '',
     this.language = '',
     this.lastRead,
@@ -59,6 +65,7 @@ class Book implements Item {
     this.seriesId,
     this.lastReadCfiLocation,
     this.finished = false,
+    this.fileHash,
   });
 
   @override
@@ -75,6 +82,7 @@ class Book implements Item {
     String? filepath,
     int? filesize,
     String? imageUrl,
+    String? firebaseCoverImagePath,
     String? genre,
     String? language,
     DateTime? lastRead,
@@ -85,6 +93,7 @@ class Book implements Item {
     String? seriesId,
     String? lastReadCfiLocation,
     bool? finished,
+    FileHash? fileHash,
   }) {
     return Book(
       id: id ?? this.id,
@@ -96,6 +105,8 @@ class Book implements Item {
       filepath: filepath ?? this.filepath,
       filesize: filesize ?? this.filesize,
       imageUrl: imageUrl ?? this.imageUrl,
+      firebaseCoverImagePath:
+          firebaseCoverImagePath ?? this.firebaseCoverImagePath,
       genre: genre ?? this.genre,
       language: language ?? this.language,
       lastRead: lastRead ?? this.lastRead,
@@ -106,6 +117,7 @@ class Book implements Item {
       seriesId: seriesId ?? this.seriesId,
       lastReadCfiLocation: lastReadCfiLocation ?? this.lastReadCfiLocation,
       finished: finished ?? this.finished,
+      fileHash: fileHash ?? this.fileHash,
     );
   }
 
@@ -121,6 +133,7 @@ class Book implements Item {
       'filepath': filepath,
       'filesize': filesize,
       'imageUrl': imageUrl,
+      'firebaseCoverImagePath': firebaseCoverImagePath,
       'genre': genre,
       'language': language,
       'lastRead': lastRead?.millisecondsSinceEpoch,
@@ -131,6 +144,7 @@ class Book implements Item {
       'seriesId': seriesId,
       'lastReadCfiLocation': lastReadCfiLocation,
       'finished': finished,
+      'fileHash': fileHash,
     };
   }
 
@@ -146,6 +160,7 @@ class Book implements Item {
       filepath: map['filepath'],
       filesize: map['filesize'],
       imageUrl: map['imageUrl'],
+      firebaseCoverImagePath: map['firebaseCoverImagePath'],
       genre: map['genre'],
       language: map['language'],
       lastRead: lastRead != null
@@ -158,6 +173,7 @@ class Book implements Item {
       seriesId: map['seriesId'],
       lastReadCfiLocation: map['lastReadCfiLocation'],
       finished: map['finished'] ?? false,
+      fileHash: FileHash.fromMap(map['fileHash']),
     );
   }
 
@@ -173,6 +189,7 @@ class Book implements Item {
       'filepath': filepath,
       'filesize': filesize,
       'imageUrl': imageUrl,
+      'firebaseCoverImagePath': firebaseCoverImagePath,
       'genre': genre,
       'language': language,
       'lastRead': lastRead != null ? Timestamp.fromDate(lastRead!) : null,
@@ -183,6 +200,7 @@ class Book implements Item {
       'seriesId': seriesId,
       'lastReadCfiLocation': lastReadCfiLocation,
       'finished': finished,
+      'fileHash': fileHash?.toMap(),
     };
   }
 
@@ -197,6 +215,7 @@ class Book implements Item {
       filepath: map['filepath'],
       filesize: map['filesize'],
       imageUrl: map['imageUrl'],
+      firebaseCoverImagePath: map['firebaseCoverImagePath'],
       genre: map['genre'],
       language: map['language'],
       lastRead: map['lastRead']?.toDate(),
@@ -207,6 +226,8 @@ class Book implements Item {
       seriesId: map['seriesId'],
       lastReadCfiLocation: map['lastReadCfiLocation'],
       finished: map['finished'] ?? false,
+      fileHash:
+          map['fileHash'] == null ? null : FileHash.fromMap(map['fileHash']),
     );
   }
 
@@ -240,6 +261,7 @@ class Book implements Item {
       collectionIds,
       lastReadCfiLocation ?? 'No last read CFI location',
       finished,
+      fileHash ?? 'No FileHash',
     ];
   }
 }

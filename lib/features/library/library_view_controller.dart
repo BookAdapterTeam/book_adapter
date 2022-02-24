@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
 import '../../controller/firebase_controller.dart';
@@ -11,12 +10,18 @@ import '../../data/failure.dart';
 import '../../data/user_data.dart';
 import '../../model/queue_model.dart';
 import '../../model/user_model.dart';
-import '../../service/storage_service.dart';
-import '../in_app_update/util/toast_utils.dart';
 import 'data/book_collection.dart';
 import 'data/book_item.dart';
 import 'data/item.dart';
 import 'data/series_item.dart';
+import 'model/book_status_notifier.dart';
+
+final fileUrlProvider =
+    FutureProvider.family<String, String>((ref, firebasePath) async {
+  return ref
+      .read(libraryViewControllerProvider.notifier)
+      .getFileDownloadUrl(firebasePath);
+});
 
 final libraryViewControllerProvider =
     StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>(
@@ -45,32 +50,11 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   final Reader _read;
   final log = Logger();
 
-  Future<void> addBooks() async {
-    // Make storage service call to pick books
-    final sRes = await _read(storageServiceProvider).pickFile(
-      type: FileType.custom,
-      allowedExtensions: ['epub'],
-      allowMultiple: true,
-      withReadStream: true,
-    );
-
-    if (sRes.isLeft()) {
-      return;
-    }
-
-    final platformFiles = sRes.getOrElse(() => []);
-
-    final uploadedBooks = <Book>[];
-    for (final file in platformFiles) {
-      // Add book to firebase
-      final fRes = await _read(firebaseControllerProvider).addBook(file);
-      fRes.fold(
-        (failure) {
-          log.e(failure.message);
-          ToastUtils.error(failure.message);
-        },
-        (book) => uploadedBooks.add(book),
-      );
+  Stream<String> addBooks() async* {
+    await for (final message
+        in _read(storageControllerProvider).pickAndUploadMultipleBooks()) {
+      log.i(message);
+      yield message;
     }
   }
 
@@ -124,8 +108,9 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     }
   }
 
-  // Pass in Reader because was getting an error after unmerging then merging a series
-  // _AssertionError ('package:riverpod/src/framework/provider_base.dart': Failed assertion: line 645 pos 7: '_debugDidChangeDependency == false': Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt)
+  // Pass in Reader because was getting an error after
+  //     unmerging then merging a series
+  // `_AssertionError ('package:riverpod/src/framework/provider_base.dart': Failed assertion: line 645 pos 7: '_debugDidChangeDependency == false': Cannot use ref functions after the dependency of a provider changed but before the provider rebuilt)`
   Future<Either<Failure, Series>> mergeIntoSeries(
     Reader read, [
     String? name,
@@ -171,6 +156,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         collection: collection,
         collectionItems: collectionItems,
       );
+
+      return null;
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
@@ -183,9 +170,12 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     try {
       deselectAllItems();
       // Remove file
-      final selectedFilenameList = selectedBooks.map((book) => book.filename).toList();
+      final selectedFilenameList =
+          selectedBooks.map((book) => book.filename).toList();
       await _read(storageControllerProvider)
           .deleteFiles(filenameList: selectedFilenameList);
+
+      return null;
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
@@ -201,6 +191,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         itemsToDelete: selectedItems.toList(),
         allBooks: state.books ?? [],
       );
+
+      return null;
     } catch (e, st) {
       log.e(e.toString, e, st);
       return Failure(e.toString());
@@ -214,6 +206,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
         items: items.toList(),
         collectionIds: collectionIds,
       );
+
+      return null;
     } on FirebaseException catch (e, st) {
       log.e(e.code + e.message.toString(), e, st);
       return FirebaseFailure(e.message.toString(), e.code);
@@ -229,7 +223,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       return Left(Failure('Collection Already Exists'));
     }
 
-    return await _read(firebaseControllerProvider).addCollection(name);
+    return _read(firebaseControllerProvider).addCollection(name);
   }
 
   bool collectionExist(String name) {
@@ -238,17 +232,19 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     return names.contains(name);
   }
 
-  Future<Either<Failure, void>> queueDownloadBook(Book book) async {
+  Future<String> getFileDownloadUrl(String firebasePath) async {
+    return _read(firebaseControllerProvider).getFileDownloadUrl(firebasePath);
+  }
+
+  Future<Failure?> queueDownloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
 
     try {
-      // TODO: Check that book is not already downloaded
-      final bool isDownloaded = await _read(storageControllerProvider)
-              .isBookDownloaded(book.filename) ??
-          false;
+      // Check that book is not already downloaded
+      final bookStatus = _read(bookStatusProvider(book)).asData?.value;
 
-      if (isDownloaded) {
-        return Left(Failure('Book has already been downloaded'));
+      if (bookStatus == BookStatus.downloaded) {
+        return Failure('Book has already been downloaded');
       }
 
       // Check if file exists on server before downloading
@@ -256,17 +252,17 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
           await _read(firebaseControllerProvider).fileExists(book.filepath);
 
       if (!existsInFirebase) {
-        return Left(Failure('Could not find file on server'));
+        return Failure('Could not find file on server');
       }
 
       _read(userModelProvider.notifier).queueDownload(book);
-      return const Right(null);
-    } on AppException catch (e) {
-      log.e(e.toString());
-      return Left(Failure(e.message ?? e.toString()));
-    } on Exception catch (e) {
-      log.e(e.toString());
-      return Left(Failure(e.toString()));
+      return null;
+    } on AppException catch (e, st) {
+      log.e(e.toString(), e, st);
+      return Failure(e.message ?? e.toString());
+    } on Exception catch (e, st) {
+      log.e(e.toString(), e, st);
+      return Failure(e.toString());
     }
   }
 
@@ -287,38 +283,6 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       return Failure(e.toString());
     }
   }
-
-  /// Get the current status of a book to determine what icon to show on the book tile
-  ///
-  /// TODO: Determine if the book is uploading, or an error downloading/uploading
-  // BookStatus getBookStatus(Book book) {
-  //   final BookStatus status;
-  //   if (state.queueData.queueListItems.contains(book)) {
-  //     status = BookStatus.downloading;
-  //   } else {
-  //     final bool exists = state.userData.downloadedFiles
-  //             ?.contains(book.filepath.split('/').last) ??
-  //         false;
-
-  //     if (exists) {
-  //       status = BookStatus.downloaded;
-  //     } else {
-  //       status = BookStatus.notDownloaded;
-  //     }
-  //   }
-  //   return status;
-  // }
-}
-
-enum BookStatus {
-  downloaded,
-  downloading,
-  waiting,
-  uploading,
-  notDownloaded,
-  errorUploading,
-  errorDownloading,
-  unknown,
 }
 
 class LibraryViewData {
@@ -375,37 +339,6 @@ class LibraryViewData {
       userData: userData ?? this.userData,
       queueData: queueData ?? this.queueData,
     );
-  }
-
-  /// Get the current status of a book to determine what icon to show on the book tile
-  ///
-  /// TODO: Determine if the book is uploading, or an error downloading/uploading
-  BookStatus getBookStatus(Book book) {
-    final BookStatus status;
-    if (queueData.queue
-        .toSet()
-        .difference(queueData.queueListItems.toSet())
-        .contains(book)) {
-      // TODO: Fix, this function doesn't get called when queueData gets updated
-      status = BookStatus.downloading;
-    } else if (queueData.queueListItems
-        .toSet()
-        .difference(queueData.queue.toSet())
-        .contains(book)) {
-      // TODO: Fix, this function doesn't get called when queueData gets updated
-      status = BookStatus.waiting;
-    } else {
-      final bool exists =
-          userData.downloadedFiles?.contains(book.filepath.split('/').last) ??
-              false;
-
-      if (exists) {
-        status = BookStatus.downloaded;
-      } else {
-        status = BookStatus.notDownloaded;
-      }
-    }
-    return status;
   }
 
   List<Item> getCollectionItems(String collectionId) {

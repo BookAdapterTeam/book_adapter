@@ -17,7 +17,7 @@ class UpdateManager {
   /// Global initialization
   ///
   /// 全局初始化
-  static init({
+  static void init({
     String baseUrl = '',
     int timeout = 5000,
     Map<String, dynamic>? headers,
@@ -25,16 +25,23 @@ class UpdateManager {
     HttpUtils.init(baseUrl: baseUrl, timeout: timeout, headers: headers);
   }
 
-  static void checkUpdate(BuildContext context, String url) {
-    HttpUtils.get(url).then((response) {
+  static Future<void> checkUpdate(
+    BuildContext context,
+    String url,
+    final VoidCallback? onIgnore,
+    final VoidCallback? onClose,
+  ) async {
+    await HttpUtils.get(url).then((response) {
       UpdateParser.parseJson(json.encode(response)).then(
         (data) {
           if (data == null) return;
 
           UpdatePrompter(
             updateData: data,
-            onInstall: (String filePath) {
-              CommonUtils.installAPP(
+            onIgnore: onIgnore,
+            onClose: onClose,
+            onInstall: (String filePath) async {
+              await CommonUtils.installAPP(
                 filePath: filePath,
                 githubReleaseUrl: data.githubReleaseUrl,
               );

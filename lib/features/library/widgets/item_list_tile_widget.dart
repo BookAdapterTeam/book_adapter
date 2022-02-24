@@ -3,24 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
+import '../../../controller/storage_controller.dart';
 import '../../../data/constants.dart';
 import '../../reader/current_book.dart';
 import '../data/book_item.dart';
 import '../data/item.dart';
 import '../data/series_item.dart';
 import '../library_view_controller.dart';
+import '../model/book_status_notifier.dart';
+import 'default_item_image.dart';
 
 class ItemListTileWidget extends ConsumerWidget {
   const ItemListTileWidget({
     Key? key,
     required this.item,
     this.disableSelect = false,
-    this.isDownloaded,
   }) : super(key: key);
 
   final Item item;
   final bool disableSelect;
-  final bool? isDownloaded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,21 +33,19 @@ class ItemListTileWidget extends ConsumerWidget {
 
     final tile = isBook
         ? _ItemListTile(
-            key: ValueKey('ItemListTile' + item.id + isSelected.toString()),
+            key: ValueKey('ItemListTile${item.id}$isSelected'),
             item: item,
             disableSelect: disableSelect,
             isBook: true,
-            isDownloaded: isDownloaded,
           )
         : Stack(
             children: [
               AnimatedSwitcher(
                 switchInCurve: Curves.easeInCubic,
                 switchOutCurve: Curves.easeOutCubic,
-                duration: const Duration(milliseconds: 250),
+                duration: kTransitionDuration,
                 child: _ItemListTile(
-                  key: ValueKey(
-                      'ItemListTile' + item.id + isSelected.toString()),
+                  key: ValueKey('ItemListTile${item.id}$isSelected'),
                   item: item,
                   disableSelect: disableSelect,
                   isBook: false,
@@ -58,16 +57,13 @@ class ItemListTileWidget extends ConsumerWidget {
           );
 
     final child = Padding(
-      key: ValueKey('ItemListTileWidget Padding' +
-          item.id +
-          isSelected.toString() +
-          isBook.toString() +
-          disableSelect.toString()),
+      key: ValueKey('ItemListTileWidget Padding${item.id}'
+          '$isSelected$isBook$disableSelect'),
       padding: const EdgeInsets.symmetric(vertical: 3),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 15000),
+          duration: kTransitionDuration,
           color: isSelected ? Colors.white30 : null,
           child: Stack(
             alignment: Alignment.center,
@@ -91,7 +87,7 @@ class ItemListTileWidget extends ConsumerWidget {
     return AnimatedSwitcher(
       switchInCurve: Curves.easeInCubic,
       switchOutCurve: Curves.easeOutCubic,
-      duration: const Duration(milliseconds: 250),
+      duration: kTransitionDuration,
       child: child,
     );
   }
@@ -103,130 +99,142 @@ class _ItemListTile extends ConsumerWidget {
     required this.item,
     required this.disableSelect,
     required this.isBook,
-    this.isDownloaded,
   }) : super(key: key);
 
   final Item item;
   final bool disableSelect;
   final bool isBook;
-  final bool? isDownloaded;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final imageUrl = item.imageUrl;
+    final firebaseCoverImagePath = item.firebaseCoverImagePath;
     final subtitle = item.subtitle != null ? Text(item.subtitle!) : null;
     final isSelected = data.selectedItems.contains(item);
+    final bookStatus =
+        item is Book ? ref.watch(bookStatusProvider(item as Book)) : null;
 
-    final Widget? image = imageUrl != null
+    final bool legacyImage = imageUrl != null && firebaseCoverImagePath == null;
+    final asyncV = firebaseCoverImagePath == null
+        ? null
+        : ref.watch(fileUrlProvider(firebaseCoverImagePath));
+
+    const width = 40.0;
+
+    final Widget image = legacyImage
         ? ClipRRect(
             child: CachedNetworkImage(
               imageUrl: imageUrl,
-              width: 40,
+              width: width,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => DefaultItemImage(
+                title: item.title,
+                subtitle: item.subtitle,
+                width: width,
+              ),
             ),
             borderRadius: BorderRadius.circular(4),
           )
-        : null;
+        : asyncV?.when(
+              data: (data) => ClipRRect(
+                child: CachedNetworkImage(
+                  imageUrl: data,
+                  width: width,
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => DefaultItemImage(
+                    title: item.title,
+                    subtitle: item.subtitle,
+                    width: width,
+                  ),
+                ),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              error: (error, st) {
+                log.e(error.toString(), error, st);
+                return const Icon(
+                  Icons.error_outline,
+                  size: width,
+                );
+              },
+              loading: () => DefaultItemImage(
+                title: item.title,
+                subtitle: item.subtitle,
+                width: width,
+              ),
+            ) ??
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: DefaultItemImage(
+                title: item.title,
+                subtitle: item.subtitle,
+                width: width,
+              ),
+            );
 
     if (item is Book) {
       final book = item as Book;
-      // final BookStatus bookStatus = data.getBookStatus(book);
-      final bookStatus = isDownloaded ?? false
-          ? BookStatus.downloaded
-          : BookStatus.notDownloaded;
       final Widget? trailing;
-      final Widget? icon;
-      final VoidCallback? onPressed;
+      final Widget? icon = bookStatus?.map<Widget?>(
+        data: (data) {
+          final bookStatus = data.value;
+          switch (bookStatus) {
+            case BookStatus.downloaded:
+              return SizedBox(
+                width: IconTheme.of(context).size ?? 24,
+              );
+            case BookStatus.downloading:
+              return const Icon(Icons.downloading_outlined);
+            case BookStatus.downloadWaiting:
+              return const Icon(Icons.circle_outlined);
+            case BookStatus.notDownloaded:
+              return const Icon(Icons.cloud_outlined);
+            case BookStatus.errorDownloading:
+              // TODO: Find better icon
+              return const Icon(Icons.error_outline);
+          }
+        },
+        error: (error) => const Icon(Icons.error_outline),
+        loading: (loading) => const CircularProgressIndicator(),
+      );
+      final VoidCallback? onPressed = bookStatus?.map<VoidCallback?>(
+        data: (data) {
+          final bookStatus = data.value;
+          switch (bookStatus) {
+            case BookStatus.downloaded:
+              return null;
+            case BookStatus.downloading:
+              return () {
+                // TODO: Cancel download after download starts
+              };
+            case BookStatus.downloadWaiting:
+              return () {
+                // TODO: Cancel download before download starts
+              };
+            case BookStatus.notDownloaded:
+              return null;
+            case BookStatus.errorDownloading:
+              return () {
+                // TODO: Make firebase call to try download book again.
+                // Delete file if it exists (could be corrupt or partial)
+              };
+          }
+        },
+        error: (error) => null,
+        loading: (loading) => null,
+      );
+
       final isSelecting = data.isSelecting;
 
-      switch (bookStatus) {
-        case BookStatus.downloaded:
-          icon = const Icon(Icons.download_done_outlined);
-          onPressed = null;
-          break;
-        case BookStatus.downloading:
-          icon = const Icon(Icons.downloading_outlined);
-          onPressed = () {
-            // TODO: Cancel download after download starts
-          };
-          break;
-        case BookStatus.uploading:
-          // Upside down downloading icon because I can't find own for uploading
-          icon = Transform.rotate(
-            angle: 180,
-            child: const Icon(Icons.downloading_outlined),
-          );
-          onPressed = null;
-          break;
-        case BookStatus.notDownloaded:
-          icon = const Icon(Icons.download);
-          onPressed = () async {
-            try {
-              final res = await ref
-                  .read(libraryViewControllerProvider.notifier)
-                  .queueDownloadBook(book);
-              res.fold(
-                (failure) {
-                  log.e(failure.message);
-                  final SnackBar snackBar = SnackBar(
-                    content: Text(failure.message),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                },
-                (r) => null,
-              );
-            } on Exception catch (e) {
-              log.e(e.toString());
-              final SnackBar snackBar = SnackBar(
-                content: Text(e.toString()),
-              );
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            }
-          };
-          break;
-        case BookStatus.errorUploading:
-          icon = const Icon(
-            Icons.replay,
-            color: Colors.red,
-          );
-          onPressed = () {
-            // TODO: Make firebase call to try upload book again
-          };
-          break;
-        case BookStatus.errorDownloading:
-          icon = const Icon(
-            Icons.replay,
-            color: Colors.red,
-          );
-          onPressed = () {
-            // TODO: Make firebase call to try download book again. Delete file if it exists (could be corrupt or partial)
-          };
-          break;
-        case BookStatus.waiting:
-          icon = const Icon(
-            Icons.stop_circle,
-          );
-          onPressed = () {
-            // TODO: Cancel download before download starts
-          };
-          break;
-        case BookStatus.unknown:
-          icon = null;
-          onPressed = null;
-          break;
-      }
-      trailing = icon != null
-          ? IconButton(
-              key: ValueKey('ListTile Button' +
-                  book.id +
-                  isSelected.toString() +
-                  bookStatus.toString() +
-                  icon.toString()),
+      trailing = icon == null
+          ? SizedBox(width: IconTheme.of(context).size)
+          : IconButton(
+              key: ValueKey('ListTile Button${book.id}'
+                  '$isSelected$bookStatus$icon'),
               onPressed: isSelecting ? null : onPressed,
               icon: icon,
-            )
-          : null;
+            );
 
       return _CustomListTileWidget(
         item: item,
@@ -235,12 +243,12 @@ class _ItemListTile extends ConsumerWidget {
         trailing: AnimatedSwitcher(
           switchInCurve: Curves.easeInCubic,
           switchOutCurve: Curves.easeOutCubic,
-          duration: const Duration(milliseconds: 250),
+          duration: kTransitionDuration,
           child: trailing,
         ),
         disableSelect: disableSelect,
         isSelected: isSelected,
-        status: bookStatus,
+        status: bookStatus?.asData?.value,
       );
     }
 
@@ -324,7 +332,10 @@ class _CustomListTileWidget extends ConsumerWidget {
           return;
         }
 
-        if (item is Book && status == BookStatus.downloaded) {
+        if (item is Book &&
+            ref
+                .read(storageControllerProvider)
+                .fileExists((item as Book).filename)) {
           final controller = ref.read(currentBookProvider.state);
           controller.state = item as Book;
           Navigator.restorablePushNamed(
@@ -336,19 +347,16 @@ class _CustomListTileWidget extends ConsumerWidget {
 
         if (item is Book && status == BookStatus.notDownloaded) {
           try {
-            final res = await ref
+            final failure = await ref
                 .read(libraryViewControllerProvider.notifier)
                 .queueDownloadBook(item as Book);
-            res.fold(
-              (failure) {
-                log.e(failure.message);
-                final SnackBar snackBar = SnackBar(
-                  content: Text(failure.message),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-              },
-              (_) => null,
+            if (failure == null) return;
+
+            log.e(failure.message);
+            final SnackBar snackBar = SnackBar(
+              content: Text(failure.message),
             );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
             return;
           } on Exception catch (e) {
             log.e(e.toString());

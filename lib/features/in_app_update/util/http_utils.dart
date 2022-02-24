@@ -18,7 +18,7 @@ class HttpUtils {
   /// Global initialization
   /// 
   /// 全局初始化
-  static init({
+  static void init({
     String baseUrl = '',
     int timeout = 5000,
     Map<String, dynamic>? headers,
@@ -101,7 +101,7 @@ class HttpUtils {
   /// Post Body Request
   /// 
   /// post body请求
-  static Future postJson(String url, [Map<String, dynamic>? data]) async {
+  static Future postJson<T>(String url, [Map<String, dynamic>? data]) async {
     final Response response = await sDio.post(url, data: data);
     return response.data;
   }

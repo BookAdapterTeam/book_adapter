@@ -1,8 +1,10 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../controller/firebase_controller.dart';
 
-final editProfileViewController = StateNotifierProvider<EditProfileViewController, EditProfileViewData>((ref) {
+final editProfileViewController =
+    StateNotifierProvider<EditProfileViewController, EditProfileViewData>(
+        (ref) {
   return EditProfileViewController(ref.read);
 });
 
@@ -18,14 +20,14 @@ class EditProfileViewController extends StateNotifier<EditProfileViewData> {
 
   Future<bool> submit() async {
     state = state.copyWith(isLoading: true);
-    final result = await _read(firebaseControllerProvider).setDisplayName(state.username);
+    final result =
+        await _read(firebaseControllerProvider).setDisplayName(state.username);
     state = state.copyWith(isLoading: false);
     return result;
   }
 }
 
 class EditProfileViewData {
-
   final String username;
   final bool isLoading;
 

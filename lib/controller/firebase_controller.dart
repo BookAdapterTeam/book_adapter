@@ -1,20 +1,18 @@
 import 'dart:async';
-import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
-import 'package:epubx/epubx.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/app_exception.dart';
 import '../data/constants.dart';
 import '../data/failure.dart';
+import '../data/file_hash.dart';
 import '../features/library/data/book_collection.dart';
 import '../features/library/data/book_item.dart';
 import '../features/library/data/item.dart';
@@ -144,7 +142,7 @@ class FirebaseController {
   /// - **invalid-email**:
   ///  - Returned if the email address is not valid.
   /// - **user-disabled**:
-  ///  - Returned if the user corresponding to the given email has been disabled.
+  ///  - Returned if the user corresponding to the given email has been disabled
   /// - **user-not-found**:
   ///  - Returned if there is no user corresponding to the given email.
   /// - **wrong-password**:
@@ -177,7 +175,7 @@ class FirebaseController {
     // If sign in failed, return the failure object
     // If sign in is successful, return the user object in case the caller cares
     return await res.fold(
-      (failure) => Left(failure),
+      Left.new,
       (userCred) async {
         final User? user = userCred.user;
         if (user == null) {
@@ -198,7 +196,8 @@ class FirebaseController {
   ///
   /// Left [FirebaseFailure] maybe returned with the following error code:
   /// - **email-already-in-use**:
-  ///  - Returned if there already exists an account with the given email address.
+  ///  - Returned if there already exists an account with the given
+  ///    email address.
   /// - **invalid-email**:
   ///  - Returned if the email address is not valid.
   /// - **operation-not-allowed**:
@@ -234,7 +233,7 @@ class FirebaseController {
     // If sign up failed, return the failure object
     // If sign up is successful, return the user object, update the username
     return await res.fold(
-      (failure) => Left(failure),
+      Left.new,
       (userCred) async {
         final User? user = userCred.user;
         if (user == null) {
@@ -255,12 +254,12 @@ class FirebaseController {
   ///
   /// If successful, it also update the stream [authStateChange]
   Future<void> signOut() async {
-    return await _firebaseService.signOut();
+    return _firebaseService.signOut();
   }
 
   /// Send reset password email
   Future<Either<Failure, void>> resetPassword(String email) async {
-    return await _firebaseService.resetPassword(email);
+    return _firebaseService.resetPassword(email);
   }
 
   /// Set display name
@@ -268,7 +267,7 @@ class FirebaseController {
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   Future<bool> setDisplayName(String name) async {
-    return await _firebaseService.setDisplayName(name);
+    return _firebaseService.setDisplayName(name);
   }
 
   /// Set profile photo
@@ -276,7 +275,7 @@ class FirebaseController {
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   Future<bool> setProfilePhoto(String photoURL) async {
-    return await _firebaseService.setProfilePhoto(photoURL);
+    return _firebaseService.setProfilePhoto(photoURL);
   }
 
   // Database
@@ -291,7 +290,7 @@ class FirebaseController {
     required String cfi,
     required String bookId,
   }) async {
-    return await _firebaseService.saveLastReadCfiLocation(
+    return _firebaseService.saveLastReadCfiLocation(
       lastReadCfiLocation: cfi,
       bookId: bookId,
     );
@@ -299,113 +298,55 @@ class FirebaseController {
 
   /// Get a list of books from the user's database
   Future<Either<Failure, List<Book>>> getBooks() async {
-    return await _firebaseService.getAllBooks();
+    return _firebaseService.getAllBooks();
   }
 
-  /// Get a list of books from the user's database
-  Future<Either<Failure, Book>> addBook(
-    PlatformFile file, {
-    AppCollection? collection,
+  Future<UploadTask?> uploadCoverImage({
+    required String firebaseFilepath,
+    required Uint8List bytes,
   }) async {
-    try {
-      final userId = _firebaseService.currentUser?.uid;
-      if (userId == null) {
-        return Left(Failure('User not logged in'));
-      }
+    return _firebaseService.uploadCoverPhoto(
+      uploadToPath: firebaseFilepath,
+      bytes: bytes,
+    );
+  }
 
-      final localFilePath = file.path;
-      if (localFilePath == null) {
-        return Left(
-            Failure('File path was null, cannot add book ${file.name}'));
-      }
+  Future<void> uploadBookDocument(Book book) async {
+    return _firebaseService.addBookToFirestore(book: book);
+  }
 
-      final readStream = file.readStream;
-      if (readStream == null) {
-        return Left(
-            Failure('File read stream was null, cannot add book ${file.name}'));
-      }
-      // Get the book stream into memory for upload
-      final stream = http.ByteStream(readStream);
+  Future<UploadTask?> uploadBookData({
+    required String userId,
+    required Uint8List bytes,
+    required String firebaseFilepath,
+    required FileHash fileHash,
+  }) async {
+    return _firebaseService.uploadBookDataToFirebaseStorage(
+      firebaseFilePath: firebaseFilepath,
+      bytes: bytes,
+      customMetadata: {
+        StorageService.kFileHashKey: fileHash.toJson(),
+      },
+    );
+  }
 
-      // Open book takes a future so it does not block the UI loading all the data
-      final EpubBookRef openedBook =
-          await EpubReader.openBook(stream.toBytes());
+  Future<UploadTask?> uploadBookFile({
+    required String userId,
+    required String cacheFilepath,
+    required String firebaseFilepath,
+    required FileHash fileHash,
+  }) async {
+    return _firebaseService.uploadBookFileToFirebaseStorage(
+      firebaseFilePath: firebaseFilepath,
+      localFilePath: cacheFilepath,
+      customMetadata: {
+        StorageService.kFileHashKey: fileHash.toJson(),
+      },
+    );
+  }
 
-      final title = openedBook.Title ?? '';
-      final subtitle =
-          openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
-      final filesize = file.size;
-
-      // Max filename is 127 characters
-      final filesizeLength = filesize.toString().length;
-      final startingInt = max(0, file.name.length - (127 - filesizeLength));
-      final tempFilename = file.name.substring(startingInt, file.name.length);
-      final filename = '$filesize-$tempFilename';
-      final firebaseFilePath = '$userId/$filename';
-      final collectionName = collection?.name ?? 'Default';
-
-      // TODO: Check for duplicates first (already checking in _firebaseService.addBookToFirestore())
-
-      final String id = uuid.v4();
-      final book = Book(
-        id: id,
-        userId: userId,
-        title: title,
-        subtitle: subtitle,
-        addedDate: DateTime.now().toUtc(),
-        filepath: firebaseFilePath,
-        filesize: filesize,
-        collectionIds: {
-          '$userId-$collectionName',
-        },
-      );
-
-      // Upload cover image to storage
-      final res = await _firebaseService.uploadCoverPhoto(
-        openedBook: openedBook,
-        uploadToPath: '$firebaseFilePath.jpg',
-      );
-      final String? imageUrl = res.fold(
-        (failure) {
-          log.w('Could not upload cover photo');
-          return;
-        },
-        (url) => url,
-      );
-      final bookWithImage = book.copyWith(imageUrl: imageUrl);
-
-      // Upload to Firestore
-      final firestoreRes = await _firebaseService.addBookToFirestore(
-        book: bookWithImage,
-      );
-      if (firestoreRes.isLeft()) {
-        return firestoreRes.fold(
-          (failure) => Left(Failure(
-              'Could not add book ${book.filename} to Firestore: ${failure.message}')),
-          (right) => Left(Failure('')), // Wont ever be returned
-        );
-      }
-
-      // Upload book to storage
-      final uploadRes = await _firebaseService.uploadBookToFirebaseStorage(
-        firebaseFilePath: book.filepath,
-        localFilePath: localFilePath,
-      );
-      if (uploadRes.isLeft()) {
-        return uploadRes.fold(
-          (failure) => Left(Failure(
-              'Could not add book to Firebase Storage: ${failure.message}')),
-          (right) => Left(Failure('')), // Wont ever be returned
-        );
-      }
-
-      // TODO: Add bookUrl to firebase book document
-      // final String? bookUrl = res.getOrElse(() => '');
-
-      return firestoreRes;
-    } on Exception catch (e) {
-      return Left(Failure(e.toString()));
-    }
+  Future<bool> fileHashExists(String md5, String sha1) async {
+    return _firebaseService.fileHashExists(md5: md5, sha1: sha1);
   }
 
   /// Create a collection
@@ -568,6 +509,10 @@ class FirebaseController {
     }
   }
 
+  Future<String> getFileDownloadUrl(String storagePath) async {
+    return _firebaseService.getFileDownloadUrl(storagePath);
+  }
+
   /// Download a file and copy it to documents
   ///
   /// Thorws `AppException` if it fails
@@ -590,7 +535,7 @@ class FirebaseController {
   ///
   /// Throws `AppException` if user is not logged in
   Future<bool> fileExists(String firebaseFilePath) async {
-    return await _firebaseService.fileExists(firebaseFilePath);
+    return _firebaseService.fileExists(firebaseFilePath);
   }
 
   /// List the files the user has uploaded to their folder
@@ -606,31 +551,31 @@ class FirebaseController {
   ///
   /// Arguments
   /// `items` - Items to be deleted
-  Future<List<Book>> deleteItemsPermanently({
+  List<Book> deleteItemsPermanently({
     required List<Item> itemsToDelete,
     required List<Book> allBooks,
-  }) async {
+  }) {
     final deletedBooks = <Book>[];
     for (final item in itemsToDelete) {
       if (item is Book) {
         // Delete the book document in firebase
-        await _firebaseService.deleteBookDocument(item.id);
+        unawaited(_firebaseService.deleteBookDocument(item.id));
         // Delete the book files on firebase storage
-        await _deleteFirebaseStorageBookFiles(item.filepath);
+        unawaited(_deleteFirebaseStorageBookFiles(item.filepath));
         deletedBooks.add(item);
       } else if (item is Series) {
         // Delete all books in the series
         final seriesItems = _getSeriesItems(item, allBooks);
         for (final itemInSeries in seriesItems) {
-          await _firebaseService.deleteBookDocument(itemInSeries.id);
+          unawaited(_firebaseService.deleteBookDocument(itemInSeries.id));
           deletedBooks.add(itemInSeries);
         }
 
         // Delete the series document in firebase
-        await _firebaseService.deleteSeriesDocument(item.id);
+        unawaited(_firebaseService.deleteSeriesDocument(item.id));
 
         for (final itemInSeries in seriesItems) {
-          await _deleteFirebaseStorageBookFiles(itemInSeries.filepath);
+          unawaited(_deleteFirebaseStorageBookFiles(itemInSeries.filepath));
         }
       }
     }

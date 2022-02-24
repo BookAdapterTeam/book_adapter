@@ -2,7 +2,10 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
 import '../data/app_exception.dart';
@@ -16,23 +19,38 @@ import 'firebase_service_storage_mixin.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
 final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {
-  return FirebaseService();
+  return FirebaseService(
+    firestore: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
+    storage: FirebaseStorage.instance,
+  );
 });
 
 /// A utility class to handle all Firebase calls
 class FirebaseService
     with FirebaseServiceAuthMixin, FirebaseServiceStorageMixin {
-  FirebaseService() : super();
+  FirebaseService({
+    required this.firestore,
+    required this.storage,
+    required this.auth,
+  }) : super();
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  static const uuid = Uuid();
+  final FirebaseFirestore firestore;
+
+  @override
+  final FirebaseStorage storage;
+
+  @override
+  final FirebaseAuth auth;
+
+  static const _uuid = Uuid();
 
   String getDefaultCollectionName(String userUid) => '$userUid-Default';
 
-  // Database ************************************************************************************************
+  // Database ******************************************************************
 
   /// Firestore BookCollections reference
-  CollectionReference<AppCollection> get _collectionsRef => _firestore
+  CollectionReference<AppCollection> get _collectionsRef => firestore
       .collection(kCollectionsCollectionName)
       .withConverter<AppCollection>(
         fromFirestore: (doc, _) {
@@ -58,7 +76,7 @@ class FirebaseService
 
   /// Firestore BookCollections reference
   CollectionReference<Book> get _booksRef =>
-      _firestore.collection(kBooksCollectionName).withConverter<Book>(
+      firestore.collection(kBooksCollectionName).withConverter<Book>(
             fromFirestore: (doc, _) {
               final data = doc.data();
               data!.addAll({'id': doc.id});
@@ -80,7 +98,7 @@ class FirebaseService
 
   /// Firestore BookCollections reference
   CollectionReference<Series> get _seriesRef =>
-      _firestore.collection(kSeriesCollectionName).withConverter<Series>(
+      firestore.collection(kSeriesCollectionName).withConverter<Series>(
             fromFirestore: (doc, _) {
               final data = doc.data();
               data!.addAll({'id': doc.id});
@@ -100,7 +118,7 @@ class FirebaseService
   Future<Series?> getSeriesById(String seriesId) async =>
       (await _seriesRef.doc(seriesId).get()).data();
 
-  // Books *****************************************************************************************************
+  // Books *********************************************************************
 
   /// Save a cfi to lastReadCfiLocation on a book document in Firestore
   Future<void> saveLastReadCfiLocation({
@@ -148,39 +166,50 @@ class FirebaseService
     }
   }
 
-  /// Add a book to Firebase Firestore
-  Future<Either<Failure, Book>> addBookToFirestore({required Book book}) async {
+  /// Check if a file has been uploaded by checking book documents for its hash
+  Future<bool> fileHashExists({
+    required String md5,
+    required String sha1,
+  }) async {
+    final log = Logger();
+    // Check books for duplicates, return if any are found
     try {
-      // Check books for duplicates, return Failure if any are found
       final duplicatesQuerySnapshot = await _booksRef
-          .where('userId', isEqualTo: book.userId)
-          .where('title', isEqualTo: book.title)
-          .where('filepath', isEqualTo: book.filepath)
-          .where('filesize', isEqualTo: book.filesize)
+          .where('userId', isEqualTo: currentUserUid)
+          .where('fileHash.md5', isEqualTo: md5)
+          .where('fileHash.sha1', isEqualTo: sha1)
           .get();
 
       final duplicates = duplicatesQuerySnapshot.docs;
 
-      if (duplicates.isNotEmpty) {
-        return Left(Failure('Book has already been uploaded'));
-      }
-
-      // Add book to Firestore
-      await _booksRef.doc(book.id).set(book);
-
-      // Return our books to the caller in case they care
-      // ignore: prefer_const_constructors
-      return Right(book);
-    } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Upload Book',
-          e.code));
-    } on Exception catch (_) {
-      return Left(Failure('Unexpected Exception, Could Not Upload Book'));
+      return duplicates.isNotEmpty;
+    } on FirebaseException catch (e, st) {
+      log.e('${e.code}-${e.message}', e, st);
+      rethrow;
     }
   }
 
-  // BookCollections ********************************************************************************************
+  /// Add a book to Firebase Firestore
+  Future<void> addBookToFirestore({required Book book}) async {
+    // Check books for duplicates, return Failure if any are found
+    final duplicatesQuerySnapshot = await _booksRef
+        .where('userId', isEqualTo: book.userId)
+        .where('title', isEqualTo: book.title)
+        .where('filepath', isEqualTo: book.filepath)
+        .where('filesize', isEqualTo: book.filesize)
+        .get();
+
+    final duplicates = duplicatesQuerySnapshot.docs;
+
+    if (duplicates.isNotEmpty) {
+      throw AppException('Book has already been uploaded');
+    }
+
+    // Add book to Firestore
+    unawaited(_booksRef.doc(book.id).set(book));
+  }
+
+  // BookCollections ***********************************************************
 
   /// Create a shelf in firestore
   Future<Either<Failure, AppCollection>> addCollection(
@@ -192,7 +221,8 @@ class FirebaseService
         return Left(Failure('User not logged in'));
       }
 
-      // Create a shelf with a custom id so that it can easily be referenced later
+      // Create a shelf with a custom id so that it can easily be
+      // referenced later
       final bookCollection = AppCollection(
         id: '$userId-$collectionName',
         name: collectionName,
@@ -213,7 +243,8 @@ class FirebaseService
   ///
   /// Takes a book and adds the collectionIds to it.
   ///
-  /// If a book does not have any collections, it will move it to the default collection
+  /// If a book does not have any collections, it will
+  /// move it to the default collection
   ///
   /// Throws [AppException] if it fails.
   Future<void> updateBookCollections({
@@ -245,7 +276,8 @@ class FirebaseService
   ///
   /// Takes a series and adds the series id to it
   ///
-  /// If a book does not have any collections, it will move it to the default collection
+  /// If a book does not have any collections, it
+  /// will move it to the default collection
   ///
   /// Throws [AppException] if it fails.
   Future<void> updateSeriesCollections({
@@ -297,9 +329,10 @@ class FirebaseService
         throw AppException('user-null');
       }
 
-      // Create a shelf with a custom id so that it can easily be referenced later
+      // Create a shelf with a custom id so
+      // that it can easily be referenced later
       final series = Series(
-          id: uuid.v4(),
+          id: _uuid.v4(),
           userId: userId,
           title: name,
           description: description,
@@ -397,7 +430,7 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteDocument(String path) async {
     try {
-      return _firestore.doc(path).delete();
+      return firestore.doc(path).delete();
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {

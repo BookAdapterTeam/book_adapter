@@ -6,7 +6,8 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 /// Creates a controller for [DragSelectGridView].
 ///
-/// The initial selection is [Selection.empty], unless a different one is provided.
+/// The initial selection is [Selection.empty], unless a
+/// different one is provided.
 EpubController useEpubController({
   required Future<EpubBook> document,
   String? epubCfi,

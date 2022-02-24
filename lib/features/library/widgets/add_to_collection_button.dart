@@ -25,7 +25,8 @@ class AddToCollectionButton extends StatelessWidget {
           isScrollControlled: true,
           context: context,
           builder: (context) {
-            // Using Wrap makes the bottom sheet height the height of the content.
+            // Using Wrap makes the bottom sheet height the
+            //   height of the content.
             // Otherwise, the height will be half the height of the screen.
             return ChooseCollectionsBottomSheet(
               onAddNewCollection: onAddNewCollection,

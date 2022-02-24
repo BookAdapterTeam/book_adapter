@@ -58,7 +58,8 @@ class MergeIntoSeriesButton extends ConsumerWidget {
                   context: context,
                   builder: (context) {
                     // Could sort the list before using choosig the title.
-                    // Without soring, it will use the title of the first book selected.
+                    // Without soring, it will use the title of the first
+                    //   book selected.
                     // final selectedItemsList = selectedItems.toList()
                     //   ..sort((a, b) => a.title.compareTo(b.title));
                     // final initialText = selectedItemsList.first.title;
@@ -100,8 +101,14 @@ class LibraryScrollView extends HookConsumerWidget {
       systemOverlayStyle: SystemUiOverlayStyle.light,
       actions: [
         AddBookButton(
-          onAdd: () =>
-              ref.read(libraryViewControllerProvider.notifier).addBooks(),
+          onAdd: () async {
+            await for (final message in ref
+                .read(libraryViewControllerProvider.notifier)
+                .addBooks()) {
+              final SnackBar snackBar = SnackBar(content: Text(message));
+              ScaffoldMessenger.of(context).showSnackBar(snackBar);
+            }
+          },
         ),
         const ProfileButton(),
       ],
@@ -115,7 +122,7 @@ class LibraryScrollView extends HookConsumerWidget {
       systemOverlayStyle: SystemUiOverlayStyle.light,
       elevation: 3.0,
       leading: BackButton(
-        onPressed: () => viewController.deselectAllItems(),
+        onPressed: viewController.deselectAllItems,
       ),
       actions: [
         AddToCollectionButton(
@@ -127,7 +134,7 @@ class LibraryScrollView extends HookConsumerWidget {
 
             final snackBar = SnackBar(
               content: Text(failure.message),
-              duration: const Duration(seconds: 2),
+              duration: kSnackBarDuration,
             );
             log.e(failure.message);
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -140,7 +147,7 @@ class LibraryScrollView extends HookConsumerWidget {
               (failure) {
                 final snackBar = SnackBar(
                   content: Text(failure.message),
-                  duration: const Duration(seconds: 2),
+                  duration: kSnackBarDuration,
                 );
                 log.e(failure.message);
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -148,7 +155,7 @@ class LibraryScrollView extends HookConsumerWidget {
               (collection) {
                 final snackBar = SnackBar(
                   content: Text('Successfully created ${collection.name}'),
-                  duration: const Duration(seconds: 2),
+                  duration: kSnackBarDuration,
                 );
                 log.i('Successfully created ${collection.name}');
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -157,7 +164,8 @@ class LibraryScrollView extends HookConsumerWidget {
           },
         ),
 
-        // Disable button until more than one book selected so that the user does not create series with only one book in it
+        // Disable button until more than one book selected so that the user
+        // does not create series with only one book in it
         MergeIntoSeriesButton(
           isDisabled: data.selectedItems.length <= 1,
           onMerge: (seriesName) async {
@@ -169,7 +177,7 @@ class LibraryScrollView extends HookConsumerWidget {
               (failure) {
                 final snackBar = SnackBar(
                   content: Text(failure.message),
-                  duration: const Duration(seconds: 2),
+                  duration: kSnackBarDuration,
                 );
                 log.e(failure.message);
                 ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -249,7 +257,7 @@ class LibraryScrollView extends HookConsumerWidget {
         slivers: [
           SliverAnimatedSwitcher(
             child: appBar,
-            duration: const Duration(milliseconds: 250),
+            duration: kTransitionDuration,
           ),
 
           // List of collections
@@ -262,7 +270,8 @@ class LibraryScrollView extends HookConsumerWidget {
 
 /// Collection List View
 ///
-/// Collection headers can be expanded and the top header is pinned to the screen
+/// Collection headers can be expanded and the top header is
+/// pinned to the screen
 ///
 /// The implementation is based on the below examples.
 ///
@@ -284,6 +293,7 @@ class SliverCollectionsList extends StatefulWidget {
 class _SliverCollectionsListState extends State<SliverCollectionsList> {
   @override
   Widget build(BuildContext context) {
+    // TODO(@getBoolean): Show number of processing books to UI
     return SliverExpandableList(
       builder: SliverExpandableChildDelegate<Item, CollectionSection>(
         sectionList: widget.sectionList,
@@ -314,7 +324,8 @@ class _SliverCollectionsListState extends State<SliverCollectionsList> {
           }
         });
       },
-      // @getBoolean: Disabled because it would mean the collection can't be collapsed
+      // @getBoolean: Disabled because it would mean the
+      // collection can't be collapsed
       hideHeader: false,
       // hideHeader: widget.sectionList.length == 1,
     );

@@ -19,13 +19,20 @@ class UpdatePrompter {
 
   final InstallCallback onInstall;
 
+  final VoidCallback? onIgnore;
+  final VoidCallback? onClose;
   UpdateDialog? _dialog;
 
   double _progress = 0.0;
 
   File? _apkFile;
 
-  UpdatePrompter({required this.updateData, required this.onInstall});
+  UpdatePrompter({
+    required this.updateData,
+    required this.onInstall,
+    required this.onIgnore,
+    required this.onClose,
+  });
 
   void show(BuildContext context) async {
     if (_dialog != null && _dialog!.isShowing()) {
@@ -40,7 +47,6 @@ class UpdatePrompter {
       _apkFile = await CommonUtils.getApkFileByUpdateData(updateData);
     }
 
-
     if (_apkFile != null && _apkFile!.existsSync()) {
       _dialog = UpdateDialog.showUpdate(
         context,
@@ -52,6 +58,8 @@ class UpdatePrompter {
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
         onUpdate: doInstall,
+        onIgnore: onIgnore,
+        onClose: onClose,
       );
     } else {
       _dialog = UpdateDialog.showUpdate(
@@ -64,6 +72,8 @@ class UpdatePrompter {
         enableIgnore: updateData.isIgnorable,
         isForce: updateData.isForce,
         onUpdate: onUpdate,
+        onIgnore: onIgnore,
+        onClose: onClose,
       );
     }
   }
@@ -79,7 +89,7 @@ class UpdatePrompter {
     return updateContent;
   }
 
-  void onUpdate() {
+  Future<void> onUpdate() async {
     if (Platform.isIOS) {
       doInstall();
       return;
@@ -87,7 +97,7 @@ class UpdatePrompter {
 
     if (_apkFile == null) return;
 
-    HttpUtils.downloadFile(
+    await HttpUtils.downloadFile(
       updateData.androidDownloadUrl,
       _apkFile!.path,
       onReceiveProgress: (int count, int total) {
@@ -109,6 +119,7 @@ class UpdatePrompter {
   /// 安装
   void doInstall() {
     _dialog?.dismiss();
-    onInstall.call(_apkFile != null ? _apkFile!.path : updateData.androidDownloadUrl);
+    onInstall.call(
+        _apkFile != null ? _apkFile!.path : updateData.androidDownloadUrl);
   }
 }

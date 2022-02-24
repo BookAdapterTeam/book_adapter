@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorderable_list.dart';
 import 'package:implicitly_animated_reorderable_list/transitions.dart';
 import 'package:sticky_and_expandable_list/sticky_and_expandable_list.dart';
 
-import '../../../controller/storage_controller.dart';
 import '../../../data/constants.dart';
 // ignore: unused_import
 import '../../in_app_update/util/toast_utils.dart';
-import '../data/book_item.dart';
 import '../data/collection_section.dart';
 import '../data/item.dart';
 import '../library_view_controller.dart';
@@ -46,8 +43,8 @@ class _SectionWidgetState extends State<SectionWidget>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+    _controller =
+        AnimationController(vsync: this, duration: kTransitionDuration);
     _iconTurns =
         _controller.drive(_halfTween.chain(CurveTween(curve: Curves.easeIn)));
     _heightFactor = _controller.drive(CurveTween(curve: Curves.easeIn));
@@ -109,7 +106,9 @@ class _SectionWidgetState extends State<SectionWidget>
                                 return AlertDialog(
                                   title: const Text('Remove Collection'),
                                   content: const Text(
-                                      'Are you sure you want to remove this collection? Items inside the collection will not be deleted.'),
+                                      'Are you sure you want to remove this '
+                                      'collection? Items inside the collection '
+                                      'will not be deleted.'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
@@ -196,8 +195,7 @@ class _SectionWidgetState extends State<SectionWidget>
           items: items,
           areItemsTheSame: (a, b) => a.id == b.id,
           itemBuilder: _booksBuilder,
-          removeItemBuilder: (context, animation, oldItem) =>
-              removeItemBuilder(context, animation, oldItem),
+          removeItemBuilder: removeItemBuilder,
         ),
       );
     }
@@ -212,27 +210,15 @@ class _SectionWidgetState extends State<SectionWidget>
   ) {
     return Consumer(
       builder: (_, ref, __) {
-        return ValueListenableBuilder(
-          valueListenable: ref
-              .read(storageControllerProvider)
-              .downloadedBooksValueListenable,
-          builder: (_, Box<bool> isDownloadedBox, __) {
-            return SizeFadeTransition(
-              key: ValueKey(
-                  widget.section.header + item.id + 'SizeFadeTransition'),
-              sizeFraction: 0.7,
-              curve: Curves.easeInOut,
-              animation: animation,
-              child: ItemListTileWidget(
-                key: ValueKey(
-                    widget.section.header + item.id + 'ItemListWidget'),
-                item: item,
-                isDownloaded: item is Book
-                    ? isDownloadedBox.get(item.filename) ?? false
-                    : null,
-              ),
-            );
-          },
+        return SizeFadeTransition(
+          key: ValueKey('${widget.section.header}${item.id}SizeFadeTransition'),
+          sizeFraction: 0.7,
+          curve: Curves.easeInOut,
+          animation: animation,
+          child: ItemListTileWidget(
+            key: ValueKey('${widget.section.header}${item.id}ItemListWidget'),
+            item: item,
+          ),
         );
       },
     );
@@ -253,25 +239,15 @@ class _SectionWidgetState extends State<SectionWidget>
                 .deselectItem(oldItem);
           }
 
-          return ValueListenableBuilder(
-            valueListenable: ref
-                .read(storageControllerProvider)
-                .downloadedBooksValueListenable,
-            builder: (_, Box<bool> isDownloadedBox, __) {
-              return FadeTransition(
-                opacity: animation,
-                key: ValueKey(
-                    widget.section.header + oldItem.id + 'FadeTransition'),
-                child: ItemListTileWidget(
-                  key: ValueKey(
-                      widget.section.header + oldItem.id + 'ItemListWidget'),
-                  item: oldItem,
-                  isDownloaded: oldItem is Book
-                      ? isDownloadedBox.get(oldItem.filename) ?? false
-                      : null,
-                ),
-              );
-            },
+          return FadeTransition(
+            opacity: animation,
+            key:
+                ValueKey('${widget.section.header}${oldItem.id}FadeTransition'),
+            child: ItemListTileWidget(
+              key: ValueKey(
+                  '${widget.section.header}${oldItem.id}ItemListWidget'),
+              item: oldItem,
+            ),
           );
         },
       );

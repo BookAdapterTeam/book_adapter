@@ -31,7 +31,7 @@ class EditProfileView extends HookConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 24),
-                // TODO: Will never show because there is no way to set the photo
+                // TODO: Will never show since there is no way to set the photo
                 if (user != null && user.photoURL != null) ...[
                   ProfileWidget(
                       photoUrl: user.photoURL!, onPressed: () async {}),
@@ -53,12 +53,11 @@ class EditProfileView extends HookConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
-                // TODO: Add change email function. Will need to ask for current password.
+                // TODO: Add change email. Will need to ask for current password
                 // TextFieldWidget(
                 //   label: 'Email',
                 //   text: user.email ?? 'Signed in anonymously',
                 //   onChanged: (email) {
-                //     // TODO: Save email in controller
                 //   },
                 // ),
                 const _SubmitButton()

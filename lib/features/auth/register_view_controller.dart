@@ -1,12 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import '../../controller/firebase_controller.dart';
 import '../../data/failure.dart';
 
-final registerViewController = StateNotifierProvider<RegisterViewController, RegisterViewData>((ref) {
+final registerViewController =
+    StateNotifierProvider<RegisterViewController, RegisterViewData>((ref) {
   return RegisterViewController(ref.read);
 });
 
@@ -16,8 +17,18 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
 
   final Reader _read;
 
-  void updateData({String? username, String? email, String? password, String? verifyPassword}) {
-    state = state.copyWith(username: username?.trim(), email: email?.trim(), password: password, verifyPassword: verifyPassword);
+  void updateData({
+    String? username,
+    String? email,
+    String? password,
+    String? verifyPassword,
+  }) {
+    state = state.copyWith(
+      username: username?.trim(),
+      email: email?.trim(),
+      password: password,
+      verifyPassword: verifyPassword,
+    );
 
     validateInput();
   }
@@ -28,22 +39,22 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
   //   state = state.copyWith(photoUrl: url);
   // }
 
-   String? validate({String? string, required String message}) {
+  String? validate({String? string, required String message}) {
     if (string == null) {
       return null;
     }
     if (string.isEmpty) {
       return message;
     }
+
+    return null;
   }
 
   void validateInput() {
     bool isButtonEnabled = state.isButtonEnabled;
-    if (
-      state.password == state.verifyPassword
-      && state.password.length >= 6
-      && state.email.isNotEmpty
-    ) {
+    if (state.password == state.verifyPassword &&
+        state.password.length >= 6 &&
+        state.email.isNotEmpty) {
       isButtonEnabled = true;
     } else {
       isButtonEnabled = false;
@@ -56,24 +67,26 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
 
     // Register
     final res = await _read(firebaseControllerProvider).signUp(
-      email: state.email, password: state.password,
+      email: state.email,
+      password: state.password,
     );
 
     // Update with username
-    final success = await _read(firebaseControllerProvider).setDisplayName(state.username);
+    final success =
+        await _read(firebaseControllerProvider).setDisplayName(state.username);
     state = state.copyWith(isLoading: false);
 
     // Create default shelf
     await _read(firebaseControllerProvider).addCollection('Default');
-    
+
     if (res.isRight()) {
       state = const RegisterViewData();
     }
 
     return res.fold(
-      (failure) => Left(failure),
-      (user) => success ? Right(user) : Left(Failure('Set Display Name Failed'))
-    );
+        Left.new,
+        (user) =>
+            success ? Right(user) : Left(Failure('Set Display Name Failed')));
   }
 }
 

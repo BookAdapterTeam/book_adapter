@@ -12,7 +12,7 @@ class AddBookButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return IconButton(
       tooltip: 'Add a book',
-      onPressed: () => onAdd.call(),
+      onPressed: onAdd.call,
       iconSize: 28,
       icon: const Icon(Icons.add),
     );

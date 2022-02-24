@@ -1,41 +1,22 @@
+import 'dart:async';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../controller/firebase_controller.dart';
-import '../controller/storage_controller.dart';
 import '../data/app_exception.dart';
 import '../data/constants.dart';
 import '../data/failure.dart';
+import '../data/file_hash.dart';
+import 'isolate_service.dart';
 
 final storageServiceInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
-});
-
-/// Get a list of files downloaded on the device. This also deletes any files not in firebase storage
-///
-/// Should only be called if the user is authenticated
-final updateDownloadedFilesProvider = FutureProvider<void>((ref) async {
-  final storageController = ref.read(storageControllerProvider);
-  final downloadedFilenameList =
-      await storageController.updateDownloadedFilenameList();
-
-  final firebaseController = ref.read(firebaseControllerProvider);
-  final uploadedFilenameList = await firebaseController.listFilenames();
-  final deletedFirebaseFilenameList = downloadedFilenameList
-      .toSet()
-      .difference(uploadedFilenameList.toSet())
-      .toList();
-  await storageController.deleteFiles(
-    filenameList: deletedFirebaseFilenameList,
-  );
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
@@ -47,41 +28,129 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 class StorageService {
   StorageService();
 
-  late io.Directory appDir;
+  late final io.Directory appDir;
 
-  late io.Directory appBookAdaptDirectory;
+  late final io.Directory appBookAdaptDirectory;
 
   final _log = Logger();
 
-  late final Box<bool> _downloadedFilesBox;
+  Box<Map<String, dynamic>>? _uploadQueueBox;
 
-  ValueListenable<Box<bool>> get downloadedBooksValueListenable =>
-      _downloadedFilesBox.listenable();
+  Box<Map<String, dynamic>>? get uploadQueueBox => _uploadQueueBox;
+
+  /// 'isDocumentUploaded'
+  static const kIsDocumentUploadedKey = 'isDocumentUploaded';
+
+  /// 'isFileUploaded'
+  static const kIsFileUploaded = 'isFileUploaded';
+
+  /// 'fileHashKey'
+  static const kFileHashKey = 'fileHashKey';
 
   /// Initilize the class
   ///
-  /// Throws a `MissingPlatformDirectoryException` if the system is unable to provide the directory.
+  /// Throws a `MissingPlatformDirectoryException`
+  /// if the system is unable to provide the directory.
   Future<void> init() async {
     try {
       appDir = await _getAppDirectory();
       appBookAdaptDirectory = io.Directory('${appDir.path}/BookAdapt');
       await appBookAdaptDirectory.create();
-      _downloadedFilesBox = await Hive.openBox(kDownloadedFilesHiveBox);
-      await clearDownloadedBooksCache();
+      await Hive.initFlutter('BookAdapterData');
+      Hive.registerAdapter(FileHashAdapter());
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
     }
   }
 
+  Future<void> initQueueBox(String userId) async {
+    _uploadQueueBox = await Hive.openBox('$userId-$kUploadQueueBox');
+  }
+
+  /// Retrieve the books in the upload queue
+  /// and return as a list of [FileHash] objects
+  List<FileHash> get uploadQueueFileHashList {
+    if (_uploadQueueBox == null) {
+      throw AppException('_uploadQueueBox not initialized');
+    }
+
+    return _uploadQueueBox!.values.map(FileHash.fromMap).toList();
+  }
+
+  /// Get a [FileHash] object from the upload queue box by the filepath
+  FileHash? getUploadQueueItem(String filepath) {
+    if (_uploadQueueBox == null) {
+      throw AppException('_uploadQueueBox not initialized');
+    }
+
+    final itemMap = _uploadQueueBox!.get(filepath);
+    if (itemMap == null) return null;
+
+    return FileHash.fromMap(itemMap);
+  }
+
+  /// Adds a file to the upload queue box with `filepath` as the key
+  Future<void> boxAddToUploadQueue(
+    String filepath, {
+    required FileHash fileHash,
+    bool isDocumentUploaded = false,
+    bool isFileUploaded = false,
+  }) async {
+    if (_uploadQueueBox == null) {
+      throw AppException('_uploadQueueBox not initialized');
+    }
+
+    await _uploadQueueBox!.put(filepath, {
+      kFileHashKey: fileHash,
+      kIsDocumentUploadedKey: isDocumentUploaded,
+      kIsFileUploaded: isFileUploaded,
+    });
+  }
+
+  Future<void> boxSetDocumentUploadedInUploadQueue(
+    String filepath,
+  ) async {
+    final fileHash = getUploadQueueItem(filepath);
+    if (fileHash == null) return;
+
+    await boxAddToUploadQueue(
+      filepath,
+      fileHash: fileHash,
+      isDocumentUploaded: true,
+    );
+  }
+
+  Future<void> boxSetFileUploadedInUploadQueue(
+    String filepath,
+  ) async {
+    final fileHash = getUploadQueueItem(filepath);
+    if (fileHash == null) return;
+
+    await boxAddToUploadQueue(
+      filepath,
+      fileHash: fileHash,
+      isFileUploaded: true,
+    );
+  }
+
+  /// Removes a file to the upload queue box
+  Future<void> boxRemoveFromUploadQueue(String filepath) async {
+    if (_uploadQueueBox == null) {
+      throw AppException('_uploadQueueBox not initialized');
+    }
+
+    return _uploadQueueBox!.delete(filepath);
+  }
+
   String getAppFilePath(String filepath) =>
-      appBookAdaptDirectory.path + '/' + filepath;
+      '${appBookAdaptDirectory.path}/$filepath';
 
   String getPathFromFilename({
     required String userId,
     required String filename,
   }) =>
-      appBookAdaptDirectory.path + '/' + userId + '/' + filename;
+      '${appBookAdaptDirectory.path}/$userId/$filename';
 
   /// Method to create a directory for the user when they login
   Future<io.Directory> createUserDirectory(String userId) async {
@@ -115,7 +184,7 @@ class StorageService {
 
     // Android only
     // getExternalStorageDirectory();
-    // TODO: Use below to ask user preffered location. Books will need to be moved.
+    // TODO: Use below to ask user preffered location. Books will be moved.
     // getExternalStorageDirectories(type: StorageDirectory.documents);
     // getExternalCacheDirectories();
 
@@ -124,10 +193,11 @@ class StorageService {
 
   /// Selects a directory and returns its absolute path.
   ///
-  /// On Android, this requires to be running on SDK 21 or above, else won't work.
+  /// On Android, this requires to be running on SDK 21 or above
   /// Returns `null` if folder path couldn't be resolved.
   ///
-  /// `dialogTitle` can be set to display a custom title on desktop platforms. It will be ignored on Web & IO.
+  /// `dialogTitle` can be set to display a custom title on desktop platforms.
+  /// It will be ignored on Web & IO.
   ///
   /// Note: Some Android paths are protected, hence can't be accessed and will return `/` instead.
   Future<Either<Failure, String>> pickDirectory({String? dialogTitle}) async {
@@ -142,7 +212,8 @@ class StorageService {
     return Right(selectedDirectory);
   }
 
-  /// Check if files exist on device on app start, then check for a book if it exists before opening it
+  /// Check if files exist on device on app start,
+  /// then check for a book if it exists before opening it
   ///
   /// Returns a list of the filenames
   List<io.FileSystemEntity> listFiles({
@@ -180,28 +251,39 @@ class StorageService {
   /// Retrieves the file(s) from the underlying platform
   ///
   /// Default `type` set to [FileType.any] with `allowMultiple` set to `false`.
-  /// Optionally, `allowedExtensions` might be provided (e.g. `[pdf, svg, jpg]`.).
+  /// Optionally, `allowedExtensions` may be provided (e.g. `[pdf, svg, jpg]`.).
   ///
-  /// If `withData` is set, picked files will have its byte data immediately available on memory as `Uint8List`
-  /// which can be useful if you are picking it for server upload or similar. However, have in mind that
-  /// enabling this on IO (iOS & Android) may result in out of memory issues if you allow multiple picks or
-  /// pick huge files. Use `withReadStream` instead. Defaults to `true` on web, `false` otherwise.
+  /// If `withData` is set, picked files will have its byte
+  /// data immediately available on memory as `Uint8List`
+  /// which can be useful if you are picking it for server
+  /// upload or similar. However, have in mind that
+  /// enabling this on IO (iOS & Android) may result in
+  /// out of memory issues if you allow multiple picks or
+  /// pick huge files. Use `withReadStream` instead.
+  /// Defaults to `true` on web, `false` otherwise.
   ///
-  /// If `withReadStream` is set, picked files will have its byte data available as a `Stream<List<int>>`
-  /// which can be useful for uploading and processing large files. Defaults to `false`.
+  /// If `withReadStream` is set, picked files will have
+  /// its byte data available as a `Stream<List<int>>`
+  /// which can be useful for uploading and processing
+  /// large files. Defaults to `false`.
   ///
-  /// If you want to track picking status, for example, because some files may take some time to be
-  /// cached (particularly those picked from cloud providers), you may want to set [onFileLoading] handler
+  /// If you want to track picking status, for example,
+  /// because some files may take some time to be
+  /// cached (particularly those picked from cloud
+  /// providers), you may want to set [onFileLoading] handler
   /// that will give you the current status of picking.
   ///
-  /// If `allowCompression` is set, it will allow media to apply the default OS compression.
+  /// If `allowCompression` is set, it will allow media
+  /// to apply the default OS compression.
   /// Defaults to `true`.
   ///
-  /// `dialogTitle` can be optionally set on desktop platforms to set the modal window title. It will be ignored on
+  /// `dialogTitle` can be optionally set on desktop
+  /// platforms to set the modal window title. It will be ignored on
   /// other platforms.
   ///
-  /// The result is wrapped in a `Either` which contains either a left `Failure` or right `List<PlatformFile>`.
-  Future<Either<Failure, List<PlatformFile>>> pickFile({
+  /// The result is wrapped in a `Either` which contains
+  /// either a left `Failure` or right `List<PlatformFile>`.
+  Future<List<PlatformFile>> pickFile({
     String? dialogTitle,
     FileType type = FileType.any,
     List<String>? allowedExtensions,
@@ -211,70 +293,74 @@ class StorageService {
     bool withData = false,
     bool withReadStream = false,
   }) async {
-    try {
-      // Clear cache because it is buggy and will confuse files of similar filenames
-      if (io.Platform.isIOS || io.Platform.isAndroid) {
-        await FilePicker.platform.clearTemporaryFiles();
-      }
+    // Clear cache because it is buggy and will confuse
+    // files of similar filenames+
 
-      final FilePickerResult? result = await FilePicker.platform.pickFiles(
-        dialogTitle: dialogTitle,
-        type: type,
-        allowedExtensions: allowedExtensions,
-        onFileLoading: onFileLoading,
-        allowCompression: allowCompression,
-        allowMultiple: allowMultiple,
-        withData: withData,
-        withReadStream: withReadStream,
-      );
+    // TODO(@getBoolean): Test if diff files with the same name get confused
+    // Commented out because adding files consequetively will
+    // cause the previous upload to fail.
+    // if (io.Platform.isIOS || io.Platform.isAndroid) {
+    //   await FilePicker.platform.clearTemporaryFiles();
+    // }
 
-      if (result == null) {
-        // User canceled the picker
-        return Left(Failure('User canceled the file picker'));
-      }
+    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+      dialogTitle: dialogTitle,
+      type: type,
+      allowedExtensions: allowedExtensions,
+      onFileLoading: onFileLoading,
+      allowCompression: allowCompression,
+      allowMultiple: allowMultiple,
+      withData: withData,
+      withReadStream: withReadStream,
+    );
 
-      if (allowMultiple) {
-        return Right(handleMultiple(result));
-      } else {
-        return Right(handleSingle(result));
-      }
-    } on Exception catch (e) {
-      return Left(Failure(e.toString()));
+    if (result == null) {
+      // User canceled the picker
+      return [];
+    }
+
+    if (allowMultiple) {
+      return _handleMultiple(result);
+    } else {
+      return _handleSingle(result);
     }
   }
 
-  List<PlatformFile> handleSingle(FilePickerResult result) {
+  List<PlatformFile> _handleSingle(FilePickerResult result) {
     final PlatformFile file = result.files.first;
 
     return [file];
   }
 
-  List<PlatformFile> handleMultiple(FilePickerResult result) {
+  List<PlatformFile> _handleMultiple(FilePickerResult result) {
     final List<PlatformFile> files = result.files;
     return files;
   }
 
-  // / Opens a save file dialog which lets the user select a file path and a file
-  // / name to save a file.
-  // /
-  // / This function does not actually save a file. It only opens the dialog to
-  // / let the user choose a location and file name. This function only returns
-  // / the **path** to this (non-existing) file.
-  // /
-  // / This method is only available on desktop platforms (Linux, macOS &
-  // / Windows).
-  // /
-  // / [dialogTitle] can be set to display a custom title on desktop platforms.
-  // / [fileName] can be set to a non-empty string to provide a default file
-  // / name.
-  // / The file type filter [type] defaults to [FileType.any]. Optionally,
-  // / [allowedExtensions] might be provided (e.g. `[pdf, svg, jpg]`.). Both
-  // / parameters are just a proposal to the user as the save file dialog does
-  // / not enforce these restrictions.
-  // /
-  // / Returns Either a left `Failure` if aborted or a right `String` which resolves to
-  // / the absolute path of the selected file, if the user selected a file.
-  // Future<Either<Failure, String>> saveFileDialog({String dialogTitle = 'Please select an output file:', String fileName = 'output-file.pdf'}) async {
+  // /// Opens a save file dialog which lets the user select a file path and a file
+  // /// name to save a file.
+  // ///
+  // /// This function does not actually save a file. It only opens the dialog to
+  // /// let the user choose a location and file name. This function only returns
+  // /// the **path** to this (non-existing) file.
+  // ///
+  // /// This method is only available on desktop platforms (Linux, macOS &
+  // /// Windows).
+  // ///
+  // /// [dialogTitle] can be set to display a custom title on desktop platforms.
+  // /// [fileName] can be set to a non-empty string to provide a default file
+  // /// name.
+  // /// The file type filter [type] defaults to [FileType.any]. Optionally,
+  // /// [allowedExtensions] might be provided (e.g. `[pdf, svg, jpg]`.). Both
+  // /// parameters are just a proposal to the user as the save file dialog does
+  // /// not enforce these restrictions.
+  // ///
+  // /// Returns Either a left `Failure` if aborted or a right `String` which resolves to
+  // /// the absolute path of the selected file, if the user selected a file.
+  // Future<Either<Failure, String>> saveFileDialog({
+  //   String dialogTitle = 'Please select an output file:',
+  //   String fileName = 'output-file.pdf',
+  // }) async {
   //   final String? outputFile = await FilePicker.platform.saveFile(
   //     dialogTitle: dialogTitle,
   //     fileName: fileName,
@@ -308,6 +394,16 @@ class StorageService {
     return false;
   }
 
+  /// Check if a file exists on the device given the filename
+  bool appFileExistsSync({required String userId, required String filename}) {
+    final String path = getPathFromFilename(userId: userId, filename: filename);
+    if (io.File(path).existsSync()) {
+      return true;
+    }
+    return false;
+  }
+
+  /// Save byte data to a file on the device
   Future<io.File> writeMemoryToFile({
     required Uint8List data,
     required String filepath,
@@ -328,24 +424,32 @@ class StorageService {
     }
   }
 
+  /// Load a file into memory and return the bytes
   Future<Uint8List> getFileInMemory(String filepath) {
     final file = io.File(filepath);
     return file.readAsBytes();
   }
 
-  bool? isBookDownloaded(String filename) {
-    return _downloadedFilesBox.get(filename);
+  /// Takes a list of files and calculates the hash of each.
+  Stream<FileHash> hashFileList(List<String> filePathList) {
+    final fileHashStream =
+        IsolateService.sendListAndReceiveStream<String, FileHash>(
+      filePathList,
+      receiveAndReturnService: IsolateService.readAndHashFileService,
+    );
+    return fileHashStream;
   }
 
-  Future<void> setFileDownloaded(String filename) async {
-    await _downloadedFilesBox.put(filename, true);
-  }
+  void saveToUploadQueueBox(List<FileHash> fileHashList) {
+    for (final fileHash in fileHashList) {
+      final String filepath = fileHash.filepath;
 
-  Future<void> setFileNotDownloaded(String filename) async {
-    await _downloadedFilesBox.put(filename, false);
-  }
+      _log.i('${filepath.split('/').last} Queued For Upload');
 
-  Future<void> clearDownloadedBooksCache() async {
-    await _downloadedFilesBox.clear();
+      unawaited(boxAddToUploadQueue(
+        filepath,
+        fileHash: fileHash,
+      ));
+    }
   }
 }

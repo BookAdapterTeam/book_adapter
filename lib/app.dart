@@ -22,6 +22,8 @@ class MyApp extends ConsumerStatefulWidget {
 }
 
 class _MyAppState extends ConsumerState<MyApp> {
+  bool ignoreUpdate = false;
+
   @override
   Widget build(BuildContext context) {
     return ToastUtils.init(
@@ -81,19 +83,16 @@ class _MyAppState extends ConsumerState<MyApp> {
               return I18n(
                 key: const ValueKey('I18n Initialization'),
                 child: UpdateChecker(
-                  child: InitFirebaseWidget(
-                    key: const ValueKey('Initialize Firebase App'),
-                    child: InitHiveWidget(
-                      child: InitStorageServiceWidget(
-                        key: const ValueKey('Initialize Storage Service'),
-                        child: AuthChecker(
-                          key: const ValueKey('Auth Checker'),
-                          child: InitDownloadedFilesWidget(
-                            child: page,
-                          ),
-                        ),
-                      ),
-                    ),
+                  ignoreUpdate: ignoreUpdate,
+                  onIgnore: () {
+                    ignoreUpdate = true;
+                  },
+                  onClose: () {
+                    ignoreUpdate = true;
+                  },
+                  child: InitWidget(
+                    key: const ValueKey('Initialize App'),
+                    child: AuthChecker(child: page),
                   ),
                 ),
               );

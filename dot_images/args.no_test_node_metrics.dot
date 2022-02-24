@@ -1,0 +1,438 @@
+digraph "" {
+  graph [style=rounded fontname="Arial Black" fontsize=13 penwidth=2.6];
+  node [shape=rect style="filled,rounded" fontname=Arial fontsize=15 fillcolor=Lavender penwidth=1.3];
+  edge [penwidth=1.3];
+  "/lib/app.dart" [label="app \n cd: 65 \n inDegree: 1 \n outDegree: 9 \n instability: 0.9 \n sloc: 91"];
+  "/lib/controller/firebase_controller.dart" [label="firebase_controller \n cd: 30 \n inDegree: 13 \n outDegree: 10 \n instability: 0.43 \n sloc: 459"];
+  "/lib/controller/storage_controller.dart" [label="storage_controller \n cd: 30 \n inDegree: 6 \n outDegree: 9 \n instability: 0.6 \n sloc: 269"];
+  "/lib/data/app_exception.dart" [label="app_exception \n cd: 1 \n inDegree: 7 \n outDegree: 0 \n instability: 0.0 \n sloc: 12"];
+  "/lib/data/constants.dart" [label="constants \n cd: 1 \n inDegree: 13 \n outDegree: 0 \n instability: 0.0 \n sloc: 12"];
+  "/lib/data/failure.dart" [label="failure \n cd: 1 \n inDegree: 12 \n outDegree: 0 \n instability: 0.0 \n sloc: 8"];
+  "/lib/data/file_hash.dart" [label="file_hash \n cd: 1 \n inDegree: 5 \n outDegree: 0 \n instability: 0.0 \n sloc: 64"];
+  "/lib/data/file_hash.g.dart" [label="file_hash.g \n cd: 1 \n inDegree: 0 \n outDegree: 0 \n instability: null \n sloc: 39" shape=octagon];
+  "/lib/data/user_data.dart" [label="user_data \n cd: 30 \n inDegree: 2 \n outDegree: 1 \n instability: 0.33 \n sloc: 23"];
+  "/lib/features/auth/auth_checker.dart" [label="auth_checker \n cd: 38 \n inDegree: 1 \n outDegree: 4 \n instability: 0.8 \n sloc: 32"];
+  "/lib/features/auth/login_view.dart" [label="login_view \n cd: 36 \n inDegree: 1 \n outDegree: 4 \n instability: 0.8 \n sloc: 173"];
+  "/lib/features/auth/login_view_controller.dart" [label="login_view_controller \n cd: 31 \n inDegree: 1 \n outDegree: 2 \n instability: 0.67 \n sloc: 73"];
+  "/lib/features/auth/register_view.dart" [label="register_view \n cd: 32 \n inDegree: 1 \n outDegree: 2 \n instability: 0.67 \n sloc: 219"];
+  "/lib/features/auth/register_view_controller.dart" [label="register_view_controller \n cd: 31 \n inDegree: 1 \n outDegree: 2 \n instability: 0.67 \n sloc: 104"];
+  "/lib/features/auth/reset_password_view.dart" [label="reset_password_view \n cd: 32 \n inDegree: 2 \n outDegree: 3 \n instability: 0.6 \n sloc: 156"];
+  "/lib/features/auth/reset_password_view_controller.dart" [label="reset_password_view_controller \n cd: 31 \n inDegree: 1 \n outDegree: 2 \n instability: 0.67 \n sloc: 53"];
+  "/lib/features/in_app_update/data/update_data.dart" [label="update_data \n cd: 1 \n inDegree: 3 \n outDegree: 0 \n instability: 0.0 \n sloc: 60"];
+  "/lib/features/in_app_update/data/update_info.dart" [label="update_info \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 70"];
+  "/lib/features/in_app_update/update.dart" [label="update \n cd: 9 \n inDegree: 3 \n outDegree: 5 \n instability: 0.63 \n sloc: 44"];
+  "/lib/features/in_app_update/update_parser.dart" [label="update_parser \n cd: 4 \n inDegree: 1 \n outDegree: 3 \n instability: 0.75 \n sloc: 29"];
+  "/lib/features/in_app_update/update_prompter.dart" [label="update_prompter \n cd: 9 \n inDegree: 1 \n outDegree: 5 \n instability: 0.83 \n sloc: 100"];
+  "/lib/features/in_app_update/util/common.dart" [label="common \n cd: 2 \n inDegree: 3 \n outDegree: 1 \n instability: 0.25 \n sloc: 84"];
+  "/lib/features/in_app_update/util/http_utils.dart" [label="http_utils \n cd: 3 \n inDegree: 2 \n outDegree: 1 \n instability: 0.33 \n sloc: 90"];
+  "/lib/features/in_app_update/util/toast_utils.dart" [label="toast_utils \n cd: 2 \n inDegree: 9 \n outDegree: 1 \n instability: 0.1 \n sloc: 63"];
+  "/lib/features/library/data/book_collection.dart" [label="book_collection \n cd: 1 \n inDegree: 6 \n outDegree: 0 \n instability: 0.0 \n sloc: 44"];
+  "/lib/features/library/data/book_item.dart" [label="book_item \n cd: 30 \n inDegree: 13 \n outDegree: 3 \n instability: 0.19 \n sloc: 248"];
+  "/lib/features/library/data/collection_section.dart" [label="collection_section \n cd: 3 \n inDegree: 2 \n outDegree: 2 \n instability: 0.5 \n sloc: 27"];
+  "/lib/features/library/data/item.dart" [label="item \n cd: 1 \n inDegree: 10 \n outDegree: 0 \n instability: 0.0 \n sloc: 28"];
+  "/lib/features/library/data/series_item.dart" [label="series_item \n cd: 30 \n inDegree: 5 \n outDegree: 2 \n instability: 0.29 \n sloc: 100"];
+  "/lib/features/library/library_view.dart" [label="library_view \n cd: 49 \n inDegree: 1 \n outDegree: 13 \n instability: 0.93 \n sloc: 258"];
+  "/lib/features/library/library_view_controller.dart" [label="library_view_controller \n cd: 30 \n inDegree: 5 \n outDegree: 12 \n instability: 0.71 \n sloc: 307"];
+  "/lib/features/library/model/book_status_notifier.dart" [label="book_status_notifier \n cd: 30 \n inDegree: 4 \n outDegree: 3 \n instability: 0.43 \n sloc: 70"];
+  "/lib/features/library/series_view.dart" [label="series_view \n cd: 30 \n inDegree: 2 \n outDegree: 7 \n instability: 0.78 \n sloc: 216"];
+  "/lib/features/library/widgets/add_book_button.dart" [label="add_book_button \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 15"];
+  "/lib/features/library/widgets/add_new_collection_button.dart" [label="add_new_collection_button \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 66"];
+  "/lib/features/library/widgets/add_to_collection_button.dart" [label="add_to_collection_button \n cd: 32 \n inDegree: 1 \n outDegree: 3 \n instability: 0.75 \n sloc: 128"];
+  "/lib/features/library/widgets/default_item_image.dart" [label="default_item_image \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 82"];
+  "/lib/features/library/widgets/delete_button.dart" [label="delete_button \n cd: 1 \n inDegree: 0 \n outDegree: 0 \n instability: null \n sloc: 45" shape=octagon];
+  "/lib/features/library/widgets/item_list_tile_widget.dart" [label="item_list_tile_widget \n cd: 30 \n inDegree: 2 \n outDegree: 9 \n instability: 0.82 \n sloc: 336"];
+  "/lib/features/library/widgets/merge_to_series.dart" [label="merge_to_series \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 42"];
+  "/lib/features/library/widgets/overflow_library_appbar_popup_menu_button.dart" [label="overflow_library_appbar_popup_menu_button \n cd: 2 \n inDegree: 2 \n outDegree: 1 \n instability: 0.33 \n sloc: 109"];
+  "/lib/features/library/widgets/profile_button.dart" [label="profile_button \n cd: 41 \n inDegree: 1 \n outDegree: 2 \n instability: 0.67 \n sloc: 56"];
+  "/lib/features/library/widgets/section_widget.dart" [label="section_widget \n cd: 32 \n inDegree: 1 \n outDegree: 6 \n instability: 0.86 \n sloc: 233"];
+  "/lib/features/parser/epub_parse_controller.dart" [label="epub_parse_controller \n cd: 30 \n inDegree: 1 \n outDegree: 2 \n instability: 0.67 \n sloc: 118"];
+  "/lib/features/profile/change_password_view.dart" [label="change_password_view \n cd: 33 \n inDegree: 2 \n outDegree: 1 \n instability: 0.33 \n sloc: 10"];
+  "/lib/features/profile/edit_profile_view.dart" [label="edit_profile_view \n cd: 33 \n inDegree: 2 \n outDegree: 4 \n instability: 0.67 \n sloc: 89"];
+  "/lib/features/profile/edit_profile_view_controller.dart" [label="edit_profile_view_controller \n cd: 31 \n inDegree: 1 \n outDegree: 1 \n instability: 0.5 \n sloc: 38"];
+  "/lib/features/profile/profile_view.dart" [label="profile_view \n cd: 40 \n inDegree: 2 \n outDegree: 5 \n instability: 0.71 \n sloc: 125"];
+  "/lib/features/profile/profile_view_controller.dart" [label="profile_view_controller \n cd: 31 \n inDegree: 1 \n outDegree: 1 \n instability: 0.5 \n sloc: 15"];
+  "/lib/features/profile/widgets/change_password_button.dart" [label="change_password_button \n cd: 34 \n inDegree: 1 \n outDegree: 1 \n instability: 0.5 \n sloc: 22"];
+  "/lib/features/profile/widgets/log_out_button.dart" [label="log_out_button \n cd: 32 \n inDegree: 1 \n outDegree: 1 \n instability: 0.5 \n sloc: 59"];
+  "/lib/features/profile/widgets/profile_widget.dart" [label="profile_widget \n cd: 1 \n inDegree: 2 \n outDegree: 0 \n instability: 0.0 \n sloc: 108"];
+  "/lib/features/reader/book_reader_view.dart" [label="book_reader_view \n cd: 30 \n inDegree: 2 \n outDegree: 5 \n instability: 0.71 \n sloc: 99"];
+  "/lib/features/reader/book_reader_view_controller.dart" [label="book_reader_view_controller \n cd: 30 \n inDegree: 1 \n outDegree: 2 \n instability: 0.67 \n sloc: 34"];
+  "/lib/features/reader/current_book.dart" [label="current_book \n cd: 30 \n inDegree: 2 \n outDegree: 1 \n instability: 0.33 \n sloc: 5"];
+  "/lib/features/reader/epub_controller.dart" [label="epub_controller \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 49"];
+  "/lib/features/widgets/async_value_widget.dart" [label="async_value_widget \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 39"];
+  "/lib/features/widgets/init_widget.dart" [label="init_widget \n cd: 39 \n inDegree: 1 \n outDegree: 6 \n instability: 0.86 \n sloc: 181"];
+  "/lib/firebase_options.dart" [label="firebase_options \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 43"];
+  "/lib/gen/assets.gen.dart" [label="assets.gen \n cd: 1 \n inDegree: 0 \n outDegree: 0 \n instability: null \n sloc: 56" shape=octagon];
+  "/lib/generated_plugin_registrant.dart" [label="generated_plugin_registrant \n cd: 1 \n inDegree: 0 \n outDegree: 0 \n instability: null \n sloc: 22" shape=octagon];
+  "/lib/localization/app.i18n.dart" [label="app.i18n \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 19"];
+  "/lib/main.dart" [label="main \n cd: 66 \n inDegree: 1 \n outDegree: 2 \n instability: 0.67 \n sloc: 12"];
+  "/lib/model/queue_model.dart" [label="queue_model \n cd: 30 \n inDegree: 2 \n outDegree: 4 \n instability: 0.67 \n sloc: 78"];
+  "/lib/model/user_model.dart" [label="user_model \n cd: 30 \n inDegree: 1 \n outDegree: 5 \n instability: 0.83 \n sloc: 30"];
+  "/lib/service/firebase_service.dart" [label="firebase_service \n cd: 30 \n inDegree: 1 \n outDegree: 8 \n instability: 0.89 \n sloc: 303"];
+  "/lib/service/firebase_service_auth_mixin.dart" [label="firebase_service_auth_mixin \n cd: 2 \n inDegree: 1 \n outDegree: 1 \n instability: 0.5 \n sloc: 76"];
+  "/lib/service/firebase_service_storage_mixin.dart" [label="firebase_service_storage_mixin \n cd: 2 \n inDegree: 1 \n outDegree: 1 \n instability: 0.5 \n sloc: 147"];
+  "/lib/service/isolate_service.dart" [label="isolate_service \n cd: 2 \n inDegree: 2 \n outDegree: 1 \n instability: 0.33 \n sloc: 144"];
+  "/lib/service/storage_service.dart" [label="storage_service \n cd: 6 \n inDegree: 4 \n outDegree: 5 \n instability: 0.56 \n sloc: 248"];
+  "/packages/flutter_update_dialog/example/lib/main.dart" [label="main \n cd: 2 \n inDegree: 0 \n outDegree: 1 \n instability: 1.0 \n sloc: 112"];
+  "/packages/flutter_update_dialog/example/lib/toast.dart" [label="toast \n cd: 1 \n inDegree: 1 \n outDegree: 0 \n instability: 0.0 \n sloc: 33"];
+  "/packages/flutter_update_dialog/lib/flutter_update_dialog.dart" [label="flutter_update_dialog \n cd: 3 \n inDegree: 0 \n outDegree: 2 \n instability: 1.0 \n sloc: 3"];
+  "/packages/flutter_update_dialog/lib/number_progress.dart" [label="number_progress \n cd: 1 \n inDegree: 2 \n outDegree: 0 \n instability: 0.0 \n sloc: 54"];
+  "/packages/flutter_update_dialog/lib/update_dialog.dart" [label="update_dialog \n cd: 2 \n inDegree: 1 \n outDegree: 1 \n instability: 0.5 \n sloc: 434"];
+  "/packages/flutter_update_dialog/test/flutter_update_dialog_test.dart" [label="flutter_update_dialog_test \n cd: 1 \n inDegree: 0 \n outDegree: 0 \n instability: null \n sloc: 2" shape=octagon];
+  "/test_driver/app.dart" [label="app \n cd: 67 \n inDegree: 0 \n outDegree: 1 \n instability: 1.0 \n sloc: 6"];
+  "/test_driver/app_test.dart" [label="app_test \n cd: 1 \n inDegree: 0 \n outDegree: 0 \n instability: null \n sloc: 13" shape=octagon];
+  subgraph "cluster~" {
+    label="book_adapter";
+    subgraph "cluster~/lib" {
+      label="lib";
+      "/lib/app.dart";
+      "/lib/firebase_options.dart";
+      "/lib/generated_plugin_registrant.dart";
+      "/lib/main.dart";
+      subgraph "cluster~/lib/controller" {
+        label="controller";
+        "/lib/controller/firebase_controller.dart";
+        "/lib/controller/storage_controller.dart";
+      }
+      subgraph "cluster~/lib/data" {
+        label="data";
+        "/lib/data/app_exception.dart";
+        "/lib/data/constants.dart";
+        "/lib/data/failure.dart";
+        "/lib/data/file_hash.dart";
+        "/lib/data/file_hash.g.dart";
+        "/lib/data/user_data.dart";
+      }
+      subgraph "cluster~/lib/features" {
+        label="features";
+        subgraph "cluster~/lib/features/auth" {
+          label="auth";
+          "/lib/features/auth/auth_checker.dart";
+          "/lib/features/auth/login_view.dart";
+          "/lib/features/auth/login_view_controller.dart";
+          "/lib/features/auth/register_view.dart";
+          "/lib/features/auth/register_view_controller.dart";
+          "/lib/features/auth/reset_password_view.dart";
+          "/lib/features/auth/reset_password_view_controller.dart";
+        }
+        subgraph "cluster~/lib/features/in_app_update" {
+          label="in_app_update";
+          "/lib/features/in_app_update/update.dart";
+          "/lib/features/in_app_update/update_parser.dart";
+          "/lib/features/in_app_update/update_prompter.dart";
+          subgraph "cluster~/lib/features/in_app_update/data" {
+            label="data";
+            "/lib/features/in_app_update/data/update_data.dart";
+            "/lib/features/in_app_update/data/update_info.dart";
+          }
+          subgraph "cluster~/lib/features/in_app_update/util" {
+            label="util";
+            "/lib/features/in_app_update/util/common.dart";
+            "/lib/features/in_app_update/util/http_utils.dart";
+            "/lib/features/in_app_update/util/toast_utils.dart";
+          }
+        }
+        subgraph "cluster~/lib/features/library" {
+          label="library";
+          "/lib/features/library/library_view.dart";
+          "/lib/features/library/library_view_controller.dart";
+          "/lib/features/library/series_view.dart";
+          subgraph "cluster~/lib/features/library/data" {
+            label="data";
+            "/lib/features/library/data/book_collection.dart";
+            "/lib/features/library/data/book_item.dart";
+            "/lib/features/library/data/collection_section.dart";
+            "/lib/features/library/data/item.dart";
+            "/lib/features/library/data/series_item.dart";
+          }
+          subgraph "cluster~/lib/features/library/model" {
+            label="model";
+            "/lib/features/library/model/book_status_notifier.dart";
+          }
+          subgraph "cluster~/lib/features/library/widgets" {
+            label="widgets";
+            "/lib/features/library/widgets/add_book_button.dart";
+            "/lib/features/library/widgets/add_new_collection_button.dart";
+            "/lib/features/library/widgets/add_to_collection_button.dart";
+            "/lib/features/library/widgets/default_item_image.dart";
+            "/lib/features/library/widgets/delete_button.dart";
+            "/lib/features/library/widgets/item_list_tile_widget.dart";
+            "/lib/features/library/widgets/merge_to_series.dart";
+            "/lib/features/library/widgets/overflow_library_appbar_popup_menu_button.dart";
+            "/lib/features/library/widgets/profile_button.dart";
+            "/lib/features/library/widgets/section_widget.dart";
+          }
+        }
+        subgraph "cluster~/lib/features/parser" {
+          label="parser";
+          "/lib/features/parser/epub_parse_controller.dart";
+        }
+        subgraph "cluster~/lib/features/profile" {
+          label="profile";
+          "/lib/features/profile/change_password_view.dart";
+          "/lib/features/profile/edit_profile_view.dart";
+          "/lib/features/profile/edit_profile_view_controller.dart";
+          "/lib/features/profile/profile_view.dart";
+          "/lib/features/profile/profile_view_controller.dart";
+          subgraph "cluster~/lib/features/profile/widgets" {
+            label="widgets";
+            "/lib/features/profile/widgets/change_password_button.dart";
+            "/lib/features/profile/widgets/log_out_button.dart";
+            "/lib/features/profile/widgets/profile_widget.dart";
+          }
+        }
+        subgraph "cluster~/lib/features/reader" {
+          label="reader";
+          "/lib/features/reader/book_reader_view.dart";
+          "/lib/features/reader/book_reader_view_controller.dart";
+          "/lib/features/reader/current_book.dart";
+          "/lib/features/reader/epub_controller.dart";
+        }
+        subgraph "cluster~/lib/features/widgets" {
+          label="widgets";
+          "/lib/features/widgets/async_value_widget.dart";
+          "/lib/features/widgets/init_widget.dart";
+        }
+      }
+      subgraph "cluster~/lib/gen" {
+        label="gen";
+        "/lib/gen/assets.gen.dart";
+      }
+      subgraph "cluster~/lib/localization" {
+        label="localization";
+        "/lib/localization/app.i18n.dart";
+      }
+      subgraph "cluster~/lib/model" {
+        label="model";
+        "/lib/model/queue_model.dart";
+        "/lib/model/user_model.dart";
+      }
+      subgraph "cluster~/lib/service" {
+        label="service";
+        "/lib/service/firebase_service.dart";
+        "/lib/service/firebase_service_auth_mixin.dart";
+        "/lib/service/firebase_service_storage_mixin.dart";
+        "/lib/service/isolate_service.dart";
+        "/lib/service/storage_service.dart";
+      }
+    }
+    subgraph "cluster~/packages" {
+      label="packages";
+      subgraph "cluster~/packages/flutter_update_dialog" {
+        label="flutter_update_dialog";
+        subgraph "cluster~/packages/flutter_update_dialog/example" {
+          label="example";
+          subgraph "cluster~/packages/flutter_update_dialog/example/lib" {
+            label="lib";
+            "/packages/flutter_update_dialog/example/lib/main.dart";
+            "/packages/flutter_update_dialog/example/lib/toast.dart";
+          }
+        }
+        subgraph "cluster~/packages/flutter_update_dialog/lib" {
+          label="lib";
+          "/packages/flutter_update_dialog/lib/flutter_update_dialog.dart";
+          "/packages/flutter_update_dialog/lib/number_progress.dart";
+          "/packages/flutter_update_dialog/lib/update_dialog.dart";
+        }
+        subgraph "cluster~/packages/flutter_update_dialog/test" {
+          label="test";
+          "/packages/flutter_update_dialog/test/flutter_update_dialog_test.dart";
+        }
+      }
+    }
+    subgraph "cluster~/test_driver" {
+      label="test_driver";
+      "/test_driver/app.dart";
+      "/test_driver/app_test.dart";
+    }
+  }
+  "/lib/app.dart" -> "/lib/features/auth/auth_checker.dart";
+  "/lib/app.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/app.dart" -> "/lib/features/library/library_view.dart";
+  "/lib/app.dart" -> "/lib/features/library/series_view.dart";
+  "/lib/app.dart" -> "/lib/features/profile/change_password_view.dart";
+  "/lib/app.dart" -> "/lib/features/profile/edit_profile_view.dart";
+  "/lib/app.dart" -> "/lib/features/profile/profile_view.dart";
+  "/lib/app.dart" -> "/lib/features/reader/book_reader_view.dart";
+  "/lib/app.dart" -> "/lib/features/widgets/init_widget.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/data/app_exception.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/data/constants.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/data/failure.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/data/file_hash.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/features/library/data/book_collection.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/features/library/data/series_item.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/service/firebase_service.dart";
+  "/lib/controller/firebase_controller.dart" -> "/lib/service/storage_service.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/data/app_exception.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/data/file_hash.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/features/library/model/book_status_notifier.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/features/parser/epub_parse_controller.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/service/storage_service.dart";
+  "/lib/controller/storage_controller.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/data/user_data.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/features/auth/auth_checker.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/auth/auth_checker.dart" -> "/lib/data/constants.dart";
+  "/lib/features/auth/auth_checker.dart" -> "/lib/features/widgets/async_value_widget.dart";
+  "/lib/features/auth/auth_checker.dart" -> "/lib/features/auth/login_view.dart";
+  "/lib/features/auth/login_view.dart" -> "/lib/data/failure.dart";
+  "/lib/features/auth/login_view.dart" -> "/lib/features/auth/login_view_controller.dart";
+  "/lib/features/auth/login_view.dart" -> "/lib/features/auth/register_view.dart";
+  "/lib/features/auth/login_view.dart" -> "/lib/features/auth/reset_password_view.dart";
+  "/lib/features/auth/login_view_controller.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/auth/login_view_controller.dart" -> "/lib/data/failure.dart";
+  "/lib/features/auth/register_view.dart" -> "/lib/data/failure.dart";
+  "/lib/features/auth/register_view.dart" -> "/lib/features/auth/register_view_controller.dart";
+  "/lib/features/auth/register_view_controller.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/auth/register_view_controller.dart" -> "/lib/data/failure.dart";
+  "/lib/features/auth/reset_password_view.dart" -> "/lib/data/constants.dart";
+  "/lib/features/auth/reset_password_view.dart" -> "/lib/data/failure.dart";
+  "/lib/features/auth/reset_password_view.dart" -> "/lib/features/auth/reset_password_view_controller.dart";
+  "/lib/features/auth/reset_password_view_controller.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/auth/reset_password_view_controller.dart" -> "/lib/data/failure.dart";
+  "/lib/features/in_app_update/update.dart" -> "/lib/features/in_app_update/update_parser.dart";
+  "/lib/features/in_app_update/update.dart" -> "/lib/features/in_app_update/update_prompter.dart";
+  "/lib/features/in_app_update/update.dart" -> "/lib/features/in_app_update/util/common.dart";
+  "/lib/features/in_app_update/update.dart" -> "/lib/features/in_app_update/util/http_utils.dart";
+  "/lib/features/in_app_update/update.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/features/in_app_update/update_parser.dart" -> "/lib/features/in_app_update/data/update_data.dart";
+  "/lib/features/in_app_update/update_parser.dart" -> "/lib/features/in_app_update/data/update_info.dart";
+  "/lib/features/in_app_update/update_parser.dart" -> "/lib/features/in_app_update/util/common.dart";
+  "/lib/features/in_app_update/update_prompter.dart" -> "/lib/features/in_app_update/data/update_data.dart";
+  "/lib/features/in_app_update/update_prompter.dart" -> "/lib/features/in_app_update/update.dart";
+  "/lib/features/in_app_update/update_prompter.dart" -> "/lib/features/in_app_update/util/common.dart";
+  "/lib/features/in_app_update/update_prompter.dart" -> "/lib/features/in_app_update/util/http_utils.dart";
+  "/lib/features/in_app_update/update_prompter.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/features/in_app_update/util/common.dart" -> "/lib/features/in_app_update/data/update_data.dart";
+  "/lib/features/in_app_update/util/http_utils.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/features/in_app_update/util/toast_utils.dart" -> "/lib/data/constants.dart";
+  "/lib/features/library/data/book_item.dart" -> "/lib/data/file_hash.dart";
+  "/lib/features/library/data/book_item.dart" -> "/lib/features/reader/book_reader_view.dart";
+  "/lib/features/library/data/book_item.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/features/library/data/collection_section.dart" -> "/lib/features/library/data/book_collection.dart";
+  "/lib/features/library/data/collection_section.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/features/library/data/series_item.dart" -> "/lib/features/library/series_view.dart";
+  "/lib/features/library/data/series_item.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/data/constants.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/localization/app.i18n.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/data/book_collection.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/data/collection_section.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/library_view_controller.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/widgets/add_book_button.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/widgets/add_to_collection_button.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/widgets/merge_to_series.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/widgets/overflow_library_appbar_popup_menu_button.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/widgets/profile_button.dart";
+  "/lib/features/library/library_view.dart" -> "/lib/features/library/widgets/section_widget.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/controller/storage_controller.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/data/app_exception.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/data/failure.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/data/user_data.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/model/queue_model.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/model/user_model.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/features/library/data/book_collection.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/features/library/data/series_item.dart";
+  "/lib/features/library/library_view_controller.dart" -> "/lib/features/library/model/book_status_notifier.dart";
+  "/lib/features/library/model/book_status_notifier.dart" -> "/lib/controller/storage_controller.dart";
+  "/lib/features/library/model/book_status_notifier.dart" -> "/lib/service/storage_service.dart";
+  "/lib/features/library/model/book_status_notifier.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/features/library/series_view.dart" -> "/lib/data/constants.dart";
+  "/lib/features/library/series_view.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/features/library/series_view.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/features/library/series_view.dart" -> "/lib/features/library/data/series_item.dart";
+  "/lib/features/library/series_view.dart" -> "/lib/features/library/library_view_controller.dart";
+  "/lib/features/library/series_view.dart" -> "/lib/features/library/widgets/item_list_tile_widget.dart";
+  "/lib/features/library/series_view.dart" -> "/lib/features/library/widgets/overflow_library_appbar_popup_menu_button.dart";
+  "/lib/features/library/widgets/add_to_collection_button.dart" -> "/lib/features/library/data/book_collection.dart";
+  "/lib/features/library/widgets/add_to_collection_button.dart" -> "/lib/features/library/library_view_controller.dart";
+  "/lib/features/library/widgets/add_to_collection_button.dart" -> "/lib/features/library/widgets/add_new_collection_button.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/controller/storage_controller.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/data/constants.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/features/reader/current_book.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/features/library/data/series_item.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/features/library/library_view_controller.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/features/library/model/book_status_notifier.dart";
+  "/lib/features/library/widgets/item_list_tile_widget.dart" -> "/lib/features/library/widgets/default_item_image.dart";
+  "/lib/features/library/widgets/overflow_library_appbar_popup_menu_button.dart" -> "/lib/data/constants.dart";
+  "/lib/features/library/widgets/profile_button.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/library/widgets/profile_button.dart" -> "/lib/features/profile/profile_view.dart";
+  "/lib/features/library/widgets/section_widget.dart" -> "/lib/data/constants.dart";
+  "/lib/features/library/widgets/section_widget.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/features/library/widgets/section_widget.dart" -> "/lib/features/library/data/collection_section.dart";
+  "/lib/features/library/widgets/section_widget.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/features/library/widgets/section_widget.dart" -> "/lib/features/library/library_view_controller.dart";
+  "/lib/features/library/widgets/section_widget.dart" -> "/lib/features/library/widgets/item_list_tile_widget.dart";
+  "/lib/features/parser/epub_parse_controller.dart" -> "/lib/service/isolate_service.dart";
+  "/lib/features/parser/epub_parse_controller.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/features/profile/change_password_view.dart" -> "/lib/features/auth/reset_password_view.dart";
+  "/lib/features/profile/edit_profile_view.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/profile/edit_profile_view.dart" -> "/lib/data/constants.dart";
+  "/lib/features/profile/edit_profile_view.dart" -> "/lib/features/profile/edit_profile_view_controller.dart";
+  "/lib/features/profile/edit_profile_view.dart" -> "/lib/features/profile/widgets/profile_widget.dart";
+  "/lib/features/profile/edit_profile_view_controller.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/profile/profile_view.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/profile/profile_view.dart" -> "/lib/features/profile/edit_profile_view.dart";
+  "/lib/features/profile/profile_view.dart" -> "/lib/features/profile/widgets/change_password_button.dart";
+  "/lib/features/profile/profile_view.dart" -> "/lib/features/profile/widgets/log_out_button.dart";
+  "/lib/features/profile/profile_view.dart" -> "/lib/features/profile/widgets/profile_widget.dart";
+  "/lib/features/profile/profile_view_controller.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/profile/widgets/change_password_button.dart" -> "/lib/features/profile/change_password_view.dart";
+  "/lib/features/profile/widgets/log_out_button.dart" -> "/lib/features/profile/profile_view_controller.dart";
+  "/lib/features/reader/book_reader_view.dart" -> "/lib/controller/storage_controller.dart";
+  "/lib/features/reader/book_reader_view.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/features/reader/book_reader_view.dart" -> "/lib/features/reader/book_reader_view_controller.dart";
+  "/lib/features/reader/book_reader_view.dart" -> "/lib/features/reader/current_book.dart";
+  "/lib/features/reader/book_reader_view.dart" -> "/lib/features/reader/epub_controller.dart";
+  "/lib/features/reader/book_reader_view_controller.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/features/reader/book_reader_view_controller.dart" -> "/lib/data/failure.dart";
+  "/lib/features/reader/current_book.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/features/widgets/init_widget.dart" -> "/lib/controller/storage_controller.dart";
+  "/lib/features/widgets/init_widget.dart" -> "/lib/data/constants.dart";
+  "/lib/features/widgets/init_widget.dart" -> "/lib/firebase_options.dart";
+  "/lib/features/widgets/init_widget.dart" -> "/lib/service/storage_service.dart";
+  "/lib/features/widgets/init_widget.dart" -> "/lib/features/in_app_update/update.dart";
+  "/lib/features/widgets/init_widget.dart" -> "/lib/features/in_app_update/util/toast_utils.dart";
+  "/lib/main.dart" -> "/lib/app.dart";
+  "/lib/main.dart" -> "/lib/features/in_app_update/update.dart";
+  "/lib/model/queue_model.dart" -> "/lib/controller/storage_controller.dart";
+  "/lib/model/queue_model.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/model/queue_model.dart" -> "/lib/features/library/data/item.dart";
+  "/lib/model/queue_model.dart" -> "/lib/features/library/model/book_status_notifier.dart";
+  "/lib/model/user_model.dart" -> "/lib/controller/firebase_controller.dart";
+  "/lib/model/user_model.dart" -> "/lib/data/app_exception.dart";
+  "/lib/model/user_model.dart" -> "/lib/data/user_data.dart";
+  "/lib/model/user_model.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/model/user_model.dart" -> "/lib/model/queue_model.dart";
+  "/lib/service/firebase_service.dart" -> "/lib/data/app_exception.dart";
+  "/lib/service/firebase_service.dart" -> "/lib/data/constants.dart";
+  "/lib/service/firebase_service.dart" -> "/lib/data/failure.dart";
+  "/lib/service/firebase_service.dart" -> "/lib/features/library/data/book_collection.dart";
+  "/lib/service/firebase_service.dart" -> "/lib/features/library/data/book_item.dart";
+  "/lib/service/firebase_service.dart" -> "/lib/features/library/data/series_item.dart";
+  "/lib/service/firebase_service.dart" -> "/lib/service/firebase_service_auth_mixin.dart";
+  "/lib/service/firebase_service.dart" -> "/lib/service/firebase_service_storage_mixin.dart";
+  "/lib/service/firebase_service_auth_mixin.dart" -> "/lib/data/failure.dart";
+  "/lib/service/firebase_service_storage_mixin.dart" -> "/lib/data/app_exception.dart";
+  "/lib/service/isolate_service.dart" -> "/lib/data/file_hash.dart";
+  "/lib/service/storage_service.dart" -> "/lib/data/app_exception.dart";
+  "/lib/service/storage_service.dart" -> "/lib/data/constants.dart";
+  "/lib/service/storage_service.dart" -> "/lib/data/failure.dart";
+  "/lib/service/storage_service.dart" -> "/lib/data/file_hash.dart";
+  "/lib/service/storage_service.dart" -> "/lib/service/isolate_service.dart";
+  "/packages/flutter_update_dialog/example/lib/main.dart" -> "/packages/flutter_update_dialog/example/lib/toast.dart";
+  "/packages/flutter_update_dialog/lib/flutter_update_dialog.dart" -> "/packages/flutter_update_dialog/lib/number_progress.dart" [style=dashed];
+  "/packages/flutter_update_dialog/lib/flutter_update_dialog.dart" -> "/packages/flutter_update_dialog/lib/update_dialog.dart" [style=dashed];
+  "/packages/flutter_update_dialog/lib/update_dialog.dart" -> "/packages/flutter_update_dialog/lib/number_progress.dart";
+  "/test_driver/app.dart" -> "/lib/main.dart";
+  "metrics" [label=" isAcyclic: false \l numNodes: 78  \l numEdges: 189  \l avgDegree: 2.42 \l numOrphans: 6 \l ccd: 1414 \l acd: 18.13 \l nccd: 3.37 \l totalSloc: 7563 \l avgSloc: 96.96 \l"];
+}
