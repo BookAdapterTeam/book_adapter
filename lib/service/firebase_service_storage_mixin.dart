@@ -7,7 +7,7 @@ import 'package:logger/logger.dart';
 import '../data/app_exception.dart';
 
 mixin FirebaseServiceStorageMixin {
-  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
+  FirebaseStorage get storage;
 
   final _log = Logger();
 
@@ -15,7 +15,7 @@ mixin FirebaseServiceStorageMixin {
 
   /// List the files the user has uploaded to their folder
   Future<List<String>> listFilenames(String userId) async {
-    final firebaseUploadedBooks = await _firebaseStorage.ref(userId).list();
+    final firebaseUploadedBooks = await storage.ref(userId).list();
     return firebaseUploadedBooks.items
         .map((listedItem) => listedItem.name)
         .toList();
@@ -81,7 +81,7 @@ mixin FirebaseServiceStorageMixin {
   }) async {
     try {
       // Check if file exists, return null if it does
-      final _ = await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
+      final _ = await storage.ref(firebaseFilePath).getDownloadURL();
       return null;
     } on FirebaseException catch (e, st) {
       if (e.code != 'unauthorized') {
@@ -91,14 +91,13 @@ mixin FirebaseServiceStorageMixin {
 
       try {
         // File does not exist, continue uploading
-        final UploadTask uploadTask =
-            _firebaseStorage.ref(firebaseFilePath).putData(
-                  bytes,
-                  SettableMetadata(
-                    contentType: contentType,
-                    customMetadata: customMetadata,
-                  ),
-                );
+        final UploadTask uploadTask = storage.ref(firebaseFilePath).putData(
+              bytes,
+              SettableMetadata(
+                contentType: contentType,
+                customMetadata: customMetadata,
+              ),
+            );
         return uploadTask;
       } on FirebaseException catch (e, st) {
         _log.e('${e.code} + ${e.message ?? ''}', e, st);
@@ -116,7 +115,7 @@ mixin FirebaseServiceStorageMixin {
   }) async {
     try {
       // Check if file exists, exit if it does
-      await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
+      await storage.ref(firebaseFilePath).getDownloadURL();
 
       return null;
     } on FirebaseException catch (e, st) {
@@ -127,14 +126,13 @@ mixin FirebaseServiceStorageMixin {
 
       // File does not exist, continue uploading
       try {
-        final UploadTask task =
-            _firebaseStorage.ref(firebaseFilePath).putFile(
-                  io.File(localFilePath),
-                  SettableMetadata(
-                    contentType: contentType,
-                    customMetadata: customMetadata,
-                  ),
-                );
+        final UploadTask task = storage.ref(firebaseFilePath).putFile(
+              io.File(localFilePath),
+              SettableMetadata(
+                contentType: contentType,
+                customMetadata: customMetadata,
+              ),
+            );
 
         return task;
       } on FirebaseException catch (e, st) {
@@ -145,7 +143,7 @@ mixin FirebaseServiceStorageMixin {
   }
 
   Future<String> getFileDownloadUrl(String storagePath) async {
-    return _firebaseStorage.ref(storagePath).getDownloadURL();
+    return storage.ref(storagePath).getDownloadURL();
   }
 
   /// Download a file to memory
@@ -158,7 +156,7 @@ mixin FirebaseServiceStorageMixin {
     final io.File downloadToFile = io.File(downloadToLocation);
 
     try {
-      final fileRef = _firebaseStorage.ref(firebaseFilePath);
+      final fileRef = storage.ref(firebaseFilePath);
       final DownloadTask task = fileRef.writeToFile(downloadToFile);
       return task;
     } on FirebaseException catch (e, st) {
@@ -170,7 +168,7 @@ mixin FirebaseServiceStorageMixin {
   /// Check if a file exists on the server
   Future<bool> fileExists(String firebaseFilePath) async {
     try {
-      await _firebaseStorage.ref(firebaseFilePath).getDownloadURL();
+      await storage.ref(firebaseFilePath).getDownloadURL();
       return true;
     } on FirebaseException catch (e, st) {
       if (e.code == 'unauthorized') {
@@ -182,6 +180,6 @@ mixin FirebaseServiceStorageMixin {
   }
 
   Future<void> deleteFile(String firebaseFilePath) async {
-    await _firebaseStorage.ref(firebaseFilePath).delete();
+    await storage.ref(firebaseFilePath).delete();
   }
 }

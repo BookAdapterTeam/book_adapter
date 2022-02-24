@@ -4,15 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../data/failure.dart';
 
 mixin FirebaseServiceAuthMixin {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  FirebaseAuth get auth;
 
-  String? get currentUserUid => _auth.currentUser?.uid;
+  String? get currentUserUid => auth.currentUser?.uid;
 
   // Authentication
 
   /// Notifies about changes to the user's sign-in state (such as sign-in or
   /// sign-out).
-  Stream<User?> get authStateChange => _auth.authStateChanges();
+  Stream<User?> get authStateChange => auth.authStateChanges();
 
   /// Notifies about changes to any user updates.
   ///
@@ -23,7 +23,7 @@ mixin FirebaseServiceAuthMixin {
   /// (signed-in, signed-out, different user & token refresh) without
   /// manually having to call [reload] and then rehydrating changes to your
   /// application.
-  Stream<User?> get userChanges => _auth.userChanges();
+  Stream<User?> get userChanges => auth.userChanges();
 
   /// Attempts to sign in a user with the given email address and password.
   ///
@@ -54,7 +54,7 @@ mixin FirebaseServiceAuthMixin {
     required String password,
   }) async {
     try {
-      final userCredential = await _auth.signInWithEmailAndPassword(
+      final userCredential = await auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -92,7 +92,7 @@ mixin FirebaseServiceAuthMixin {
     required String password,
   }) async {
     try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
+      final userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -110,7 +110,7 @@ mixin FirebaseServiceAuthMixin {
   ///
   /// If successful, it also update the stream [authStateChange]
   Future<void> signOut() async {
-    await _auth.signOut();
+    await auth.signOut();
   }
 
   /// Returns the current [User] if they are currently signed-in, or `null` if
@@ -120,13 +120,13 @@ mixin FirebaseServiceAuthMixin {
   /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
   /// subscribe to updates.
   User? get currentUser {
-    return _auth.currentUser;
+    return auth.currentUser;
   }
 
   /// Send reset password email
   Future<Either<Failure, void>> resetPassword(String email) async {
     try {
-      await _auth.sendPasswordResetEmail(email: email);
+      await auth.sendPasswordResetEmail(email: email);
       return const Right(null);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(
@@ -142,7 +142,7 @@ mixin FirebaseServiceAuthMixin {
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   Future<bool> setDisplayName(String name) async {
-    final user = _auth.currentUser;
+    final user = auth.currentUser;
     if (user == null) {
       return false;
     }
@@ -155,7 +155,7 @@ mixin FirebaseServiceAuthMixin {
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
   Future<bool> setProfilePhoto(String photoURL) async {
-    final user = _auth.currentUser;
+    final user = auth.currentUser;
     if (user == null) {
       return false;
     }

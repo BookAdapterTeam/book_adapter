@@ -8,20 +8,23 @@ import 'package:book_adapter/service/firebase_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
-
-final fakeFirebaseServiceProvider = Provider<MockFirebaseService>((ref) {
-  return MockFirebaseService(firebaseAuth: MockFirebaseAuth());
-});
 
 class MockFirebaseService implements FirebaseService {
-  MockFirebaseService({required this.firebaseAuth});
-  final FirebaseAuth firebaseAuth;
+  MockFirebaseService({
+    required this.auth,
+    required this.storage,
+    required this.firestore,
+  });
+  @override
+  final FirebaseAuth auth;
+  @override
+  final FirebaseStorage storage;
+  @override
+  final FirebaseFirestore firestore;
 
   @override
-  Stream<User?> get authStateChange => firebaseAuth.authStateChanges();
+  Stream<User?> get authStateChange => auth.authStateChanges();
 
   // Mock get list of books
   @override
@@ -51,7 +54,7 @@ class MockFirebaseService implements FirebaseService {
     required String password,
   }) async {
     try {
-      final userCredential = await firebaseAuth.signInWithEmailAndPassword(
+      final userCredential = await auth.signInWithEmailAndPassword(
           email: email, password: password);
       // Return the data incase the caller needs it
       return Right(userCredential);
@@ -64,7 +67,7 @@ class MockFirebaseService implements FirebaseService {
 
   @override
   Future<void> signOut() async {
-    await firebaseAuth.signOut();
+    await auth.signOut();
   }
 
   @override
@@ -73,7 +76,7 @@ class MockFirebaseService implements FirebaseService {
     required String password,
   }) async {
     try {
-      final userCredential = await firebaseAuth.createUserWithEmailAndPassword(
+      final userCredential = await auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -89,13 +92,13 @@ class MockFirebaseService implements FirebaseService {
 
   /// Get the current user
   @override
-  User? get currentUser => firebaseAuth.currentUser;
+  User? get currentUser => auth.currentUser;
 
   /// Send reset password email
   @override
   Future<Either<Failure, void>> resetPassword(String email) async {
     try {
-      await firebaseAuth.sendPasswordResetEmail(email: email);
+      await auth.sendPasswordResetEmail(email: email);
       return const Right(null);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(
@@ -108,7 +111,7 @@ class MockFirebaseService implements FirebaseService {
 
   @override
   Future<bool> setDisplayName(String name) async {
-    final user = firebaseAuth.currentUser;
+    final user = auth.currentUser;
     if (user == null) {
       return false;
     }
@@ -118,7 +121,7 @@ class MockFirebaseService implements FirebaseService {
 
   @override
   Future<bool> setProfilePhoto(String photoURL) async {
-    final user = firebaseAuth.currentUser;
+    final user = auth.currentUser;
     if (user == null) {
       return false;
     }

@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
@@ -17,15 +19,30 @@ import 'firebase_service_storage_mixin.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
 final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {
-  return FirebaseService();
+  return FirebaseService(
+    firestore: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
+    storage: FirebaseStorage.instance,
+  );
 });
 
 /// A utility class to handle all Firebase calls
 class FirebaseService
     with FirebaseServiceAuthMixin, FirebaseServiceStorageMixin {
-  FirebaseService() : super();
+  FirebaseService({
+    required this.firestore,
+    required this.storage,
+    required this.auth,
+  }) : super();
 
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseFirestore firestore;
+
+  @override
+  final FirebaseStorage storage;
+
+  @override
+  final FirebaseAuth auth;
+
   static const _uuid = Uuid();
 
   String getDefaultCollectionName(String userUid) => '$userUid-Default';
@@ -33,7 +50,7 @@ class FirebaseService
   // Database ******************************************************************
 
   /// Firestore BookCollections reference
-  CollectionReference<AppCollection> get _collectionsRef => _firestore
+  CollectionReference<AppCollection> get _collectionsRef => firestore
       .collection(kCollectionsCollectionName)
       .withConverter<AppCollection>(
         fromFirestore: (doc, _) {
@@ -59,7 +76,7 @@ class FirebaseService
 
   /// Firestore BookCollections reference
   CollectionReference<Book> get _booksRef =>
-      _firestore.collection(kBooksCollectionName).withConverter<Book>(
+      firestore.collection(kBooksCollectionName).withConverter<Book>(
             fromFirestore: (doc, _) {
               final data = doc.data();
               data!.addAll({'id': doc.id});
@@ -81,7 +98,7 @@ class FirebaseService
 
   /// Firestore BookCollections reference
   CollectionReference<Series> get _seriesRef =>
-      _firestore.collection(kSeriesCollectionName).withConverter<Series>(
+      firestore.collection(kSeriesCollectionName).withConverter<Series>(
             fromFirestore: (doc, _) {
               final data = doc.data();
               data!.addAll({'id': doc.id});
@@ -413,7 +430,7 @@ class FirebaseService
   /// path is the firestore path to the document, ie `collection/document/collection/...`
   Future<void> deleteDocument(String path) async {
     try {
-      return _firestore.doc(path).delete();
+      return firestore.doc(path).delete();
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
