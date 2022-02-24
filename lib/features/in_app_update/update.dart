@@ -25,13 +25,13 @@ class UpdateManager {
     HttpUtils.init(baseUrl: baseUrl, timeout: timeout, headers: headers);
   }
 
-  static void checkUpdate(
+  static Future<void> checkUpdate(
     BuildContext context,
     String url,
     final VoidCallback? onIgnore,
     final VoidCallback? onClose,
-  ) {
-    HttpUtils.get(url).then((response) {
+  ) async {
+    await HttpUtils.get(url).then((response) {
       UpdateParser.parseJson(json.encode(response)).then(
         (data) {
           if (data == null) return;
@@ -40,8 +40,8 @@ class UpdateManager {
             updateData: data,
             onIgnore: onIgnore,
             onClose: onClose,
-            onInstall: (String filePath) {
-              CommonUtils.installAPP(
+            onInstall: (String filePath) async {
+              await CommonUtils.installAPP(
                 filePath: filePath,
                 githubReleaseUrl: data.githubReleaseUrl,
               );

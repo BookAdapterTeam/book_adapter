@@ -89,7 +89,7 @@ class UpdatePrompter {
     return updateContent;
   }
 
-  void onUpdate() {
+  Future<void> onUpdate() async {
     if (Platform.isIOS) {
       doInstall();
       return;
@@ -97,7 +97,7 @@ class UpdatePrompter {
 
     if (_apkFile == null) return;
 
-    HttpUtils.downloadFile(
+    await HttpUtils.downloadFile(
       updateData.androidDownloadUrl,
       _apkFile!.path,
       onReceiveProgress: (int count, int total) {

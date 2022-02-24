@@ -33,11 +33,9 @@ void main() {
 
       // Mock sign in.
       final userCred = await firebaseService.signIn(
-              email: 'bob@somedomain.com', password: 'password');
-      
-      expect(
-          userCred.isRight(),
-          true);
+          email: 'bob@somedomain.com', password: 'password');
+
+      expect(userCred.isRight(), true);
     });
 
     // TODO: Test signup

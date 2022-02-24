@@ -185,18 +185,20 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   @override
   void initState() {
     super.initState();
-    if (!widget.ignoreUpdate) {
-      UpdateManager.checkUpdate(
-        context,
-        _updateUrl,
-        widget.onIgnore,
-        widget.onClose,
-      );
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.child;
+    return !widget.ignoreUpdate ? widget.child : FutureBuilder<void>(
+      future: UpdateManager.checkUpdate(
+        context,
+        _updateUrl,
+        widget.onIgnore,
+        widget.onClose,
+      ),
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
+        return widget.child;
+      },
+    );
   }
 }

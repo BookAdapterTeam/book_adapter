@@ -11,6 +11,7 @@ import 'package:book_adapter/features/library/library_view.dart';
 import 'package:book_adapter/features/widgets/init_widget.dart';
 import 'package:book_adapter/service/firebase_service.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:firebase_storage_mocks/firebase_storage_mocks.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 import 'service/mock_firebase_service.dart';
+
+final fakeUserChangesProvider =
+    StreamProvider.autoDispose.family<User?, MockUser>((ref, mockUser) async* {
+  yield mockUser;
+});
 
 // Run the following command
 // - `flutter test`
@@ -60,7 +66,7 @@ void main() {
     });
 
     final firebaseService = MockFirebaseService(
-      auth: MockFirebaseAuth(mockUser: mockUser),
+      auth: MockFirebaseAuth(mockUser: mockUser, signedIn: true),
       firestore: firestoreInstance,
       storage: MockFirebaseStorage(),
     );
@@ -69,23 +75,25 @@ void main() {
       overrides: [
         firebaseServiceProvider.overrideWithValue(firebaseService),
         providerForInitStream.overrideWithValue(const AsyncData(null)),
-        authStateChangesProvider.overrideWithValue(AsyncData(mockUser)),
+        authStateChangesProvider
+            .overrideWithProvider(fakeUserChangesProvider(mockUser)),
+        userChangesProvider
+            .overrideWithProvider(fakeUserChangesProvider(mockUser)),
       ],
       child: const MyApp(),
     ));
 
-    // // The first frame is a loading state.
-    // expect(find.byType(CircularProgressIndicator), findsOneWidget,
-    //     reason: 'loading');
+    // The first frame is a loading state.
+    expect(find.byType(CircularProgressIndicator), findsOneWidget,
+        reason: 'loading');
 
-    // // Re-render.
-    // await tester.pump();
+    // Re-render.
+    await tester.pumpAndSettle();
 
     // No-longer loading
     expect(find.byType(CircularProgressIndicator), findsNothing,
         reason: 'not loading');
-    expect(find.byType(LibraryView), findsOneWidget,
-        reason: 'not loading');
+    expect(find.byType(LibraryView), findsOneWidget, reason: 'not loading');
 
     // Rendered three ListTiles with the data returned by MockFirebaseService
     await tester.pump();

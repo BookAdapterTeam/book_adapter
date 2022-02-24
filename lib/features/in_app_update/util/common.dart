@@ -96,7 +96,7 @@ class CommonUtils {
   /// Installs APK on android, goes to app store on iOS
   ///
   /// 安装apk
-  static void installAPP({
+  static Future<void> installAPP({
     required String filePath,
     required String githubReleaseUrl,
   }) async {
