@@ -107,7 +107,8 @@ class UpdateData {
     return 'UpdateEntity(hasUpdate: $hasUpdate, isForce: $isForce, '
         'versionCode: $versionCode, '
         'versionName: $versionName, updateContent: $updateContent, '
-        'downloadUrl: $androidDownloadUrl, githubReleaseUrl: $githubReleaseUrl, '
+        'downloadUrl: $androidDownloadUrl, '
+        'githubReleaseUrl: $githubReleaseUrl, '
         'apkSize: $apkSize, apkMd5: $apkMd5)';
   }
 }
