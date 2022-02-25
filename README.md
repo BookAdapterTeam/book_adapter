@@ -73,6 +73,16 @@ Code coverage is generated automatically when GitHub Actions are run, and upload
 5. Open a Pull Request from your branch to main
 6. The PR can be merged by an Admin if there are no issues
 
+## Debugging
+
+### IOS Build Errors
+
+If you run into this error
+ > `Umbrella header for module 'GoogleUtilities' does not include header 'GULSwizzler.h'`
+
+This error is caused by improperly removing the GoogleServices-info.plist file. Readd the file with XCode and then remove the file again through XCode instead
+of using the file manager.
+
 ## Getting Started with Flutter
 
 This project is a starting point for a Flutter application.
