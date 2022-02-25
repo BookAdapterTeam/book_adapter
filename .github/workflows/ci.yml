@@ -14,10 +14,10 @@ jobs:
     name: Run flutter test and analyze
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the code
+      - name: Checkout Repository
         uses: actions/checkout@v2
         
-      - name: Setup java
+      - name: Setup Java
         uses: actions/setup-java@v1
         with:
           java-version: "12.x"
@@ -25,22 +25,22 @@ jobs:
         uses: subosito/flutter-action@v1
         with:
           channel: "stable"
-      - name: Restore packages
+      - name: Restore Packages
         run: flutter pub get
       - name: Analyze
         run: flutter analyze
-      - name: Run tests
+      - name: Run Tests
         run: flutter test --coverage
-      - name: Upload coverage to codecov
-        run: curl -s https://codecov.io/bash
-        shell: bash
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v2.1.0
+
 
   build_ios_without_signing:
     name: Build Flutter (iOS) Without Signing
     needs: [flutter_test]
     runs-on: macos-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Setup Java
         uses: actions/setup-java@v1
@@ -137,7 +137,7 @@ jobs:
     needs: [flutter_test]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Install Firebase google services and setup keystore for signing
         env:
@@ -174,7 +174,7 @@ jobs:
     needs: [flutter_test]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v2
       - name: Install Firebase google services and setup keystore for signing
         env:
