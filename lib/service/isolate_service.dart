@@ -356,11 +356,11 @@ class IsolateService {
         }
 
         // Send the result to the main isolate.
-        // Use Isolate.exit instead of p.send for large pieces of 
+        // Use Isolate.exit instead of p.send for large pieces of
         // data so that dart does not copy the values
         Isolate.exit(p, coverImage);
       } else if (message == null) {
-        // Exit if the main isolate sends a null message, 
+        // Exit if the main isolate sends a null message,
         // indicating there are no more files to read and parse.
         break;
       }

@@ -21,8 +21,8 @@ class ProfileButton extends ConsumerWidget {
           tooltip: 'Account Details',
           key: const ValueKey('profile'),
           icon: user != null
-                ? _userLoggedIn(user)
-                : const Icon(Icons.account_circle),
+              ? _userLoggedIn(user)
+              : const Icon(Icons.account_circle),
           onPressed: () {
             // Navigate to the settings page. If the user leaves and returns
             // to the app after it has been killed while running in the
@@ -32,12 +32,12 @@ class ProfileButton extends ConsumerWidget {
         );
       },
       loading: () => IconButton(
-          key: const ValueKey('profile'),
-          icon: const Icon(Icons.account_circle),
-          onPressed: () {
-            Navigator.restorablePushNamed(context, ProfileView.routeName);
-          },
-        ),
+        key: const ValueKey('profile'),
+        icon: const Icon(Icons.account_circle),
+        onPressed: () {
+          Navigator.restorablePushNamed(context, ProfileView.routeName);
+        },
+      ),
       error: (e, st) {
         log.e('Error getting user data', e, st);
         return IconButton(
@@ -52,12 +52,11 @@ class ProfileButton extends ConsumerWidget {
   }
 
   Widget _userLoggedIn(User user) {
-    return user.photoURL != null 
+    return user.photoURL != null
         ? CircleAvatar(
-          backgroundImage:
-            NetworkImage(user.photoURL!),
-          backgroundColor: Colors.grey,
-        )
+            backgroundImage: NetworkImage(user.photoURL!),
+            backgroundColor: Colors.grey,
+          )
         : const Icon(Icons.account_circle);
   }
 }

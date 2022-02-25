@@ -127,9 +127,9 @@ class UpdateInfo {
   @override
   String toString() {
     return 'UpdateInfo(Code: $code, Msg: $msg, UpdateStatus: $updateStatus, '
-    'VersionCode: $versionCode, VersionName: $versionName, '
-    'UploadTime: $uploadTime, ModifyContent: $modifyContent, '
-    'DownloadUrl: $androidDownloadUrl, GithubReleaseUrl: $githubReleaseUrl, '
-    'ApkMd5: $apkMd5, ApkSize: $apkSize)';
+        'VersionCode: $versionCode, VersionName: $versionName, '
+        'UploadTime: $uploadTime, ModifyContent: $modifyContent, '
+        'DownloadUrl: $androidDownloadUrl, GithubReleaseUrl: $githubReleaseUrl, '
+        'ApkMd5: $apkMd5, ApkSize: $apkSize)';
   }
 }

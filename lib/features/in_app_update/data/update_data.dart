@@ -21,7 +21,7 @@ class UpdateData {
   /// Can this version be ignored
   ///
   /// 是否可忽略该版本
-   bool get isIgnorable => !isForce;
+  bool get isIgnorable => !isForce;
 
   //===========Update information - 升级的信息=============//
 
@@ -105,9 +105,9 @@ class UpdateData {
   @override
   String toString() {
     return 'UpdateEntity(hasUpdate: $hasUpdate, isForce: $isForce, '
-    'versionCode: $versionCode, '
-    'versionName: $versionName, updateContent: $updateContent, '
-    'downloadUrl: $androidDownloadUrl, githubReleaseUrl: $githubReleaseUrl, '
-    'apkSize: $apkSize, apkMd5: $apkMd5)';
+        'versionCode: $versionCode, '
+        'versionName: $versionName, updateContent: $updateContent, '
+        'downloadUrl: $androidDownloadUrl, githubReleaseUrl: $githubReleaseUrl, '
+        'apkSize: $apkSize, apkMd5: $apkMd5)';
   }
 }

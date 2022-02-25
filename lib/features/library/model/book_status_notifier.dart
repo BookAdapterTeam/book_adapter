@@ -38,7 +38,7 @@ final bookStatusProvider = StateNotifierProvider.family
 class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
   BookStatusNotifier(this._read, this.book, AsyncValue<BookStatus> status)
       : super(status) {
-      updateStatus();
+    updateStatus();
   }
 
   final Book book;
@@ -76,7 +76,7 @@ class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
   /// Only updates if `state == const AsyncValue.loading()`
   void updateStatus() {
     if (state != const AsyncLoading<BookStatus>()) return;
-    
+
     final storageService = _read(storageServiceProvider);
     final path = storageService.getAppFilePath(book.filepath);
 

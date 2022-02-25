@@ -5,22 +5,23 @@ const String legalese = 'Legal stuff here.';
 extension Localization on String {
   // Example in English. It is not required to enter it in for English
   static final _t = Translations.byLocale('en_us') +
-    {
-      'en_us': {
-        'Book Adapter': 'Book Adapter',
-        legalese: 'Blah blah.',
-        'Library': 'Library',
-        'Settings': 'Settings',
-        'This is the reader in the future': 'This is the reader in the future',
-      },
-    }
-    // + 
-    // {
-    //   'language_code': {
-    //     'Original string': 'Translated string',
-    //   }
-    // }
-    ;
+          {
+            'en_us': {
+              'Book Adapter': 'Book Adapter',
+              legalese: 'Blah blah.',
+              'Library': 'Library',
+              'Settings': 'Settings',
+              'This is the reader in the future':
+                  'This is the reader in the future',
+            },
+          }
+      // +
+      // {
+      //   'language_code': {
+      //     'Original string': 'Translated string',
+      //   }
+      // }
+      ;
 
   String get i18n => localize(this, _t);
 

@@ -6,7 +6,7 @@ import 'toast_utils.dart';
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/utils/http.dart
 
 /// Network request tools
-/// 
+///
 /// 网络请求工具类
 class HttpUtils {
   HttpUtils._internal();
@@ -16,7 +16,7 @@ class HttpUtils {
   static final _log = Logger();
 
   /// Global initialization
-  /// 
+  ///
   /// 全局初始化
   static void init({
     String baseUrl = '',
@@ -91,7 +91,7 @@ class HttpUtils {
   }
 
   /// Post Request
-  /// 
+  ///
   /// post 表单请求
   static Future post(String url, [Map<String, dynamic>? params]) async {
     final Response response = await sDio.post(url, queryParameters: params);
@@ -99,7 +99,7 @@ class HttpUtils {
   }
 
   /// Post Body Request
-  /// 
+  ///
   /// post body请求
   static Future postJson<T>(String url, [Map<String, dynamic>? data]) async {
     final Response response = await sDio.post(url, data: data);
@@ -107,7 +107,7 @@ class HttpUtils {
   }
 
   /// Download File
-  /// 
+  ///
   /// 下载文件
   static Future downloadFile(
     String urlPath,

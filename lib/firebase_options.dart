@@ -54,7 +54,8 @@ class DefaultFirebaseOptions {
     messagingSenderId: '1038050596871',
     projectId: 'bookadapter',
     storageBucket: 'bookadapter.appspot.com',
-    iosClientId: '1038050596871-d6hnsqhmv99sgakk9uu65acrcnc7vpc3.apps.googleusercontent.com',
+    iosClientId:
+        '1038050596871-d6hnsqhmv99sgakk9uu65acrcnc7vpc3.apps.googleusercontent.com',
     iosBundleId: 'com.bookadapterteam.bookadapter',
   );
 }

@@ -9,8 +9,7 @@ part 'file_hash.g.dart';
 // If change Hive stuff, run `flutter packages pub run build_runner build`
 // with flutter generate disabled in pubspec.yaml
 @immutable
-@HiveType(typeId: 1) 
-
+@HiveType(typeId: 1)
 class FileHash extends Equatable {
   @HiveField(0)
   final String filepath;
@@ -69,8 +68,7 @@ class FileHash extends Equatable {
       FileHash.fromMap(json.decode(source));
 
   @override
-  String toString() =>
-      'FileHash('
+  String toString() => 'FileHash('
       'filepath: $filepath, '
       'collectionName: $collectionName, '
       'md5: $md5, '

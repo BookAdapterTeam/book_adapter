@@ -18,10 +18,7 @@ class ProfileWidget extends StatelessWidget {
     return Center(
       child: Stack(
         children: [
-          _ProfileImage(
-            imageUrl: photoUrl,
-            onPressed: onPressed
-          ),
+          _ProfileImage(imageUrl: photoUrl, onPressed: onPressed),
 
           // For editing the profile image and username
           Positioned(
@@ -62,7 +59,7 @@ class _ProfileImage extends StatelessWidget {
           ),
           onTap: onPressed,
         ),
-        
+
         // Ink.image(
         //   image: image,
         //   fit: BoxFit.cover,
@@ -106,7 +103,7 @@ class _EditIcon extends StatelessWidget {
 }
 
 class _Circle extends StatelessWidget {
-  const _Circle ({
+  const _Circle({
     Key? key,
     required this.child,
     required this.all,
