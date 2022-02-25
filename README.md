@@ -62,7 +62,6 @@ Launch an emulator, then run the following command
 ### Code Coverage
 
 Code coverage is generated automatically when GitHub Actions are run, and uploaded to [codecov.io](https://app.codecov.io/gh/BookAdapterTeam/book_adapter)
-[![License](https://img.shields.io/github/license/BookAdapterTeam/book_adapter)](https://github.com/BookAdapterTeam/book_adapter/blob/main/LICENSE)
 
 ## Contributing
 
