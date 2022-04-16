@@ -35,8 +35,7 @@ class ToastUtils {
     showToast(msg, duration: duration, backgroundColor: Colors.red);
   }
 
-  static void success(String msg,
-      {Duration duration = defaultToastDuration}) {
+  static void success(String msg, {Duration duration = defaultToastDuration}) {
     showToast(msg, duration: duration, backgroundColor: Colors.lightGreen);
   }
 }
