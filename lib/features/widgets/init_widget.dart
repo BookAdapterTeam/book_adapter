@@ -189,7 +189,7 @@ class _UpdateCheckerState extends State<UpdateChecker> {
 
   @override
   Widget build(BuildContext context) {
-    return !widget.ignoreUpdate
+    return widget.ignoreUpdate
         ? widget.child
         : FutureBuilder<void>(
             future: UpdateManager.checkUpdate(

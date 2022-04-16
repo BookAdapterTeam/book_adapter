@@ -19,10 +19,16 @@ class UpdateManager {
   /// 全局初始化
   static void init({
     String baseUrl = '',
-    int timeout = 5000,
+    int updateCheckTimeout = 5000,
+    int downloadTimeout = 5000,
     Map<String, dynamic>? headers,
   }) {
-    HttpUtils.init(baseUrl: baseUrl, timeout: timeout, headers: headers);
+    HttpUtils.init(
+      baseUrl: baseUrl,
+      updateCheckTimeout: updateCheckTimeout,
+      downloadTimeout: downloadTimeout,
+      headers: headers,
+    );
   }
 
   static Future<void> checkUpdate(
@@ -31,7 +37,7 @@ class UpdateManager {
     final VoidCallback? onIgnore,
     final VoidCallback? onClose,
   ) async {
-    await HttpUtils.get(url).then((response) {
+    await HttpUtils.get<Map<String, dynamic>>(url).then((response) {
       UpdateParser.parseJson(json.encode(response)).then(
         (data) {
           if (data == null) return;

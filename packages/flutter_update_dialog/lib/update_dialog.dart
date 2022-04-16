@@ -8,8 +8,11 @@ import 'number_progress.dart';
 ///版本更新加提示框
 class UpdateDialog {
   bool _isShowing = false;
+  final bool isForce;
   late BuildContext _context;
   late UpdateWidget _widget;
+  final GlobalKey<_UpdateWidgetState> keyUpdateWidget =
+      GlobalKey<_UpdateWidgetState>(debugLabel: 'updateDialogGlobalKey');
 
   // ignore: sort_constructors_first
   UpdateDialog(
@@ -28,13 +31,14 @@ class UpdateDialog {
     double radius = 4.0,
     Color themeColor = Colors.red,
     VoidCallback? onIgnore,
-    bool isForce = false,
+    this.isForce = false,
     String? updateButtonText,
     String? ignoreButtonText,
     VoidCallback? onClose,
   }) {
     _context = context;
     _widget = UpdateWidget(
+      key: keyUpdateWidget,
       width: width,
       title: title,
       updateContent: updateContent,
@@ -74,7 +78,7 @@ class UpdateDialog {
           builder: (BuildContext context) {
             return WillPopScope(
               onWillPop: () {
-                if (!_widget.isForce) {
+                if (!isForce) {
                   dismiss();
                 }
 
@@ -116,7 +120,7 @@ class UpdateDialog {
   /// 更新进度
   void update(double progress) {
     if (isShowing()) {
-      _widget.update(progress);
+      keyUpdateWidget.currentState?.update(progress);
     }
   }
 

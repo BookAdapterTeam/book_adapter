@@ -1,10 +1,10 @@
 name: book_adapter
 description: A new Flutter project.
 publish_to: "none"
-version: 0.4.2+9
+version: 0.4.0+7
 
 environment:
-  sdk: ">=2.16.0 <3.0.0"
+  sdk: ">=2.16.2 <3.0.0"
 
 dependencies:
   cached_network_image: ^3.1.0
@@ -42,7 +42,7 @@ dependencies:
   package_info: ^2.0.2
   oktoast: ^3.1.5
   app_installer: ^1.1.0
-  dio: ^4.0.1
+  dio: ^4.0.6
   permission_handler: ^9.1.0
   sticky_and_expandable_list: ^1.0.2
   crypto: ^3.0.1

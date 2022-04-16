@@ -34,7 +34,7 @@ class UpdatePrompter {
     required this.onClose,
   });
 
-  void show(BuildContext context) async {
+  Future<void> show(BuildContext context) async {
     if (_dialog != null && _dialog!.isShowing()) {
       return;
     }
@@ -106,10 +106,10 @@ class UpdatePrompter {
           _dialog?.update(_progress);
         }
       },
-    ).then((value) {
+    ).then((_) {
       doInstall();
-    }).catchError((value) {
-      ToastUtils.success('Download Failed!');
+    }).catchError((_) {
+      ToastUtils.error('Download Failed!');
       _dialog?.dismiss();
     });
   }

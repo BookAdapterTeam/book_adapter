@@ -11,5 +11,8 @@ void main() async {
 
 Future<void> init() async {
   WidgetsFlutterBinding.ensureInitialized();
-  UpdateManager.init();
+  UpdateManager.init(
+    updateCheckTimeout: 60 * 1000, // 1 minute
+    downloadTimeout: 60 * 1000, // 1 minute
+  );
 }

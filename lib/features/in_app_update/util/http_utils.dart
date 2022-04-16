@@ -11,23 +11,26 @@ import 'toast_utils.dart';
 class HttpUtils {
   HttpUtils._internal();
 
-  static late Dio sDio;
+  static late final Dio sDio;
 
   static final _log = Logger();
+  static late final int downloadTimeout;
 
   /// Global initialization
   ///
   /// 全局初始化
   static void init({
     String baseUrl = '',
-    int timeout = 5000,
+    int updateCheckTimeout = 5000,
+    int downloadTimeout = 5000,
     Map<String, dynamic>? headers,
   }) {
+    HttpUtils.downloadTimeout = downloadTimeout;
     sDio = Dio(BaseOptions(
         baseUrl: baseUrl,
-        connectTimeout: timeout,
-        sendTimeout: timeout,
-        receiveTimeout: timeout,
+        connectTimeout: updateCheckTimeout,
+        sendTimeout: updateCheckTimeout,
+        receiveTimeout: updateCheckTimeout,
         headers: headers));
     // Add interceptor - 添加拦截器
     sDio.interceptors.add(InterceptorsWrapper(onRequest: (
@@ -80,36 +83,20 @@ class HttpUtils {
   /// Get Request
   ///
   /// get请求
-  static Future get(String url, [Map<String, dynamic>? params]) async {
-    Response response;
+  static Future<T?> get<T>(String url, [Map<String, dynamic>? params]) async {
+    Response<T> response;
     if (params != null) {
-      response = await sDio.get(url, queryParameters: params);
+      response = await sDio.get<T>(url, queryParameters: params);
     } else {
-      response = await sDio.get(url);
+      response = await sDio.get<T>(url);
     }
-    return response.data;
-  }
-
-  /// Post Request
-  ///
-  /// post 表单请求
-  static Future post(String url, [Map<String, dynamic>? params]) async {
-    final Response response = await sDio.post(url, queryParameters: params);
-    return response.data;
-  }
-
-  /// Post Body Request
-  ///
-  /// post body请求
-  static Future postJson<T>(String url, [Map<String, dynamic>? data]) async {
-    final Response response = await sDio.post(url, data: data);
     return response.data;
   }
 
   /// Download File
   ///
   /// 下载文件
-  static Future downloadFile(
+  static Future<Response> downloadFile(
     String urlPath,
     String savePath, {
     ProgressCallback? onReceiveProgress,
@@ -118,7 +105,10 @@ class HttpUtils {
       urlPath,
       savePath,
       onReceiveProgress: onReceiveProgress,
-      options: Options(sendTimeout: 25000, receiveTimeout: 25000),
+      options: Options(
+        sendTimeout: downloadTimeout,
+        receiveTimeout: downloadTimeout,
+      ),
     );
     return response;
   }
