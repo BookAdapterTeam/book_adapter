@@ -31,12 +31,13 @@ class UpdateManager {
     );
   }
 
-  static Future<void> checkUpdate(
-    BuildContext context,
-    String url,
+  static Future<void> checkUpdate({
+    required BuildContext context,
+    required String url,
     final VoidCallback? onIgnore,
     final VoidCallback? onClose,
-  ) async {
+    final VoidCallback? onNoUpdate,
+  }) async {
     await HttpUtils.get<Map<String, dynamic>>(url).then((response) {
       UpdateParser.parseJson(json.encode(response)).then(
         (data) {
@@ -46,6 +47,7 @@ class UpdateManager {
             updateData: data,
             onIgnore: onIgnore,
             onClose: onClose,
+            onNoUpdate: onNoUpdate,
             onInstall: (String filePath) async {
               await CommonUtils.installAPP(
                 filePath: filePath,

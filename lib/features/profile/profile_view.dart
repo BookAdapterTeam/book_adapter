@@ -7,6 +7,7 @@ import 'package:package_info/package_info.dart';
 import '../../controller/firebase_controller.dart';
 import 'edit_profile_view.dart';
 import 'widgets/change_password_button.dart';
+import 'widgets/check_update_button.dart';
 import 'widgets/log_out_button.dart';
 import 'widgets/profile_widget.dart';
 
@@ -66,6 +67,7 @@ class ProfileView extends ConsumerWidget {
                 const _NameEmailWidget(),
                 const SizedBox(height: 64),
                 const ChangePasswordButton(),
+                const CheckUpdateButton(),
                 const LogOutButton(),
               ]
             ],

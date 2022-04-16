@@ -21,6 +21,7 @@ class UpdatePrompter {
 
   final VoidCallback? onIgnore;
   final VoidCallback? onClose;
+  final VoidCallback? onNoUpdate;
   UpdateDialog? _dialog;
 
   double _progress = 0.0;
@@ -32,6 +33,7 @@ class UpdatePrompter {
     required this.onInstall,
     required this.onIgnore,
     required this.onClose,
+    required this.onNoUpdate,
   });
 
   Future<void> show(BuildContext context) async {
@@ -39,7 +41,10 @@ class UpdatePrompter {
       return;
     }
 
-    if (!updateData.hasUpdate) return;
+    if (!updateData.hasUpdate) {
+      onNoUpdate?.call();
+      return;
+    }
 
     final String title = 'Upgrade to ${updateData.versionName}?';
     final String updateContent = getUpdateContent();

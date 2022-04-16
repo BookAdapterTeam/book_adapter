@@ -30,3 +30,5 @@ const kCornerRadius = 8.0;
 const kTransitionDuration = Duration(milliseconds: 350);
 
 const kSnackBarDuration = Duration(seconds: 2);
+
+const kUpdateUrl = 'https://www.bookadapter.com/update/update.json';

@@ -180,8 +180,6 @@ class UpdateChecker extends StatefulWidget {
 }
 
 class _UpdateCheckerState extends State<UpdateChecker> {
-  final _updateUrl = 'https://www.bookadapter.com/update/update.json';
-
   @override
   void initState() {
     super.initState();
@@ -193,10 +191,10 @@ class _UpdateCheckerState extends State<UpdateChecker> {
         ? widget.child
         : FutureBuilder<void>(
             future: UpdateManager.checkUpdate(
-              context,
-              _updateUrl,
-              widget.onIgnore,
-              widget.onClose,
+              context: context,
+              url: kUpdateUrl,
+              onIgnore: widget.onIgnore,
+              onClose: widget.onClose,
             ),
             builder: (BuildContext context, AsyncSnapshot snapshot) {
               return widget.child;
