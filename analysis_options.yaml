@@ -16,6 +16,7 @@ analyzer:
     - "lib/generated_plugin_registrant.dart"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "**/*.iconfig.dart"
     # This is generated from the i18n vscode extension
     - "**/i18n.dart"
     - "lib/generated/intl/messages*.dart"
@@ -58,7 +59,7 @@ linter:
 
     avoid_annotating_with_dynamic: true
 
-    lines_longer_than_80_chars: true
+    lines_longer_than_80_chars: false
 
     prefer_interpolation_to_compose_strings: true
 
