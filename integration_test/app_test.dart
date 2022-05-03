@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
 // Launch an emulator, then run the following command
-// `flutter drive --target=test_driver/app.dart`
+// `flutter test integration_test`
 
 // Writing integration tests documentation
 // https://flutter.dev/docs/cookbook/testing/integration/introduction
