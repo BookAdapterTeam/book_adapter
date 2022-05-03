@@ -5,6 +5,12 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "paged_html_example",
+            "request": "launch",
+            "program": "packages/paged_html/example/lib/main.dart",
+            "type": "dart",
+        },
+        {
             "name": "book_adapter",
             "request": "launch",
             "type": "dart"

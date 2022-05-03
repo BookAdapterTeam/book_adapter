@@ -15,6 +15,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  boxy:
+    dependency: transitive
+    description:
+      name: boxy
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5+1"
   characters:
     dependency: transitive
     description:
@@ -43,6 +50,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.15.0"
+  csslib:
+    dependency: transitive
+    description:
+      name: csslib
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.17.1"
   cupertino_icons:
     dependency: "direct main"
     description:
@@ -74,6 +88,34 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_widget_from_html_core:
+    dependency: transitive
+    description:
+      name: flutter_widget_from_html_core
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.5+3"
+  fwfh_selectable_text:
+    dependency: transitive
+    description:
+      name: fwfh_selectable_text
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.3+1"
+  fwfh_text_style:
+    dependency: transitive
+    description:
+      name: fwfh_text_style
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.7.3+2"
+  html:
+    dependency: transitive
+    description:
+      name: html
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.15.0"
   lints:
     dependency: transitive
     description:
@@ -102,6 +144,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.0"
+  paged_html:
+    dependency: "direct main"
+    description:
+      path: ".."
+      relative: true
+    source: path
+    version: "0.0.1"
   path:
     dependency: transitive
     description:
@@ -172,3 +221,4 @@ packages:
     version: "2.1.1"
 sdks:
   dart: ">=2.16.2 <3.0.0"
+  flutter: ">=2.8.0"

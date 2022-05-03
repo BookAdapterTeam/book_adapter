@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:paged_html/paged_html.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,53 +15,44 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const PagedHtmlExample(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+class PagedHtmlExample extends StatelessWidget {
+  const PagedHtmlExample({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      appBar: AppBar(title: const Text('PagedHtml Example')),
+      body: PagedHtml(
+        key: const ValueKey('HtmlReader'),
+        scrollDirection: Axis.horizontal,
+        physics: const PageScrollPhysics(),
+        html: '''
+<div>
+  <h1>PagedHtml</h1>
+  <p>A Widget that displays the html in horizontal or verticle pages</p>
+  <p>
+    <a href="https://pub.dev/packages/paged_html">
+      https://pub.dev/packages/paged_html
+    </a>
+  </p>
+  <p>
+    <a href="https://pub.dev/packages/paged_html#readme">
+      https://pub.dev/packages/paged_html#readme
+    </a>
+  </p>
+  <p>
+    <a href="https://pub.dev/packages/paged_html#example">
+      https://pub.dev/packages/paged_html#example
+    </a>
+  </p>
+</div>
+''' *
+            5,
       ),
     );
   }
