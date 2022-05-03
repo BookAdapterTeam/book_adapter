@@ -154,7 +154,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
     // print('Html Height: ${actualSize.height}');
     // print('Max Height: ${constraints.maxHeight}');
 
-    // if actual height == max height, rebuild with less html
+    // TODO: if actual height == max height, rebuild with less html
 
     return actualSize;
   }
