@@ -172,6 +172,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
 
     // TODO: if actual height == max height, rebuild with less html
     // Note: THIS IS NOT WORKING YET
+    // This loop should be in the PageView.builder widget
     HtmlPageAction action = HtmlPageAction.paragraph;
     while (action != HtmlPageAction.none) {
       if (actualHeight < maxHeight) {
