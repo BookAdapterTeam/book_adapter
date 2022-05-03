@@ -66,7 +66,11 @@ class _PagedHtmlState extends State<PagedHtml> {
           });
         },
         itemBuilder: (context, index) {
-          return HtmlPage(html: widget.html, page: index);
+          return HtmlPage(
+            html: widget.html,
+            page: index,
+            onRequestedRebuild: (event, action) {},
+          );
         },
       ),
     );
@@ -111,10 +115,12 @@ class HtmlPage extends StatelessWidget {
     Key? key,
     required this.html,
     required this.page,
+    required this.onRequestedRebuild,
   }) : super(key: key);
 
   final String html;
   final int page;
+  final void Function(HtmlPageEvent, HtmlPageAction) onRequestedRebuild;
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +128,10 @@ class HtmlPage extends StatelessWidget {
       children: [
         Flexible(
           child: CustomBoxy(
-            delegate: _HtmlPageDelegate(html: html),
+            delegate: _HtmlPageDelegate(
+              html: html,
+              requestRebuild: onRequestedRebuild,
+            ),
             children: const [],
           ),
         ),
@@ -132,9 +141,10 @@ class HtmlPage extends StatelessWidget {
 }
 
 class _HtmlPageDelegate extends BoxyDelegate {
-  _HtmlPageDelegate({required this.html});
+  _HtmlPageDelegate({required this.html, required this.requestRebuild});
 
   final String html;
+  final void Function(HtmlPageEvent, HtmlPageAction) requestRebuild;
 
   @override
   Size layout() {
@@ -144,7 +154,10 @@ class _HtmlPageDelegate extends BoxyDelegate {
         // '<h1>Hello World</h1>',
         html,
         enableCaching: true,
-        renderMode: const ListViewMode(shrinkWrap: true),
+        renderMode: const ListViewMode(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+        ),
       ),
     );
 
@@ -154,8 +167,57 @@ class _HtmlPageDelegate extends BoxyDelegate {
     // print('Html Height: ${actualSize.height}');
     // print('Max Height: ${constraints.maxHeight}');
 
+    final actualHeight = actualSize.height;
+    final maxHeight = constraints.maxHeight;
+
     // TODO: if actual height == max height, rebuild with less html
+
+    HtmlPageAction action = HtmlPageAction.paragraph;
+    while (action != HtmlPageAction.none) {
+      if (actualHeight < maxHeight) {
+        requestRebuild(HtmlPageEvent.hasExtraSpace, action);
+      } else {
+        switch (action) {
+          case HtmlPageAction.paragraph:
+            requestRebuild(HtmlPageEvent.hasNoExtraSpace, action);
+            action = HtmlPageAction.sentence;
+            break;
+          case HtmlPageAction.sentence:
+            requestRebuild(HtmlPageEvent.hasNoExtraSpace, action);
+            action = HtmlPageAction.word;
+            break;
+          case HtmlPageAction.word:
+            requestRebuild(HtmlPageEvent.hasNoExtraSpace, action);
+            action = HtmlPageAction.none;
+            break;
+          case HtmlPageAction.none:
+            break;
+        }
+      }
+    }
 
     return actualSize;
   }
+}
+
+enum HtmlPageEvent {
+  /// The html page has extra space available, so extra content can be added.
+  hasExtraSpace,
+
+  /// The html is too long for the page, so some content should be removed.
+  hasNoExtraSpace,
+}
+
+enum HtmlPageAction {
+  /// Add or remove a paragraph from the html content, depending on the event.
+  paragraph,
+
+  /// Add or remove a sentence from the html content, depending on the event.
+  sentence,
+
+  /// Add or remove a word from the html content, depending on the event.
+  word,
+
+  /// Do nothing, rebuild should be ignored
+  none,
 }
