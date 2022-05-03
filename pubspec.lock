@@ -57,6 +57,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.0"
+  boxy:
+    dependency: transitive
+    description:
+      name: boxy
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.5+1"
   build:
     dependency: transitive
     description:
@@ -572,6 +579,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_widget_from_html_core:
+    dependency: transitive
+    description:
+      name: flutter_widget_from_html_core
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.5+3"
   frontend_server_client:
     dependency: transitive
     description:
@@ -584,6 +598,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  fwfh_selectable_text:
+    dependency: transitive
+    description:
+      name: fwfh_selectable_text
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.3+1"
+  fwfh_text_style:
+    dependency: transitive
+    description:
+      name: fwfh_text_style
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.7.3+2"
   gettext_parser:
     dependency: transitive
     description:
@@ -820,6 +848,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.2"
+  paged_html:
+    dependency: "direct main"
+    description:
+      path: "packages/paged_html"
+      relative: true
+    source: path
+    version: "0.0.1"
   path:
     dependency: transitive
     description:
