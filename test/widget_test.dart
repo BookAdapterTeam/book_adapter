@@ -88,7 +88,7 @@ void main() {
         reason: 'loading');
 
     // Re-render.
-    await tester.pumpAndSettle();
+    await tester.pumpAndSettle(const Duration(seconds: 3));
 
     // No-longer loading
     expect(find.byType(CircularProgressIndicator), findsNothing,
