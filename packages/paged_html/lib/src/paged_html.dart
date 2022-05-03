@@ -2,12 +2,6 @@ import 'package:boxy/boxy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
-/// A Calculator.
-class Calculator {
-  /// Returns [value] plus 1.
-  int addOne(int value) => value + 1;
-}
-
 /// A Widget that displays the html in horizontal or verticle pages
 class PagedHtml extends StatefulWidget {
   const PagedHtml({
