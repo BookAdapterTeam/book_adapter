@@ -120,7 +120,7 @@ class HtmlPage extends StatelessWidget {
 
   final String html;
   final int page;
-  final void Function(HtmlPageEvent, HtmlPageAction) onRequestedRebuild;
+  final RebuildRequestCallback onRequestedRebuild;
 
   @override
   Widget build(BuildContext context) {
@@ -144,7 +144,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
   _HtmlPageDelegate({required this.html, required this.requestRebuild});
 
   final String html;
-  final void Function(HtmlPageEvent, HtmlPageAction) requestRebuild;
+  final RebuildRequestCallback requestRebuild;
 
   @override
   Size layout() {
@@ -199,6 +199,8 @@ class _HtmlPageDelegate extends BoxyDelegate {
     return actualSize;
   }
 }
+
+typedef RebuildRequestCallback = void Function(HtmlPageEvent, HtmlPageAction);
 
 enum HtmlPageEvent {
   /// The html page has extra space available, so extra content can be added.
