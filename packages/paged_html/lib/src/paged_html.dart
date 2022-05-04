@@ -1,7 +1,6 @@
 import 'package:boxy/boxy.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import 'html_page_action.dart';
@@ -74,6 +73,7 @@ class _PagedHtmlState extends State<PagedHtml> {
         },
         itemCount: 3,
         itemBuilder: (context, index) {
+          // TODO: Add pages to items list lazily
           return _HtmlPage(
             html: widget.html,
             previousAction: _previousAction,
