@@ -225,12 +225,9 @@ class _HtmlPageDelegate extends BoxyDelegate {
 
     // ** Can not fit all content, remove extra **
 
-    // TODO: Previously removed content and still has too much content
+    // Previously removed content and still has too much content
     if (previousAction.isTypeRemove) {
-      // Previous removed content and still has too much content
       requestRebuild(event, previousAction);
-
-      // TODO: Fix problem where previousAction.amount is always none after above
     }
 
     // Previously added content and now has too much content
