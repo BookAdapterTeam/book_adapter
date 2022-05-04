@@ -17,6 +17,10 @@ class HtmlPageAction {
     required this.amount,
   });
 
+  const HtmlPageAction.none()
+      : type = HtmlPageActionType.none,
+        amount = HtmlPageChangeAmount.none;
+
   const HtmlPageAction.addNone()
       : type = HtmlPageActionType.add,
         amount = HtmlPageChangeAmount.none;
@@ -65,8 +69,14 @@ enum HtmlPageEvent {
 }
 
 enum HtmlPageActionType {
+  /// Add the changed amount of html
   add,
+
+  /// Remove the changed amount of html
   remove,
+
+  /// Do not change the html
+  none,
 }
 
 enum HtmlPageChangeAmount {
@@ -79,6 +89,6 @@ enum HtmlPageChangeAmount {
   /// Add or remove a word from the html content, depending on the event.
   word,
 
-  /// No action is required.
+  /// Do nothing.
   none,
 }
