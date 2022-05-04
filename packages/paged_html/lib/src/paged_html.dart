@@ -1,5 +1,7 @@
 import 'package:boxy/boxy.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import 'paged_html_controller.dart';
@@ -26,18 +28,20 @@ class PagedHtml extends StatefulWidget {
 }
 
 class _PagedHtmlState extends State<PagedHtml> {
-  late PageController _pageController;
+  late PagedHtmlController _pagedHtmlController;
   int currentPage = 0;
+  HtmlPageAction? previousAction;
+  // TODO: Handle to current position in html
 
   @override
   void initState() {
-    _pageController = widget.controller?.pageController ?? PageController();
+    _pagedHtmlController = widget.controller ?? PagedHtmlController();
     super.initState();
   }
 
   @override
   void dispose() {
-    _pageController.dispose();
+    _pagedHtmlController.dispose();
     super.dispose();
   }
 
@@ -51,7 +55,7 @@ class _PagedHtmlState extends State<PagedHtml> {
       }),
       child: PageView.builder(
         scrollDirection: widget.scrollDirection,
-        controller: _pageController,
+        controller: _pagedHtmlController.pageController,
         scrollBehavior: widget.scrollBehavior,
         physics: widget.physics,
         onPageChanged: (index) {
@@ -60,10 +64,47 @@ class _PagedHtmlState extends State<PagedHtml> {
           });
         },
         itemBuilder: (context, index) {
-          return HtmlPage(
+          return _HtmlPage(
             html: widget.html,
+            previousAction: previousAction,
             page: index,
-            onRequestedRebuild: (event, action) {},
+            onRequestedRebuild: (removeAction, addAction) {
+              switch (removeAction) {
+                case HtmlPageAction.paragraph:
+                  // TODO: Remove a paragraph
+                  break;
+                case HtmlPageAction.sentence:
+                  // TODO: Remove a sentence
+                  break;
+                case HtmlPageAction.word:
+                  // TODO: Remove a word
+                  break;
+                case HtmlPageAction.none:
+                  break;
+              }
+
+              switch (addAction) {
+                case HtmlPageAction.paragraph:
+                  // TODO: Add a paragraph
+                  break;
+                case HtmlPageAction.sentence:
+                  // TODO: Add a sentence
+                  break;
+                case HtmlPageAction.word:
+                  // TODO: Add a word
+                  break;
+                case HtmlPageAction.none:
+                  break;
+              }
+
+              SchedulerBinding.instance?.addPostFrameCallback((_) {
+                print('previousAction: $previousAction');
+                print('addAction: $addAction');
+                setState(() {
+                  previousAction = addAction;
+                });
+              });
+            },
           );
         },
       ),
@@ -71,17 +112,22 @@ class _PagedHtmlState extends State<PagedHtml> {
   }
 }
 
-class HtmlPage extends StatelessWidget {
-  const HtmlPage({
+class _HtmlPage extends StatelessWidget {
+  const _HtmlPage({
     Key? key,
     required this.html,
     required this.page,
     required this.onRequestedRebuild,
+    this.previousAction,
   }) : super(key: key);
 
+  /// The html to display in the page
+  ///
+  /// Must start with one paragraph
   final String html;
   final int page;
   final RebuildRequestCallback onRequestedRebuild;
+  final HtmlPageAction? previousAction;
 
   @override
   Widget build(BuildContext context) {
@@ -90,25 +136,11 @@ class HtmlPage extends StatelessWidget {
         Flexible(
           child: CustomBoxy(
             delegate: _HtmlPageDelegate(
+              html: html,
               requestRebuild: onRequestedRebuild,
+              previousAction: previousAction,
             ),
-            children: [
-              BoxyId(
-                id: #html,
-                child: Container(
-                  color: Colors.grey,
-                  child: HtmlWidget(
-                    // '<h1>Hello World</h1>',
-                    html,
-                    enableCaching: true,
-                    renderMode: const ListViewMode(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                    ),
-                  ),
-                ),
-              )
-            ],
+            children: const [],
           ),
         ),
       ],
@@ -117,13 +149,34 @@ class HtmlPage extends StatelessWidget {
 }
 
 class _HtmlPageDelegate extends BoxyDelegate {
-  _HtmlPageDelegate({required this.requestRebuild});
+  _HtmlPageDelegate({
+    required final this.html,
+    required final this.requestRebuild,
+    final HtmlPageAction? previousAction = HtmlPageAction.paragraph,
+  }) : previousAction = previousAction ?? HtmlPageAction.paragraph;
 
+  final String html;
   final RebuildRequestCallback requestRebuild;
+  final HtmlPageAction previousAction;
 
   @override
   Size layout() {
-    final htmlChild = getChild(#html);
+    // final htmlChild = getChild(#html);
+
+    final htmlWidget = Container(
+      color: Colors.grey,
+      child: HtmlWidget(
+        // '<h1>Hello World</h1>',
+        html,
+        enableCaching: true,
+        renderMode: const ListViewMode(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+        ),
+      ),
+    );
+
+    final htmlChild = inflate(htmlWidget, id: #html);
 
     final actualSize = htmlChild.layout(constraints);
     // print('Html Height: ${actualSize.height}');
@@ -132,28 +185,35 @@ class _HtmlPageDelegate extends BoxyDelegate {
     final actualHeight = actualSize.height;
     final maxHeight = constraints.maxHeight;
 
-    // TODO: if actual height == max height, rebuild with less html
-    // Note: THIS IS NOT WORKING YET
-    // This loop should be in the PageView.builder widget
-    HtmlPageAction? action = HtmlPageAction.paragraph;
-    while (action != null) {
-      if (actualHeight < maxHeight) {
-        requestRebuild(HtmlPageEvent.hasExtraSpace, action);
-      } else {
-        switch (action) {
-          case HtmlPageAction.paragraph:
-            requestRebuild(HtmlPageEvent.hasNoExtraSpace, action);
-            action = HtmlPageAction.sentence;
-            break;
-          case HtmlPageAction.sentence:
-            requestRebuild(HtmlPageEvent.hasNoExtraSpace, action);
-            action = HtmlPageAction.word;
-            break;
-          case HtmlPageAction.word:
-            requestRebuild(HtmlPageEvent.hasNoExtraSpace, action);
-            action = null;
-            break;
-        }
+    if (actualHeight < maxHeight) {
+      // Add content
+      requestRebuild(
+        HtmlPageAction.none,
+        previousAction,
+      );
+    } else {
+      // Remove extra content
+      switch (previousAction) {
+        case HtmlPageAction.paragraph:
+          requestRebuild(
+            previousAction,
+            HtmlPageAction.sentence,
+          );
+          break;
+        case HtmlPageAction.sentence:
+          requestRebuild(
+            previousAction,
+            HtmlPageAction.word,
+          );
+          break;
+        case HtmlPageAction.word:
+          requestRebuild(
+            previousAction,
+            HtmlPageAction.none,
+          );
+          break;
+        case HtmlPageAction.none:
+          break;
       }
     }
 
@@ -161,15 +221,10 @@ class _HtmlPageDelegate extends BoxyDelegate {
   }
 }
 
-typedef RebuildRequestCallback = void Function(HtmlPageEvent, HtmlPageAction);
-
-enum HtmlPageEvent {
-  /// The html page has extra space available, so extra content can be added.
-  hasExtraSpace,
-
-  /// The html is too long for the page, so some content should be removed.
-  hasNoExtraSpace,
-}
+typedef RebuildRequestCallback = void Function(
+  HtmlPageAction removeAction,
+  HtmlPageAction addAction,
+);
 
 enum HtmlPageAction {
   /// Add or remove a paragraph from the html content, depending on the event.
@@ -180,4 +235,7 @@ enum HtmlPageAction {
 
   /// Add or remove a word from the html content, depending on the event.
   word,
+
+  /// No action is required.
+  none,
 }
