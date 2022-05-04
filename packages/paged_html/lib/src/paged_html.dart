@@ -116,7 +116,7 @@ class _PagedHtmlState extends State<PagedHtml> {
 
               // _previousAction = action;
               // _previousEvent = event;
-              // _rebuildCount++;
+              _rebuildCount++;
 
               // TODO: Set to false when all html is displayed
               _hasMorePages = false;
