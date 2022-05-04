@@ -220,7 +220,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
       // Remove extra content
 
       // Handle when still too much content after removing some
-      if (previousEvent == event) {
+      if (previousEvent == event && event == HtmlPageEvent.hasNoExtraSpace) {
         requestRebuild(
           event,
           previousAction,
