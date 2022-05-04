@@ -11,8 +11,7 @@ import 'package:equatable/equatable.dart';
 /// - addAction: The amount of content that should be added
 typedef RebuildRequestCallback = void Function(
   HtmlPageEvent event,
-  HtmlPageAction removeAction,
-  HtmlPageAction addAction,
+  HtmlPageAction action,
 );
 
 class HtmlPageAction extends Equatable {
@@ -24,15 +23,6 @@ class HtmlPageAction extends Equatable {
   bool get isTypeAdd => type == HtmlPageActionType.add;
 
   bool get isTypeRemove => type == HtmlPageActionType.remove;
-
-  bool get isTypeNone => type == HtmlPageActionType.none;
-
-  bool get isNone =>
-      type == HtmlPageActionType.none && amount == HtmlPageChangeAmount.none;
-
-  const HtmlPageAction.none()
-      : type = HtmlPageActionType.none,
-        amount = HtmlPageChangeAmount.none;
 
   // const HtmlPageAction.addNone()
   //     : type = HtmlPageActionType.add,
@@ -126,9 +116,6 @@ enum HtmlPageActionType {
 
   /// Remove the changed amount of html
   remove,
-
-  /// Do not change the html
-  none,
 }
 
 enum HtmlPageChangeAmount {
@@ -140,7 +127,4 @@ enum HtmlPageChangeAmount {
 
   /// Add or remove a word from the html content, depending on the event.
   word,
-
-  /// Do nothing.
-  none,
 }

@@ -76,47 +76,40 @@ class _PagedHtmlState extends State<PagedHtml> {
               previousAction: _previousAction,
               previousEvent: _previousEvent,
               page: index,
-              onRequestedRebuild: (event, removeAction, addAction) {
-                switch (removeAction.amount) {
-                  case HtmlPageChangeAmount.paragraph:
-                    // TODO: Remove a paragraph
-                    break;
-                  case HtmlPageChangeAmount.sentence:
-                    // TODO: Remove a sentence
-                    break;
-                  case HtmlPageChangeAmount.word:
-                    // TODO: Remove a word
-                    break;
-                  case HtmlPageChangeAmount.none:
-                    // Remove nothing
-                    break;
-                }
-
-                switch (addAction.amount) {
-                  case HtmlPageChangeAmount.paragraph:
-                    // TODO: Add a paragraph
-                    break;
-                  case HtmlPageChangeAmount.sentence:
-                    // TODO: Add a sentence
-                    break;
-                  case HtmlPageChangeAmount.word:
-                    // TODO: Add a word
-                    break;
-                  case HtmlPageChangeAmount.none:
-                    // Add nothing
-                    break;
+              onRequestedRebuild: (event, action) {
+                if (action.isTypeAdd) {
+                  switch (action.amount) {
+                    case HtmlPageChangeAmount.paragraph:
+                      // TODO: Add a paragraph
+                      break;
+                    case HtmlPageChangeAmount.sentence:
+                      // TODO: Add a sentence
+                      break;
+                    case HtmlPageChangeAmount.word:
+                      // TODO: Add a word
+                      break;
+                  }
+                } else if (action.isTypeRemove) {
+                  switch (action.amount) {
+                    case HtmlPageChangeAmount.paragraph:
+                      // TODO: Remove a paragraph
+                      break;
+                    case HtmlPageChangeAmount.sentence:
+                      // TODO: Remove a sentence
+                      break;
+                    case HtmlPageChangeAmount.word:
+                      // TODO: Remove a word
+                      break;
+                  }
                 }
 
                 SchedulerBinding.instance?.addPostFrameCallback((_) {
                   print('previousAction: $_previousAction');
-                  print('removeAction: $removeAction');
-                  print('addAction: $addAction\n');
+                  print('action: $action');
                   setState(() {});
                 });
 
-                _previousAction = addAction == const HtmlPageAction.none()
-                    ? _previousAction
-                    : addAction;
+                _previousAction = action;
                 _previousEvent = event;
 
                 // TODO: Set to false when all html is displayed
@@ -192,13 +185,11 @@ class _HtmlPageDelegate extends BoxyDelegate {
     required final this.requestRebuild,
     final HtmlPageAction? previousAction = const HtmlPageAction.addParagraph(),
     final HtmlPageEvent? previousEvent = HtmlPageEvent.hasExtraSpace,
-  })  : previousAction = previousAction ?? const HtmlPageAction.addParagraph(),
-        previousEvent = previousEvent ?? HtmlPageEvent.hasExtraSpace;
+  }) : previousAction = previousAction ?? const HtmlPageAction.addParagraph();
 
   final String html;
   final RebuildRequestCallback requestRebuild;
   final HtmlPageAction previousAction;
-  final HtmlPageEvent previousEvent;
   final int page;
 
   @override
@@ -214,14 +205,20 @@ class _HtmlPageDelegate extends BoxyDelegate {
 
     // ** Has extra space, add more content **
     if (event == HtmlPageEvent.hasExtraSpace) {
-      requestRebuild(
-        HtmlPageEvent.hasExtraSpace,
-        const HtmlPageAction.none(),
-        HtmlPageAction(
-          amount: previousAction.amount,
-          type: HtmlPageActionType.add,
-        ),
-      );
+      // Previously added content and still has extra space
+      if (previousAction.isTypeAdd) {
+        // Add more content
+        requestRebuild(event, previousAction);
+      }
+      // Previous removed content and now has extra space
+      else if (previousAction.isTypeRemove) {
+        // Remove content
+        if (previousAction.amount == HtmlPageChangeAmount.paragraph) {
+          requestRebuild(event, const HtmlPageAction.addSentence());
+        } else if (previousAction.amount == HtmlPageChangeAmount.sentence) {
+          requestRebuild(event, const HtmlPageAction.addWord());
+        }
+      }
 
       return actualSize;
     }
@@ -230,46 +227,25 @@ class _HtmlPageDelegate extends BoxyDelegate {
 
     // TODO: Previously removed content and still has too much content
     if (previousAction.isTypeRemove) {
-      requestRebuild(
-        event,
-        previousAction,
-        const HtmlPageAction.none(),
-      );
+      // Previous removed content and still has too much content
+      requestRebuild(event, previousAction);
 
       // TODO: Fix problem where previousAction.amount is always none after above
-
-      return actualSize;
     }
 
     // Previously added content and now has too much content
-    if (previousAction.isTypeAdd) {
+    else if (previousAction.isTypeAdd) {
       switch (previousAction.amount) {
         case HtmlPageChangeAmount.paragraph:
-          requestRebuild(
-            event,
-            const HtmlPageAction.removeParagraph(),
-            const HtmlPageAction.addSentence(),
-          );
+          requestRebuild(event, const HtmlPageAction.removeParagraph());
           break;
         case HtmlPageChangeAmount.sentence:
-          requestRebuild(
-            event,
-            const HtmlPageAction.removeSentence(),
-            const HtmlPageAction.addWord(),
-          );
+          requestRebuild(event, const HtmlPageAction.removeSentence());
           break;
         case HtmlPageChangeAmount.word:
-          requestRebuild(
-            event,
-            const HtmlPageAction.removeWord(),
-            const HtmlPageAction.none(),
-          );
-          break;
-        case HtmlPageChangeAmount.none:
+          requestRebuild(event, const HtmlPageAction.removeWord());
           break;
       }
-
-      return actualSize;
     }
 
     return actualSize;
