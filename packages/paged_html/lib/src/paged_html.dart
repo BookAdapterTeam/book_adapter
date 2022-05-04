@@ -115,6 +115,9 @@ class _PagedHtmlState extends State<PagedHtml> {
 
                 previousAction = addAction;
                 previousEvent = event;
+
+                // TODO: Set to false when all html is displayed
+                hasMorePages = false;
               },
             )
         ],
