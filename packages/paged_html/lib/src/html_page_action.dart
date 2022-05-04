@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:equatable/equatable.dart';
+
 /// Callback with the current event, previous action, and action
 /// that should be performed
 ///
@@ -11,15 +15,15 @@ typedef RebuildRequestCallback = void Function(
   HtmlPageAction addAction,
 );
 
-class HtmlPageAction {
+class HtmlPageAction extends Equatable {
   const HtmlPageAction({
     required this.type,
     required this.amount,
   });
 
-  const HtmlPageAction.none()
-      : type = HtmlPageActionType.none,
-        amount = HtmlPageChangeAmount.none;
+  bool get isAdd => type == HtmlPageActionType.add;
+
+  bool get isRemove => type == HtmlPageActionType.remove;
 
   const HtmlPageAction.addNone()
       : type = HtmlPageActionType.add,
@@ -54,10 +58,48 @@ class HtmlPageAction {
         amount = HtmlPageChangeAmount.word;
 
   /// Determines how [amount] should be used
+  /// 
+  /// enum
   final HtmlPageActionType type;
 
   /// The amount of html that should be added or removed, depending on [type]
+  /// 
+  /// enum
   final HtmlPageChangeAmount amount;
+
+  HtmlPageAction copyWith({
+    HtmlPageActionType? type,
+    HtmlPageChangeAmount? amount,
+  }) {
+    return HtmlPageAction(
+      type: type ?? this.type,
+      amount: amount ?? this.amount,
+    );
+  }
+
+  @override
+  List<Object> get props => [type, amount];
+
+  @override
+  String toString() => 'HtmlPageAction(type: $type, amount: $amount)';
+
+  Map<String, dynamic> toMap() {
+    return {
+      'type': type.name,
+      'amount': amount.name,
+    };
+  }
+
+  factory HtmlPageAction.fromMap(Map<String, dynamic> map) {
+    return HtmlPageAction(
+      type: HtmlPageActionType.values.byName(map['type']),
+      amount: HtmlPageChangeAmount.values.byName(map['amount']),
+    );
+  }
+
+  String toJson() => json.encode(toMap());
+
+  factory HtmlPageAction.fromJson(String source) => HtmlPageAction.fromMap(json.decode(source));
 }
 
 enum HtmlPageEvent {
@@ -74,9 +116,6 @@ enum HtmlPageActionType {
 
   /// Remove the changed amount of html
   remove,
-
-  /// Do not change the html
-  none,
 }
 
 enum HtmlPageChangeAmount {

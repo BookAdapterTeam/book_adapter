@@ -13,6 +13,7 @@ dependencies:
   flutter_widget_from_html_core: ^0.8.5+3
   boxy: ^2.0.5+1
   fwfh_selectable_text: ^0.8.3+1
+  equatable: ^2.0.3
 
 dev_dependencies:
   flutter_test:
