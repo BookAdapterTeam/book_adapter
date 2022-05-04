@@ -259,6 +259,13 @@ class _HtmlPageDelegate extends BoxyDelegate {
   }
 }
 
+/// Callback with the current event, previous action, and action
+/// that should be performed
+///
+/// Arguments:
+/// - event: The status of the page
+/// - removeAction: The amount of content that should be removed
+/// - addAction: The amount of content that should be added
 typedef RebuildRequestCallback = void Function(
   HtmlPageEvent event,
   HtmlPageAction removeAction,
