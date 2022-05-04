@@ -34,7 +34,7 @@ class _PagedHtmlState extends State<PagedHtml> {
   HtmlPageEvent? previousEvent;
 
   // TODO: True when all html is displayed
-  bool get hasMorePages => true;
+  bool hasMorePages = true;
 
   // TODO: Handle to current position in html
 
