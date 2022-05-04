@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+import 'html_page_action.dart';
 import 'paged_html_controller.dart';
 
 /// A Widget that displays the html in horizontal or verticle pages
@@ -29,12 +30,12 @@ class PagedHtml extends StatefulWidget {
 
 class _PagedHtmlState extends State<PagedHtml> {
   late PagedHtmlController _pagedHtmlController;
-  int currentPage = 0;
-  HtmlPageAction? previousAction;
-  HtmlPageEvent? previousEvent;
+  int _currentPage = 0;
+  HtmlPageAction? _previousAction;
+  HtmlPageEvent? _previousEvent;
 
   // TODO: True when all html is displayed
-  bool hasMorePages = true;
+  bool _hasMorePages = true;
 
   // TODO: Handle to current position in html
 
@@ -65,59 +66,59 @@ class _PagedHtmlState extends State<PagedHtml> {
         physics: widget.physics,
         onPageChanged: (index) {
           setState(() {
-            currentPage = index;
+            _currentPage = index;
           });
         },
         children: [
-          for (int index = 0; hasMorePages; index++)
+          for (int index = 0; _hasMorePages; index++)
             _HtmlPage(
               html: widget.html,
-              previousAction: previousAction,
-              previousEvent: previousEvent,
+              previousAction: _previousAction,
+              previousEvent: _previousEvent,
               page: index,
               onRequestedRebuild: (event, removeAction, addAction) {
-                switch (removeAction) {
-                  case HtmlPageAction.paragraph:
+                switch (removeAction.amount) {
+                  case HtmlPageChangeAmount.paragraph:
                     // TODO: Remove a paragraph
                     break;
-                  case HtmlPageAction.sentence:
+                  case HtmlPageChangeAmount.sentence:
                     // TODO: Remove a sentence
                     break;
-                  case HtmlPageAction.word:
+                  case HtmlPageChangeAmount.word:
                     // TODO: Remove a word
                     break;
-                  case HtmlPageAction.none:
+                  case HtmlPageChangeAmount.none:
                     // Remove nothing
                     break;
                 }
 
-                switch (addAction) {
-                  case HtmlPageAction.paragraph:
+                switch (addAction.amount) {
+                  case HtmlPageChangeAmount.paragraph:
                     // TODO: Add a paragraph
                     break;
-                  case HtmlPageAction.sentence:
+                  case HtmlPageChangeAmount.sentence:
                     // TODO: Add a sentence
                     break;
-                  case HtmlPageAction.word:
+                  case HtmlPageChangeAmount.word:
                     // TODO: Add a word
                     break;
-                  case HtmlPageAction.none:
+                  case HtmlPageChangeAmount.none:
                     // Add nothing
                     break;
                 }
 
                 SchedulerBinding.instance?.addPostFrameCallback((_) {
-                  print('previousAction: $previousAction');
+                  print('previousAction: $_previousAction');
                   print('removeAction: $removeAction');
                   print('addAction: $addAction\n');
                   setState(() {});
                 });
 
-                previousAction = addAction;
-                previousEvent = event;
+                _previousAction = addAction;
+                _previousEvent = event;
 
                 // TODO: Set to false when all html is displayed
-                hasMorePages = false;
+                _hasMorePages = false;
               },
             )
         ],
@@ -187,9 +188,9 @@ class _HtmlPageDelegate extends BoxyDelegate {
     required final this.html,
     required final this.page,
     required final this.requestRebuild,
-    final HtmlPageAction? previousAction = HtmlPageAction.paragraph,
+    final HtmlPageAction? previousAction = const HtmlPageAction.addParagraph(),
     final HtmlPageEvent? previousEvent = HtmlPageEvent.hasExtraSpace,
-  })  : previousAction = previousAction ?? HtmlPageAction.paragraph,
+  })  : previousAction = previousAction ?? const HtmlPageAction.addParagraph(),
         previousEvent = previousEvent ?? HtmlPageEvent.hasExtraSpace;
 
   final String html;
@@ -213,8 +214,11 @@ class _HtmlPageDelegate extends BoxyDelegate {
       // Add content
       requestRebuild(
         HtmlPageEvent.hasExtraSpace,
-        HtmlPageAction.none,
-        previousAction,
+        const HtmlPageAction.removeNone(),
+        HtmlPageAction(
+          amount: previousAction.amount,
+          type: HtmlPageActionType.add,
+        ),
       );
     } else {
       // Remove extra content
@@ -223,73 +227,61 @@ class _HtmlPageDelegate extends BoxyDelegate {
       if (previousEvent == event && event == HtmlPageEvent.hasNoExtraSpace) {
         requestRebuild(
           event,
-          previousAction,
-          HtmlPageAction.none,
+          HtmlPageAction(
+            amount: previousAction.amount,
+            type: HtmlPageActionType.remove,
+          ),
+          const HtmlPageAction.addNone(),
         );
       }
 
-      switch (previousAction) {
-        case HtmlPageAction.paragraph:
+      // TODO: Fix problem where action.amount is always none after above
+
+      switch (previousAction.amount) {
+        case HtmlPageChangeAmount.paragraph:
           requestRebuild(
             event,
-            previousAction,
-            HtmlPageAction.sentence,
+            HtmlPageAction(
+              amount: previousAction.amount,
+              type: HtmlPageActionType.remove,
+            ),
+            const HtmlPageAction(
+              amount: HtmlPageChangeAmount.sentence,
+              type: HtmlPageActionType.add,
+            ),
           );
           break;
-        case HtmlPageAction.sentence:
+        case HtmlPageChangeAmount.sentence:
           requestRebuild(
             event,
-            previousAction,
-            HtmlPageAction.word,
+            HtmlPageAction(
+              amount: previousAction.amount,
+              type: HtmlPageActionType.remove,
+            ),
+            const HtmlPageAction(
+              amount: HtmlPageChangeAmount.word,
+              type: HtmlPageActionType.add,
+            ),
           );
           break;
-        case HtmlPageAction.word:
+        case HtmlPageChangeAmount.word:
           requestRebuild(
             event,
-            previousAction,
-            HtmlPageAction.none,
+            HtmlPageAction(
+              amount: previousAction.amount,
+              type: HtmlPageActionType.remove,
+            ),
+            const HtmlPageAction(
+              amount: HtmlPageChangeAmount.none,
+              type: HtmlPageActionType.add,
+            ),
           );
           break;
-        case HtmlPageAction.none:
+        case HtmlPageChangeAmount.none:
           break;
       }
     }
 
     return actualSize;
   }
-}
-
-/// Callback with the current event, previous action, and action
-/// that should be performed
-///
-/// Arguments:
-/// - event: The status of the page
-/// - removeAction: The amount of content that should be removed
-/// - addAction: The amount of content that should be added
-typedef RebuildRequestCallback = void Function(
-  HtmlPageEvent event,
-  HtmlPageAction removeAction,
-  HtmlPageAction addAction,
-);
-
-enum HtmlPageEvent {
-  /// The html page has extra space available, so extra content can be added.
-  hasExtraSpace,
-
-  /// The html is too long for the page, so some content should be removed.
-  hasNoExtraSpace,
-}
-
-enum HtmlPageAction {
-  /// Add or remove a paragraph from the html content, depending on the event.
-  paragraph,
-
-  /// Add or remove a sentence from the html content, depending on the event.
-  sentence,
-
-  /// Add or remove a word from the html content, depending on the event.
-  word,
-
-  /// No action is required.
-  none,
 }
