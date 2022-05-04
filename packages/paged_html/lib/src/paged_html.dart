@@ -181,7 +181,6 @@ class _HtmlPage extends StatelessWidget {
                     enableCaching: true,
                     renderMode: const ListViewMode(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
                     ),
                   ),
                 ),
