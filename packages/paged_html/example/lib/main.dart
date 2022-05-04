@@ -11,7 +11,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Flutter PagedHtml Example',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -20,18 +20,27 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class PagedHtmlExample extends StatelessWidget {
+class PagedHtmlExample extends StatefulWidget {
   const PagedHtmlExample({Key? key}) : super(key: key);
+
+  @override
+  State<PagedHtmlExample> createState() => _PagedHtmlExampleState();
+}
+
+class _PagedHtmlExampleState extends State<PagedHtmlExample> {
+  final controller = PagedHtmlController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('PagedHtml Example')),
+      appBar: AppBar(title: const Text('Flutter PagedHtml Example')),
       body: PagedHtml(
         key: const ValueKey('HtmlReader'),
         scrollDirection: Axis.horizontal,
+        controller: controller,
         physics: const PageScrollPhysics(),
-        html: '''
+        html:
+            '''
 <div>
   <h1>PagedHtml</h1>
   <p>A Widget that displays the html in horizontal or verticle pages</p>
@@ -52,7 +61,7 @@ class PagedHtmlExample extends StatelessWidget {
   </p>
 </div>
 ''' *
-            5,
+                5,
       ),
     );
   }

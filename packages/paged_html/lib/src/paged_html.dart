@@ -2,6 +2,8 @@ import 'package:boxy/boxy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
+import 'paged_html_controller.dart';
+
 /// A Widget that displays the html in horizontal or verticle pages
 class PagedHtml extends StatefulWidget {
   const PagedHtml({
@@ -10,18 +12,14 @@ class PagedHtml extends StatefulWidget {
     this.physics,
     this.scrollDirection = Axis.horizontal,
     this.scrollBehavior,
-    this.pageTurnDuration = const Duration(milliseconds: 300),
-    this.nextPageCurve = Curves.easeInOut,
-    this.previousPageCurve = Curves.easeInOut,
+    this.controller,
   }) : super(key: key);
 
   final Axis scrollDirection;
   final String html;
   final ScrollPhysics? physics;
   final ScrollBehavior? scrollBehavior;
-  final Duration pageTurnDuration;
-  final Curve nextPageCurve;
-  final Curve previousPageCurve;
+  final PagedHtmlController? controller;
 
   @override
   State<PagedHtml> createState() => _PagedHtmlState();
@@ -33,7 +31,7 @@ class _PagedHtmlState extends State<PagedHtml> {
 
   @override
   void initState() {
-    _pageController = PageController();
+    _pageController = widget.controller?.pageController ?? PageController();
     super.initState();
   }
 
