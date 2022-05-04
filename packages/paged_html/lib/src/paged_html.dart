@@ -114,8 +114,9 @@ class _PagedHtmlState extends State<PagedHtml> {
                   setState(() {});
                 });
 
-                _previousAction =
-                    addAction == const HtmlPageAction.none() ? _previousAction : addAction;
+                _previousAction = addAction == const HtmlPageAction.none()
+                    ? _previousAction
+                    : addAction;
                 _previousEvent = event;
 
                 // TODO: Set to false when all html is displayed
@@ -228,7 +229,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
     // ** Can not fit all content, remove extra **
 
     // TODO: Previously removed content and still has too much content
-    if (previousAction.isRemove) {
+    if (previousAction.isTypeRemove) {
       requestRebuild(
         event,
         previousAction,
@@ -241,7 +242,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
     }
 
     // Previously added content and now has too much content
-    if (previousAction.isAdd) {
+    if (previousAction.isTypeAdd) {
       switch (previousAction.amount) {
         case HtmlPageChangeAmount.paragraph:
           requestRebuild(

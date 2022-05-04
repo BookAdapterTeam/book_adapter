@@ -21,9 +21,14 @@ class HtmlPageAction extends Equatable {
     required this.amount,
   });
 
-  bool get isAdd => type == HtmlPageActionType.add;
+  bool get isTypeAdd => type == HtmlPageActionType.add;
 
-  bool get isRemove => type == HtmlPageActionType.remove;
+  bool get isTypeRemove => type == HtmlPageActionType.remove;
+
+  bool get isTypeNone => type == HtmlPageActionType.none;
+
+  bool get isNone =>
+      type == HtmlPageActionType.none && amount == HtmlPageChangeAmount.none;
 
   const HtmlPageAction.none()
       : type = HtmlPageActionType.none,
