@@ -210,8 +210,8 @@ class _HtmlPageDelegate extends BoxyDelegate {
         ? HtmlPageEvent.hasExtraSpace
         : HtmlPageEvent.hasNoExtraSpace;
 
+    // ** Has extra space, add more content **
     if (event == HtmlPageEvent.hasExtraSpace) {
-      // Add content
       requestRebuild(
         HtmlPageEvent.hasExtraSpace,
         const HtmlPageAction.removeNone(),
@@ -220,66 +220,57 @@ class _HtmlPageDelegate extends BoxyDelegate {
           type: HtmlPageActionType.add,
         ),
       );
-    } else {
-      // Remove extra content
 
-      // Handle when still too much content after removing some
-      if (previousEvent == event && event == HtmlPageEvent.hasNoExtraSpace) {
-        requestRebuild(
-          event,
-          HtmlPageAction(
-            amount: previousAction.amount,
-            type: HtmlPageActionType.remove,
-          ),
-          const HtmlPageAction.addNone(),
-        );
-      }
+      return actualSize;
+    }
+
+    // ** Can not fit all content, remove extra **
+
+    // Previously removed content and still has too much content
+    if (previousAction.isRemove) {
+      requestRebuild(
+        event,
+        HtmlPageAction(
+          amount: previousAction.amount,
+          type: HtmlPageActionType.remove,
+        ),
+        const HtmlPageAction.addNone(),
+      );
 
       // TODO: Fix problem where previousAction.amount is always none after above
 
+      return actualSize;
+    }
+
+    // Previously added content and now has too much content
+    if (previousAction.isAdd) {
       switch (previousAction.amount) {
         case HtmlPageChangeAmount.paragraph:
           requestRebuild(
             event,
-            HtmlPageAction(
-              amount: previousAction.amount,
-              type: HtmlPageActionType.remove,
-            ),
-            const HtmlPageAction(
-              amount: HtmlPageChangeAmount.sentence,
-              type: HtmlPageActionType.add,
-            ),
+            const HtmlPageAction.removeParagraph(),
+            const HtmlPageAction.addSentence(),
           );
           break;
         case HtmlPageChangeAmount.sentence:
           requestRebuild(
             event,
-            HtmlPageAction(
-              amount: previousAction.amount,
-              type: HtmlPageActionType.remove,
-            ),
-            const HtmlPageAction(
-              amount: HtmlPageChangeAmount.word,
-              type: HtmlPageActionType.add,
-            ),
+            const HtmlPageAction.removeSentence(),
+            const HtmlPageAction.addWord(),
           );
           break;
         case HtmlPageChangeAmount.word:
           requestRebuild(
             event,
-            HtmlPageAction(
-              amount: previousAction.amount,
-              type: HtmlPageActionType.remove,
-            ),
-            const HtmlPageAction(
-              amount: HtmlPageChangeAmount.none,
-              type: HtmlPageActionType.add,
-            ),
+            const HtmlPageAction.removeWord(),
+            const HtmlPageAction.addNone(),
           );
           break;
         case HtmlPageChangeAmount.none:
           break;
       }
+
+      return actualSize;
     }
 
     return actualSize;
