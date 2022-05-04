@@ -134,8 +134,8 @@ class _HtmlPageDelegate extends BoxyDelegate {
     // TODO: if actual height == max height, rebuild with less html
     // Note: THIS IS NOT WORKING YET
     // This loop should be in the PageView.builder widget
-    HtmlPageAction action = HtmlPageAction.paragraph;
-    while (action != HtmlPageAction.none) {
+    HtmlPageAction? action = HtmlPageAction.paragraph;
+    while (action != null) {
       if (actualHeight < maxHeight) {
         requestRebuild(HtmlPageEvent.hasExtraSpace, action);
       } else {
@@ -150,9 +150,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
             break;
           case HtmlPageAction.word:
             requestRebuild(HtmlPageEvent.hasNoExtraSpace, action);
-            action = HtmlPageAction.none;
-            break;
-          case HtmlPageAction.none:
+            action = null;
             break;
         }
       }
@@ -181,7 +179,4 @@ enum HtmlPageAction {
 
   /// Add or remove a word from the html content, depending on the event.
   word,
-
-  /// Do nothing, rebuild should be ignored
-  none,
 }
