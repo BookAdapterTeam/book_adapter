@@ -43,10 +43,12 @@ class _PagedHtmlState extends State<PagedHtml> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanUpdate: _handlePanGesture,
-      // onTap: () => _nextPage(),
-      // onDoubleTap: () => _prevPage(),
+    return ScrollConfiguration(
+      behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+        ...ScrollConfiguration.of(context).dragDevices,
+        PointerDeviceKind.mouse,
+        PointerDeviceKind.stylus,
+      }),
       child: PageView.builder(
         scrollDirection: widget.scrollDirection,
         controller: _pageController,
@@ -66,39 +68,6 @@ class _PagedHtmlState extends State<PagedHtml> {
         },
       ),
     );
-  }
-
-  Future<void> _nextPage() => _pageController.animateToPage(
-        currentPage + 1,
-        duration: widget.pageTurnDuration,
-        curve: widget.nextPageCurve,
-      );
-
-  Future<void> _prevPage() => _pageController.animateToPage(
-        currentPage - 1,
-        duration: widget.pageTurnDuration,
-        curve: widget.previousPageCurve,
-      );
-
-  void _handlePanGesture(DragUpdateDetails details) {
-    // TODO: Improve gesture handling
-    if (widget.scrollDirection == Axis.horizontal) {
-      if (details.delta.dx > 0) {
-        // right
-        _prevPage();
-      } else {
-        // left
-        _nextPage();
-      }
-    } else {
-      if (details.delta.dy > 0) {
-        // down
-        _prevPage();
-      } else {
-        // up
-        _nextPage();
-      }
-    }
   }
 }
 
