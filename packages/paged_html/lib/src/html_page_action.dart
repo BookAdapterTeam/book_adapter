@@ -25,9 +25,13 @@ class HtmlPageAction extends Equatable {
 
   bool get isRemove => type == HtmlPageActionType.remove;
 
-  const HtmlPageAction.addNone()
-      : type = HtmlPageActionType.add,
+  const HtmlPageAction.none()
+      : type = HtmlPageActionType.none,
         amount = HtmlPageChangeAmount.none;
+
+  // const HtmlPageAction.addNone()
+  //     : type = HtmlPageActionType.add,
+  //       amount = HtmlPageChangeAmount.none;
 
   const HtmlPageAction.addParagraph()
       : type = HtmlPageActionType.add,
@@ -41,9 +45,9 @@ class HtmlPageAction extends Equatable {
       : type = HtmlPageActionType.add,
         amount = HtmlPageChangeAmount.word;
 
-  const HtmlPageAction.removeNone()
-      : type = HtmlPageActionType.remove,
-        amount = HtmlPageChangeAmount.none;
+  // const HtmlPageAction.removeNone()
+  //     : type = HtmlPageActionType.remove,
+  //       amount = HtmlPageChangeAmount.none;
 
   const HtmlPageAction.removeParagraph()
       : type = HtmlPageActionType.remove,
@@ -58,12 +62,12 @@ class HtmlPageAction extends Equatable {
         amount = HtmlPageChangeAmount.word;
 
   /// Determines how [amount] should be used
-  /// 
+  ///
   /// enum
   final HtmlPageActionType type;
 
   /// The amount of html that should be added or removed, depending on [type]
-  /// 
+  ///
   /// enum
   final HtmlPageChangeAmount amount;
 
@@ -99,7 +103,8 @@ class HtmlPageAction extends Equatable {
 
   String toJson() => json.encode(toMap());
 
-  factory HtmlPageAction.fromJson(String source) => HtmlPageAction.fromMap(json.decode(source));
+  factory HtmlPageAction.fromJson(String source) =>
+      HtmlPageAction.fromMap(json.decode(source));
 }
 
 enum HtmlPageEvent {
@@ -116,6 +121,9 @@ enum HtmlPageActionType {
 
   /// Remove the changed amount of html
   remove,
+
+  /// Do not change the html
+  none,
 }
 
 enum HtmlPageChangeAmount {

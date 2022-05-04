@@ -114,7 +114,8 @@ class _PagedHtmlState extends State<PagedHtml> {
                   setState(() {});
                 });
 
-                _previousAction = addAction;
+                _previousAction =
+                    addAction == const HtmlPageAction.none() ? _previousAction : addAction;
                 _previousEvent = event;
 
                 // TODO: Set to false when all html is displayed
@@ -214,7 +215,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
     if (event == HtmlPageEvent.hasExtraSpace) {
       requestRebuild(
         HtmlPageEvent.hasExtraSpace,
-        const HtmlPageAction.removeNone(),
+        const HtmlPageAction.none(),
         HtmlPageAction(
           amount: previousAction.amount,
           type: HtmlPageActionType.add,
@@ -226,15 +227,12 @@ class _HtmlPageDelegate extends BoxyDelegate {
 
     // ** Can not fit all content, remove extra **
 
-    // Previously removed content and still has too much content
+    // TODO: Previously removed content and still has too much content
     if (previousAction.isRemove) {
       requestRebuild(
         event,
-        HtmlPageAction(
-          amount: previousAction.amount,
-          type: HtmlPageActionType.remove,
-        ),
-        const HtmlPageAction.addNone(),
+        previousAction,
+        const HtmlPageAction.none(),
       );
 
       // TODO: Fix problem where previousAction.amount is always none after above
@@ -263,7 +261,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
           requestRebuild(
             event,
             const HtmlPageAction.removeWord(),
-            const HtmlPageAction.addNone(),
+            const HtmlPageAction.none(),
           );
           break;
         case HtmlPageChangeAmount.none:
