@@ -39,8 +39,7 @@ class _PagedHtmlExampleState extends State<PagedHtmlExample> {
         scrollDirection: Axis.horizontal,
         controller: controller,
         physics: const PageScrollPhysics(),
-        html:
-            '''
+        html: '''
 <div>
   <h1>PagedHtml</h1>
   <p>A Widget that displays the html in horizontal or verticle pages</p>
@@ -61,7 +60,7 @@ class _PagedHtmlExampleState extends State<PagedHtmlExample> {
   </p>
 </div>
 ''' *
-                5,
+            5,
       ),
     );
   }
