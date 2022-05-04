@@ -235,7 +235,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
         );
       }
 
-      // TODO: Fix problem where action.amount is always none after above
+      // TODO: Fix problem where previousAction.amount is always none after above
 
       switch (previousAction.amount) {
         case HtmlPageChangeAmount.paragraph:
