@@ -11,6 +11,13 @@
             "type": "dart",
         },
         {
+            "name": "paged_html_example (profile mode)",
+            "request": "launch",
+            "program": "packages/paged_html/example/lib/main.dart",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
             "name": "book_adapter",
             "request": "launch",
             "type": "dart"
