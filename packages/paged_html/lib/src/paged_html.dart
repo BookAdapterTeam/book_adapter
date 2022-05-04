@@ -90,10 +90,25 @@ class HtmlPage extends StatelessWidget {
         Flexible(
           child: CustomBoxy(
             delegate: _HtmlPageDelegate(
-              html: html,
               requestRebuild: onRequestedRebuild,
             ),
-            children: const [],
+            children: [
+              BoxyId(
+                id: #html,
+                child: Container(
+                  color: Colors.grey,
+                  child: HtmlWidget(
+                    // '<h1>Hello World</h1>',
+                    html,
+                    enableCaching: true,
+                    renderMode: const ListViewMode(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
         ),
       ],
@@ -102,27 +117,13 @@ class HtmlPage extends StatelessWidget {
 }
 
 class _HtmlPageDelegate extends BoxyDelegate {
-  _HtmlPageDelegate({required this.html, required this.requestRebuild});
+  _HtmlPageDelegate({required this.requestRebuild});
 
-  final String html;
   final RebuildRequestCallback requestRebuild;
 
   @override
   Size layout() {
-    final htmlWidget = Container(
-      color: Colors.grey,
-      child: HtmlWidget(
-        // '<h1>Hello World</h1>',
-        html,
-        enableCaching: true,
-        renderMode: const ListViewMode(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-        ),
-      ),
-    );
-
-    final htmlChild = inflate(htmlWidget, id: #html);
+    final htmlChild = getChild(#html);
 
     final actualSize = htmlChild.layout(constraints);
     // print('Html Height: ${actualSize.height}');
