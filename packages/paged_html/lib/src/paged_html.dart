@@ -31,6 +31,11 @@ class _PagedHtmlState extends State<PagedHtml> {
   late PagedHtmlController _pagedHtmlController;
   int currentPage = 0;
   HtmlPageAction? previousAction;
+  HtmlPageEvent? previousEvent;
+
+  // TODO: True when all html is displayed
+  bool get hasMorePages => true;
+
   // TODO: Handle to current position in html
 
   @override
@@ -53,7 +58,7 @@ class _PagedHtmlState extends State<PagedHtml> {
         PointerDeviceKind.mouse,
         PointerDeviceKind.stylus,
       }),
-      child: PageView.builder(
+      child: PageView(
         scrollDirection: widget.scrollDirection,
         controller: _pagedHtmlController.pageController,
         scrollBehavior: widget.scrollBehavior,
@@ -63,50 +68,56 @@ class _PagedHtmlState extends State<PagedHtml> {
             currentPage = index;
           });
         },
-        itemBuilder: (context, index) {
-          return _HtmlPage(
-            html: widget.html,
-            previousAction: previousAction,
-            page: index,
-            onRequestedRebuild: (removeAction, addAction) {
-              switch (removeAction) {
-                case HtmlPageAction.paragraph:
-                  // TODO: Remove a paragraph
-                  break;
-                case HtmlPageAction.sentence:
-                  // TODO: Remove a sentence
-                  break;
-                case HtmlPageAction.word:
-                  // TODO: Remove a word
-                  break;
-                case HtmlPageAction.none:
-                  break;
-              }
+        children: [
+          for (int index = 0; hasMorePages; index++)
+            _HtmlPage(
+              html: widget.html,
+              previousAction: previousAction,
+              previousEvent: previousEvent,
+              page: index,
+              onRequestedRebuild: (event, removeAction, addAction) {
+                switch (removeAction) {
+                  case HtmlPageAction.paragraph:
+                    // TODO: Remove a paragraph
+                    break;
+                  case HtmlPageAction.sentence:
+                    // TODO: Remove a sentence
+                    break;
+                  case HtmlPageAction.word:
+                    // TODO: Remove a word
+                    break;
+                  case HtmlPageAction.none:
+                    // Remove nothing
+                    break;
+                }
 
-              switch (addAction) {
-                case HtmlPageAction.paragraph:
-                  // TODO: Add a paragraph
-                  break;
-                case HtmlPageAction.sentence:
-                  // TODO: Add a sentence
-                  break;
-                case HtmlPageAction.word:
-                  // TODO: Add a word
-                  break;
-                case HtmlPageAction.none:
-                  break;
-              }
+                switch (addAction) {
+                  case HtmlPageAction.paragraph:
+                    // TODO: Add a paragraph
+                    break;
+                  case HtmlPageAction.sentence:
+                    // TODO: Add a sentence
+                    break;
+                  case HtmlPageAction.word:
+                    // TODO: Add a word
+                    break;
+                  case HtmlPageAction.none:
+                    // Add nothing
+                    break;
+                }
 
-              SchedulerBinding.instance?.addPostFrameCallback((_) {
-                print('previousAction: $previousAction');
-                print('addAction: $addAction');
-                setState(() {
-                  previousAction = addAction;
+                SchedulerBinding.instance?.addPostFrameCallback((_) {
+                  print('previousAction: $previousAction');
+                  print('removeAction: $removeAction');
+                  print('addAction: $addAction\n');
+                  setState(() {});
                 });
-              });
-            },
-          );
-        },
+
+                previousAction = addAction;
+                previousEvent = event;
+              },
+            )
+        ],
       ),
     );
   }
@@ -119,6 +130,7 @@ class _HtmlPage extends StatelessWidget {
     required this.page,
     required this.onRequestedRebuild,
     this.previousAction,
+    this.previousEvent,
   }) : super(key: key);
 
   /// The html to display in the page
@@ -128,6 +140,7 @@ class _HtmlPage extends StatelessWidget {
   final int page;
   final RebuildRequestCallback onRequestedRebuild;
   final HtmlPageAction? previousAction;
+  final HtmlPageEvent? previousEvent;
 
   @override
   Widget build(BuildContext context) {
@@ -137,10 +150,28 @@ class _HtmlPage extends StatelessWidget {
           child: CustomBoxy(
             delegate: _HtmlPageDelegate(
               html: html,
+              page: page,
               requestRebuild: onRequestedRebuild,
               previousAction: previousAction,
+              previousEvent: previousEvent,
             ),
-            children: const [],
+            children: [
+              BoxyId(
+                id: 'html_$page',
+                child: Container(
+                  color: Colors.grey,
+                  child: HtmlWidget(
+                    // '<h1>Hello World</h1>',
+                    html,
+                    enableCaching: true,
+                    renderMode: const ListViewMode(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                    ),
+                  ),
+                ),
+              )
+            ],
           ),
         ),
       ],
@@ -151,63 +182,67 @@ class _HtmlPage extends StatelessWidget {
 class _HtmlPageDelegate extends BoxyDelegate {
   _HtmlPageDelegate({
     required final this.html,
+    required final this.page,
     required final this.requestRebuild,
     final HtmlPageAction? previousAction = HtmlPageAction.paragraph,
-  }) : previousAction = previousAction ?? HtmlPageAction.paragraph;
+    final HtmlPageEvent? previousEvent = HtmlPageEvent.hasExtraSpace,
+  })  : previousAction = previousAction ?? HtmlPageAction.paragraph,
+        previousEvent = previousEvent ?? HtmlPageEvent.hasExtraSpace;
 
   final String html;
   final RebuildRequestCallback requestRebuild;
   final HtmlPageAction previousAction;
+  final HtmlPageEvent previousEvent;
+  final int page;
 
   @override
   Size layout() {
-    // final htmlChild = getChild(#html);
-
-    final htmlWidget = Container(
-      color: Colors.grey,
-      child: HtmlWidget(
-        // '<h1>Hello World</h1>',
-        html,
-        enableCaching: true,
-        renderMode: const ListViewMode(
-          shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
-        ),
-      ),
-    );
-
-    final htmlChild = inflate(htmlWidget, id: #html);
-
+    final htmlChild = getChild('html_$page');
     final actualSize = htmlChild.layout(constraints);
-    // print('Html Height: ${actualSize.height}');
-    // print('Max Height: ${constraints.maxHeight}');
-
     final actualHeight = actualSize.height;
     final maxHeight = constraints.maxHeight;
 
-    if (actualHeight < maxHeight) {
+    final event = actualHeight < maxHeight
+        ? HtmlPageEvent.hasExtraSpace
+        : HtmlPageEvent.hasNoExtraSpace;
+
+    if (event == HtmlPageEvent.hasExtraSpace) {
       // Add content
       requestRebuild(
+        HtmlPageEvent.hasExtraSpace,
         HtmlPageAction.none,
         previousAction,
       );
     } else {
       // Remove extra content
+
+      // Handle when still too much content after removing some
+      if (previousEvent == event) {
+        requestRebuild(
+          event,
+          previousAction,
+          HtmlPageAction.none,
+        );
+      }
+
       switch (previousAction) {
         case HtmlPageAction.paragraph:
           requestRebuild(
+            event,
             previousAction,
             HtmlPageAction.sentence,
           );
           break;
         case HtmlPageAction.sentence:
           requestRebuild(
+            event,
             previousAction,
             HtmlPageAction.word,
           );
           break;
         case HtmlPageAction.word:
           requestRebuild(
+            event,
             previousAction,
             HtmlPageAction.none,
           );
@@ -222,9 +257,18 @@ class _HtmlPageDelegate extends BoxyDelegate {
 }
 
 typedef RebuildRequestCallback = void Function(
+  HtmlPageEvent event,
   HtmlPageAction removeAction,
   HtmlPageAction addAction,
 );
+
+enum HtmlPageEvent {
+  /// The html page has extra space available, so extra content can be added.
+  hasExtraSpace,
+
+  /// The html is too long for the page, so some content should be removed.
+  hasNoExtraSpace,
+}
 
 enum HtmlPageAction {
   /// Add or remove a paragraph from the html content, depending on the event.
