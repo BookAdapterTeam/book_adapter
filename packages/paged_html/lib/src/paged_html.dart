@@ -16,6 +16,7 @@ class PagedHtml extends StatefulWidget {
     this.scrollDirection = Axis.horizontal,
     this.scrollBehavior,
     this.controller,
+    this.maxRebuilds = 20,
   }) : super(key: key);
 
   final Axis scrollDirection;
@@ -23,6 +24,7 @@ class PagedHtml extends StatefulWidget {
   final ScrollPhysics? physics;
   final ScrollBehavior? scrollBehavior;
   final PagedHtmlController? controller;
+  final int maxRebuilds;
 
   @override
   State<PagedHtml> createState() => _PagedHtmlState();
@@ -31,6 +33,7 @@ class PagedHtml extends StatefulWidget {
 class _PagedHtmlState extends State<PagedHtml> {
   late PagedHtmlController _pagedHtmlController;
   int _currentPage = 0;
+  int _rebuildCount = 0;
   HtmlPageAction? _previousAction;
   HtmlPageEvent? _previousEvent;
 
@@ -59,7 +62,7 @@ class _PagedHtmlState extends State<PagedHtml> {
         PointerDeviceKind.mouse,
         PointerDeviceKind.stylus,
       }),
-      child: PageView(
+      child: PageView.builder(
         scrollDirection: widget.scrollDirection,
         controller: _pagedHtmlController.pageController,
         scrollBehavior: widget.scrollBehavior,
@@ -69,54 +72,61 @@ class _PagedHtmlState extends State<PagedHtml> {
             _currentPage = index;
           });
         },
-        children: [
-          for (int index = 0; _hasMorePages; index++)
-            _HtmlPage(
-              html: widget.html,
-              previousAction: _previousAction,
-              previousEvent: _previousEvent,
-              page: index,
-              onRequestedRebuild: (event, action) {
-                if (action.isTypeAdd) {
-                  switch (action.amount) {
-                    case HtmlPageChangeAmount.paragraph:
-                      // TODO: Add a paragraph
-                      break;
-                    case HtmlPageChangeAmount.sentence:
-                      // TODO: Add a sentence
-                      break;
-                    case HtmlPageChangeAmount.word:
-                      // TODO: Add a word
-                      break;
-                  }
-                } else if (action.isTypeRemove) {
-                  switch (action.amount) {
-                    case HtmlPageChangeAmount.paragraph:
-                      // TODO: Remove a paragraph
-                      break;
-                    case HtmlPageChangeAmount.sentence:
-                      // TODO: Remove a sentence
-                      break;
-                    case HtmlPageChangeAmount.word:
-                      // TODO: Remove a word
-                      break;
-                  }
+        itemCount: 3,
+        itemBuilder: (context, index) {
+          return _HtmlPage(
+            html: widget.html,
+            previousAction: _previousAction,
+            previousEvent: _previousEvent,
+            page: index,
+            maxRebuilds: widget.maxRebuilds,
+            currentRebuildCount: _rebuildCount,
+            onRequestedRebuild: (event, action) {
+              if (action.isTypeAdd) {
+                switch (action.amount) {
+                  case HtmlPageChangeAmount.paragraph:
+                    // TODO: Add a paragraph
+                    break;
+                  case HtmlPageChangeAmount.sentence:
+                    // TODO: Add a sentence
+                    break;
+                  case HtmlPageChangeAmount.word:
+                    // TODO: Add a word
+                    break;
                 }
+              } else if (action.isTypeRemove) {
+                switch (action.amount) {
+                  case HtmlPageChangeAmount.paragraph:
+                    // TODO: Remove a paragraph
+                    break;
+                  case HtmlPageChangeAmount.sentence:
+                    // TODO: Remove a sentence
+                    break;
+                  case HtmlPageChangeAmount.word:
+                    // TODO: Remove a word
+                    break;
+                }
+              }
 
-                SchedulerBinding.instance?.addPostFrameCallback((_) {
-                  print('previousAction: $_previousAction');
-                  print('action: $action');
-                  setState(() {});
-                });
+              // SchedulerBinding.instance?.addPostFrameCallback((_) {
+              //   print('previousAction: $_previousAction');
+              //   print('action: $action');
+              //   setState(() {});
+              // });
 
-                _previousAction = action;
-                _previousEvent = event;
+              // _previousAction = action;
+              // _previousEvent = event;
+              // _rebuildCount++;
 
-                // TODO: Set to false when all html is displayed
-                _hasMorePages = false;
-              },
-            )
-        ],
+              // TODO: Set to false when all html is displayed
+              _hasMorePages = false;
+            },
+          );
+        },
+        // children: [
+        //   for (int index = 0; _hasMorePages; index++)
+
+        // ],
       ),
     );
   }
@@ -128,6 +138,8 @@ class _HtmlPage extends StatelessWidget {
     required this.html,
     required this.page,
     required this.onRequestedRebuild,
+    required this.maxRebuilds,
+    required this.currentRebuildCount,
     this.previousAction,
     this.previousEvent,
   }) : super(key: key);
@@ -137,6 +149,8 @@ class _HtmlPage extends StatelessWidget {
   /// Must start with one paragraph
   final String html;
   final int page;
+  final int maxRebuilds;
+  final int currentRebuildCount;
   final RebuildRequestCallback onRequestedRebuild;
   final HtmlPageAction? previousAction;
   final HtmlPageEvent? previousEvent;
@@ -153,6 +167,8 @@ class _HtmlPage extends StatelessWidget {
               requestRebuild: onRequestedRebuild,
               previousAction: previousAction,
               previousEvent: previousEvent,
+              maxRebuilds: maxRebuilds,
+              currentRebuildCount: currentRebuildCount,
             ),
             children: [
               BoxyId(
@@ -183,6 +199,8 @@ class _HtmlPageDelegate extends BoxyDelegate {
     required final this.html,
     required final this.page,
     required final this.requestRebuild,
+    required this.maxRebuilds,
+    required this.currentRebuildCount,
     final HtmlPageAction? previousAction = const HtmlPageAction.addParagraph(),
     final HtmlPageEvent? previousEvent = HtmlPageEvent.hasExtraSpace,
   }) : previousAction = previousAction ?? const HtmlPageAction.addParagraph();
@@ -191,6 +209,8 @@ class _HtmlPageDelegate extends BoxyDelegate {
   final RebuildRequestCallback requestRebuild;
   final HtmlPageAction previousAction;
   final int page;
+  final int maxRebuilds;
+  final int currentRebuildCount;
 
   @override
   Size layout() {
@@ -202,6 +222,10 @@ class _HtmlPageDelegate extends BoxyDelegate {
     final event = actualHeight < maxHeight
         ? HtmlPageEvent.hasExtraSpace
         : HtmlPageEvent.hasNoExtraSpace;
+
+    if (currentRebuildCount >= maxRebuilds) {
+      return actualSize;
+    }
 
     // ** Has extra space, add more content **
     if (event == HtmlPageEvent.hasExtraSpace) {
