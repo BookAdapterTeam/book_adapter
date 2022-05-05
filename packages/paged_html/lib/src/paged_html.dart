@@ -1,6 +1,7 @@
 import 'package:boxy/boxy.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
 
 import 'html_page_action.dart';
@@ -30,9 +31,10 @@ class PagedHtml extends StatefulWidget {
 }
 
 class _PagedHtmlState extends State<PagedHtml> {
+  final List<Widget> _pages = <Widget>[];
   late PagedHtmlController _pagedHtmlController;
   int _currentPage = 0;
-  int _rebuildCount = 0;
+  final List<int> _rebuildCount = [0];
   HtmlPageAction? _previousAction;
   HtmlPageEvent? _previousEvent;
 
@@ -41,9 +43,34 @@ class _PagedHtmlState extends State<PagedHtml> {
 
   // TODO: Handle to current position in html
 
+  Widget buildHtmlPage(int page) {
+    return _HtmlPage(
+      html: widget.html,
+      previousAction: _previousAction,
+      previousEvent: _previousEvent,
+      page: page,
+      maxRebuilds: widget.maxRebuilds,
+      currentRebuildCount: _rebuildCount[page],
+      onDone: () {
+        // TODO: Only add more pages if it has more html not shown
+        if (!_hasMorePages) {
+          return;
+        }
+
+        _pages.add(buildHtmlPage(page + 1));
+        SchedulerBinding.instance?.addPostFrameCallback((_) {
+          setState(() {});
+        });
+      },
+      onRequestedRebuild: (event, action) =>
+          _onRequestedRebuild(event, action, page),
+    );
+  }
+
   @override
   void initState() {
     _pagedHtmlController = widget.controller ?? PagedHtmlController();
+    _pages.add(buildHtmlPage(0));
     super.initState();
   }
 
@@ -58,8 +85,7 @@ class _PagedHtmlState extends State<PagedHtml> {
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
         ...ScrollConfiguration.of(context).dragDevices,
-        PointerDeviceKind.mouse,
-        PointerDeviceKind.stylus,
+        ...const {PointerDeviceKind.mouse, PointerDeviceKind.stylus},
       }),
       child: PageView.builder(
         scrollDirection: widget.scrollDirection,
@@ -71,64 +97,63 @@ class _PagedHtmlState extends State<PagedHtml> {
             _currentPage = index;
           });
         },
-        itemCount: 3,
+        itemCount: _pages.length,
         itemBuilder: (context, index) {
           // TODO: Add pages to items list lazily
-          return _HtmlPage(
-            html: widget.html,
-            previousAction: _previousAction,
-            previousEvent: _previousEvent,
-            page: index,
-            maxRebuilds: widget.maxRebuilds,
-            currentRebuildCount: _rebuildCount,
-            onRequestedRebuild: (event, action) {
-              if (action.isTypeAdd) {
-                switch (action.amount) {
-                  case HtmlPageChangeAmount.paragraph:
-                    // TODO: Add a paragraph
-                    break;
-                  case HtmlPageChangeAmount.sentence:
-                    // TODO: Add a sentence
-                    break;
-                  case HtmlPageChangeAmount.word:
-                    // TODO: Add a word
-                    break;
-                }
-              } else if (action.isTypeRemove) {
-                switch (action.amount) {
-                  case HtmlPageChangeAmount.paragraph:
-                    // TODO: Remove a paragraph
-                    break;
-                  case HtmlPageChangeAmount.sentence:
-                    // TODO: Remove a sentence
-                    break;
-                  case HtmlPageChangeAmount.word:
-                    // TODO: Remove a word
-                    break;
-                }
-              }
+          if (_rebuildCount.length == index) {
+            _rebuildCount.add(0);
+          }
 
-              // SchedulerBinding.instance?.addPostFrameCallback((_) {
-              //   print('previousAction: $_previousAction');
-              //   print('action: $action');
-              //   setState(() {});
-              // });
-
-              // _previousAction = action;
-              // _previousEvent = event;
-              _rebuildCount++;
-
-              // TODO: Set to false when all html is displayed
-              _hasMorePages = false;
-            },
-          );
+          return _pages[index];
         },
-        // children: [
-        //   for (int index = 0; _hasMorePages; index++)
-
-        // ],
       ),
     );
+  }
+
+  void _onRequestedRebuild(
+      HtmlPageEvent event, HtmlPageAction action, int index) {
+    if (action.isTypeAdd) {
+      switch (action.amount) {
+        case HtmlPageChangeAmount.paragraph:
+          // TODO: Add a paragraph
+          break;
+        case HtmlPageChangeAmount.sentence:
+          // TODO: Add a sentence
+          break;
+        case HtmlPageChangeAmount.word:
+          // TODO: Add a word
+          break;
+      }
+    } else if (action.isTypeRemove) {
+      switch (action.amount) {
+        case HtmlPageChangeAmount.paragraph:
+          // TODO: Remove a paragraph
+          break;
+        case HtmlPageChangeAmount.sentence:
+          // TODO: Remove a sentence
+          break;
+        case HtmlPageChangeAmount.word:
+          // TODO: Remove a word
+          break;
+      }
+    }
+
+    SchedulerBinding.instance?.addPostFrameCallback((_) {
+      // print('previousAction: $_previousAction');
+      // print('action: $action');
+      setState(() {});
+    });
+
+    _previousAction = action;
+    _previousEvent = event;
+    if (_rebuildCount.length > index) {
+      _rebuildCount[index]++;
+    } else {
+      _rebuildCount.add(1);
+    }
+
+    // TODO: Set to false when all html is displayed
+    _hasMorePages = false;
   }
 }
 
@@ -140,6 +165,7 @@ class _HtmlPage extends StatelessWidget {
     required this.onRequestedRebuild,
     required this.maxRebuilds,
     required this.currentRebuildCount,
+    required this.onDone,
     this.previousAction,
     this.previousEvent,
   }) : super(key: key);
@@ -154,6 +180,7 @@ class _HtmlPage extends StatelessWidget {
   final RebuildRequestCallback onRequestedRebuild;
   final HtmlPageAction? previousAction;
   final HtmlPageEvent? previousEvent;
+  final VoidCallback onDone;
 
   @override
   Widget build(BuildContext context) {
@@ -169,6 +196,7 @@ class _HtmlPage extends StatelessWidget {
               previousEvent: previousEvent,
               maxRebuilds: maxRebuilds,
               currentRebuildCount: currentRebuildCount,
+              onDone: onDone,
             ),
             children: [
               BoxyId(
@@ -198,6 +226,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
     required final this.html,
     required final this.page,
     required final this.requestRebuild,
+    required final this.onDone,
     required this.maxRebuilds,
     required this.currentRebuildCount,
     final HtmlPageAction? previousAction = const HtmlPageAction.addParagraph(),
@@ -210,6 +239,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
   final int page;
   final int maxRebuilds;
   final int currentRebuildCount;
+  final VoidCallback onDone;
 
   @override
   Size layout() {
