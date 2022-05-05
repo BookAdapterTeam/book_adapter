@@ -43,9 +43,9 @@ class _PagedHtmlState extends State<PagedHtml> {
 
   // TODO: Handle to current position in html
 
-  Widget buildHtmlPage(int page) {
+  Widget buildHtmlPage(String html, int page) {
     return _HtmlPage(
-      html: widget.html,
+      html: html,
       previousAction: _previousAction,
       previousEvent: _previousEvent,
       page: page,
@@ -57,7 +57,10 @@ class _PagedHtmlState extends State<PagedHtml> {
           return;
         }
 
-        _pages.add(buildHtmlPage(page + 1));
+        // TODO: Get remaining html from html handler
+        final remainingHtml = html;
+
+        _pages.add(buildHtmlPage(remainingHtml, page + 1));
         SchedulerBinding.instance?.addPostFrameCallback((_) {
           setState(() {});
         });
