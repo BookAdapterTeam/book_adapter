@@ -111,7 +111,10 @@ class _PagedHtmlState extends State<PagedHtml> {
   }
 
   void _onRequestedRebuild(
-      HtmlPageEvent event, HtmlPageAction action, int index) {
+    HtmlPageEvent event,
+    HtmlPageAction action,
+    int index,
+  ) {
     if (action.isTypeAdd) {
       switch (action.amount) {
         case HtmlPageChangeAmount.paragraph:
@@ -265,7 +268,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
         requestRebuild(event, previousAction);
         return actualSize;
       }
-      
+
       // Previous removed content and now has extra space
       switch (previousAction.amount) {
         case HtmlPageChangeAmount.paragraph:
