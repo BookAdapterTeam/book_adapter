@@ -44,6 +44,7 @@ class _PagedHtmlState extends State<PagedHtml> {
   // TODO: Handle to current position in html
 
   Widget _buildHtmlPage(String html, int page) {
+    print(_rebuildCount[page]);
     return _HtmlPage(
       html: html,
       previousAction: _previousAction,
@@ -52,18 +53,7 @@ class _PagedHtmlState extends State<PagedHtml> {
       maxRebuilds: widget.maxRebuilds,
       currentRebuildCount: _rebuildCount[page],
       onDone: () {
-        // TODO: Only add more pages if it has more html not shown
-        if (!_hasMorePages) {
-          return;
-        }
-
-        // TODO: Get remaining html from html handler
-        final remainingHtml = html;
-
-        _pages.add(_buildHtmlPage(remainingHtml, page + 1));
-        SchedulerBinding.instance?.addPostFrameCallback((_) {
-          setState(() {});
-        });
+        print('Done');
       },
       onRequestedRebuild: (event, action) =>
           _onRequestedRebuild(event, action, page),
@@ -96,18 +86,38 @@ class _PagedHtmlState extends State<PagedHtml> {
         scrollBehavior: widget.scrollBehavior,
         physics: widget.physics,
         onPageChanged: (index) {
+          print('New page: $index');
           setState(() {
             _currentPage = index;
           });
         },
-        itemCount: _pages.length,
+        itemCount: _pages.length + 1,
         itemBuilder: (context, index) {
           // TODO: Add pages to items list lazily
-          if (_rebuildCount.length == index) {
+          if (_rebuildCount.length - 1 == index) {
             _rebuildCount.add(0);
           }
 
-          return _pages[index];
+          // TODO: If last page, add another page if there is more html
+          if (!_hasMorePages && index == _pages.length) {
+            return const Scaffold(
+              body: Center(
+                child: Text('No more pages'),
+              ),
+            );
+          }
+
+          // TODO: Get remaining html from html handler
+          final remainingHtml = widget.html;
+
+          // Get page from list if it already exists
+          if (_pages.length > index) {
+            return _pages[index];
+          }
+
+          final newPage = _buildHtmlPage(remainingHtml, index + 1);
+          _pages.add(newPage);
+          return newPage;
         },
       ),
     );
