@@ -73,7 +73,7 @@ class _PagedHtmlState extends State<PagedHtml> {
   @override
   void initState() {
     _pagedHtmlController = widget.controller ?? PagedHtmlController();
-    _pages.add(buildHtmlPage(0));
+    _pages.add(buildHtmlPage(widget.html, 0));
     super.initState();
   }
 
