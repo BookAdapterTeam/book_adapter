@@ -253,6 +253,7 @@ class _HtmlPageDelegate extends BoxyDelegate {
         : HtmlPageEvent.hasNoExtraSpace;
 
     if (currentRebuildCount >= maxRebuilds) {
+      onDone();
       return actualSize;
     }
 
@@ -260,17 +261,22 @@ class _HtmlPageDelegate extends BoxyDelegate {
     if (event == HtmlPageEvent.hasExtraSpace) {
       // Previously added content and still has extra space
       if (previousAction.isTypeAdd) {
-        // Add more content
+        // Add the same
         requestRebuild(event, previousAction);
+        return actualSize;
       }
+      
       // Previous removed content and now has extra space
-      else if (previousAction.isTypeRemove) {
-        // Remove content
-        if (previousAction.amount == HtmlPageChangeAmount.paragraph) {
+      switch (previousAction.amount) {
+        case HtmlPageChangeAmount.paragraph:
           requestRebuild(event, const HtmlPageAction.addSentence());
-        } else if (previousAction.amount == HtmlPageChangeAmount.sentence) {
+          break;
+        case HtmlPageChangeAmount.sentence:
           requestRebuild(event, const HtmlPageAction.addWord());
-        }
+          break;
+        case HtmlPageChangeAmount.word:
+          onDone();
+          break;
       }
 
       return actualSize;
@@ -281,21 +287,20 @@ class _HtmlPageDelegate extends BoxyDelegate {
     // Previously removed content and still has too much content
     if (previousAction.isTypeRemove) {
       requestRebuild(event, previousAction);
+      return actualSize;
     }
 
     // Previously added content and now has too much content
-    else if (previousAction.isTypeAdd) {
-      switch (previousAction.amount) {
-        case HtmlPageChangeAmount.paragraph:
-          requestRebuild(event, const HtmlPageAction.removeParagraph());
-          break;
-        case HtmlPageChangeAmount.sentence:
-          requestRebuild(event, const HtmlPageAction.removeSentence());
-          break;
-        case HtmlPageChangeAmount.word:
-          requestRebuild(event, const HtmlPageAction.removeWord());
-          break;
-      }
+    switch (previousAction.amount) {
+      case HtmlPageChangeAmount.paragraph:
+        requestRebuild(event, const HtmlPageAction.removeParagraph());
+        break;
+      case HtmlPageChangeAmount.sentence:
+        requestRebuild(event, const HtmlPageAction.removeSentence());
+        break;
+      case HtmlPageChangeAmount.word:
+        requestRebuild(event, const HtmlPageAction.removeWord());
+        break;
     }
 
     return actualSize;
