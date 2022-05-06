@@ -46,6 +46,7 @@ class _PagedHtmlState extends State<PagedHtml> {
   Widget _buildHtmlPage(String html, int page) {
     print(_rebuildCount[page]);
     return _HtmlPage(
+      key: ValueKey('HtmlPage-$page'),
       html: html,
       previousAction: _previousAction,
       previousEvent: _previousEvent,
@@ -173,7 +174,7 @@ class _PagedHtmlState extends State<PagedHtml> {
   }
 }
 
-class _HtmlPage extends StatelessWidget {
+class _HtmlPage extends StatefulWidget {
   const _HtmlPage({
     Key? key,
     required this.html,
@@ -199,32 +200,54 @@ class _HtmlPage extends StatelessWidget {
   final VoidCallback onDone;
 
   @override
+  State<_HtmlPage> createState() => _HtmlPageState();
+}
+
+class _HtmlPageState extends State<_HtmlPage> {
+  late ScrollController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Column(
       children: [
         Flexible(
           child: CustomBoxy(
             delegate: _HtmlPageDelegate(
-              html: html,
-              page: page,
-              requestRebuild: onRequestedRebuild,
-              previousAction: previousAction,
-              previousEvent: previousEvent,
-              maxRebuilds: maxRebuilds,
-              currentRebuildCount: currentRebuildCount,
-              onDone: onDone,
+              html: widget.html,
+              page: widget.page,
+              requestRebuild: widget.onRequestedRebuild,
+              previousAction: widget.previousAction,
+              previousEvent: widget.previousEvent,
+              maxRebuilds: widget.maxRebuilds,
+              currentRebuildCount: widget.currentRebuildCount,
+              onDone: widget.onDone,
             ),
             children: [
               BoxyId(
-                id: 'html_$page',
+                id: 'html_${widget.page}',
                 child: Container(
                   color: Colors.grey,
                   child: HtmlWidget(
                     // '<h1>Hello World</h1>',
-                    html,
+                    widget.html,
+                    key: ValueKey('HtmlWidget-${widget.page}'),
                     enableCaching: true,
-                    renderMode: const ListViewMode(
+                    renderMode: ListViewMode(
                       shrinkWrap: true,
+                      controller: _controller
+                      // physics: NeverScrollableScrollPhysics()
                     ),
                   ),
                 ),
