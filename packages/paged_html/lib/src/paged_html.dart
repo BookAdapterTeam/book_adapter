@@ -21,7 +21,8 @@ class PagedHtml extends StatefulWidget {
     this.controller,
     this.maxRebuilds = 20,
     this.onPageChanged,
-    this.noMoreHtmlPage = const Scaffold(
+    this.showEndPage = true,
+    this.endPage = const Scaffold(
       body: Center(
         child: Text('No more pages'),
       ),
@@ -48,11 +49,11 @@ class PagedHtml extends StatefulWidget {
   ///
   /// Defaults to matching platform conventions.
   final ScrollPhysics? physics;
-  
+
   final PagedHtmlController? controller;
 
   /// The maximum number of rebuilds allowed to fit the html on one page
-  /// 
+  ///
   /// If the max rebuilds is reached and the HTML is too much to fit on
   /// one page, the screen will be scrollable.
   final int maxRebuilds;
@@ -60,8 +61,13 @@ class PagedHtml extends StatefulWidget {
   /// Called whenever the page in the center of the viewport changes.
   final void Function(int index)? onPageChanged;
 
+  /// The widget shown when the user scrolls past the last page
+  final Widget endPage;
 
-  final Widget noMoreHtmlPage;
+  /// Shows [endPage] when the user scrolls past the last page
+  ///
+  /// Defaults to true
+  final bool showEndPage;
 
   /// Whether the page view scrolls in the reading direction.
   ///
@@ -97,7 +103,7 @@ class PagedHtml extends StatefulWidget {
 
   /// {@macro flutter.widgets.scrollable.restorationId}
   final String? restorationId;
-  
+
   /// {@macro flutter.material.Material.clipBehavior}
   ///
   /// Defaults to [Clip.hardEdge].
@@ -196,14 +202,14 @@ class _PagedHtmlState extends State<PagedHtml> {
         scrollBehavior: widget.scrollBehavior,
         physics: widget.physics,
         onPageChanged: widget.onPageChanged,
-        itemCount: _pages.length + 1,
+        itemCount: widget.showEndPage ? _pages.length + 1 : _pages.length,
         itemBuilder: (context, index) {
           if (_rebuildCount.length - 1 == index) {
             _rebuildCount.add(0);
           }
 
-          if (!_hasMorePages && index == _pages.length) {
-            return widget.noMoreHtmlPage;
+          if (widget.showEndPage && !_hasMorePages && index == _pages.length) {
+            return widget.endPage;
           }
 
           // TODO: Get remaining html from html handler
@@ -268,7 +274,7 @@ class _PagedHtmlState extends State<PagedHtml> {
     }
 
     // TODO: Set to false when all html is displayed
-    // _hasMorePages = false;
+    _hasMorePages = false;
   }
 }
 
