@@ -1,39 +1,51 @@
-<!-- 
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
-
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/guides/libraries/writing-package-pages). 
-
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-library-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/developing-packages). 
--->
-
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+A Flutter package for displaying HTML content in a PageView.
 
 ## Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
+Splits the HTML content into pages and displays them in a PageView.
+
+Limitations:
+
+- It is impossible to get the number of pages
+- The HTML widget is measured during layout and rebuilt multiple times
+until it fits in the available space.
+- No support for jumping to a specific location in the html (Epub CFI)
 
 ## Getting started
 
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
+In the pubspec.yaml of your flutter project, add the following dependency:
+
+<!-- ```yaml
+dependencies:
+  paged_html: ^0.0.1
+``` -->
+```yaml
+dependencies:
+  paged_html:
+    git: https://github.com/BookAdapterTeam/book_adapter/blob/main/packages/paged_html
+```
+
+In your library add the following import:
+
+```yaml
+import 'package:paged_html/paged_html.dart';
+```
 
 ## Usage
 
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder. 
+Example:
 
 ```dart
-const like = 'sample';
+  @override
+  Widget build(BuildContext context) {
+    return PagedHtml(
+        html: '<h1>Hello World</h1>',
+    );
+  }
 ```
 
-## Additional information
+<!-- ## Additional information
 
 TODO: Tell users more about the package: where to find more information, how to 
 contribute to the package, how to file issues, what response they can expect 
-from the package authors, and more.
+from the package authors, and more. -->
