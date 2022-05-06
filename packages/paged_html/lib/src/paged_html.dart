@@ -117,7 +117,7 @@ class _PagedHtmlState extends State<PagedHtml> {
             return _pages[index];
           }
 
-          final newPage = _buildHtmlPage(remainingHtml, index + 1);
+          final newPage = _buildHtmlPage(remainingHtml, index);
           _pages.add(newPage);
           return newPage;
         },
