@@ -1,25 +1,27 @@
 import 'package:flutter/material.dart';
 
+/// A page controller for [PagedHtml]
+/// 
+/// This is a wrapper of [PageController] which provides the methods
+/// which would be useful for [PagedHtml].
 class PagedHtmlController {
-  final PageController _pageController;
+  final PageController pageController;
   final Duration pageTurnDuration;
   final Curve nextPageCurve;
   final Curve previousPageCurve;
-
-  PageController get pageController => _pageController;
 
   PagedHtmlController({
     this.pageTurnDuration = const Duration(milliseconds: 300),
     this.nextPageCurve = Curves.easeInOut,
     this.previousPageCurve = Curves.easeInOut,
-  }) : _pageController = PageController();
+  }) : pageController = PageController();
 
-  Future<void> nextPage() => _pageController.nextPage(
+  Future<void> nextPage() => pageController.nextPage(
         duration: pageTurnDuration,
         curve: nextPageCurve,
       );
 
-  Future<void> prevPage() => _pageController.previousPage(
+  Future<void> prevPage() => pageController.previousPage(
         duration: pageTurnDuration,
         curve: previousPageCurve,
       );
@@ -29,6 +31,6 @@ class PagedHtmlController {
   ///
   /// This method should only be called by the object's owner.
   void dispose() {
-    _pageController.dispose();
+    pageController.dispose();
   }
 }
