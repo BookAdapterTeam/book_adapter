@@ -169,7 +169,7 @@ class _PagedHtmlState extends State<PagedHtml> {
     }
 
     // TODO: Set to false when all html is displayed
-    _hasMorePages = false;
+    // _hasMorePages = false;
   }
 }
 
