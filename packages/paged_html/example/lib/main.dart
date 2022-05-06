@@ -36,7 +36,6 @@ class _PagedHtmlExampleState extends State<PagedHtmlExample> {
       appBar: AppBar(title: const Text('Flutter PagedHtml Example')),
       body: PagedHtml(
         key: const ValueKey('HtmlReader'),
-        scrollDirection: Axis.horizontal,
         controller: controller,
         physics: const PageScrollPhysics(),
         restorationId: 'PagedHtmlExample',
