@@ -95,6 +95,7 @@ class PagedHtml extends StatefulWidget {
   /// {@macro flutter.widgets.scrollable.dragStartBehavior}
   final DragStartBehavior dragStartBehavior;
 
+  /// {@macro flutter.widgets.scrollable.restorationId}
   final String? restorationId;
   
   /// {@macro flutter.material.Material.clipBehavior}
