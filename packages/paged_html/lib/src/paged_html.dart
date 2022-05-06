@@ -45,7 +45,7 @@ class _PagedHtmlState extends State<PagedHtml> {
   HtmlPageAction? _previousAction;
   HtmlPageEvent? _previousEvent;
 
-  // TODO: True when all html is displayed
+  // TODO: False when all html is displayed
   bool _hasMorePages = true;
 
   set hasMorePages(bool value) {
@@ -56,7 +56,7 @@ class _PagedHtmlState extends State<PagedHtml> {
     setState(() {});
   }
 
-  // TODO: Handle to current position in html
+  // TODO: Add handle to current position in html
 
   Widget _buildHtmlPage(String html, int page) {
     return _HtmlPage(
@@ -105,7 +105,6 @@ class _PagedHtmlState extends State<PagedHtml> {
             _rebuildCount.add(0);
           }
 
-          // TODO: If last page, add another page if there is more html, else return no more pages page
           if (!_hasMorePages && index == _pages.length) {
             return widget.noMoreHtmlPage;
           }
