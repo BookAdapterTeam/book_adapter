@@ -13,7 +13,10 @@ class PagedHtml extends StatefulWidget {
     Key? key,
     required this.html,
     this.physics,
-    this.scrollDirection = Axis.horizontal,
+    this.reverse = false,
+    this.pageSnapping = true,
+    this.dragStartBehavior = DragStartBehavior.start,
+    this.allowImplicitScrolling = true,
     this.scrollBehavior,
     this.controller,
     this.maxRebuilds = 20,
@@ -23,16 +26,103 @@ class PagedHtml extends StatefulWidget {
         child: Text('No more pages'),
       ),
     ),
+    this.restorationId,
+    this.clipBehavior = Clip.hardEdge,
+    this.padEnds = true,
   }) : super(key: key);
 
-  final Axis scrollDirection;
+  /// The HTML content to display.
   final String html;
+
+  /// How the page view should respond to user input.
+  ///
+  /// For example, determines how the page view continues to animate after the
+  /// user stops dragging the page view.
+  ///
+  /// The physics are modified to snap to page boundaries using
+  /// [PageScrollPhysics] prior to being used.
+  ///
+  /// If an explicit [ScrollBehavior] is provided to [scrollBehavior], the
+  /// [ScrollPhysics] provided by that behavior will take precedence after
+  /// [physics].
+  ///
+  /// Defaults to matching platform conventions.
   final ScrollPhysics? physics;
-  final ScrollBehavior? scrollBehavior;
+  
   final PagedHtmlController? controller;
+
+  /// The maximum number of rebuilds allowed to fit the html on one page
+  /// 
+  /// If the max rebuilds is reached and the HTML is too much to fit on
+  /// one page, the screen will be scrollable.
   final int maxRebuilds;
+
+  /// Called whenever the page in the center of the viewport changes.
   final void Function(int index)? onPageChanged;
+
+
   final Widget noMoreHtmlPage;
+
+  /// Whether the page view scrolls in the reading direction.
+  ///
+  /// For example, if the reading direction is left-to-right, then the page
+  /// view scrolls from left to right when [reverse] is false and from right
+  /// to left when [reverse] is true.
+  ///
+  /// Defaults to false.
+  final bool reverse;
+
+  /// Set to false to disable page snapping, useful for custom scroll behavior.
+  ///
+  /// If the [padEnds] is false and [PageController.viewportFraction] < 1.0,
+  /// the page will snap to the beginning of the viewport; otherwise, the page
+  /// will snap to the center of the viewport.
+  final bool pageSnapping;
+
+  /// Controls whether the widget's pages will respond to
+  /// [RenderObject.showOnScreen], which will allow for implicit accessibility
+  /// scrolling.
+  ///
+  /// With this flag set to false, when accessibility focus reaches the end of
+  /// the current page and the user attempts to move it to the next element, the
+  /// focus will traverse to the next widget outside of the page view.
+  ///
+  /// With this flag set to true, when accessibility focus reaches the end of
+  /// the current page and user attempts to move it to the next element, focus
+  /// will traverse to the next page in the page view.
+  final bool allowImplicitScrolling;
+
+  /// {@macro flutter.widgets.scrollable.dragStartBehavior}
+  final DragStartBehavior dragStartBehavior;
+
+  final String? restorationId;
+  
+  /// {@macro flutter.material.Material.clipBehavior}
+  ///
+  /// Defaults to [Clip.hardEdge].
+  final Clip clipBehavior;
+
+  /// {@macro flutter.widgets.shadow.scrollBehavior}
+  ///
+  /// [ScrollBehavior]s also provide [ScrollPhysics]. If an explicit
+  /// [ScrollPhysics] is provided in [physics], it will take precedence,
+  /// followed by [scrollBehavior], and then the inherited ancestor
+  /// [ScrollBehavior].
+  ///
+  /// The [ScrollBehavior] of the inherited [ScrollConfiguration] will be
+  /// modified by default to not apply a [Scrollbar].
+  final ScrollBehavior? scrollBehavior;
+
+  /// Whether to add padding to both ends of the list.
+  ///
+  /// If this is set to true and [PageController.viewportFraction] < 1.0, padding will be added
+  /// such that the first and last child slivers will be in the center of
+  /// the viewport when scrolled all the way to the start or end, respectively.
+  ///
+  /// If [PageController.viewportFraction] >= 1.0, this property has no effect.
+  ///
+  /// This property defaults to true and must not be null.
+  final bool padEnds;
 
   @override
   State<PagedHtml> createState() => _PagedHtmlState();
@@ -94,7 +184,13 @@ class _PagedHtmlState extends State<PagedHtml> {
       }),
       child: PageView.builder(
         key: const ValueKey('PagedHtml'),
-        scrollDirection: widget.scrollDirection,
+        reverse: widget.reverse,
+        pageSnapping: widget.pageSnapping,
+        dragStartBehavior: widget.dragStartBehavior,
+        allowImplicitScrolling: widget.allowImplicitScrolling,
+        restorationId: widget.restorationId,
+        clipBehavior: widget.clipBehavior,
+        padEnds: widget.padEnds,
         controller: _pagedHtmlController.pageController,
         scrollBehavior: widget.scrollBehavior,
         physics: widget.physics,
