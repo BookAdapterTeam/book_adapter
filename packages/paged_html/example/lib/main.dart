@@ -39,6 +39,7 @@ class _PagedHtmlExampleState extends State<PagedHtmlExample> {
         scrollDirection: Axis.horizontal,
         controller: controller,
         physics: const PageScrollPhysics(),
+        restorationId: 'PagedHtmlExample',
         html: '''
 <div>
   <h1>PagedHtml</h1>
