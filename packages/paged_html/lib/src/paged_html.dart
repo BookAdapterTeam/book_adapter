@@ -238,6 +238,7 @@ class _HtmlPageState extends State<_HtmlPage> {
               BoxyId(
                 id: 'html_${widget.page}',
                 child: Container(
+                  key: ValueKey('HtmlContainer-${widget.page}'),
                   color: Colors.grey,
                   child: HtmlWidget(
                     // '<h1>Hello World</h1>',
@@ -246,8 +247,8 @@ class _HtmlPageState extends State<_HtmlPage> {
                     enableCaching: true,
                     renderMode: ListViewMode(
                       shrinkWrap: true,
-                      controller: _controller
-                      // physics: NeverScrollableScrollPhysics()
+                      controller: _controller,
+                      restorationId: 'html_${widget.page}',
                     ),
                   ),
                 ),
