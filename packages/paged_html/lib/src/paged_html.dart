@@ -17,6 +17,7 @@ class PagedHtml extends StatefulWidget {
     this.scrollBehavior,
     this.controller,
     this.maxRebuilds = 20,
+    this.onPageChanged,
   }) : super(key: key);
 
   final Axis scrollDirection;
@@ -25,6 +26,7 @@ class PagedHtml extends StatefulWidget {
   final ScrollBehavior? scrollBehavior;
   final PagedHtmlController? controller;
   final int maxRebuilds;
+  final void Function(int index)? onPageChanged;
 
   @override
   State<PagedHtml> createState() => _PagedHtmlState();
@@ -33,7 +35,6 @@ class PagedHtml extends StatefulWidget {
 class _PagedHtmlState extends State<PagedHtml> {
   final List<Widget> _pages = <Widget>[];
   late PagedHtmlController _pagedHtmlController;
-  int _currentPage = 0;
   final List<int> _rebuildCount = [0];
   HtmlPageAction? _previousAction;
   HtmlPageEvent? _previousEvent;
@@ -41,10 +42,17 @@ class _PagedHtmlState extends State<PagedHtml> {
   // TODO: True when all html is displayed
   bool _hasMorePages = true;
 
+  set hasMorePages(bool value) {
+    if (_hasMorePages == value) {
+      return;
+    }
+    _hasMorePages = value;
+    setState(() {});
+  }
+
   // TODO: Handle to current position in html
 
   Widget _buildHtmlPage(String html, int page) {
-    print(_rebuildCount[page]);
     return _HtmlPage(
       key: ValueKey('HtmlPage-$page'),
       html: html,
@@ -53,9 +61,6 @@ class _PagedHtmlState extends State<PagedHtml> {
       page: page,
       maxRebuilds: widget.maxRebuilds,
       currentRebuildCount: _rebuildCount[page],
-      onDone: () {
-        print('Done');
-      },
       onRequestedRebuild: (event, action) =>
           _onRequestedRebuild(event, action, page),
     );
@@ -82,16 +87,12 @@ class _PagedHtmlState extends State<PagedHtml> {
         ...const {PointerDeviceKind.mouse, PointerDeviceKind.stylus},
       }),
       child: PageView.builder(
+        key: const ValueKey('PagedHtml'),
         scrollDirection: widget.scrollDirection,
         controller: _pagedHtmlController.pageController,
         scrollBehavior: widget.scrollBehavior,
         physics: widget.physics,
-        onPageChanged: (index) {
-          print('New page: $index');
-          setState(() {
-            _currentPage = index;
-          });
-        },
+        onPageChanged: widget.onPageChanged,
         itemCount: _pages.length + 1,
         itemBuilder: (context, index) {
           // TODO: Add pages to items list lazily
@@ -182,7 +183,7 @@ class _HtmlPage extends StatefulWidget {
     required this.onRequestedRebuild,
     required this.maxRebuilds,
     required this.currentRebuildCount,
-    required this.onDone,
+    this.onDone,
     this.previousAction,
     this.previousEvent,
   }) : super(key: key);
@@ -197,7 +198,7 @@ class _HtmlPage extends StatefulWidget {
   final RebuildRequestCallback onRequestedRebuild;
   final HtmlPageAction? previousAction;
   final HtmlPageEvent? previousEvent;
-  final VoidCallback onDone;
+  final VoidCallback? onDone;
 
   @override
   State<_HtmlPage> createState() => _HtmlPageState();
@@ -221,9 +222,12 @@ class _HtmlPageState extends State<_HtmlPage> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      key: ValueKey('HtmlPage-${widget.page}'),
       children: [
         Flexible(
+          key: ValueKey('HtmlPage-${widget.page}-Flexible'),
           child: CustomBoxy(
+            key: ValueKey('HtmlPage-${widget.page}-CustomBoxy'),
             delegate: _HtmlPageDelegate(
               html: widget.html,
               page: widget.page,
@@ -232,13 +236,14 @@ class _HtmlPageState extends State<_HtmlPage> {
               previousEvent: widget.previousEvent,
               maxRebuilds: widget.maxRebuilds,
               currentRebuildCount: widget.currentRebuildCount,
-              onDone: widget.onDone,
+              onDone: widget.onDone ?? () {},
             ),
             children: [
               BoxyId(
                 id: 'html_${widget.page}',
+                key: ValueKey('HtmlPage-${widget.page}-BoxyId'),
                 child: Container(
-                  key: ValueKey('HtmlContainer-${widget.page}'),
+                  key: ValueKey('HtmlPage-${widget.page}-Container'),
                   color: Colors.grey,
                   child: HtmlWidget(
                     // '<h1>Hello World</h1>',
