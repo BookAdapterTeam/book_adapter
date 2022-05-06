@@ -18,6 +18,11 @@ class PagedHtml extends StatefulWidget {
     this.controller,
     this.maxRebuilds = 20,
     this.onPageChanged,
+    this.noMoreHtmlPage = const Scaffold(
+      body: Center(
+        child: Text('No more pages'),
+      ),
+    ),
   }) : super(key: key);
 
   final Axis scrollDirection;
@@ -27,6 +32,7 @@ class PagedHtml extends StatefulWidget {
   final PagedHtmlController? controller;
   final int maxRebuilds;
   final void Function(int index)? onPageChanged;
+  final Widget noMoreHtmlPage;
 
   @override
   State<PagedHtml> createState() => _PagedHtmlState();
@@ -95,18 +101,13 @@ class _PagedHtmlState extends State<PagedHtml> {
         onPageChanged: widget.onPageChanged,
         itemCount: _pages.length + 1,
         itemBuilder: (context, index) {
-          // TODO: Add pages to items list lazily
           if (_rebuildCount.length - 1 == index) {
             _rebuildCount.add(0);
           }
 
-          // TODO: If last page, add another page if there is more html
+          // TODO: If last page, add another page if there is more html, else return no more pages page
           if (!_hasMorePages && index == _pages.length) {
-            return const Scaffold(
-              body: Center(
-                child: Text('No more pages'),
-              ),
-            );
+            return widget.noMoreHtmlPage;
           }
 
           // TODO: Get remaining html from html handler
