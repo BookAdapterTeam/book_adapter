@@ -1,6 +1,8 @@
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parseFragment;
 
+import 'models/mirror_node.dart';
+
 class Pair<T, K> {
   const Pair(this.first, this.second);
 
@@ -9,6 +11,7 @@ class Pair<T, K> {
 }
 
 class HtmlUtils {
+  /// Returns the parsed [html]
   static dom.DocumentFragment parseHtml(String html) {
     return parseFragment(html);
   }
@@ -20,10 +23,10 @@ class HtmlUtils {
   static Iterable<Pair<dom.Node, int>> getNodes(dom.NodeList elements) sync* {
     for (var i = 0; i < elements.length; i++) {
       final element = elements[i];
-      yield Pair(element, i);
       if (element.hasChildNodes()) {
         yield* getNodes(element.nodes);
       }
+      yield Pair(element, i);
     }
   }
 
@@ -158,23 +161,23 @@ class HtmlUtils {
     return true;
   }
 
-  // /// Returns true if node [a] has child [b]
-  // static bool nodeHasChild(dom.Node a, dom.Node b) {
-  //   final children = a.children;
+  /// Parses the [node] and returns a mirror of the tree
+  static MirrorNode getMirrorNode(dom.Node node, {MirrorNode? parent}) {
+    final parentNode = node.parent;
+    final indexInParent = parentNode?.nodes.indexOf(node) ?? -1;
 
-  //   return nodeListContains(children, b);
-  // }
+    final mirrorNode = MirrorNode(
+      node: node,
+      parent: parent ?? (parentNode != null ? getMirrorNode(parentNode) : null),
+      indexInParent: indexInParent,
+    );
 
-  // /// Returns true if list of nodes contains [node]
-  // static bool nodeListContains(List<dom.Node> nodes, dom.Node node) {
-  //   for (final n in nodes) {
-  //     if (n == node || nodeDeepEquals(n, node)) {
-  //       return true;
-  //     }
-  //   }
-
-  //   return false;
-  // }
+    return mirrorNode.copyWith(
+      nodes: node.nodes
+          .map((node) => getMirrorNode(node, parent: mirrorNode))
+          .toList(),
+    );
+  }
 }
 
 /// A class which holds html, the current position in the html, the html before the current position, and the html after the current position
