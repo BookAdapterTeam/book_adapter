@@ -1,6 +1,5 @@
 import 'package:equatable/equatable.dart';
 import 'package:html/dom.dart' as dom;
-import 'package:uuid/uuid.dart';
 
 class MirrorNode<T extends dom.Node> extends Equatable {
   const MirrorNode({
@@ -21,11 +20,55 @@ class MirrorNode<T extends dom.Node> extends Equatable {
   /// Returns null if this is the root node.
   final MirrorNode? parent;
 
+  /// The parent element of this node.
+  ///
+  /// Returns null if this node either does not have a parent or its parent is
+  /// not an element.
+  MirrorNode<dom.Element>? get parentElement {
+    if (parent == null) return null;
+
+    final parentNode = parent!;
+    return parentNode.node is dom.Element
+        ? MirrorNode(
+            id: parentNode.id,
+            node: parentNode.node as dom.Element,
+            indexInParent: parentNode.indexInParent,
+            parent: parentNode.parent,
+          )
+        : null;
+  }
+
   /// The index of this node in [parent]'s children nodes
   final int indexInParent;
 
   /// The children of this node.
   final List<MirrorNode> nodes;
+
+  bool hasChildNodes() => nodes.isNotEmpty;
+
+  bool contains(MirrorNode node) => nodes.contains(node);
+
+  /// Insert [node] as a child of the current node, before [refNode] in the
+  void insertBefore(MirrorNode node, MirrorNode? refNode) {
+    if (refNode == null) {
+      nodes.add(node);
+    } else {
+      nodes.insert(nodes.indexOf(refNode), node);
+    }
+  }
+
+  /// Replaces this node with another node.
+  MirrorNode replaceWith(MirrorNode otherNode) {
+    if (parent == null) {
+      throw UnsupportedError('Node must have a parent to replace it.');
+    }
+    parent!.nodes[parent!.nodes.indexOf(this)] = otherNode;
+    return this;
+  }
+
+  void append(MirrorNode node) => nodes.add(node);
+
+  MirrorNode? get firstChild => nodes.isNotEmpty ? nodes[0] : null;
 
   /// Returns the children [nodes] which are of type [dom.Element]
   List<MirrorNode<dom.Element>> get elements => nodes
@@ -58,7 +101,7 @@ class MirrorNode<T extends dom.Node> extends Equatable {
   }
 
   @override
-  List<Object> get props => [node, parent ?? 'no parent', indexInParent, nodes];
+  List<Object> get props => [id, indexInParent];
 
   @override
   String toString() {
