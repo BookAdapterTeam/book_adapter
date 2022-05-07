@@ -6,7 +6,7 @@ class HtmlUtils {
     return parseFragment(html);
   }
 
-  /// Returns the elements using depth first search
+  /// Returns children of [elements] using depth first traversal
   static Iterable<dom.Element> getNodes(dom.NodeList elements) sync* {
     for (final element in elements) {
       if (element is dom.Element) {
@@ -18,12 +18,14 @@ class HtmlUtils {
     }
   }
 
+  /// Parse [fragment] and return the nodes using depth first traversal
   static Iterable<dom.Node> getNodesFromFragment(
     dom.DocumentFragment fragment,
   ) sync* {
     yield* getNodes(fragment.nodes);
   }
 
+  /// Parse [html] and return the nodes using depth first traversal
   static Iterable<dom.Node> getNodesFromHtml(String html) sync* {
     final fragment = parseHtml(html);
 
@@ -68,6 +70,7 @@ class HtmlUtils {
     return parent;
   }
 
+  /// Returns the root ancestor of [node] with the siblings after it removed
   static dom.Node getNodeWithAncestors(dom.Node node) {
     final parent = getParentNodeWithoutSiblingsAfterElement(node);
     if (parent == null) {
@@ -77,6 +80,7 @@ class HtmlUtils {
     return getNodeWithAncestors(parent);
   }
 
+  /// Returns the html representation of [element], including itself
   static String elementToHtml(dom.Element element) {
     return element.outerHtml;
   }
