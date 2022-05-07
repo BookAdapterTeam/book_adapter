@@ -23,7 +23,7 @@ class MirrorNode<T extends dom.Node> extends Equatable {
   /// The parent element of this node.
   ///
   /// Returns null if this node either does not have a parent or its parent is
-  /// not an element.
+  /// not [dom.Element].
   MirrorNode<dom.Element>? get parentElement {
     if (parent == null) return null;
 
