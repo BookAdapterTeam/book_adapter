@@ -1,7 +1,10 @@
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parseFragment;
+import 'package:uuid/uuid.dart';
 
 import 'models/mirror_node.dart';
+
+const uuid = Uuid();
 
 class Pair<T, K> {
   const Pair(this.first, this.second);
@@ -167,6 +170,7 @@ class HtmlUtils {
     final indexInParent = parentNode?.nodes.indexOf(node) ?? -1;
 
     final mirrorNode = MirrorNode(
+      id: uuid.v4(),
       node: node,
       parent: parent ??
           (parentNode != null &&

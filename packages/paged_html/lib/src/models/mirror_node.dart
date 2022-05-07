@@ -1,13 +1,17 @@
 import 'package:equatable/equatable.dart';
 import 'package:html/dom.dart' as dom;
+import 'package:uuid/uuid.dart';
 
 class MirrorNode<T extends dom.Node> extends Equatable {
   const MirrorNode({
+    required this.id,
     required this.node,
     required this.parent,
     required this.indexInParent,
     this.nodes = const [],
   });
+
+  final String id;
 
   /// The node that this mirror is reflecting.
   final T node;
@@ -29,6 +33,7 @@ class MirrorNode<T extends dom.Node> extends Equatable {
         (mirrorNode) => mirrorNode.node is dom.Element,
       )
       .map((e) => MirrorNode(
+            id: e.id,
             node: e.node as dom.Element,
             parent: e.parent,
             indexInParent: e.indexInParent,
@@ -37,12 +42,14 @@ class MirrorNode<T extends dom.Node> extends Equatable {
       .toList();
 
   MirrorNode copyWith({
+    String? id,
     dom.Node? node,
     MirrorNode? parent,
     int? indexInParent,
     List<MirrorNode>? nodes,
   }) {
     return MirrorNode(
+      id: id ?? this.id,
       node: node ?? this.node,
       parent: parent ?? this.parent,
       indexInParent: indexInParent ?? this.indexInParent,
