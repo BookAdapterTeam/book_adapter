@@ -163,12 +163,17 @@ class HtmlUtils {
 
   /// Parses the [node] and returns a mirror of the tree
   static MirrorNode getMirrorNode(dom.Node node, {MirrorNode? parent}) {
-    final parentNode = node.parent;
+    final parentNode = node.parentNode;
     final indexInParent = parentNode?.nodes.indexOf(node) ?? -1;
 
     final mirrorNode = MirrorNode(
       node: node,
-      parent: parent ?? (parentNode != null ? getMirrorNode(parentNode) : null),
+      parent: parent ??
+          (parentNode != null &&
+                  parentNode is! dom.DocumentFragment &&
+                  parentNode is! dom.Document
+              ? getMirrorNode(parentNode)
+              : null),
       indexInParent: indexInParent,
     );
 
