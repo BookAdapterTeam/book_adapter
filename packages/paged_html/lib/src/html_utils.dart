@@ -1,47 +1,37 @@
 import 'package:html/dom.dart' as dom;
 import 'package:html/parser.dart' show parseFragment;
-import 'package:uuid/uuid.dart';
 
 import 'models/mirror_node.dart';
 
-const uuid = Uuid();
-
-class Pair<T, K> {
-  const Pair(this.first, this.second);
-
-  final T first;
-  final K second;
-}
-
 class HtmlUtils {
+  const HtmlUtils._();
+
   /// Returns the parsed [html]
-  static dom.DocumentFragment parseHtml(String html) {
-    return parseFragment(html);
+  static MirrorNode<dom.DocumentFragment> parseHtml(String html) {
+    final fragment = parseFragment(html);
+    return getMirrorNode(fragment) as MirrorNode<dom.DocumentFragment>;
   }
 
   /// Returns children of [elements] using depth first traversal
-  ///
-  /// Each element is returned as a [Pair] with the element as [Pair.first]
-  /// and its index in its parent as [Pair.second].
-  static Iterable<Pair<dom.Node, int>> getNodes(dom.NodeList elements) sync* {
+  static Iterable<MirrorNode> getNodes(List<MirrorNode> elements) sync* {
     for (var i = 0; i < elements.length; i++) {
       final element = elements[i];
       if (element.hasChildNodes()) {
         yield* getNodes(element.nodes);
       }
-      yield Pair(element, i);
+      yield element;
     }
   }
 
   /// Parse [fragment] and return the nodes using depth first traversal
-  static Iterable<Pair<dom.Node, int>> getNodesFromFragment(
-    dom.DocumentFragment fragment,
+  static Iterable<MirrorNode> getNodesFromFragment(
+    MirrorNode<dom.DocumentFragment> fragment,
   ) sync* {
     yield* getNodes(fragment.nodes);
   }
 
   /// Parse [html] and return the nodes using depth first traversal
-  static Iterable<Pair<dom.Node, int>> getNodesFromHtml(String html) sync* {
+  static Iterable<MirrorNode> getNodesFromHtml(String html) sync* {
     final fragment = parseHtml(html);
 
     yield* getNodesFromFragment(fragment);
@@ -66,52 +56,114 @@ class HtmlUtils {
   /// Returns the parent of [node] with the siblings after it removed
   ///
   /// Returns null if [node] has no parent.
-  static Pair<dom.Node, int>? getParentNodeWithoutSiblingsAfterElement(
-    dom.Node node, {
-    required int indexInParent,
-  }) {
-    final parentNode = node.parentNode;
+  static MirrorNode? getParentNodeWithoutSiblingsAfterElement(MirrorNode node) {
+    final parentNode = node.parent;
     if (parentNode == null) {
       return null;
     }
 
-    // Find parent's index in parent's children
-    // TODO: Fix when nested 4 levels deep
-    // div-1 > div-2 > cloned-p > cloned-a
-    final parentIndex = parentNode.parent?.nodes.indexOf(parentNode) ?? -1;
-
-    // final index = indexOfNode(node, parentNode);
-    final index = indexInParent;
+    // node's index in parent's children
+    final index = node.indexInParent;
 
     if (index == -1) {
       // TODO: Should probably be an error
       return null;
     }
 
-    final clonedParent = parentNode.clone(true);
-    clonedParent.parentNode = parentNode.parentNode;
+    final clonedParent = parentNode.deepClone();
     final clonedSiblings = clonedParent.nodes;
 
+    if (index >= parentNode.nodes.length - 1) {
+      return clonedParent;
+    }
+
     // Remove siblings after index
-    for (final dom.Node sibling in clonedSiblings.sublist(index + 1)) {
+    for (final sibling in clonedSiblings.sublist(index + 1)) {
       sibling.remove();
     }
 
-    return Pair(clonedParent, parentIndex);
+    return clonedParent;
   }
 
-  /// Returns the root ancestor of [node] with the siblings after it removed
-  static dom.Node getNodeWithAncestors(
-    dom.Node node, {
-    required int indexInParent,
-  }) {
-    final parent = getParentNodeWithoutSiblingsAfterElement(node,
-        indexInParent: indexInParent);
+  /// Returns the root node of [node]
+  ///
+  /// Returns itself if [node] has no parent.
+  static MirrorNode getRootMirrorNode(MirrorNode node) {
+    final parent = node.parent;
     if (parent == null) {
       return node;
     }
 
-    return getNodeWithAncestors(parent.first, indexInParent: parent.second);
+    return getRootMirrorNode(parent);
+  }
+
+  /// Returns the root ancestor of [node] with the siblings after it removed
+  static MirrorNode getNodeWithAncestors(
+    MirrorNode node,
+  ) {
+    // Find root node of node
+    final rootNode = getRootMirrorNode(node);
+
+    final rootNodeClone = rootNode.deepClone();
+
+    // Remove siblings after index
+    final clonedNode = rootNodeClone.findDecendentWithId(node.id);
+    removeSiblingsAfterNodeForAllParents(clonedNode!);
+
+    return rootNodeClone;
+    // final parent = getParentNodeWithoutSiblingsAfterElement(node);
+    // if (parent == null) {
+    //   return node;
+    // }
+
+    // return getNodeWithAncestors(parent);
+  }
+
+  /// Removes siblings after [node]
+  ///
+  /// If [node] is the last element in the list, or [node] has no parent,
+  /// nothing will be removed.
+  static void removeSiblingsAfterNode(MirrorNode node) {
+    final parent = node.parent;
+    if (parent == null) {
+      return;
+    }
+
+    final siblings = parent.nodes;
+    final index = siblings.indexOf(node);
+
+    for (final sibling in siblings.sublist(index + 1)) {
+      sibling.remove();
+    }
+  }
+
+  /// Removes siblings after [node] for all parents
+  ///
+  /// If [node] is the last element in the list, or [node] has no parent,
+  /// nothing will be removed.
+  static void removeSiblingsAfterNodeForAllParents(MirrorNode node) {
+    final parent = node.parent;
+    if (parent == null) {
+      return;
+    }
+
+    removeSiblingsAfterNode(node);
+
+    removeSiblingsAfterNodeForAllParents(parent);
+  }
+
+  /// Reconnect the [dom.Node] tree
+  static void reconnectMirrorNodes(MirrorNode mirrorNode) {
+    if (!mirrorNode.hasChildNodes()) {
+      return;
+    }
+
+    // Reconnect the dom.Node tree with its children
+    mirrorNode.node.nodes.clear();
+    for (final node in mirrorNode.nodes) {
+      mirrorNode.node.append(node.node..parentNode = mirrorNode.node);
+      reconnectMirrorNodes(node);
+    }
   }
 
   /// Returns the html representation of [element], including itself
@@ -119,73 +171,70 @@ class HtmlUtils {
     return element.outerHtml;
   }
 
-  /// Finds the index of [node] in [parent]
-  static int indexOfNode(dom.Node node, dom.Node parent) {
-    final siblings = parent.nodes;
-
-    for (int i = 0; i < siblings.length; i++) {
-      final sibling = siblings[i];
-      if (nodeDeepEquals(sibling, node)) {
-        return i;
-      }
-    }
-
-    return -1;
+  /// Returns the html representation of [document], including itself
+  static String documentToHtml(dom.Document document) {
+    return document.outerHtml;
   }
 
-  /// Returns true if the contents of [a] and [b] are equal
-  static bool nodeDeepEquals(dom.Node a, dom.Node b) {
-    if (a == b) {
-      return true;
-    }
-
-    final attributesEqual = ((a.parentNode == null && b.parentNode == null) ||
-            (a.parentNode != null && b.parentNode != null)) &&
-        a.text == b.text &&
-        a.nodeType == b.nodeType;
-
-    final childrenEqual = nodeListEquals(a.children, b.children);
-
-    return attributesEqual && childrenEqual;
-  }
-
-  /// Returns true if the contents of [a] and [b] are equal
-  static bool nodeListEquals(List<dom.Node> a, List<dom.Node> b) {
-    if (a.length != b.length) {
-      return false;
-    }
-
-    for (var i = 0; i < a.length; i++) {
-      if (!nodeDeepEquals(a[i], b[i])) {
-        return false;
-      }
-    }
-
-    return true;
+  /// Returns the html representation of [fragment], including itself
+  static String fragmentToHtml(dom.DocumentFragment fragment) {
+    return fragment.outerHtml;
   }
 
   /// Parses the [node] and returns a mirror of the tree
   static MirrorNode getMirrorNode(dom.Node node, {MirrorNode? parent}) {
+    if (node is dom.Document) {
+      final mirrorNode = MirrorNode.id(
+        node: node,
+      );
+
+      mirrorNode.nodes = node.nodes
+          .map((node) => getMirrorNode(node, parent: mirrorNode))
+          .toList();
+
+      return mirrorNode;
+    } else if (node is dom.DocumentFragment) {
+      final mirrorNode = MirrorNode.id(
+        node: node,
+      );
+
+      mirrorNode.nodes = node.nodes
+          .map((node) => getMirrorNode(node, parent: mirrorNode))
+          .toList();
+
+      return mirrorNode;
+    } else if (node is dom.Element) {
+      final parentNode = node.parentNode;
+      final indexInParent = parentNode?.nodes.indexOf(node) ?? -1;
+
+      final mirrorNode = MirrorNode.id(
+        node: node,
+        parent:
+            parent ?? (parentNode != null ? getMirrorNode(parentNode) : null),
+        indexInParent: indexInParent,
+      );
+
+      mirrorNode.nodes = node.nodes
+          .map((node) => getMirrorNode(node, parent: mirrorNode))
+          .toList();
+
+      return mirrorNode;
+    }
+
     final parentNode = node.parentNode;
     final indexInParent = parentNode?.nodes.indexOf(node) ?? -1;
 
-    final mirrorNode = MirrorNode(
-      id: uuid.v4(),
+    final mirrorNode = MirrorNode.id(
       node: node,
-      parent: parent ??
-          (parentNode != null &&
-                  parentNode is! dom.DocumentFragment &&
-                  parentNode is! dom.Document
-              ? getMirrorNode(parentNode)
-              : null),
+      parent: parent ?? (parentNode != null ? getMirrorNode(parentNode) : null),
       indexInParent: indexInParent,
     );
 
-    return mirrorNode.copyWith(
-      nodes: node.nodes
-          .map((node) => getMirrorNode(node, parent: mirrorNode))
-          .toList(),
-    );
+    mirrorNode.nodes = node.nodes
+        .map((node) => getMirrorNode(node, parent: mirrorNode))
+        .toList();
+
+    return mirrorNode;
   }
 }
 
