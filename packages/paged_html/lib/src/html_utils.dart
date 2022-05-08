@@ -219,6 +219,54 @@ class HtmlUtils {
           .toList();
 
       return mirrorNode;
+    } else if (node is dom.DocumentType) {
+      final parentNode = node.parentNode;
+      final indexInParent = parentNode?.nodes.indexOf(node) ?? -1;
+
+      final mirrorNode = MirrorNode.id(
+        node: node,
+        parent:
+            parent ?? (parentNode != null ? getMirrorNode(parentNode) : null),
+        indexInParent: indexInParent,
+      );
+
+      mirrorNode.nodes = node.nodes
+          .map((node) => getMirrorNode(node, parent: mirrorNode))
+          .toList();
+
+      return mirrorNode;
+    } else if (node is dom.Comment) {
+      final parentNode = node.parentNode;
+      final indexInParent = parentNode?.nodes.indexOf(node) ?? -1;
+
+      final mirrorNode = MirrorNode.id(
+        node: node,
+        parent:
+            parent ?? (parentNode != null ? getMirrorNode(parentNode) : null),
+        indexInParent: indexInParent,
+      );
+
+      mirrorNode.nodes = node.nodes
+          .map((node) => getMirrorNode(node, parent: mirrorNode))
+          .toList();
+
+      return mirrorNode;
+    } else if (node is dom.Text) {
+      final parentNode = node.parentNode;
+      final indexInParent = parentNode?.nodes.indexOf(node) ?? -1;
+
+      final mirrorNode = MirrorNode.id(
+        node: node,
+        parent:
+            parent ?? (parentNode != null ? getMirrorNode(parentNode) : null),
+        indexInParent: indexInParent,
+      );
+
+      mirrorNode.nodes = node.nodes
+          .map((node) => getMirrorNode(node, parent: mirrorNode))
+          .toList();
+
+      return mirrorNode;
     }
 
     final parentNode = node.parentNode;
