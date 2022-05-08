@@ -52,7 +52,7 @@ class PagedHtml extends StatefulWidget {
   final ScrollPhysics? physics;
 
   /// Controller for going to the next and previous page.
-  /// 
+  ///
   /// This is a wrapper of PageController to provide custom behavior,
   /// and hide methods of [PageController] not intended to be used
   /// (though it can still be accessed).
@@ -343,33 +343,34 @@ class _HtmlPageState extends State<_HtmlPage> {
       children: [
         Flexible(
           key: ValueKey('HtmlPage-${widget.page}-Flexible'),
-          child: CustomBoxy(
-            key: ValueKey('HtmlPage-${widget.page}-CustomBoxy'),
-            delegate: _HtmlPageDelegate(
-              html: widget.html,
-              page: widget.page,
-              requestRebuild: widget.onRequestedRebuild,
-              previousAction: widget.previousAction,
-              previousEvent: widget.previousEvent,
-              maxRebuilds: widget.maxRebuilds,
-              currentRebuildCount: widget.currentRebuildCount,
-              onDone: widget.onDone ?? () {},
-            ),
-            children: [
-              BoxyId(
-                id: 'html_${widget.page}',
-                key: ValueKey('HtmlPage-${widget.page}-BoxyId'),
-                child: Container(
-                  key: ValueKey('HtmlPage-${widget.page}-Container'),
-                  color: Colors.grey[300],
-                  child: Html(
-                    key: ValueKey('HtmlWidget-${widget.page}'),
-                    data: widget.html,
-                    shrinkWrap: false, // Restricts width
+          child: SingleChildScrollView(
+            child: CustomBoxy(
+              key: ValueKey('HtmlPage-${widget.page}-CustomBoxy'),
+              delegate: _HtmlPageDelegate(
+                page: widget.page,
+                requestRebuild: widget.onRequestedRebuild,
+                previousAction: widget.previousAction,
+                previousEvent: widget.previousEvent,
+                maxRebuilds: widget.maxRebuilds,
+                currentRebuildCount: widget.currentRebuildCount,
+                onDone: widget.onDone ?? () {},
+              ),
+              children: [
+                BoxyId(
+                  id: 'html_${widget.page}',
+                  key: ValueKey('HtmlPage-${widget.page}-BoxyId'),
+                  child: Container(
+                    key: ValueKey('HtmlPage-${widget.page}-Container'),
+                    color: Colors.grey[300],
+                    child: Html(
+                      key: ValueKey('HtmlWidget-${widget.page}'),
+                      data: widget.html,
+                      shrinkWrap: false, // Restricts width
+                    ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ],
@@ -379,7 +380,6 @@ class _HtmlPageState extends State<_HtmlPage> {
 
 class _HtmlPageDelegate extends BoxyDelegate {
   _HtmlPageDelegate({
-    required final this.html,
     required final this.page,
     required final this.requestRebuild,
     required final this.onDone,
@@ -389,7 +389,6 @@ class _HtmlPageDelegate extends BoxyDelegate {
     final HtmlPageEvent? previousEvent = HtmlPageEvent.hasExtraSpace,
   }) : previousAction = previousAction ?? const HtmlPageAction.addParagraph();
 
-  final String html;
   final RebuildRequestCallback requestRebuild;
   final HtmlPageAction previousAction;
   final int page;
