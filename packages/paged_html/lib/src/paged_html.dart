@@ -19,7 +19,7 @@ class PagedHtml extends StatefulWidget {
     this.allowImplicitScrolling = true,
     this.scrollBehavior,
     this.controller,
-    this.maxRebuilds = 20,
+    this.maxRebuilds = 100,
     this.onPageChanged,
     this.showEndPage = true,
     this.endPage = const Scaffold(
@@ -61,7 +61,7 @@ class PagedHtml extends StatefulWidget {
   /// The maximum number of rebuilds allowed to fit the html on one page
   ///
   /// If the max rebuilds is reached and the HTML is too much to fit on
-  /// one page, the screen will be scrollable.
+  /// one page, the html will flow below the screen and be cut off.
   final int maxRebuilds;
 
   /// Called whenever the page in the center of the viewport changes.
@@ -343,34 +343,32 @@ class _HtmlPageState extends State<_HtmlPage> {
       children: [
         Flexible(
           key: ValueKey('HtmlPage-${widget.page}-Flexible'),
-          child: SingleChildScrollView(
-            child: CustomBoxy(
-              key: ValueKey('HtmlPage-${widget.page}-CustomBoxy'),
-              delegate: _HtmlPageDelegate(
-                page: widget.page,
-                requestRebuild: widget.onRequestedRebuild,
-                previousAction: widget.previousAction,
-                previousEvent: widget.previousEvent,
-                maxRebuilds: widget.maxRebuilds,
-                currentRebuildCount: widget.currentRebuildCount,
-                onDone: widget.onDone ?? () {},
-              ),
-              children: [
-                BoxyId(
-                  id: 'html_${widget.page}',
-                  key: ValueKey('HtmlPage-${widget.page}-BoxyId'),
-                  child: Container(
-                    key: ValueKey('HtmlPage-${widget.page}-Container'),
-                    color: Colors.grey[300],
-                    child: Html(
-                      key: ValueKey('HtmlWidget-${widget.page}'),
-                      data: widget.html,
-                      shrinkWrap: false, // Restricts width
-                    ),
-                  ),
-                )
-              ],
+          child: CustomBoxy(
+            key: ValueKey('HtmlPage-${widget.page}-CustomBoxy'),
+            delegate: _HtmlPageDelegate(
+              page: widget.page,
+              requestRebuild: widget.onRequestedRebuild,
+              previousAction: widget.previousAction,
+              previousEvent: widget.previousEvent,
+              maxRebuilds: widget.maxRebuilds,
+              currentRebuildCount: widget.currentRebuildCount,
+              onDone: widget.onDone ?? () {},
             ),
+            children: [
+              BoxyId(
+                id: 'html_${widget.page}',
+                key: ValueKey('HtmlPage-${widget.page}-BoxyId'),
+                child: Container(
+                  key: ValueKey('HtmlPage-${widget.page}-Container'),
+                  color: Colors.grey[300],
+                  child: Html(
+                    key: ValueKey('HtmlWidget-${widget.page}'),
+                    data: widget.html,
+                    shrinkWrap: false, // Restricts width
+                  ),
+                ),
+              )
+            ],
           ),
         ),
       ],
