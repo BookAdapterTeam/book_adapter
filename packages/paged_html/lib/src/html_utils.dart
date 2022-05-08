@@ -1,15 +1,20 @@
 import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart' show parseFragment;
+import 'package:html/parser.dart' show parse;
 
 import 'models/mirror_node.dart';
 
 class HtmlUtils {
   const HtmlUtils._();
 
-  /// Returns the parsed [html]
-  static MirrorNode<dom.DocumentFragment> parseHtml(String html) {
-    final fragment = parseFragment(html);
-    return getMirrorNode(fragment) as MirrorNode<dom.DocumentFragment>;
+  /// Returns the parsed [html] document
+  /// 
+  /// The returned document includes the `html` tag,
+  /// which contains the `head` and `body` tags. The
+  /// body tag contains the [html] content if the `html`
+  /// tag was not included.
+  static MirrorNode<dom.Document> parseHtml(String html) {
+    final fragment = parse(html);
+    return getMirrorNode(fragment) as MirrorNode<dom.Document>;
   }
 
   /// Returns children of [elements] using depth first traversal
@@ -21,36 +26,6 @@ class HtmlUtils {
       }
       yield element;
     }
-  }
-
-  /// Parse [fragment] and return the nodes using depth first traversal
-  static Iterable<MirrorNode> getNodesFromFragment(
-    MirrorNode<dom.DocumentFragment> fragment,
-  ) sync* {
-    yield* getNodes(fragment.nodes);
-  }
-
-  /// Parse [html] and return the nodes using depth first traversal
-  static Iterable<MirrorNode> getNodesFromHtml(String html) sync* {
-    final fragment = parseHtml(html);
-
-    yield* getNodesFromFragment(fragment);
-  }
-
-  /// Returns the siblings of [node] that are before it
-  ///
-  /// If [node] is the first element in the list, or [node] has no parent,
-  /// a list with only [node] will be returned.
-  static List<dom.Node> getSiblingNodesBefore(dom.Node node) {
-    final parent = node.parent;
-    if (parent == null) {
-      return [node];
-    }
-
-    final siblings = parent.nodes;
-    final index = siblings.indexOf(node);
-
-    return siblings.sublist(0, index);
   }
 
   /// Returns the parent of [node] with the siblings after it removed
@@ -290,20 +265,20 @@ class HtmlUtils {
 class HtmlReader {
   HtmlReader({required this.htmlString})
       : elements =
-            HtmlUtils.getNodesFromHtml(htmlString).whereType<dom.Element>() {
+            HtmlUtils.getNodes(HtmlUtils.parseHtml(htmlString).elements).whereType<MirrorNode<dom.Element>>() {
     currentElement = elements.first;
   }
 
   final String htmlString;
 
-  final Iterable<dom.Element> elements;
+  final Iterable<MirrorNode<dom.Element>> elements;
 
   /// The current index in [elements]
   int currentPosition = 0;
 
-  late dom.Node currentElement;
+  late MirrorNode<dom.Node> currentElement;
 
-  String get currentHtml => elements.elementAt(currentPosition).innerHtml;
+  String get currentHtml => elements.elementAt(currentPosition).node.innerHtml;
 
   String get previousHtml =>
       (elements.take(currentPosition) as dom.NodeList).join();
