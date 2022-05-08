@@ -42,27 +42,28 @@ class _PagedHtmlExampleState extends State<PagedHtmlExample> {
         showEndPage: true,
         html:
             '''
-<div>
-  <h1>PagedHtml</h1>
-  <p>A Widget that displays the html in horizontal or verticle pages</p>
-  <p>
-    <a href="https://pub.dev/packages/paged_html">
-      https://pub.dev/packages/paged_html
-    </a>
-  </p>
-  <p>
-    <a href="https://pub.dev/packages/paged_html#readme">
-      https://pub.dev/packages/paged_html#readme
-    </a>
-  </p>
-  <p>
-    <a href="https://pub.dev/packages/paged_html#example">
-      https://pub.dev/packages/paged_html#example
-    </a>
-  </p>
-</div>
-''' *
-                5,
+<html>
+  <body>
+    <h1>PagedHtml</h1>
+    <p>A Widget that displays the html in horizontal or verticle pages</p>
+    <p>
+      <a href="https://pub.dev/packages/paged_html">
+        https://pub.dev/packages/paged_html
+      </a>
+    </p>
+    <p>
+      <a href="https://pub.dev/packages/paged_html#readme">
+        https://pub.dev/packages/paged_html#readme
+      </a>
+    </p>
+    <p>
+      <a href="https://pub.dev/packages/paged_html#example">
+        https://pub.dev/packages/paged_html#example
+      </a>
+    </p>
+  </body>
+</html>
+''',
       ),
     );
   }
