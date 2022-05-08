@@ -347,7 +347,7 @@ class _HtmlPageState extends State<_HtmlPage> {
                 key: ValueKey('HtmlPage-${widget.page}-BoxyId'),
                 child: Container(
                   key: ValueKey('HtmlPage-${widget.page}-Container'),
-                  color: Colors.grey,
+                  color: Colors.grey[300],
                   child: Html(
                     key: ValueKey('HtmlWidget-${widget.page}'),
                     data: widget.html,
