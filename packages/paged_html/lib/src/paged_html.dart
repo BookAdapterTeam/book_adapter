@@ -2,7 +2,7 @@ import 'package:boxy/boxy.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:flutter_html/flutter_html.dart';
 
 import 'html_page_action.dart';
 import 'paged_html_controller.dart';
@@ -348,16 +348,10 @@ class _HtmlPageState extends State<_HtmlPage> {
                 child: Container(
                   key: ValueKey('HtmlPage-${widget.page}-Container'),
                   color: Colors.grey,
-                  child: HtmlWidget(
-                    // '<h1>Hello World</h1>',
-                    widget.html,
+                  child: Html(
                     key: ValueKey('HtmlWidget-${widget.page}'),
-                    enableCaching: true,
-                    renderMode: ListViewMode(
-                      shrinkWrap: true,
-                      controller: _controller,
-                      restorationId: 'html_${widget.page}',
-                    ),
+                    data: widget.html,
+                    shrinkWrap: false, // Restricts width
                   ),
                 ),
               )
