@@ -30,6 +30,7 @@ class PagedHtml extends StatefulWidget {
     this.restorationId,
     this.clipBehavior = Clip.hardEdge,
     this.padEnds = true,
+    this.backgroundColor,
   }) : super(key: key);
 
   /// The HTML content to display.
@@ -50,6 +51,11 @@ class PagedHtml extends StatefulWidget {
   /// Defaults to matching platform conventions.
   final ScrollPhysics? physics;
 
+  /// Controller for going to the next and previous page.
+  /// 
+  /// This is a wrapper of PageController to provide custom behavior,
+  /// and hide methods of [PageController] not intended to be used
+  /// (though it can still be accessed).
   final PagedHtmlController? controller;
 
   /// The maximum number of rebuilds allowed to fit the html on one page
@@ -131,6 +137,9 @@ class PagedHtml extends StatefulWidget {
   /// This property defaults to true and must not be null.
   final bool padEnds;
 
+  /// The background color of the this widget
+  final Color? backgroundColor;
+
   @override
   State<PagedHtml> createState() => _PagedHtmlState();
 }
@@ -184,46 +193,51 @@ class _PagedHtmlState extends State<PagedHtml> {
 
   @override
   Widget build(BuildContext context) {
-    return ScrollConfiguration(
-      behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
-        ...ScrollConfiguration.of(context).dragDevices,
-        ...const {PointerDeviceKind.mouse, PointerDeviceKind.stylus},
-      }),
-      child: PageView.builder(
-        key: const ValueKey('PagedHtml'),
-        reverse: widget.reverse,
-        pageSnapping: widget.pageSnapping,
-        dragStartBehavior: widget.dragStartBehavior,
-        allowImplicitScrolling: widget.allowImplicitScrolling,
-        restorationId: widget.restorationId,
-        clipBehavior: widget.clipBehavior,
-        padEnds: widget.padEnds,
-        controller: _pagedHtmlController.pageController,
-        scrollBehavior: widget.scrollBehavior,
-        physics: widget.physics,
-        onPageChanged: widget.onPageChanged,
-        itemCount: widget.showEndPage ? _pages.length + 1 : _pages.length,
-        itemBuilder: (context, index) {
-          if (_rebuildCount.length - 1 == index) {
-            _rebuildCount.add(0);
-          }
+    return Container(
+      color: widget.backgroundColor,
+      child: ScrollConfiguration(
+        behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
+          ...ScrollConfiguration.of(context).dragDevices,
+          ...const {PointerDeviceKind.mouse, PointerDeviceKind.stylus},
+        }),
+        child: PageView.builder(
+          key: const ValueKey('PagedHtml'),
+          reverse: widget.reverse,
+          pageSnapping: widget.pageSnapping,
+          dragStartBehavior: widget.dragStartBehavior,
+          allowImplicitScrolling: widget.allowImplicitScrolling,
+          restorationId: widget.restorationId,
+          clipBehavior: widget.clipBehavior,
+          padEnds: widget.padEnds,
+          controller: _pagedHtmlController.pageController,
+          scrollBehavior: widget.scrollBehavior,
+          physics: widget.physics,
+          onPageChanged: widget.onPageChanged,
+          itemCount: widget.showEndPage ? _pages.length + 1 : _pages.length,
+          itemBuilder: (context, index) {
+            if (_rebuildCount.length - 1 == index) {
+              _rebuildCount.add(0);
+            }
 
-          if (widget.showEndPage && !_hasMorePages && index == _pages.length) {
-            return widget.endPage;
-          }
+            if (widget.showEndPage &&
+                !_hasMorePages &&
+                index == _pages.length) {
+              return widget.endPage;
+            }
 
-          // TODO: Get remaining html from html handler
-          final remainingHtml = widget.html;
+            // TODO: Get remaining html from html handler
+            final remainingHtml = widget.html;
 
-          // Get page from list if it already exists
-          if (_pages.length > index) {
-            return _pages[index];
-          }
+            // Get page from list if it already exists
+            if (_pages.length > index) {
+              return _pages[index];
+            }
 
-          final newPage = _buildHtmlPage(remainingHtml, index);
-          _pages.add(newPage);
-          return newPage;
-        },
+            final newPage = _buildHtmlPage(remainingHtml, index);
+            _pages.add(newPage);
+            return newPage;
+          },
+        ),
       ),
     );
   }
