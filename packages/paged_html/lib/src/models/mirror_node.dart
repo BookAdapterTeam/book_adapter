@@ -79,32 +79,6 @@ class MirrorNode<T extends dom.Node> {
         : null;
   }
 
-  // /// Returns a copy of this node.
-  // ///
-  // /// If [deep] is `true`, then all of this node's children and decendents are
-  // /// copied as well. If [deep] is `false`, then only this node is copied.
-  // ///
-  // /// TODO: Fix clone
-  // MirrorNode clone({final bool deep = false}) {
-  //   final result = MirrorNode(
-  //     id: id,
-  //     node: node.clone(deep)..parentNode = node.parentNode,
-  //     parent: parent,
-  //     indexInParent: indexInParent,
-  //   );
-  //   result.node.nodes.clear();
-  //   return _clone(result, deep);
-  // }
-
-  // K _clone<K extends MirrorNode>(K shallowClone, bool deep) {
-  //   if (deep) {
-  //     for (var child in nodes) {
-  //       shallowClone.append(child.clone(deep: true));
-  //     }
-  //   }
-  //   return shallowClone;
-  // }
-
   /// Returns a deep copy of this.
   ///
   /// This clones the entire tree, including all parents and children
@@ -117,7 +91,7 @@ class MirrorNode<T extends dom.Node> {
     // Reconnect the dom.Node tree
     HtmlUtils.reconnectMirrorNodes(clonedRootNode);
 
-    final clonedNode = clonedRootNode.findDecendentWithId(id);
+    final clonedNode = clonedRootNode.findFirstDecendentWithId(id);
 
     return clonedNode!;
   }
@@ -146,7 +120,31 @@ class MirrorNode<T extends dom.Node> {
     }
   }
 
-  MirrorNode? findDecendentWithId(String id) {
+  /// Returns the first child decendent node with [tag]
+  MirrorNode? findFirstDecendentWithTag(String tag) {
+    final thisNode = node;
+    if (thisNode is dom.Element && thisNode.localName == tag) return this;
+
+    try {
+      return elements.firstWhere(
+        (node) {
+          return node.node.localName == tag;
+        },
+      );
+    } on StateError catch (_) {
+      for (final node in elements) {
+        final result = node.findFirstDecendentWithTag(tag);
+        if (result != null) {
+          return result;
+        }
+      }
+
+      return null;
+    }
+  }
+
+  /// Returns the first child decendent node with [id]
+  MirrorNode? findFirstDecendentWithId(String id) {
     if (this.id == id) return this;
 
     try {
@@ -155,7 +153,7 @@ class MirrorNode<T extends dom.Node> {
       );
     } on StateError catch (_) {
       for (final node in nodes) {
-        final result = node.findDecendentWithId(id);
+        final result = node.findFirstDecendentWithId(id);
         if (result != null) {
           return result;
         }

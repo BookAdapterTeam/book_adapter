@@ -7,7 +7,7 @@ class HtmlUtils {
   const HtmlUtils._();
 
   /// Returns the parsed [html] document
-  /// 
+  ///
   /// The returned document includes the `html` tag,
   /// which contains the `head` and `body` tags. The
   /// body tag contains the [html] content if the `html`
@@ -82,7 +82,7 @@ class HtmlUtils {
     final rootNodeClone = rootNode.deepClone();
 
     // Remove siblings after index
-    final clonedNode = rootNodeClone.findDecendentWithId(node.id);
+    final clonedNode = rootNodeClone.findFirstDecendentWithId(node.id);
     removeSiblingsAfterNodeForAllParents(clonedNode!);
 
     return rootNodeClone;
@@ -264,8 +264,8 @@ class HtmlUtils {
 /// A class which holds html, the current position in the html, the html before the current position, and the html after the current position
 class HtmlReader {
   HtmlReader({required this.htmlString})
-      : elements =
-            HtmlUtils.getNodes(HtmlUtils.parseHtml(htmlString).elements).whereType<MirrorNode<dom.Element>>() {
+      : elements = HtmlUtils.getNodes(HtmlUtils.parseHtml(htmlString).elements)
+            .whereType<MirrorNode<dom.Element>>() {
     currentElement = elements.first;
   }
 
