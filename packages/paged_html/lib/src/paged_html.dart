@@ -361,10 +361,89 @@ class _HtmlPageState extends State<_HtmlPage> {
                 child: Container(
                   key: ValueKey('HtmlPage-${widget.page}-Container'),
                   color: Colors.grey[300],
-                  child: Html(
+                  child:
+
+                      // HtmlWidget(
+                      //   // '<h1>Hello World</h1>',
+                      //   widget.html,
+                      //   key: ValueKey('HtmlWidget-${widget.page}'),
+                      //   enableCaching: true,
+                      //   renderMode: ListViewMode(
+                      //     shrinkWrap: true,
+                      //     controller: _controller,
+                      //     restorationId: 'html_${widget.page}',
+                      //   ),
+                      //   customStylesBuilder: (element) {
+                      //     Map<String, String>? styles;
+                      //     if (element.classes.contains('italic')) {
+                      //       styles ??= {};
+                      //       styles.addAll({'font-style': 'italic'});
+                      //     }
+                      //     if (element.classes.contains('bold')) {
+                      //       styles ??= {};
+                      //       styles.addAll({'font-weight': 'bold'});
+                      //     }
+
+                      //     return styles;
+                      //   },
+                      //   customWidgetBuilder: (element) {
+                      //     if (element.styles
+                      //         .where((style) => style.hasDartStyle)
+                      //         .map((style) => style.property)
+                      //         .contains('text-indent')) {
+                      //       return Text.rich(
+                      //         TextSpan(
+                      //           children: [
+                      //             const WidgetSpan(child: SizedBox(width: 40)),
+                      //             TextSpan(text: element.text),
+                      //           ],
+                      //         ),
+                      //       );
+                      //     }
+                      //     return null;
+                      //   },
+                      // ),
+
+                      Html(
                     key: ValueKey('HtmlWidget-${widget.page}'),
                     data: widget.html,
                     shrinkWrap: false, // Restricts width
+                    customRender: {
+                      'span': (RenderContext context, Widget parsedChild) {
+                        final isItalic = context.tree.elementClasses.contains('italic');
+                        final isBold = context.tree.elementClasses.contains('bold');
+                        if (isItalic || isBold) {
+                          return TextSpan(
+                            text: context.tree.element?.text ?? '',
+                            style: Theme.of(context.buildContext)
+                                .textTheme
+                                .bodyText2
+                                ?.copyWith(
+                                  fontStyle: isItalic ? FontStyle.italic : null,
+                                  fontWeight: isBold ? FontWeight.bold : null,
+                                ),
+                          );
+                        }
+                      }
+                      // 'p': (context, parsedChild) {
+                      //   if (context.tree.element?.styles
+                      //           .map((style) => style.property)
+                      //           .contains('text-indent') ??
+                      //       false) {
+                      //     // final style = context.tree.element?.styles
+                      //     //     .where((style) => style.property == 'text-indent')
+                      //     //     .first;
+                      //     // print(style?.value?.span);
+                      //     return TextSpan(
+                      //       children: [
+                      //         const WidgetSpan(child: SizedBox(width: 40.0)),
+                      //         TextSpan(
+                      //             children: [WidgetSpan(child: parsedChild)]),
+                      //       ],
+                      //     );
+                      //   }
+                      // }
+                    },
                   ),
                 ),
               )
