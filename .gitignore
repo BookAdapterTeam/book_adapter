@@ -30,7 +30,7 @@
 .pub-cache/
 .pub/
 /build/
-.fvm/
+.fvm/flutter_sdk
 GoogleService-Info.plist
 google-services.json
 
