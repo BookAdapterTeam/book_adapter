@@ -312,13 +312,15 @@ class _SliverCollectionsListState extends State<SliverCollectionsList> {
   }
 
   Widget _buildSection(
-      BuildContext context, ExpandableSectionContainerInfo containerInfo) {
+    BuildContext context,
+    ExpandableSectionContainerInfo containerInfo,
+  ) {
     return SectionWidget(
       section: widget.sectionList[containerInfo.sectionIndex],
       containerInfo: containerInfo,
       onStateChanged: () {
         //notify ExpandableListView that expand state has changed.
-        WidgetsBinding.instance!.addPostFrameCallback((_) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             setState(() {});
           }
