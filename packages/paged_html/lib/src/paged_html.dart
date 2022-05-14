@@ -273,7 +273,7 @@ class _PagedHtmlState extends State<PagedHtml> {
       }
     }
 
-    SchedulerBinding.instance?.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
       // print('previousAction: $_previousAction');
       // print('action: $action');
       setState(() {});
@@ -300,7 +300,6 @@ class _HtmlPage extends StatefulWidget {
     required this.onRequestedRebuild,
     required this.maxRebuilds,
     required this.currentRebuildCount,
-    this.onDone,
     this.previousAction,
     this.previousEvent,
   }) : super(key: key);
@@ -315,7 +314,6 @@ class _HtmlPage extends StatefulWidget {
   final RebuildRequestCallback onRequestedRebuild;
   final HtmlPageAction? previousAction;
   final HtmlPageEvent? previousEvent;
-  final VoidCallback? onDone;
 
   @override
   State<_HtmlPage> createState() => _HtmlPageState();
@@ -352,7 +350,6 @@ class _HtmlPageState extends State<_HtmlPage> {
               previousEvent: widget.previousEvent,
               maxRebuilds: widget.maxRebuilds,
               currentRebuildCount: widget.currentRebuildCount,
-              onDone: widget.onDone ?? () {},
             ),
             children: [
               BoxyId(
@@ -463,7 +460,6 @@ class _HtmlPageDelegate extends BoxyDelegate {
   _HtmlPageDelegate({
     required final this.page,
     required final this.requestRebuild,
-    required final this.onDone,
     required this.maxRebuilds,
     required this.currentRebuildCount,
     final HtmlPageAction? previousAction = const HtmlPageAction.addParagraph(),
@@ -475,7 +471,6 @@ class _HtmlPageDelegate extends BoxyDelegate {
   final int page;
   final int maxRebuilds;
   final int currentRebuildCount;
-  final VoidCallback onDone;
 
   @override
   Size layout() {
@@ -489,7 +484,6 @@ class _HtmlPageDelegate extends BoxyDelegate {
         : HtmlPageEvent.hasNoExtraSpace;
 
     if (currentRebuildCount >= maxRebuilds) {
-      onDone();
       return actualSize;
     }
 
@@ -511,7 +505,6 @@ class _HtmlPageDelegate extends BoxyDelegate {
           requestRebuild(event, const HtmlPageAction.addWord());
           break;
         case HtmlPageChangeAmount.word:
-          onDone();
           break;
       }
 
