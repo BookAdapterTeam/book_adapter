@@ -1,4 +1,6 @@
 import 'package:epub_view/epub_view.dart';
+// ignore: implementation_imports
+import 'package:epub_view/src/data/models/chapter_view_value.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
@@ -40,7 +42,7 @@ class BookReaderView extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         leading: const BackButton(),
-        title: EpubActualChapter(
+        title: EpubViewActualChapter(
           controller: epubReaderController,
           builder: (chapterValue) => Text(
             (chapterValue?.chapter?.Title?.trim() ?? '').replaceAll('\n', ''),
@@ -57,7 +59,7 @@ class BookReaderView extends HookConsumerWidget {
         // ],
       ),
       endDrawer: Drawer(
-        child: EpubReaderTableOfContents(controller: epubReaderController),
+        child: EpubViewTableOfContents(controller: epubReaderController),
       ),
       body: EpubView(
         controller: epubReaderController,
@@ -67,10 +69,14 @@ class BookReaderView extends HookConsumerWidget {
         onExternalLinkPressed: (link) async {
           log.i('Attempting to open link: $link');
 
-          await launch(link);
+          final uri = Uri.tryParse(link);
+          if (uri != null) {
+            await launchUrl(uri);
+          }
+          
           log.i('Launched link: $link');
         },
-        onChange: (value) => onChange(
+        onChapterChanged: (value) => onChange(
           context,
           epubChapterViewValue: value,
           epubReaderController: epubReaderController,
