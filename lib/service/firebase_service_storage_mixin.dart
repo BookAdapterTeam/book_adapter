@@ -81,7 +81,8 @@ mixin FirebaseServiceStorageMixin {
   }) async {
     try {
       // Check if file exists, return null if it does
-      final _ = await storage.ref(firebaseFilePath).getDownloadURL();
+      // ignore: unused_local_variable
+      final downloadUrl = await storage.ref(firebaseFilePath).getDownloadURL();
       return null;
     } on FirebaseException catch (e, st) {
       if (e.code != 'unauthorized') {

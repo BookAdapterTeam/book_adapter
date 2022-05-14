@@ -54,7 +54,7 @@ class ChooseCollectionsBottomSheet extends ConsumerStatefulWidget {
   final void Function(String) onAddNewCollection;
 
   @override
-  _ChooseCollectionsBottomSheetState createState() =>
+  ConsumerState<ChooseCollectionsBottomSheet> createState() =>
       _ChooseCollectionsBottomSheetState();
 }
 
