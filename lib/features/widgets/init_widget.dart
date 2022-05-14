@@ -176,7 +176,7 @@ class UpdateChecker extends StatefulWidget {
   final bool ignoreUpdate;
 
   @override
-  _UpdateCheckerState createState() => _UpdateCheckerState();
+  State<UpdateChecker> createState() => _UpdateCheckerState();
 }
 
 class _UpdateCheckerState extends State<UpdateChecker> {
