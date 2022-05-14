@@ -51,13 +51,13 @@ class _ProfileImage extends StatelessWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
+          onTap: onPressed,
           child: CachedNetworkImage(
             imageUrl: imageUrl,
             width: 200,
             height: 200,
             fit: BoxFit.cover,
           ),
-          onTap: onPressed,
         ),
 
         // Ink.image(
@@ -84,6 +84,7 @@ class _EditIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onTap: onPressed,
       child: _Circle(
         color: Colors.white,
         all: 3,
@@ -97,7 +98,6 @@ class _EditIcon extends StatelessWidget {
           ),
         ),
       ),
-      onTap: onPressed,
     );
   }
 }

@@ -80,7 +80,6 @@ class _RegisterButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
     return ElevatedButton(
-      child: const Text('Register', style: TextStyle(fontSize: 20.0)),
       style: !data.isButtonEnabled
           ? ButtonStyle(
               backgroundColor: MaterialStateProperty.all<Color>(Colors.black38))
@@ -103,6 +102,7 @@ class _RegisterButton extends ConsumerWidget {
           (user) => Navigator.of(context).pop(),
         );
       },
+      child: const Text('Register', style: TextStyle(fontSize: 20.0)),
     );
   }
 }

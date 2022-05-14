@@ -78,7 +78,6 @@ class _SubmitButton extends ConsumerWidget {
     final log = Logger();
     final data = ref.watch(editProfileViewController);
     return ElevatedButton(
-      child: const Text('Submit'),
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
@@ -102,6 +101,7 @@ class _SubmitButton extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(snackBar);
         }
       },
+      child: const Text('Submit'),
     );
   }
 }

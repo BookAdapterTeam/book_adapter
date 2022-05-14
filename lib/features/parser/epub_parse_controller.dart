@@ -39,7 +39,7 @@ class EPUBParseController {
     required String collectionName,
     String? id,
   }) async {
-    final String _id = id ?? _uuid.v4();
+    final String idValue = id ?? _uuid.v4();
 
     final file = io.File(cacheFilePath);
     final openedBook = await EpubReader.openBook(bytes);
@@ -50,12 +50,12 @@ class EPUBParseController {
     final filesize = await file.length();
 
     // Filename: Max filename is 127 characters
-    final cutFilename = _getFilename(cacheFilePath, _id);
+    final cutFilename = _getFilename(cacheFilePath, idValue);
 
     final firebaseFilePath = '$userId/$cutFilename';
 
     return Book(
-      id: _id,
+      id: idValue,
       userId: userId,
       title: title,
       subtitle: subtitle,

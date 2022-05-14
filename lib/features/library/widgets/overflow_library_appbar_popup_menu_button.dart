@@ -43,6 +43,7 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
             },
           ),
           PopupMenuItem(
+            onTap: onRemoveDownloads,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -54,7 +55,6 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
                 Text('Remove Downloads'),
               ],
             ),
-            onTap: onRemoveDownloads,
           ),
           PopupMenuItem(
             child: Row(

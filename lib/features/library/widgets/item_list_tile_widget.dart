@@ -125,6 +125,7 @@ class _ItemListTile extends ConsumerWidget {
 
     final Widget image = legacyImage
         ? ClipRRect(
+            borderRadius: BorderRadius.circular(4),
             child: CachedNetworkImage(
               imageUrl: imageUrl,
               width: width,
@@ -135,10 +136,10 @@ class _ItemListTile extends ConsumerWidget {
                 width: width,
               ),
             ),
-            borderRadius: BorderRadius.circular(4),
           )
         : asyncV?.when(
               data: (data) => ClipRRect(
+                borderRadius: BorderRadius.circular(4),
                 child: CachedNetworkImage(
                   imageUrl: data,
                   width: width,
@@ -149,7 +150,6 @@ class _ItemListTile extends ConsumerWidget {
                     width: width,
                   ),
                 ),
-                borderRadius: BorderRadius.circular(4),
               ),
               error: (error, st) {
                 log.e(error.toString(), error, st);

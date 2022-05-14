@@ -87,7 +87,6 @@ class _CancelButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextButton(
-      child: const Text('Cancel'),
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
@@ -98,6 +97,7 @@ class _CancelButton extends StatelessWidget {
       onPressed: () {
         Navigator.of(context).pop();
       },
+      child: const Text('Cancel'),
     );
   }
 }
@@ -116,7 +116,6 @@ class _SendResetEmailButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final log = Logger();
     return ElevatedButton(
-      child: const Text('Send Email'),
       style: ButtonStyle(
         shape: MaterialStateProperty.all<RoundedRectangleBorder>(
           RoundedRectangleBorder(
@@ -145,6 +144,7 @@ Reset email was sent to ${data.email} from noreply@bookadapter.firebaseapp.com''
           },
         );
       },
+      child: const Text('Send Email'),
     );
   }
 }

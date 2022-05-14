@@ -256,8 +256,8 @@ class LibraryScrollView extends HookConsumerWidget {
         controller: scrollController,
         slivers: [
           SliverAnimatedSwitcher(
-            child: appBar,
             duration: kTransitionDuration,
+            child: appBar,
           ),
 
           // List of collections

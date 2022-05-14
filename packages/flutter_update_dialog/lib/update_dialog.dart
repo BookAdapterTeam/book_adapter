@@ -11,8 +11,8 @@ class UpdateDialog {
   final bool isForce;
   late BuildContext _context;
   late UpdateWidget _widget;
-  final GlobalKey<_UpdateWidgetState> keyUpdateWidget =
-      GlobalKey<_UpdateWidgetState>(debugLabel: 'updateDialogGlobalKey');
+  final GlobalKey<UpdateWidgetState> _keyUpdateWidget =
+      GlobalKey<UpdateWidgetState>(debugLabel: 'updateDialogGlobalKey');
 
   // ignore: sort_constructors_first
   UpdateDialog(
@@ -38,7 +38,7 @@ class UpdateDialog {
   }) {
     _context = context;
     _widget = UpdateWidget(
-      key: keyUpdateWidget,
+      key: _keyUpdateWidget,
       width: width,
       title: title,
       updateContent: updateContent,
@@ -120,7 +120,7 @@ class UpdateDialog {
   /// 更新进度
   void update(double progress) {
     if (isShowing()) {
-      keyUpdateWidget.currentState?.update(progress);
+      _keyUpdateWidget.currentState?.update(progress);
     }
   }
 
@@ -251,7 +251,7 @@ class UpdateWidget extends StatefulWidget {
     this.onClose,
   }) : super(key: key);
 
-  final _UpdateWidgetState _state = _UpdateWidgetState();
+  final UpdateWidgetState _state = UpdateWidgetState();
 
   void update(double progress) {
     _state.update(progress);
@@ -259,10 +259,10 @@ class UpdateWidget extends StatefulWidget {
 
   @override
   // ignore: no_logic_in_create_state
-  _UpdateWidgetState createState() => _state;
+  UpdateWidgetState createState() => _state;
 }
 
-class _UpdateWidgetState extends State<UpdateWidget> {
+class UpdateWidgetState extends State<UpdateWidget> {
   void update(double progress) {
     if (!mounted) {
       return;
@@ -385,8 +385,8 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                                     backgroundColor: MaterialStateProperty.all(
                                         widget.themeColor),
                                   ),
-                                  child: Text(widget.updateButtonText),
                                   onPressed: widget.onUpdate,
+                                  child: Text(widget.updateButtonText),
                                 ),
                               ),
                             ),
@@ -411,8 +411,8 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                                               borderRadius:
                                                   BorderRadius.circular(5))),
                                     ),
-                                    child: Text(widget.ignoreButtonText),
                                     onPressed: widget.onIgnore,
+                                    child: Text(widget.ignoreButtonText),
                                   ),
                                 ),
                               )
@@ -443,8 +443,8 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                                                 borderRadius:
                                                     BorderRadius.circular(5))),
                                       ),
-                                      child: Text(widget.ignoreButtonText),
                                       onPressed: widget.onIgnore,
+                                      child: Text(widget.ignoreButtonText),
                                     ),
                                   ),
                                 Flexible(
@@ -467,8 +467,8 @@ class _UpdateWidgetState extends State<UpdateWidget> {
                                           MaterialStateProperty.all(
                                               widget.themeColor),
                                     ),
-                                    child: Text(widget.updateButtonText),
                                     onPressed: widget.onUpdate,
+                                    child: Text(widget.updateButtonText),
                                   ),
                                 ),
                               ],
