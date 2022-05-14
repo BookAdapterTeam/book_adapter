@@ -121,7 +121,10 @@ class CommonUtils {
     } else {
       // Goes to iOS store app url
       // await AppInstaller.goStore('', uri);
-      await launch(githubReleaseUrl);
+      final uri = Uri.tryParse(githubReleaseUrl);
+      if (uri != null) {
+        await launchUrl(uri);
+      }
     }
   }
 }
