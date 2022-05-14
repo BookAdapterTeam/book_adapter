@@ -11,8 +11,8 @@ class UpdateDialog {
   final bool isForce;
   late BuildContext _context;
   late UpdateWidget _widget;
-  final GlobalKey<UpdateWidgetState> _keyUpdateWidget =
-      GlobalKey<UpdateWidgetState>(debugLabel: 'updateDialogGlobalKey');
+  final GlobalKey<_UpdateWidgetState> _keyUpdateWidget =
+      GlobalKey<_UpdateWidgetState>(debugLabel: 'updateDialogGlobalKey');
 
   // ignore: sort_constructors_first
   UpdateDialog(
@@ -251,7 +251,7 @@ class UpdateWidget extends StatefulWidget {
     this.onClose,
   }) : super(key: key);
 
-  final UpdateWidgetState _state = UpdateWidgetState();
+  final _UpdateWidgetState _state = _UpdateWidgetState();
 
   void update(double progress) {
     _state.update(progress);
@@ -259,10 +259,10 @@ class UpdateWidget extends StatefulWidget {
 
   @override
   // ignore: no_logic_in_create_state
-  UpdateWidgetState createState() => _state;
+  State<UpdateWidget> createState() => _state;
 }
 
-class UpdateWidgetState extends State<UpdateWidget> {
+class _UpdateWidgetState extends State<UpdateWidget> {
   void update(double progress) {
     if (!mounted) {
       return;
