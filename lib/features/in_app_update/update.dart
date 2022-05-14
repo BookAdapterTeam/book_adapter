@@ -38,28 +38,29 @@ class UpdateManager {
     final VoidCallback? onClose,
     final VoidCallback? onNoUpdate,
   }) async {
-    await HttpUtils.get<Map<String, dynamic>>(url).then((response) {
-      UpdateParser.parseJson(json.encode(response)).then(
-        (data) {
-          if (data == null) return;
+    try {
+      final response = await HttpUtils.get<Map<String, dynamic>>(url);
 
-          UpdatePrompter(
-            updateData: data,
-            onIgnore: onIgnore,
-            onClose: onClose,
-            onNoUpdate: onNoUpdate,
-            onInstall: (String filePath) async {
-              await CommonUtils.installAPP(
-                filePath: filePath,
-                githubReleaseUrl: data.githubReleaseUrl,
-              );
-            },
-          ).show(context);
+      final data = await UpdateParser.parseJson(json.encode(response));
+      if (data == null) return;
+
+      // TODO: Fix lint
+      // ignore: use_build_context_synchronously
+      await UpdatePrompter(
+        updateData: data,
+        onIgnore: onIgnore,
+        onClose: onClose,
+        onNoUpdate: onNoUpdate,
+        onInstall: (String filePath) async {
+          await CommonUtils.installAPP(
+            filePath: filePath,
+            githubReleaseUrl: data.githubReleaseUrl,
+          );
         },
-      );
-    }).catchError((onError) {
-      ToastUtils.error(onError.toString());
-    });
+      ).show(context);
+    } catch (e) {
+      ToastUtils.error(e.toString());
+    }
   }
 }
 

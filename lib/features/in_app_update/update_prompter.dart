@@ -53,6 +53,8 @@ class UpdatePrompter {
     }
 
     if (_apkFile != null && _apkFile!.existsSync()) {
+      // TODO: Fix lint
+      // ignore: use_build_context_synchronously
       _dialog = UpdateDialog.showUpdate(
         context,
         title: title,
@@ -67,6 +69,8 @@ class UpdatePrompter {
         onClose: onClose,
       );
     } else {
+      // TODO: Fix lint
+      // ignore: use_build_context_synchronously
       _dialog = UpdateDialog.showUpdate(
         context,
         title: title,
