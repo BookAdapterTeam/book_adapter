@@ -68,13 +68,16 @@ class EditProfileView extends HookConsumerWidget {
   }
 }
 
-class _SubmitButton extends ConsumerWidget {
-  const _SubmitButton({
-    Key? key,
-  }) : super(key: key);
+class _SubmitButton extends ConsumerStatefulWidget {
+  const _SubmitButton({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => __SubmitButtonState();
+}
+
+class __SubmitButtonState extends ConsumerState<_SubmitButton> {
+  @override
+  Widget build(BuildContext context) {
     final log = Logger();
     final data = ref.watch(editProfileViewController);
     return ElevatedButton(
@@ -88,6 +91,8 @@ class _SubmitButton extends ConsumerWidget {
       onPressed: () async {
         final success =
             await ref.read(editProfileViewController.notifier).submit();
+        if (!mounted) return;
+
         if (!success) {
           const errorMessage = 'Updating Userdata Failed';
           log.e(errorMessage);

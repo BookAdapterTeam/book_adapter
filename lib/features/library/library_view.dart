@@ -81,11 +81,17 @@ class MergeIntoSeriesButton extends ConsumerWidget {
   }
 }
 
-class LibraryScrollView extends HookConsumerWidget {
+class LibraryScrollView extends StatefulHookConsumerWidget {
   const LibraryScrollView({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      _LibraryScrollViewState();
+}
+
+class _LibraryScrollViewState extends ConsumerState<LibraryScrollView> {
+  @override
+  Widget build(BuildContext context) {
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     final LibraryViewController viewController =
         ref.watch(libraryViewControllerProvider.notifier);
@@ -131,6 +137,7 @@ class LibraryScrollView extends HookConsumerWidget {
                 .read(libraryViewControllerProvider.notifier)
                 .moveItemsToCollections(collectionIds);
             if (failure == null) return;
+            if (!mounted) return;
 
             final snackBar = SnackBar(
               content: Text(failure.message),
@@ -219,11 +226,13 @@ class LibraryScrollView extends HookConsumerWidget {
                 .read(libraryViewControllerProvider.notifier)
                 .queueDownloadBooks();
             if (failure == null) return;
+            if (!mounted) return;
 
             log.e(failure.message);
             final SnackBar snackBar = SnackBar(
               content: Text(failure.message),
             );
+
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
         ),

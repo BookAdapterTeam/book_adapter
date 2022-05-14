@@ -85,7 +85,7 @@ class SeriesView extends HookConsumerWidget {
   }
 }
 
-class _SliverBackgroundAppBar extends ConsumerWidget {
+class _SliverBackgroundAppBar extends ConsumerStatefulWidget {
   const _SliverBackgroundAppBar({
     Key? key,
     required this.imageUrl,
@@ -96,7 +96,14 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
   final Series series;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() =>
+      __SliverBackgroundAppBarState();
+}
+
+class __SliverBackgroundAppBarState
+    extends ConsumerState<_SliverBackgroundAppBar> {
+  @override
+  Widget build(BuildContext context) {
     final viewController = ref.watch(libraryViewControllerProvider.notifier);
     final bool isSelecting = ref.watch(libraryViewControllerProvider
         .select((controller) => controller.isSelecting));
@@ -109,7 +116,7 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
         SliverAppBar(
           expandedHeight: 250,
           stretch: true,
-          flexibleSpace: imageUrl != null ? _buildFlexibleSpace() : null,
+          flexibleSpace: widget.imageUrl != null ? _buildFlexibleSpace() : null,
           actions: [
             PopupMenuButton(
               offset: const Offset(0, kToolbarHeight),
@@ -132,7 +139,7 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
                       Navigator.pop(context);
                       ref
                           .read(libraryViewControllerProvider.notifier)
-                          .unmergeSeries(series);
+                          .unmergeSeries(widget.series);
                     },
                   ),
                 ];
@@ -179,6 +186,7 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
                       .read(libraryViewControllerProvider.notifier)
                       .queueDownloadBooks();
                   if (failure == null) return;
+                  if (!mounted) return;
 
                   log.e(failure.message);
                   final SnackBar snackBar = SnackBar(
@@ -195,7 +203,7 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
 
   FlexibleSpaceBar _buildFlexibleSpace() {
     return FlexibleSpaceBar(
-      title: Text(series.title),
+      title: Text(widget.series.title),
       stretchModes: const <StretchMode>[
         StretchMode.zoomBackground,
         StretchMode.blurBackground,
@@ -215,7 +223,7 @@ class _SliverBackgroundAppBar extends ConsumerWidget {
             imageFilter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
             child: CachedNetworkImage(
               fit: BoxFit.fitWidth,
-              imageUrl: imageUrl!,
+              imageUrl: widget.imageUrl!,
               width: 40,
             ), // Widget that is blurred
           ),

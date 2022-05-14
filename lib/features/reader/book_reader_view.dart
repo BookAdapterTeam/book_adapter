@@ -13,14 +13,18 @@ import 'book_reader_view_controller.dart';
 import 'current_book.dart';
 import 'epub_controller.dart';
 
-/// Displays detailed information about a BookItem.
-class BookReaderView extends HookConsumerWidget {
-  const BookReaderView({Key? key}) : super(key: key);
-
+class BookReaderView extends StatefulHookConsumerWidget {
   static const routeName = '/book_reader';
 
+  const BookReaderView({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => _BookReaderViewState();
+}
+
+class _BookReaderViewState extends ConsumerState<BookReaderView> {
+  @override
+  Widget build(BuildContext context) {
     final log = Logger();
     final Book? book = ref.read(currentBookProvider);
 
@@ -73,7 +77,7 @@ class BookReaderView extends HookConsumerWidget {
           if (uri != null) {
             await launchUrl(uri);
           }
-          
+
           log.i('Launched link: $link');
         },
         onChapterChanged: (value) => onChange(
@@ -126,6 +130,7 @@ class BookReaderView extends HookConsumerWidget {
       final snackBar = SnackBar(
         content: Text(fail.message),
       );
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
   }

@@ -263,7 +263,7 @@ class _ItemListTile extends ConsumerWidget {
   }
 }
 
-class _CustomListTileWidget extends ConsumerWidget {
+class _CustomListTileWidget extends ConsumerStatefulWidget {
   const _CustomListTileWidget({
     Key? key,
     required this.item,
@@ -284,7 +284,13 @@ class _CustomListTileWidget extends ConsumerWidget {
   final BookStatus? status;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ConsumerStatefulWidget> createState() => __CustomListTileWidgetState();
+}
+
+class __CustomListTileWidgetState extends ConsumerState<_CustomListTileWidget> {
+
+  @override
+  Widget build(BuildContext context) {
     final log = Logger();
     final LibraryViewData data = ref.watch(libraryViewControllerProvider);
     return ListTile(
@@ -295,62 +301,63 @@ class _CustomListTileWidget extends ConsumerWidget {
         ),
       ),
       title: Text(
-        item.title,
-        maxLines: subtitle == null ? 3 : 2,
+        widget.item.title,
+        maxLines: widget.subtitle == null ? 3 : 2,
         style: DefaultTextStyle.of(context)
             .style
             .copyWith(overflow: TextOverflow.ellipsis),
       ),
-      subtitle: subtitle,
+      subtitle: widget.subtitle,
       minLeadingWidth: 0,
-      leading: leading,
-      trailing: trailing,
+      leading: widget.leading,
+      trailing: widget.trailing,
       onLongPress: () {
-        if (disableSelect) return;
+        if (widget.disableSelect) return;
 
-        ref.read(libraryViewControllerProvider.notifier).selectItem(item);
+        ref.read(libraryViewControllerProvider.notifier).selectItem(widget.item);
       },
       onTap: () async {
-        if (isSelected) {
+        if (widget.isSelected) {
           return ref
               .read(libraryViewControllerProvider.notifier)
-              .deselectItem(item);
+              .deselectItem(widget.item);
         }
 
-        if (data.isSelecting && !disableSelect) {
+        if (data.isSelecting && !widget.disableSelect) {
           return ref
               .read(libraryViewControllerProvider.notifier)
-              .selectItem(item);
+              .selectItem(widget.item);
         }
 
-        if (item is Series) {
+        if (widget.item is Series) {
           Navigator.restorablePushNamed(
             context,
-            item.routeTo,
-            arguments: item.toMapSerializable(),
+            widget.item.routeTo,
+            arguments: widget.item.toMapSerializable(),
           );
           return;
         }
 
-        if (item is Book &&
+        if (widget.item is Book &&
             ref
                 .read(storageControllerProvider)
-                .fileExists((item as Book).filename)) {
+                .fileExists((widget.item as Book).filename)) {
           final controller = ref.read(currentBookProvider.state);
-          controller.state = item as Book;
+          controller.state = widget.item as Book;
           Navigator.restorablePushNamed(
             context,
-            item.routeTo,
+            widget.item.routeTo,
           );
           return;
         }
 
-        if (item is Book && status == BookStatus.notDownloaded) {
+        if (widget.item is Book && widget.status == BookStatus.notDownloaded) {
           try {
             final failure = await ref
                 .read(libraryViewControllerProvider.notifier)
-                .queueDownloadBook(item as Book);
+                .queueDownloadBook(widget.item as Book);
             if (failure == null) return;
+            if (!mounted) return;
 
             log.e(failure.message);
             final SnackBar snackBar = SnackBar(
