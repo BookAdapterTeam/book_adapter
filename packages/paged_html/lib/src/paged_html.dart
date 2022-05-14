@@ -408,23 +408,24 @@ class _HtmlPageState extends State<_HtmlPage> {
                     key: ValueKey('HtmlWidget-${widget.page}'),
                     data: widget.html,
                     shrinkWrap: false, // Restricts width
-                    customRender: {
-                      'span': (RenderContext context, Widget parsedChild) {
-                        final isItalic = context.tree.elementClasses.contains('italic');
-                        final isBold = context.tree.elementClasses.contains('bold');
-                        if (isItalic || isBold) {
-                          return TextSpan(
-                            text: context.tree.element?.text ?? '',
-                            style: Theme.of(context.buildContext)
-                                .textTheme
-                                .bodyText2
-                                ?.copyWith(
-                                  fontStyle: isItalic ? FontStyle.italic : null,
-                                  fontWeight: isBold ? FontWeight.bold : null,
-                                ),
-                          );
-                        }
-                      }
+                    customRenders: {
+                      spanMatcher(): CustomRender.inlineSpan(
+                          inlineSpan: (context, buildChildren) {
+                        final isItalic =
+                            context.tree.elementClasses.contains('italic');
+                        final isBold =
+                            context.tree.elementClasses.contains('bold');
+                        return TextSpan(
+                          text: context.tree.element?.text ?? '',
+                          style: Theme.of(context.buildContext)
+                              .textTheme
+                              .bodyText2
+                              ?.copyWith(
+                                fontStyle: isItalic ? FontStyle.italic : null,
+                                fontWeight: isBold ? FontWeight.bold : null,
+                              ),
+                        );
+                      }),
                       // 'p': (context, parsedChild) {
                       //   if (context.tree.element?.styles
                       //           .map((style) => style.property)
@@ -453,6 +454,9 @@ class _HtmlPageState extends State<_HtmlPage> {
       ],
     );
   }
+
+  CustomRenderMatcher spanMatcher() =>
+      (context) => context.tree.element?.localName == 'span';
 }
 
 class _HtmlPageDelegate extends BoxyDelegate {

@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_html: ^2.2.1
+  flutter_html_all: ^3.0.0-alpha.3
   flutter_widget_from_html_core: ^0.8.5+3
   boxy: ^2.0.5+1
   fwfh_selectable_text: ^0.8.3+1
