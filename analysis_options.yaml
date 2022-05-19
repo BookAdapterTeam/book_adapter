@@ -53,7 +53,8 @@ linter:
 
     unawaited_futures: true
 
-    prefer_relative_imports: true
+    prefer_relative_imports: false
+    always_use_package_imports: true
 
     cast_nullable_to_non_nullable: true
 
