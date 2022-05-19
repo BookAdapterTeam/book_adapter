@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:book_adapter/src/data/app_exception.dart';
 import 'package:book_adapter/src/constants/constants.dart';
 import 'package:book_adapter/src/data/failure.dart';
 import 'package:book_adapter/src/data/file_hash.dart';
+import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:book_adapter/src/features/library/data/book_collection.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/features/library/data/item.dart';

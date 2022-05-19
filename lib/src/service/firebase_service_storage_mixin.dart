@@ -1,7 +1,7 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/src/data/app_exception.dart';
+import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:logger/logger.dart';
 

@@ -1,7 +1,7 @@
 // Handles Profile edit action
 
-import 'package:book_adapter/src/controller/firebase_controller.dart';
 import 'package:book_adapter/src/constants/constants.dart';
+import 'package:book_adapter/src/controller/firebase_controller.dart';
 import 'package:book_adapter/src/features/profile/edit_profile_view_controller.dart';
 import 'package:book_adapter/src/features/profile/widgets/profile_widget.dart';
 import 'package:flutter/material.dart';

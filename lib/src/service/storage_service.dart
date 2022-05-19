@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/src/data/app_exception.dart';
 import 'package:book_adapter/src/constants/constants.dart';
 import 'package:book_adapter/src/data/failure.dart';
 import 'package:book_adapter/src/data/file_hash.dart';
+import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:book_adapter/src/service/isolate_service.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';

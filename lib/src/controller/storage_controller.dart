@@ -3,8 +3,8 @@ import 'dart:io' as io;
 import 'dart:typed_data';
 
 import 'package:book_adapter/src/controller/firebase_controller.dart';
-import 'package:book_adapter/src/data/app_exception.dart';
 import 'package:book_adapter/src/data/file_hash.dart';
+import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/features/library/data/item.dart';
 import 'package:book_adapter/src/features/library/model/book_status_notifier.dart';

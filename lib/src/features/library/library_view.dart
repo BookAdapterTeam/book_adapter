@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:book_adapter/src/constants/constants.dart';
 import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/src/features/library/data/book_collection.dart';
@@ -12,7 +13,6 @@ import 'package:book_adapter/src/features/library/widgets/merge_to_series.dart';
 import 'package:book_adapter/src/features/library/widgets/overflow_library_appbar_popup_menu_button.dart';
 import 'package:book_adapter/src/features/library/widgets/profile_button.dart';
 import 'package:book_adapter/src/features/library/widgets/section_widget.dart';
-import 'package:book_adapter/localization/app.i18n.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
