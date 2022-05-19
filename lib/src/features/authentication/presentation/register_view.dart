@@ -1,5 +1,5 @@
-import 'package:book_adapter/src/features/auth/controller/register_view_controller.dart';
-import 'package:book_adapter/src/features/auth/data/register_view_data.dart';
+import 'package:book_adapter/src/features/authentication/controller/register_view_controller.dart';
+import 'package:book_adapter/src/features/authentication/data/register_view_data.dart';
 import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';

@@ -1,5 +1,5 @@
 import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/features/auth/controller/reset_password_view_controller.dart';
+import 'package:book_adapter/src/features/authentication/controller/reset_password_view_controller.dart';
 import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

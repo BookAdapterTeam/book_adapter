@@ -1,5 +1,5 @@
 import 'package:book_adapter/src/common_widgets/init_widget.dart';
-import 'package:book_adapter/src/features/auth/presentation/auth_checker.dart';
+import 'package:book_adapter/src/features/authentication/presentation/auth_checker.dart';
 import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/src/features/library/presentation/library_view.dart';
 import 'package:book_adapter/src/features/library/presentation/series_view.dart';

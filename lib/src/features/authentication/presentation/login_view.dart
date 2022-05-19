@@ -1,6 +1,6 @@
-import 'package:book_adapter/src/features/auth/controller/login_view_controller.dart';
-import 'package:book_adapter/src/features/auth/presentation/register_view.dart';
-import 'package:book_adapter/src/features/auth/presentation/reset_password_view.dart';
+import 'package:book_adapter/src/features/authentication/controller/login_view_controller.dart';
+import 'package:book_adapter/src/features/authentication/presentation/register_view.dart';
+import 'package:book_adapter/src/features/authentication/presentation/reset_password_view.dart';
 import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

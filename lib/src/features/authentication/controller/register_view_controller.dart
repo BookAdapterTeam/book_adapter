@@ -1,4 +1,4 @@
-import 'package:book_adapter/src/features/auth/data/register_view_data.dart';
+import 'package:book_adapter/src/features/authentication/data/register_view_data.dart';
 import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:dartz/dartz.dart';

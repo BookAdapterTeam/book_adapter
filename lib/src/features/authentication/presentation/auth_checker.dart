@@ -1,6 +1,6 @@
 import 'package:book_adapter/src/common_widgets/async_value_widget.dart';
 import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/features/auth/presentation/login_view.dart';
+import 'package:book_adapter/src/features/authentication/presentation/login_view.dart';
 import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
