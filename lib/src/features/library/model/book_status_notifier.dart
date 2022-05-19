@@ -2,6 +2,7 @@ import 'dart:io' as io;
 
 import 'package:book_adapter/src/controller/storage_controller.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
+import 'package:book_adapter/src/features/library/model/book_status_enum.dart';
 import 'package:book_adapter/src/service/storage_service.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:watcher/watcher.dart';
@@ -90,24 +91,3 @@ class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
   }
 }
 
-enum BookStatus {
-  /// The book file is downloaded to this device
-  downloaded,
-
-  /// The book file is currrently being downloaded to this device
-  downloading,
-
-  /// The book is waiting to download
-  downloadWaiting,
-
-  /// The book file is not downloaded to this device
-  notDownloaded,
-
-  /// An error occured during download
-  ///
-  /// The checksum of the file does not match the saved checksum.
-  ///
-  /// This could be caused by the download being interrupted, or
-  /// the file on the server is corrupted.
-  errorDownloading,
-}

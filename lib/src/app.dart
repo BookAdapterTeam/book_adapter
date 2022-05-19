@@ -1,8 +1,8 @@
 import 'package:book_adapter/src/common_widgets/init_widget.dart';
 import 'package:book_adapter/src/features/auth/presentation/auth_checker.dart';
 import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/src/features/library/library_view.dart';
-import 'package:book_adapter/src/features/library/series_view.dart';
+import 'package:book_adapter/src/features/library/presentation/library_view.dart';
+import 'package:book_adapter/src/features/library/presentation/series_view.dart';
 import 'package:book_adapter/src/features/profile/change_password_view.dart';
 import 'package:book_adapter/src/features/profile/edit_profile_view.dart';
 import 'package:book_adapter/src/features/profile/profile_view.dart';

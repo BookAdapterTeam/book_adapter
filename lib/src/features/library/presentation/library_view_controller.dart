@@ -7,6 +7,7 @@ import 'package:book_adapter/src/features/library/data/book_collection.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/features/library/data/item.dart';
 import 'package:book_adapter/src/features/library/data/series_item.dart';
+import 'package:book_adapter/src/features/library/model/book_status_enum.dart';
 import 'package:book_adapter/src/features/library/model/book_status_notifier.dart';
 import 'package:book_adapter/src/model/queue_model.dart';
 import 'package:book_adapter/src/model/user_model.dart';

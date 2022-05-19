@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:book_adapter/src/features/library/data/item.dart';
-import 'package:book_adapter/src/features/library/series_view.dart';
+import 'package:book_adapter/src/features/library/presentation/series_view.dart';
 
 class Series implements Item {
   @override

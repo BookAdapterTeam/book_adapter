@@ -1,6 +1,6 @@
 import 'package:book_adapter/src/features/library/data/book_collection.dart';
-import 'package:book_adapter/src/features/library/library_view_controller.dart';
-import 'package:book_adapter/src/features/library/widgets/add_new_collection_button.dart';
+import 'package:book_adapter/src/features/library/presentation/library_view_controller.dart';
+import 'package:book_adapter/src/features/library/presentation/widgets/add_new_collection_button.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
