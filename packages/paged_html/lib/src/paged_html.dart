@@ -3,8 +3,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:html/dom.dart' as dom;
 
 import 'html_page_action.dart';
+import 'html_utils.dart';
+import 'models/mirror_node.dart';
 import 'paged_html_controller.dart';
 
 /// A Widget that displays the html in horizontal or verticle pages
@@ -182,6 +185,28 @@ class _PagedHtmlState extends State<PagedHtml> {
   void initState() {
     _pagedHtmlController = widget.controller ?? PagedHtmlController();
     _pages.add(_buildHtmlPage(widget.html, 0));
+
+    final document = HtmlUtils.parseHtml(widget.html);
+
+    final elements = document.findFirstDecendentWithTag('body')?.elements ?? [];
+    final childElements = HtmlUtils.getNodes(elements)
+        .whereType<MirrorNode<dom.Element>>()
+        .toList();
+
+    for (final item in childElements) {
+      final ancestor = HtmlUtils.getNodeWithAncestors(item);
+      final ancestorNode = ancestor.node;
+      if (ancestorNode is dom.DocumentFragment) {
+        final html = HtmlUtils.fragmentToHtml(ancestorNode);
+        print('${item.node.localName}: $html');
+      } else if (ancestorNode is dom.Document) {
+        final html = HtmlUtils.documentToHtml(ancestorNode);
+        print('${item.node.localName}: $html');
+      } else if (ancestorNode is dom.Element) {
+        final html = HtmlUtils.elementToHtml(ancestorNode);
+        print('${item.node.localName}: $html');
+      }
+    }
     super.initState();
   }
 
@@ -276,7 +301,10 @@ class _PagedHtmlState extends State<PagedHtml> {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       // print('previousAction: $_previousAction');
       // print('action: $action');
-      setState(() {});
+      // TODO: Need to handle when page build is interupted due to navigation and pages are cached
+      if (mounted) {
+        setState(() {});
+      }
     });
 
     _previousAction = action;
