@@ -1,4 +1,4 @@
-import 'package:book_adapter/src/data/failure.dart';
+import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

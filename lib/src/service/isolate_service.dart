@@ -3,7 +3,7 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:async/async.dart';
-import 'package:book_adapter/src/data/file_hash.dart';
+import 'package:book_adapter/src/shared/data/file_hash.dart';
 import 'package:crypto/crypto.dart';
 // ignore: implementation_imports
 import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';

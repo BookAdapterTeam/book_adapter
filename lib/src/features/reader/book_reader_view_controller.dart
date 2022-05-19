@@ -1,5 +1,5 @@
-import 'package:book_adapter/src/data/failure.dart';
 import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
+import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';

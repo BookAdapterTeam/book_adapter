@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/src/data/file_hash.dart';
 import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/features/library/data/item.dart';
@@ -10,6 +9,7 @@ import 'package:book_adapter/src/features/library/model/book_status_notifier.dar
 import 'package:book_adapter/src/service/storage_service.dart';
 import 'package:book_adapter/src/shared/controller/epub_parse_controller.dart';
 import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
+import 'package:book_adapter/src/shared/data/file_hash.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';

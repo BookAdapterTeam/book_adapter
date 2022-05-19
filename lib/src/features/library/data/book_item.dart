@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:book_adapter/src/data/file_hash.dart';
 import 'package:book_adapter/src/features/library/data/item.dart';
 import 'package:book_adapter/src/features/reader/book_reader_view.dart';
+import 'package:book_adapter/src/shared/data/file_hash.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 /// A placeholder class that represents a book.

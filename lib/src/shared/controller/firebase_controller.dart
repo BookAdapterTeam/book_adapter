@@ -2,8 +2,6 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/data/failure.dart';
-import 'package:book_adapter/src/data/file_hash.dart';
 import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:book_adapter/src/features/library/data/book_collection.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
@@ -11,6 +9,8 @@ import 'package:book_adapter/src/features/library/data/item.dart';
 import 'package:book_adapter/src/features/library/data/series_item.dart';
 import 'package:book_adapter/src/service/firebase_service.dart';
 import 'package:book_adapter/src/service/storage_service.dart';
+import 'package:book_adapter/src/shared/data/failure.dart';
+import 'package:book_adapter/src/shared/data/file_hash.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
