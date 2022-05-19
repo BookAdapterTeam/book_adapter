@@ -16,8 +16,8 @@ class ToastUtils {
       radius: 10,
       dismissOtherOnShow: true,
       textPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      child: child,
       duration: defaultToastDuration,
+      child: child,
     );
   }
 
