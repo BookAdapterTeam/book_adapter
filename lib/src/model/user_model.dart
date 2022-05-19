@@ -1,5 +1,5 @@
 import 'package:book_adapter/src/controller/firebase_controller.dart';
-import 'package:book_adapter/src/data/user_data.dart';
+import 'package:book_adapter/src/features/auth/data/user_data.dart';
 import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/model/queue_model.dart';

@@ -1,7 +1,7 @@
 import 'package:book_adapter/src/data/failure.dart';
-import 'package:book_adapter/src/features/auth/login_view_controller.dart';
-import 'package:book_adapter/src/features/auth/register_view.dart';
-import 'package:book_adapter/src/features/auth/reset_password_view.dart';
+import 'package:book_adapter/src/features/auth/controller/login_view_controller.dart';
+import 'package:book_adapter/src/features/auth/presentation/register_view.dart';
+import 'package:book_adapter/src/features/auth/presentation/reset_password_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
