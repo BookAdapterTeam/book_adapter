@@ -13,7 +13,6 @@ class MockitoFirebaseAuth extends Mock implements FirebaseAuth {}
 // Run the following command
 // - `flutter test`
 void main() {
-  // TODO: Fix broken tests, all tests don't currently work
   group('Auth', () {
     test('Test Login', () async {
       // Set up mock user account
