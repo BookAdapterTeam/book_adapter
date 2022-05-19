@@ -5,7 +5,7 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:book_adapter/app.dart';
+import 'package:book_adapter/src/app.dart';
 import 'package:book_adapter/src/common_widgets/init_widget.dart';
 import 'package:book_adapter/src/controller/firebase_controller.dart';
 import 'package:book_adapter/src/features/library/library_view.dart';
