@@ -1,4 +1,4 @@
 library flutter_update_dialog;
 
-export 'number_progress.dart';
-export 'update_dialog.dart';
+export 'src/number_progress.dart';
+export 'src/update_dialog.dart';

@@ -31,7 +31,7 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
@@ -52,19 +52,19 @@ class _MyHomePageState extends State<MyHomePage> {
                     mainAxisSize: MainAxisSize.min, //主轴大小，默认MainAxisSize.max
                     children: <Widget>[
                       ElevatedButton(
-                        child: const Text('默认样式'),
                         style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
                                 Theme.of(context).primaryColor)),
                         // color: Theme.of(context).primaryColor,
                         onPressed: defaultStyle,
+                        child: const Text('默认样式'),
                       ),
                       ElevatedButton(
-                        child: const Text('自定义样式'),
                         style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all(
                                 Theme.of(context).primaryColor)),
                         onPressed: customStyle,
+                        child: const Text('自定义样式'),
                       ),
                     ],
                   ),
