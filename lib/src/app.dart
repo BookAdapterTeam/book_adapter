@@ -1,4 +1,3 @@
-import 'package:book_adapter/src/common_widgets/init_widget.dart';
 import 'package:book_adapter/src/features/authentication/presentation/auth_checker.dart';
 import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/src/features/library/presentation/library_view.dart';
@@ -7,6 +6,7 @@ import 'package:book_adapter/src/features/profile/change_password_view.dart';
 import 'package:book_adapter/src/features/profile/edit_profile_view.dart';
 import 'package:book_adapter/src/features/profile/profile_view.dart';
 import 'package:book_adapter/src/features/reader/book_reader_view.dart';
+import 'package:book_adapter/src/shared/widgets/init_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
