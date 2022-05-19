@@ -7,9 +7,9 @@
 
 import 'package:book_adapter/src/app.dart';
 import 'package:book_adapter/src/common_widgets/init_widget.dart';
-import 'package:book_adapter/src/controller/firebase_controller.dart';
 import 'package:book_adapter/src/features/library/presentation/library_view.dart';
 import 'package:book_adapter/src/service/firebase_service.dart';
+import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';

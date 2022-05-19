@@ -1,9 +1,9 @@
 import 'dart:io' as io;
 
-import 'package:book_adapter/src/controller/storage_controller.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/features/library/model/book_status_enum.dart';
 import 'package:book_adapter/src/service/storage_service.dart';
+import 'package:book_adapter/src/shared/controller/storage_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:watcher/watcher.dart';
 
@@ -90,4 +90,3 @@ class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
     }
   }
 }
-

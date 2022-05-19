@@ -1,8 +1,8 @@
-import 'package:book_adapter/src/controller/storage_controller.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/features/reader/book_reader_view_controller.dart';
 import 'package:book_adapter/src/features/reader/current_book.dart';
 import 'package:book_adapter/src/features/reader/epub_controller.dart';
+import 'package:book_adapter/src/shared/controller/storage_controller.dart';
 import 'package:epub_view/epub_view.dart';
 // ignore: implementation_imports
 import 'package:epub_view/src/data/models/chapter_view_value.dart';

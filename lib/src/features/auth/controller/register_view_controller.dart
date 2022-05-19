@@ -1,6 +1,6 @@
-import 'package:book_adapter/src/controller/firebase_controller.dart';
 import 'package:book_adapter/src/data/failure.dart';
 import 'package:book_adapter/src/features/auth/data/register_view_data.dart';
+import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -88,5 +88,3 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
             success ? Right(user) : Left(Failure('Set Display Name Failed')));
   }
 }
-
-

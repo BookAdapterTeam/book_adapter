@@ -1,5 +1,5 @@
-import 'package:book_adapter/src/controller/firebase_controller.dart';
 import 'package:book_adapter/src/data/failure.dart';
+import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:dartz/dartz.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/cupertino.dart';

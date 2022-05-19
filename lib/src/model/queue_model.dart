@@ -1,10 +1,10 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:book_adapter/src/controller/storage_controller.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/features/library/data/item.dart';
 import 'package:book_adapter/src/features/library/model/book_status_notifier.dart';
+import 'package:book_adapter/src/shared/controller/storage_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 

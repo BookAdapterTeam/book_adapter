@@ -1,5 +1,3 @@
-import 'package:book_adapter/src/controller/firebase_controller.dart';
-import 'package:book_adapter/src/controller/storage_controller.dart';
 import 'package:book_adapter/src/data/failure.dart';
 import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:book_adapter/src/features/auth/data/user_data.dart';
@@ -11,6 +9,8 @@ import 'package:book_adapter/src/features/library/model/book_status_enum.dart';
 import 'package:book_adapter/src/features/library/model/book_status_notifier.dart';
 import 'package:book_adapter/src/model/queue_model.dart';
 import 'package:book_adapter/src/model/user_model.dart';
+import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
+import 'package:book_adapter/src/shared/controller/storage_controller.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';

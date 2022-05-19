@@ -1,11 +1,11 @@
 // Handles profile page information
 
-import 'package:book_adapter/src/controller/firebase_controller.dart';
 import 'package:book_adapter/src/features/profile/edit_profile_view.dart';
 import 'package:book_adapter/src/features/profile/widgets/change_password_button.dart';
 import 'package:book_adapter/src/features/profile/widgets/check_update_button.dart';
 import 'package:book_adapter/src/features/profile/widgets/log_out_button.dart';
 import 'package:book_adapter/src/features/profile/widgets/profile_widget.dart';
+import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
