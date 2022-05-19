@@ -16,7 +16,7 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-        
+
       - name: Setup Java
         uses: actions/setup-java@v1
         with:
@@ -32,8 +32,7 @@ jobs:
       - name: Run Tests
         run: flutter test --coverage
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v2.1.0
-
+        uses: codecov/codecov-action@v3
 
   build_ios_without_signing:
     name: Build Flutter (iOS) Without Signing
