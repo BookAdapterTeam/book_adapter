@@ -1,4 +1,4 @@
-import 'package:book_adapter/src/data/constants.dart';
+import 'package:book_adapter/src/constants/constants.dart';
 import 'package:book_adapter/src/data/failure.dart';
 import 'package:book_adapter/src/features/auth/reset_password_view_controller.dart';
 import 'package:flutter/material.dart';

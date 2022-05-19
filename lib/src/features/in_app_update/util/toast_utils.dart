@@ -1,4 +1,4 @@
-import 'package:book_adapter/src/data/constants.dart';
+import 'package:book_adapter/src/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
 

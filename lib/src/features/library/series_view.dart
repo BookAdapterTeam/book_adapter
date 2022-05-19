@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:book_adapter/src/data/constants.dart';
+import 'package:book_adapter/src/constants/constants.dart';
 import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:book_adapter/src/features/library/data/series_item.dart';

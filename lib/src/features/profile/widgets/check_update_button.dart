@@ -1,4 +1,4 @@
-import 'package:book_adapter/src/data/constants.dart';
+import 'package:book_adapter/src/constants/constants.dart';
 import 'package:book_adapter/src/features/in_app_update/update.dart';
 import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
 import 'package:flutter/material.dart';
