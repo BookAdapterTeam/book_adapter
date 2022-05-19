@@ -1,8 +1,8 @@
 import 'package:book_adapter/src/constants/constants.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
+import 'package:book_adapter/src/features/library/data/book_status_enum.dart';
 import 'package:book_adapter/src/features/library/data/item.dart';
 import 'package:book_adapter/src/features/library/data/series_item.dart';
-import 'package:book_adapter/src/features/library/model/book_status_enum.dart';
 import 'package:book_adapter/src/features/library/model/book_status_notifier.dart';
 import 'package:book_adapter/src/features/library/presentation/library_view_controller.dart';
 import 'package:book_adapter/src/features/library/presentation/widgets/default_item_image.dart';
