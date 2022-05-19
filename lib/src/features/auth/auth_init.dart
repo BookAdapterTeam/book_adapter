@@ -1,5 +1,5 @@
+import 'package:book_adapter/src/common_widgets/async_value_widget.dart';
 import 'package:book_adapter/src/controller/storage_controller.dart';
-import 'package:book_adapter/src/features/widgets/async_value_widget.dart';
 import 'package:book_adapter/src/service/storage_service.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
