@@ -1,7 +1,6 @@
 import 'package:book_adapter/firebase_options.dart';
-import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/features/in_app_update/update.dart';
 import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
+import 'package:book_adapter/src/features/initialization/presentation/loading_page.dart';
 import 'package:book_adapter/src/service/storage_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -11,15 +10,23 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
 final providerForInitStream = StreamProvider.autoDispose<String?>((ref) async* {
+  yield* _initStream(ref);
+});
+
+// TODO: Refactor to use AsyncValue with StateNotifier
+Stream<String?> _initStream(Ref ref) async* {
   yield 'Initializing Firebase...';
+
   // FlutterFire setup: https://firebase.flutter.dev/docs/cli/
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   ); //.timeout(const Duration(seconds: 5));
+
   yield 'Initializing Local Database...';
   await ref.watch(storageServiceProvider).init();
+
   yield null;
-});
+}
 
 class InitWidget extends ConsumerWidget {
   const InitWidget({
@@ -46,7 +53,7 @@ class InitWidget extends ConsumerWidget {
           return child;
         }
 
-        return loading?.call(message) ?? _LoadingPage(message: message);
+        return loading?.call(message) ?? LoadingPage(message: message);
       },
       error: (asyncError) {
         final error = asyncError.error;
@@ -108,96 +115,8 @@ class InitWidget extends ConsumerWidget {
         );
       },
       loading: (loading) {
-        return const _LoadingPage(message: 'Loading...');
+        return const LoadingPage(message: 'Loading...');
       },
     );
-  }
-}
-
-class _LoadingPage extends StatelessWidget {
-  const _LoadingPage({
-    Key? key,
-    required this.message,
-  }) : super(key: key);
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.max,
-          children: [
-            const CircularProgressIndicator(),
-            const SizedBox(height: 16),
-            _LoadingMessageWidget(message: message),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _LoadingMessageWidget extends StatelessWidget {
-  const _LoadingMessageWidget({
-    Key? key,
-    required this.message,
-  }) : super(key: key);
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      key: ValueKey(message),
-      switchInCurve: Curves.easeInCubic,
-      switchOutCurve: Curves.easeOutCubic,
-      duration: kTransitionDuration,
-      child: Text(message),
-    );
-  }
-}
-
-class UpdateChecker extends StatefulWidget {
-  const UpdateChecker({
-    Key? key,
-    required this.child,
-    this.ignoreUpdate = false,
-    required this.onIgnore,
-    required this.onClose,
-  }) : super(key: key);
-
-  final Widget child;
-  final VoidCallback? onIgnore;
-  final VoidCallback? onClose;
-  final bool ignoreUpdate;
-
-  @override
-  State<UpdateChecker> createState() => _UpdateCheckerState();
-}
-
-class _UpdateCheckerState extends State<UpdateChecker> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return widget.ignoreUpdate
-        ? widget.child
-        : FutureBuilder<void>(
-            future: UpdateManager.checkUpdate(
-              context: context,
-              url: kUpdateUrl,
-              onIgnore: widget.onIgnore,
-              onClose: widget.onClose,
-            ),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              return widget.child;
-            },
-          );
   }
 }
