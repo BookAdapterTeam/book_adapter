@@ -16,7 +16,7 @@ Future<Result<User, Exception>> signUp(
   String email,
   String password,
   String userId,
-) async {
+) {
   return Result.asyncOf(
     () => users.create(userId: userId, email: email, password: password),
   );
@@ -33,7 +33,7 @@ Future<Result<Bucket, Exception>> createBucket({
   List<dynamic>? allowedFileExtensions,
   bool? encryption,
   bool? antivirus,
-}) async {
+}) {
   return Result.asyncOf(
     () => storage.createBucket(
       bucketId: bucketId,
@@ -57,7 +57,7 @@ Future<Result<File, Exception>> uploadFile({
   List<dynamic>? read,
   List<dynamic>? write,
   dynamic Function(UploadProgress)? onProgress,
-}) async {
+}) {
   final InputFile file = InputFile(path: path);
   return Result.asyncOf(
     () => storage.createFile(
@@ -71,6 +71,14 @@ Future<Result<File, Exception>> uploadFile({
   );
 }
 
-Future<Result<BucketList, Exception>> listBuckets() async {
+Future<Result<BucketList, Exception>> listBuckets() {
   return Result.asyncOf(() => storage.listBuckets());
+}
+
+Future<Result<User, Exception>> setUserName(String userId, String name) async {
+  return Result.asyncOf(() => users.updateName(userId: userId, name: name));
+}
+
+Future<Result<UserList, Exception>> listUsers() {
+  return Result.asyncOf(() => users.list());
 }

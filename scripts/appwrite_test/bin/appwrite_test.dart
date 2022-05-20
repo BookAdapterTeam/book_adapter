@@ -4,6 +4,8 @@ import 'package:dcli/dcli.dart';
 
 const String kExitString = 'Exit';
 const String kCreateAccountString = 'Create Account';
+const String kListUsersString = 'List Users';
+const String kUpdateUserNameString = 'Update User Name';
 const String kUploadFileString = 'Upload File';
 const String kListBucketsString = 'List Buckets';
 const String kCreateBucketString = 'Create Bucket';
@@ -11,11 +13,14 @@ const String kCreateBucketString = 'Create Bucket';
 Future<void> main(List<String> arguments) async {
   String choice = 'Exit';
   do {
+    print(orange('\nAppwrite Admin Console'));
     choice = menu(
       prompt: 'Select an option: ',
       options: [
         kExitString,
         kCreateAccountString,
+        kListUsersString,
+        kUpdateUserNameString,
         kUploadFileString,
         kListBucketsString,
         kCreateBucketString,
@@ -29,11 +34,45 @@ Future<void> main(List<String> arguments) async {
         print(green('\nCreate an Account\n'));
         final email = ask('Email: ', validator: Ask.email);
         final password = ask('Password: ', hidden: true);
+        final username = ask('User Name: ', required: false);
         final userId = ask('User ID: ', defaultValue: 'unique()');
         final result = await lib.signUp(email, password, userId);
+        final message = result.whenAsync(
+          ok: (user) async {
+            String message = green('User created: ${user.email}');
+            final res = await lib.setUserName(user.$id, username);
+            if (res.isErr()) {
+              message += red('\nCould not set name of user');
+            }
+
+            return message;
+          },
+          err: (e) async => red('Exception: $e'),
+        );
+
+        print(message);
+        break;
+      case kListUsersString:
+        print(green('\nUsers\n'));
+        final result = await lib.listUsers();
         final message = result.when(
-          ok: (user) => green('User created: ${user.email}'),
-          err: (e) => red('Exception: $e'),
+          ok: (UserList users) => users.users
+              .map((u) =>
+                  'Email: ${u.email}\n  Name: ${u.name}\n  ID: ${u.$id}\n')
+              .toList()
+              .join('\n'),
+          err: (Exception e) => red('Exception: $e'),
+        );
+        print(message);
+        break;
+      case kUpdateUserNameString:
+        print(green('\nUpdate User Name\n'));
+        final userId = ask('User ID: ', required: true);
+        final name = ask('New Name: ', required: true);
+        final result = await lib.setUserName(userId, name);
+        final message = result.when(
+          ok: (User user) => green('User name updated: ${user.name}'),
+          err: (Exception e) => red('Exception: $e'),
         );
         print(message);
         break;
@@ -60,12 +99,10 @@ Future<void> main(List<String> arguments) async {
         print(green('\nBuckets\n'));
         final result = await lib.listBuckets();
         final message = result.when(
-          ok: (BucketList buckets) => green(
-            buckets.buckets
-                .map((e) => 'Name: ${e.name}\n  ID: ${e.$id}\n')
-                .toList()
-                .join('\n'),
-          ),
+          ok: (BucketList buckets) => buckets.buckets
+              .map((e) => 'Name: ${e.name}\n  ID: ${e.$id}\n')
+              .toList()
+              .join('\n'),
           err: (Exception e) => red('Exception: $e'),
         );
         print(message);
