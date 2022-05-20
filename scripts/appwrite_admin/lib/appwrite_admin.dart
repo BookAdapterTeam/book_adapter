@@ -1,4 +1,4 @@
-import 'package:appwrite_test/env/env.dart';
+import 'package:appwrite_admin/env/env.dart';
 import 'package:dart_appwrite/dart_appwrite.dart';
 import 'package:dart_appwrite/models.dart';
 import 'package:oxidized/oxidized.dart';

@@ -1,4 +1,4 @@
-import 'package:appwrite_test/appwrite_test.dart' as lib;
+import 'package:appwrite_admin/appwrite_admin.dart' as lib;
 import 'package:dart_appwrite/models.dart';
 import 'package:dcli/dcli.dart';
 

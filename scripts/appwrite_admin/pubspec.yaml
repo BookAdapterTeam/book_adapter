@@ -1,5 +1,5 @@
-name: appwrite_test
-description: A sample command-line application.
+name: appwrite_admin
+description: An admin command-line application for Appwrite
 version: 1.0.0
 # homepage: https://www.example.com
 
