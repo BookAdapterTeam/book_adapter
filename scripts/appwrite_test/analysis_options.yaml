@@ -1,0 +1,69 @@
+include: package:lints/recommended.yaml
+
+analyzer:
+  errors:
+    todo: ignore
+  exclude:
+    - "lib/generated_plugin_registrant.dart"
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.iconfig.dart"
+
+linter:
+  rules:
+    # Single quotes are easier to type and don't compromise on readability.
+    prefer_single_quotes: true
+
+    # Type annotations are sometimes necessary for readability
+    omit_local_variable_types: false
+
+    # Better to declare variables as final
+    prefer_final_locals: true
+
+    # Better to leave it up to the programmer
+    prefer_int_literals: false
+
+    # It is better to group related packages
+    sort_pub_dependencies: false
+
+    directives_ordering: true
+
+    unawaited_futures: true
+
+    prefer_relative_imports: false
+    always_use_package_imports: true
+
+    cast_nullable_to_non_nullable: true
+
+    avoid_annotating_with_dynamic: true
+
+    lines_longer_than_80_chars: false
+
+    unnecessary_await_in_return: true
+
+    unnecessary_lambdas: true
+
+    unnecessary_null_checks: true
+
+    unnecessary_parenthesis: true
+
+    unnecessary_raw_strings: true
+
+    use_decorated_box: true
+
+    use_is_even_rather_than_modulo: true
+
+    use_late_for_private_fields_and_variables: true
+
+    use_string_buffers: true
+
+    use_test_throws_matchers: true
+
+    void_checks: true
+
+    use_to_and_as_if_applicable: true
+
+    secure_pubspec_urls: true
+# Additional information about this file can be found at
+# https://dart.dev/guides/language/analysis-options
+

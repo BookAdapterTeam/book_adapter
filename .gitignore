@@ -52,3 +52,7 @@ app.*.map.json
 # See here for instructions on signing https://docs.flutter.dev/deployment/android#signing-the-app
 *.jks
 key.properties
+
+# Secrets
+env.g.dart
+.env
