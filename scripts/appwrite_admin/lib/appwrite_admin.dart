@@ -26,11 +26,7 @@ Future<Result<Bucket, Exception>> createBucket({
   required String bucketId,
   required String name,
   required String permission,
-  List<dynamic>? read,
-  List<dynamic>? write,
-  bool? enabled,
   int? maximumFileSize,
-  List<dynamic>? allowedFileExtensions,
   bool? encryption,
   bool? antivirus,
 }) {
@@ -39,11 +35,7 @@ Future<Result<Bucket, Exception>> createBucket({
       bucketId: bucketId,
       name: name,
       permission: permission,
-      read: read,
-      write: write,
-      enabled: enabled,
       maximumFileSize: maximumFileSize,
-      allowedFileExtensions: allowedFileExtensions,
       encryption: encryption,
       antivirus: antivirus,
     ),
@@ -54,9 +46,7 @@ Future<Result<File, Exception>> uploadFile({
   required String path,
   required String bucketId,
   required String fileId,
-  List<dynamic>? read,
-  List<dynamic>? write,
-  dynamic Function(UploadProgress)? onProgress,
+  void Function(UploadProgress)? onProgress,
 }) {
   final InputFile file = InputFile(path: path);
   return Result.asyncOf(
@@ -64,8 +54,6 @@ Future<Result<File, Exception>> uploadFile({
       bucketId: bucketId,
       fileId: fileId,
       file: file,
-      read: read,
-      write: write,
       onProgress: onProgress,
     ),
   );
