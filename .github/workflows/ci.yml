@@ -21,18 +21,30 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: "12.x"
+
       - name: Install and set Flutter version
         uses: subosito/flutter-action@v1
         with:
           channel: "stable"
+
       - name: Restore Packages
         run: flutter pub get
+
       - name: Analyze
         run: flutter analyze
+
+      - name: Activate Coverage
+        run: dart pub global activate coverage
+
+      # Project needs to have tests in test/ and a dependency on
+      # package:test for this step to succeed.
+      #
+      # Function coverage removed because it is bugged
       - name: Run Tests
-        run: flutter test --coverage
+        run: dart pub global run coverage:test_with_coverage --branch-coverage # --function-coverage
+
       - name: Upload Coverage to Codecov
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v3.1.0
 
   build_ios_without_signing:
     name: Build Flutter (iOS) Without Signing
