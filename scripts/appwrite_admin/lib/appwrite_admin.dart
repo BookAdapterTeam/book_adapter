@@ -6,7 +6,7 @@ import 'package:oxidized/oxidized.dart';
 Client client = Client()
     .setEndpoint(
         'https://api.bookadapter.com/v1') // Make sure your endpoint is accessible
-    .setProject('6246775298d4e3bab05a') // Your project ID
+    .setProject('bookAdapter') // Your project ID
     .setKey(Env.key);
 
 Users users = Users(client);
