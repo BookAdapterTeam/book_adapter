@@ -69,6 +69,8 @@ dev_dependencies:
   mockito: ^5.1.0
   dependency_validator: ^3.1.2
   test: any
+  integration_test:
+    sdk: flutter
 
 # Uncomment the flutter_icons section when adding an icon, then run
 # flutter pub run flutter_launcher_icons:main
