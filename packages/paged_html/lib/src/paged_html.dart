@@ -458,8 +458,8 @@ class _HtmlPageState extends State<_HtmlPage> {
 
 class _HtmlPageDelegate extends BoxyDelegate {
   _HtmlPageDelegate({
-    required final this.page,
-    required final this.requestRebuild,
+    required this.page,
+    required this.requestRebuild,
     required this.maxRebuilds,
     required this.currentRebuildCount,
     final HtmlPageAction? previousAction = const HtmlPageAction.addParagraph(),

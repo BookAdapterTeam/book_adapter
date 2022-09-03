@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io' as io;
-import 'dart:typed_data';
 
 import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:book_adapter/src/features/library/data/book_item.dart';
