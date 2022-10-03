@@ -1,3 +1,6 @@
+A warning: We currently plan to move away from Firebase sometime in the future. This means that older app versions will stop working when this happens.
+
+The EPUB library used is buggy, so some EPUB files will fail to open.
 
 # BookAdapter - ePub Reader & Library Management
 
