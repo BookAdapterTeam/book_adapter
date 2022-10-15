@@ -50,12 +50,12 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAYt6RM3K-jnxPwydpZ4FL4gzR6dLysaDU',
-    appId: '1:1038050596871:ios:2853941dc68cfc998772a2',
+    appId: '1:1038050596871:ios:505bc03ad6e7dba28772a2',
     messagingSenderId: '1038050596871',
     projectId: 'bookadapter',
     storageBucket: 'bookadapter.appspot.com',
     iosClientId:
-        '1038050596871-d6hnsqhmv99sgakk9uu65acrcnc7vpc3.apps.googleusercontent.com',
-    iosBundleId: 'com.bookadapterteam.bookadapter',
+        '1038050596871-tu74adaj7p25gecriet7tgjv7adu0ml9.apps.googleusercontent.com',
+    iosBundleId: 'com.bookAdapterTeam.bookAdapter',
   );
 }
