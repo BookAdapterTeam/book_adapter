@@ -139,8 +139,6 @@ linter:
 
     eol_at_end_of_file: true
 
-    implicit_call_tearoffs: true
-
     leading_newlines_in_multiline_strings: true
 
     missing_whitespace_between_adjacent_strings: true
