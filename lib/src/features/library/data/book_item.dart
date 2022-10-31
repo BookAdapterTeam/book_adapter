@@ -7,22 +7,7 @@ import '../../reader/book_reader_view.dart';
 import 'item.dart';
 
 /// A placeholder class that represents a book.
-class Book implements Item {
-  @override
-  final String id;
-  @override
-  final String userId;
-  @override
-  final String title;
-  @override
-  final String? subtitle;
-  @override
-  final String? imageUrl;
-  @override
-  final Set<String> collectionIds;
-  @override
-  final String? firebaseCoverImagePath;
-
+class Book extends Item {
   final DateTime addedDate;
   final String description;
   final String filepath;
@@ -45,23 +30,23 @@ class Book implements Item {
   String get filetype => filepath.split('.').last;
 
   const Book({
-    required this.id,
-    required this.userId,
-    required this.title,
+    required super.id,
+    required super.userId,
+    required super.title,
     required this.addedDate,
-    this.subtitle = '',
+    super.subtitle = '',
     this.description = '',
     required this.filepath,
     required this.filesize,
-    this.imageUrl,
-    this.firebaseCoverImagePath,
+    super.imageUrl,
+    super.firebaseCoverImagePath,
     this.genre = '',
     this.language = '',
     this.lastRead,
     this.publisher = '',
     this.readingProgress,
     this.wordCount,
-    required this.collectionIds,
+    required super.collectionIds,
     this.seriesId,
     this.lastReadCfiLocation,
     this.finished = false,

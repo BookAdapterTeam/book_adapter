@@ -13,11 +13,13 @@ EpubController useEpubController({
   String? epubCfi,
   FutureOr<void> Function(String? lastReadCfiLocation)? beforeDispose,
 }) =>
-    use(_EpubControllerHook(
-      document: document,
-      epubCfi: epubCfi,
-      beforeDispose: beforeDispose,
-    ));
+    use(
+      _EpubControllerHook(
+        document: document,
+        epubCfi: epubCfi,
+        beforeDispose: beforeDispose,
+      ),
+    );
 
 class _EpubControllerHook extends Hook<EpubController> {
   const _EpubControllerHook({
@@ -45,7 +47,7 @@ class _EpubControllerHookState extends HookState<EpubController, _EpubController
   }
 
   @override
-  void dispose() async {
+  Future<void> dispose() async {
     final lastCfi = _controller.generateEpubCfi();
     await hook.beforeDispose?.call(lastCfi);
     _controller.dispose();

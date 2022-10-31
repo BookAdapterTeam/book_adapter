@@ -430,10 +430,12 @@ class StorageService {
 
       _log.i('${filepath.split('/').last} Queued For Upload');
 
-      unawaited(boxAddToUploadQueue(
-        filepath,
-        fileHash: fileHash,
-      ));
+      unawaited(
+        boxAddToUploadQueue(
+          filepath,
+          fileHash: fileHash,
+        ),
+      );
     }
   }
 }

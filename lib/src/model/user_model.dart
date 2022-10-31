@@ -20,9 +20,7 @@ class UserModel extends StateNotifier<UserData> {
 
   /// Qeue a new book download
   void queueDownload(Book book) {
-    final downloadQueueNotifier = _read(queueBookProvider.notifier);
-    // Queue download
-    downloadQueueNotifier.addToQueue(book);
+    _read(queueBookProvider.notifier).addToQueue(book);
   }
 
   List<Book> get downloadQueue => _read(queueBookProvider).queueListItems;

@@ -18,11 +18,13 @@ import 'firebase_service_auth_mixin.dart';
 import 'firebase_service_storage_mixin.dart';
 
 /// Provider to easily get access to the [FirebaseService] functions
-final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) => FirebaseService(
-      firestore: FirebaseFirestore.instance,
-      auth: FirebaseAuth.instance,
-      storage: FirebaseStorage.instance,
-    ));
+final firebaseServiceProvider = Provider.autoDispose<FirebaseService>(
+  (ref) => FirebaseService(
+    firestore: FirebaseFirestore.instance,
+    auth: FirebaseAuth.instance,
+    storage: FirebaseStorage.instance,
+  ),
+);
 
 /// A utility class to handle all Firebase calls
 class FirebaseService with FirebaseServiceAuthMixin, FirebaseServiceStorageMixin {
@@ -146,8 +148,12 @@ class FirebaseService with FirebaseServiceAuthMixin, FirebaseServiceStorageMixin
       // ignore: prefer_const_constructors
       return Right(books);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books', e.code));
+      return Left(
+        FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books',
+          e.code,
+        ),
+      );
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Refresh Books'));
     }
@@ -316,12 +322,13 @@ class FirebaseService with FirebaseServiceAuthMixin, FirebaseServiceStorageMixin
       // Create a shelf with a custom id so
       // that it can easily be referenced later
       final series = Series(
-          id: _uuid.v4(),
-          userId: userId,
-          title: name,
-          description: description,
-          imageUrl: imageUrl,
-          collectionIds: collectionIds ?? {'$userId-Default'});
+        id: _uuid.v4(),
+        userId: userId,
+        title: name,
+        description: description,
+        imageUrl: imageUrl,
+        collectionIds: collectionIds ?? {'$userId-Default'},
+      );
       unawaited(_seriesRef.doc(series.id).set(series));
 
       // Return the shelf to the caller in case they care

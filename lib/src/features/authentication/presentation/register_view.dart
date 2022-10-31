@@ -18,54 +18,56 @@ class RegisterView extends ConsumerWidget {
     final data = ref.watch(registerViewController);
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Register Account'),
-        ),
-        body: SingleChildScrollView(
-          reverse: true,
-          child: Padding(
-              padding: const EdgeInsets.all(25.0),
-              child: Form(
-                autovalidateMode: AutovalidateMode.always,
-                key: _formKey,
-                child: AutofillGroup(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 1 / 9,
-                      ),
-                      // TODO: Add pfp image picker, upload to Firebase Storage
-
-                      // Enter username
-                      _UsernameTextField(data: data),
-                      const SizedBox(
-                        height: 8,
-                      ),
-
-                      // Enter email
-                      _EmailTextField(data: data),
-                      const SizedBox(
-                        height: 8,
-                      ),
-
-                      // Enter password
-                      _PasswordTextField(data: data),
-                      const SizedBox(
-                        height: 8,
-                      ),
-
-                      // Enter password again
-                      _VerifyPasswordTextField(data: data),
-
-                      // Submit
-                      _RegisterButton(data: data)
-                    ],
+      appBar: AppBar(
+        title: const Text('Register Account'),
+      ),
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Padding(
+          padding: const EdgeInsets.all(25.0),
+          child: Form(
+            autovalidateMode: AutovalidateMode.always,
+            key: _formKey,
+            child: AutofillGroup(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 1 / 9,
                   ),
-                ),
-              )),
-        ));
+                  // TODO: Add pfp image picker, upload to Firebase Storage
+
+                  // Enter username
+                  _UsernameTextField(data: data),
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  // Enter email
+                  _EmailTextField(data: data),
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  // Enter password
+                  _PasswordTextField(data: data),
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  // Enter password again
+                  _VerifyPasswordTextField(data: data),
+
+                  // Submit
+                  _RegisterButton(data: data)
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -94,9 +96,12 @@ class _RegisterButton extends ConsumerWidget {
           (failure) {
             log.e(failure.message);
             final snackBar = SnackBar(
-                content: Text(failure is FirebaseFailure
+              content: Text(
+                failure is FirebaseFailure
                     ? '${failure.code}: ${failure.message}'
-                    : failure.message));
+                    : failure.message,
+              ),
+            );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },
           (user) => Navigator.of(context).pop(),

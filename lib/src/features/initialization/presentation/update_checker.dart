@@ -37,6 +37,6 @@ class _UpdateCheckerState extends State<UpdateChecker> {
             onIgnore: widget.onIgnore,
             onClose: widget.onClose,
           ),
-          builder: (BuildContext context, AsyncSnapshot snapshot) => widget.child,
+          builder: (context, snapshot) => widget.child,
         );
 }

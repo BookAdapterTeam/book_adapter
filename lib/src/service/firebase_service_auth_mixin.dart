@@ -126,8 +126,12 @@ mixin FirebaseServiceAuthMixin {
       await auth.sendPasswordResetEmail(email: email);
       return const Right(null);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email', e.code));
+      return Left(
+        FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email',
+          e.code,
+        ),
+      );
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Send Reset Email'));
     }

@@ -329,10 +329,9 @@ class __CustomListTileWidgetState extends ConsumerState<_CustomListTileWidget> {
           return;
         }
 
-        if (widget.item is Book &&
-            ref.read(storageControllerProvider).fileExists((widget.item as Book).filename)) {
-          final controller = ref.read(currentBookProvider.state);
-          controller.state = widget.item as Book;
+        final item = widget.item;
+        if (item is Book && ref.read(storageControllerProvider).fileExists(item.filename)) {
+          ref.read(currentBookProvider.state).state = item;
           Navigator.restorablePushNamed(
             context,
             widget.item.routeTo,

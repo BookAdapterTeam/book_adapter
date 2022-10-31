@@ -90,7 +90,7 @@ class _ChooseCollectionsBottomSheetState extends ConsumerState<ChooseCollections
           for (final collection in collectionList ?? <AppCollection>[]) ...[
             CheckboxListTile(
               title: Text(collection.name),
-              onChanged: (bool? checked) {
+              onChanged: (checked) {
                 if (checked == null) return;
 
                 if (checked) {

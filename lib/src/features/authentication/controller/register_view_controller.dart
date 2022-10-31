@@ -7,7 +7,8 @@ import '../../../shared/data/failure.dart';
 import '../data/register_view_data.dart';
 
 final registerViewController = StateNotifierProvider<RegisterViewController, RegisterViewData>(
-    (ref) => RegisterViewController(ref.read));
+  (ref) => RegisterViewController(ref.read),
+);
 
 // State is if the view is loading
 class RegisterViewController extends StateNotifier<RegisterViewData> {
@@ -31,7 +32,7 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
     validateInput();
   }
 
-  // TODO: Implement choosing a profile image
+  // TODO(@getBoolean): Implement choosing a profile image
   // void chooseProfileImage() async {
   //   String url = '';
   //   state = state.copyWith(photoUrl: url);
@@ -81,6 +82,8 @@ class RegisterViewController extends StateNotifier<RegisterViewData> {
     }
 
     return res.fold(
-        Left.new, (user) => success ? Right(user) : Left(Failure('Set Display Name Failed')));
+      Left.new,
+      (user) => success ? Right(user) : Left(Failure('Set Display Name Failed')),
+    );
   }
 }

@@ -11,7 +11,7 @@ void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('end-to-end test', () {
-    testWidgets('find the loading text', (WidgetTester tester) async {
+    testWidgets('find the loading text', (tester) async {
       app.main();
       await tester.pump();
       expect(find.text('Loading...'), findsOneWidget);

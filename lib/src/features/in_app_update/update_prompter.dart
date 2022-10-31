@@ -108,7 +108,7 @@ class UpdatePrompter {
     await HttpUtils.downloadFile(
       updateData.androidDownloadUrl,
       _apkFile!.path,
-      onReceiveProgress: (int count, int total) {
+      onReceiveProgress: (count, total) {
         _progress = count.toDouble() / total;
         if (_progress <= 1.0001) {
           _dialog?.update(_progress);

@@ -52,22 +52,23 @@ class MergeIntoSeriesButton extends ConsumerWidget {
             ? null
             : () async {
                 final seriesName = await showDialog<String>(
-                    context: context,
-                    builder: (context) {
-                      // Could sort the list before using choosig the title.
-                      // Without soring, it will use the title of the first
-                      //   book selected.
-                      // final selectedItemsList = selectedItems.toList()
-                      //   ..sort((a, b) => a.title.compareTo(b.title));
-                      // final initialText = selectedItemsList.first.title;
-                      final initialText =
-                          ref.read(libraryViewControllerProvider).selectedItems.first.title;
-                      return AddNewSeriesDialog(
-                        initialText: initialText,
-                      );
-                    });
-                if (seriesName == null) return;
-                onMerge.call(seriesName);
+                  context: context,
+                  builder: (context) {
+                    // Could sort the list before using choosig the title.
+                    // Without soring, it will use the title of the first
+                    //   book selected.
+                    // final selectedItemsList = selectedItems.toList()
+                    //   ..sort((a, b) => a.title.compareTo(b.title));
+                    // final initialText = selectedItemsList.first.title;
+                    final initialText =
+                        ref.read(libraryViewControllerProvider).selectedItems.first.title;
+                    return AddNewSeriesDialog(
+                      initialText: initialText,
+                    );
+                  },
+                );
+
+                if (seriesName != null) onMerge.call(seriesName);
               },
         // onPressed: () => viewController.mergeIntoSeries(),
         icon: const Icon(Icons.merge_type),
@@ -122,7 +123,7 @@ class _LibraryScrollViewState extends ConsumerState<LibraryScrollView> {
       ),
       actions: [
         AddToCollectionButton(
-          onMove: (List<String> collectionIds) async {
+          onMove: (collectionIds) async {
             final failure = await ref
                 .read(libraryViewControllerProvider.notifier)
                 .moveItemsToCollections(collectionIds);
@@ -239,12 +240,14 @@ class _LibraryScrollViewState extends ConsumerState<LibraryScrollView> {
     }
 
     final sectionList = filteredCollections
-        .map((collection) => CollectionSection(
-              expanded: true,
-              items: data.getCollectionItems(collection.id),
-              header: collection.name,
-              collection: collection,
-            ))
+        .map(
+          (collection) => CollectionSection(
+            expanded: true,
+            items: data.getCollectionItems(collection.id),
+            header: collection.name,
+            collection: collection,
+          ),
+        )
         .toList();
 
     return SafeArea(

@@ -75,10 +75,10 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
               // Weird work around
               // See here for details: https://stackoverflow.com/questions/69568862/flutter-showdialog-is-not-shown-on-popupmenuitem-tap
               final shouldDelete = await Future<bool?>.delayed(
-                const Duration(),
+                Duration.zero,
                 () => showDialog<bool>(
                   context: context,
-                  builder: (BuildContext context) => AlertDialog(
+                  builder: (context) => AlertDialog(
                     title: const Text('Delete Permanently'),
                     content: const Text('Are you sure you want to delete all selected books '
                         'and series? This cannot be undone.'),

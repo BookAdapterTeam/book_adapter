@@ -12,6 +12,8 @@ import 'package:logger/logger.dart';
 import '../shared/data/file_hash.dart';
 
 class IsolateService {
+  static final log = Logger();
+
   /// Spawns an isolate and asynchronously sends List<T> for it to
   /// read and decode. Waits for the response containing the file hash
   /// before sending the next.
@@ -286,7 +288,6 @@ class IsolateService {
   /// The entrypoint that runs on the spawned isolate. Receives messages from
   /// the main isolate, reads the contents of the file, and returns it
   static Future<void> readAndHashFileService(SendPort p) async {
-    final log = Logger();
     log.i('Spawned isolate started.');
 
     // Send a SendPort to the main isolate so that it can send JSON strings to
@@ -307,11 +308,13 @@ class IsolateService {
         final sha1Hash = sha1.convert(bytesList).toString();
 
         // Send the result to the main isolate.
-        p.send(FileHash(
-          filepath: filepath,
-          md5: md5Hash,
-          sha1: sha1Hash,
-        ));
+        p.send(
+          FileHash(
+            filepath: filepath,
+            md5: md5Hash,
+            sha1: sha1Hash,
+          ),
+        );
       } else if (message == null) {
         // Exit if the main isolate sends a
         // null message, indicating there are
@@ -327,7 +330,6 @@ class IsolateService {
   /// The entrypoint that runs on the spawned isolate. Receives images from
   /// the main isolate, decodes the images, and returns it
   static Future<void> readAndDecodeImageService(SendPort p) async {
-    final log = Logger();
     log.i('Spawned isolate started.');
 
     // Send a SendPort to the main isolate so that it can send JSON strings to
@@ -371,7 +373,6 @@ class IsolateService {
   /// The entrypoint that runs on the spawned isolate. Receives an image from
   /// the main isolate, encodes the images, and returns the bytes
   static Future<void> readAndEncodeImageService(SendPort p) async {
-    final log = Logger();
     log.i('Spawned isolate started.');
 
     // Send a SendPort to the main isolate so that it can send JSON strings to

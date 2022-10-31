@@ -192,10 +192,11 @@ class StorageController {
         bytes = await io.File(cacheFilepath).readAsBytes();
       } on io.IOException catch (e, st) {
         log.i(
-            'Unable to upload file "$cachedFilename", '
-            'it may not exist',
-            e,
-            st);
+          'Unable to upload file "$cachedFilename", '
+          'it may not exist',
+          e,
+          st,
+        );
         yield 'Unable to upload file "$cachedFilename", '
             'it may not exist';
         unawaited(_read(storageServiceProvider).boxRemoveFromUploadQueue(cacheFilepath));
@@ -209,6 +210,7 @@ class StorageController {
       //
       //         In the app, a default image will be shown included in
       //         the assets if image url is null
+      // ignore: cascade_invocations
       log.i('Reading Cover: $cachedFilename');
       final coverData = await _read(epubServiceProvider).getCoverImage(bytes);
       log.i('Reading Cover Done: $cachedFilename');
@@ -264,9 +266,7 @@ class StorageController {
           log.i('Finished File Upload: '
               '$coverImageFirebaseFilename');
         } on Exception catch (e, st) {
-          log.i('Unable to upload file: '
-              '$coverImageFirebaseFilename');
-          log.w(e.toString(), e, st);
+          log.w('Unable to upload file: $coverImageFirebaseFilename : $e', e, st);
           coverImageFirebaseFilepath = null;
         }
 

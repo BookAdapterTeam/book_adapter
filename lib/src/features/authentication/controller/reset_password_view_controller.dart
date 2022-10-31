@@ -8,7 +8,8 @@ import '../../../shared/data/failure.dart';
 
 final resetPasswordViewController =
     StateNotifierProvider<ResetPasswordViewController, ResetPasswordViewData>(
-        (ref) => ResetPasswordViewController(ref.read));
+  (ref) => ResetPasswordViewController(ref.read),
+);
 
 // State is if the view is loading
 class ResetPasswordViewController extends StateNotifier<ResetPasswordViewData> {

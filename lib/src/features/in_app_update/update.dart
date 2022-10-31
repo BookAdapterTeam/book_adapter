@@ -34,9 +34,9 @@ class UpdateManager {
   static Future<void> checkUpdate({
     required BuildContext context,
     required String url,
-    final VoidCallback? onIgnore,
-    final VoidCallback? onClose,
-    final VoidCallback? onNoUpdate,
+    VoidCallback? onIgnore,
+    VoidCallback? onClose,
+    VoidCallback? onNoUpdate,
   }) async {
     try {
       final response = await HttpUtils.get<Map<String, dynamic>>(url);
@@ -51,7 +51,7 @@ class UpdateManager {
         onIgnore: onIgnore,
         onClose: onClose,
         onNoUpdate: onNoUpdate,
-        onInstall: (String filePath) async {
+        onInstall: (filePath) async {
           await CommonUtils.installAPP(
             filePath: filePath,
             githubReleaseUrl: data.githubReleaseUrl,

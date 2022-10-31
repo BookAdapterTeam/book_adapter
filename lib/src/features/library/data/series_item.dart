@@ -3,32 +3,18 @@ import 'dart:convert';
 import '../presentation/series_view.dart';
 import 'item.dart';
 
-class Series implements Item {
-  @override
-  final String id;
-  @override
-  final String userId;
-  @override
-  final String title;
-  @override
-  final String? subtitle;
-  @override
-  final String? imageUrl;
-  @override
-  final Set<String> collectionIds;
-  @override
-  final String? firebaseCoverImagePath;
-
+class Series extends Item {
   final String description;
+
   const Series({
-    required this.id,
-    required this.userId,
-    required this.title,
-    this.subtitle,
-    this.imageUrl,
-    this.firebaseCoverImagePath,
+    required super.id,
+    required super.userId,
+    required super.title,
+    super.subtitle,
+    super.imageUrl,
+    super.firebaseCoverImagePath,
     this.description = '',
-    required this.collectionIds,
+    required super.collectionIds,
   });
 
   @override

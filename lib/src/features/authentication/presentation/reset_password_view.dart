@@ -127,9 +127,11 @@ class _SendResetEmailButton extends StatelessWidget {
           (failure) {
             log.e(failure.message);
             final snackBar = SnackBar(
-              content: Text(failure is FirebaseFailure
-                  ? '${failure.code}: ${failure.message}'
-                  : failure.message),
+              content: Text(
+                failure is FirebaseFailure
+                    ? '${failure.code}: ${failure.message}'
+                    : failure.message,
+              ),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
           },

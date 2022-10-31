@@ -23,7 +23,7 @@ class LogOutButton extends ConsumerWidget {
           // Log out the user
           showDialog(
             context: context,
-            builder: (BuildContext context) => AlertDialog(
+            builder: (context) => AlertDialog(
               title: const Text('Are you sure you want to sign out?'),
               content: const Text(
                 'Downloaded books will remain on your device.',

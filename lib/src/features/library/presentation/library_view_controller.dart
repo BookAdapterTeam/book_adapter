@@ -17,8 +17,10 @@ import '../data/item.dart';
 import '../data/series_item.dart';
 import '../model/book_status_notifier.dart';
 
-final fileUrlProvider = FutureProvider.family<String, String>((ref, firebasePath) async =>
-    ref.read(libraryViewControllerProvider.notifier).getFileDownloadUrl(firebasePath));
+final fileUrlProvider = FutureProvider.family<String, String>(
+  (ref, firebasePath) =>
+      ref.read(libraryViewControllerProvider.notifier).getFileDownloadUrl(firebasePath),
+);
 
 final libraryViewControllerProvider =
     StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>((ref) {
@@ -29,7 +31,7 @@ final libraryViewControllerProvider =
   final queueData = ref.watch(queueBookProvider);
 
   final data = LibraryViewData(
-    books: books.asData?.value,
+    books: books.asData?.value ?? [],
     collections: collections.asData?.value,
     series: series.asData?.value,
     userData: userData,
@@ -62,8 +64,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   void deselectItem(Item item) {
-    final selectedItems = {...state.selectedItems};
-    selectedItems.remove(item);
+    final selectedItems = {...state.selectedItems}..remove(item);
     state = state.copyWith(selectedItems: selectedItems);
   }
 
@@ -179,7 +180,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       // Remove books
       await _read(storageControllerProvider).deleteItemsPermanently(
         itemsToDelete: selectedItems.toList(),
-        allBooks: state.books ?? [],
+        allBooks: state.books,
       );
 
       return null;
@@ -274,7 +275,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 }
 
 class LibraryViewData {
-  final List<Book>? books;
+  final List<Book> books;
   final List<String>? downloadingBooks;
   final List<AppCollection>? collections;
   final List<Series>? series;
@@ -302,7 +303,7 @@ class LibraryViewData {
   int get numberSelected => selectedItems.length;
 
   LibraryViewData({
-    this.books,
+    this.books = const [],
     this.downloadingBooks,
     this.collections,
     this.selectedItems = const <Item>{},
@@ -329,9 +330,8 @@ class LibraryViewData {
       );
 
   List<Item> getCollectionItems(String collectionId) {
-    final items = books?.where((book) => book.collectionIds.contains(collectionId)).toList() ?? [];
-    // Remove books with a seriesId
-    items.removeWhere((item) => item.hasSeries);
+    final items = books.where((book) => book.collectionIds.contains(collectionId)).toList()
+      ..removeWhere((item) => item.hasSeries);
 
     // Add series objects to items if it is in this collection
     final seriesList = series;
@@ -339,16 +339,14 @@ class LibraryViewData {
     if (seriesList != null) {
       seriesInCollection = seriesList.where((s) => s.collectionIds.contains(collectionId)).toList();
     }
-    final allBooks = <Item>[...items, ...seriesInCollection];
-
-    allBooks.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    final allBooks = <Item>[...items, ...seriesInCollection]
+      ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return allBooks;
   }
 
   List<Book> getSeriesItems(String seriesId) {
-    final items = books?.where((book) => book.seriesId == seriesId).toList() ?? [];
-
-    items.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    final items = books.where((book) => book.seriesId == seriesId).toList()
+      ..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return items;
   }
 
@@ -359,7 +357,7 @@ class LibraryViewData {
       if (item is Book) {
         books.add(item);
       } else if (item is Series) {
-        final seriesBooks = this.books?.where((book) => book.seriesId == item.id).toList() ?? [];
+        final seriesBooks = this.books.where((book) => book.seriesId == item.id).toList();
         books.addAll(seriesBooks);
       }
     }

@@ -22,47 +22,48 @@ class EditProfileView extends HookConsumerWidget {
     final usernameController = useTextEditingController();
 
     return Scaffold(
-        appBar: AppBar(title: const Text('Edit Profile')),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(25.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
+      appBar: AppBar(title: const Text('Edit Profile')),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(25.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const SizedBox(height: 24),
+              // TODO: Will never show since there is no way to set the photo
+              if (user != null && user.photoURL != null) ...[
+                ProfileWidget(photoUrl: user.photoURL!, onPressed: () async {}),
                 const SizedBox(height: 24),
-                // TODO: Will never show since there is no way to set the photo
-                if (user != null && user.photoURL != null) ...[
-                  ProfileWidget(photoUrl: user.photoURL!, onPressed: () async {}),
-                  const SizedBox(height: 24),
-                ],
-                TextField(
-                  restorationId: 'change_username',
-                  controller: usernameController,
-                  autofocus: true,
-                  autofillHints: const [AutofillHints.name],
-                  decoration: const InputDecoration(
-                      border: UnderlineInputBorder(), labelText: 'Change Username'),
-                  onChanged: (usernameValue) {
-                    ref
-                        .read(editProfileViewController.notifier)
-                        .updateData(username: usernameValue);
-                  },
-                ),
-                const SizedBox(height: 24),
-
-                // TODO: Add change email. Will need to ask for current password
-                // TextFieldWidget(
-                //   label: 'Email',
-                //   text: user.email ?? 'Signed in anonymously',
-                //   onChanged: (email) {
-                //   },
-                // ),
-                const _SubmitButton()
               ],
-            ),
+              TextField(
+                restorationId: 'change_username',
+                controller: usernameController,
+                autofocus: true,
+                autofillHints: const [AutofillHints.name],
+                decoration: const InputDecoration(
+                  border: UnderlineInputBorder(),
+                  labelText: 'Change Username',
+                ),
+                onChanged: (usernameValue) {
+                  ref.read(editProfileViewController.notifier).updateData(username: usernameValue);
+                },
+              ),
+              const SizedBox(height: 24),
+
+              // TODO: Add change email. Will need to ask for current password
+              // TextFieldWidget(
+              //   label: 'Email',
+              //   text: user.email ?? 'Signed in anonymously',
+              //   onChanged: (email) {
+              //   },
+              // ),
+              const _SubmitButton()
+            ],
           ),
-        ));
+        ),
+      ),
+    );
   }
 }
 

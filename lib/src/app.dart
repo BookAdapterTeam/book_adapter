@@ -51,9 +51,9 @@ class _MyAppState extends ConsumerState<MyApp> {
           // Define a function to handle named routes in order to support
           // Flutter web url navigation and deep linking.
           // home: I18n(child: const LibraryView()),
-          onGenerateRoute: (RouteSettings routeSettings) => MaterialPageRoute<void>(
+          onGenerateRoute: (routeSettings) => MaterialPageRoute<void>(
             settings: routeSettings,
-            builder: (BuildContext context) {
+            builder: (context) {
               final Widget page;
               switch (routeSettings.name) {
                 case ProfileView.routeName:

@@ -341,15 +341,19 @@ class FirebaseController {
     try {
       for (final item in items) {
         if (item is Book) {
-          unawaited(_firebaseService.updateBookCollections(
-            bookId: item.id,
-            collectionIds: collectionIds,
-          ));
+          unawaited(
+            _firebaseService.updateBookCollections(
+              bookId: item.id,
+              collectionIds: collectionIds,
+            ),
+          );
         } else if (item is Series) {
-          unawaited(_firebaseService.updateSeriesCollections(
-            seriesId: item.id,
-            collectionIds: collectionIds,
-          ));
+          unawaited(
+            _firebaseService.updateSeriesCollections(
+              seriesId: item.id,
+              collectionIds: collectionIds,
+            ),
+          );
         }
       }
     } on FirebaseException catch (e) {
@@ -382,17 +386,19 @@ class FirebaseController {
         collectionIds: collectionIds,
       );
 
-      unawaited(newSeriesFuture.then((newSeries) {
-        addBooksToSeries(
-          books: selectedBooks,
-          series: newSeries,
-          collectionIds: collectionIds,
-        );
+      unawaited(
+        newSeriesFuture.then((newSeries) {
+          addBooksToSeries(
+            books: selectedBooks,
+            series: newSeries,
+            collectionIds: collectionIds,
+          );
 
-        for (final series in selectedSeries) {
-          unawaited(_firebaseService.deleteSeriesDocument(series.id));
-        }
-      }));
+          for (final series in selectedSeries) {
+            unawaited(_firebaseService.deleteSeriesDocument(series.id));
+          }
+        }),
+      );
 
       return newSeriesFuture;
     } on FirebaseException catch (e) {
@@ -415,11 +421,13 @@ class FirebaseController {
   }) async {
     try {
       for (final book in books) {
-        unawaited(_firebaseService.addBookToSeries(
-          bookId: book.id,
-          seriesId: series.id,
-          collectionIds: collectionIds,
-        ));
+        unawaited(
+          _firebaseService.addBookToSeries(
+            bookId: book.id,
+            seriesId: series.id,
+            collectionIds: collectionIds,
+          ),
+        );
       }
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
@@ -466,15 +474,16 @@ class FirebaseController {
     required Book book,
     required Series series,
   }) async {
-    final collectionIds = series.collectionIds;
-    collectionIds.addAll(book.collectionIds);
+    final collectionIds = series.collectionIds..addAll(book.collectionIds);
 
     try {
-      unawaited(_firebaseService.addBookToSeries(
-        bookId: book.id,
-        seriesId: series.id,
-        collectionIds: collectionIds,
-      ));
+      unawaited(
+        _firebaseService.addBookToSeries(
+          bookId: book.id,
+          seriesId: series.id,
+          collectionIds: collectionIds,
+        ),
+      );
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);
     } on Exception catch (e) {
@@ -587,10 +596,12 @@ class FirebaseController {
       unawaited(_firebaseService.deleteSeriesDocument(series.id));
       for (final book in books) {
         unawaited(_firebaseService.updateBookSeries(book.id, null));
-        unawaited(_firebaseService.updateBookCollections(
-          bookId: book.id,
-          collectionIds: series.collectionIds.toList(),
-        ));
+        unawaited(
+          _firebaseService.updateBookCollections(
+            bookId: book.id,
+            collectionIds: series.collectionIds.toList(),
+          ),
+        );
       }
     } on FirebaseException catch (e) {
       throw AppException(e.message ?? e.toString(), e.code);

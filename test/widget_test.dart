@@ -28,7 +28,7 @@ final fakeUserChangesProvider =
 // Run the following command
 // - `flutter test`
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
+  testWidgets('Counter increments smoke test', (tester) async {
     // Build our app and trigger a frame.
     // Use the mock firebase service
     final mockUser = MockUser(
@@ -71,28 +71,34 @@ void main() {
       storage: MockFirebaseStorage(),
     );
 
-    await tester.pumpWidget(ProviderScope(
-      overrides: [
-        firebaseServiceProvider.overrideWithValue(firebaseService),
-        providerForInitStream.overrideWithValue(const AsyncData(null)),
-        authStateChangesProvider
-            .overrideWithProvider(fakeUserChangesProvider(mockUser)),
-        userChangesProvider
-            .overrideWithProvider(fakeUserChangesProvider(mockUser)),
-      ],
-      child: const MyApp(),
-    ));
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          firebaseServiceProvider.overrideWithValue(firebaseService),
+          providerForInitStream.overrideWithValue(const AsyncData(null)),
+          authStateChangesProvider.overrideWithProvider(fakeUserChangesProvider(mockUser)),
+          userChangesProvider.overrideWithProvider(fakeUserChangesProvider(mockUser)),
+        ],
+        child: const MyApp(),
+      ),
+    );
 
     // The first frame is a loading state.
-    expect(find.byType(CircularProgressIndicator), findsOneWidget,
-        reason: 'loading');
+    expect(
+      find.byType(CircularProgressIndicator),
+      findsOneWidget,
+      reason: 'loading',
+    );
 
     // Re-render.
     await tester.pumpAndSettle(const Duration(seconds: 3));
 
     // No-longer loading
-    expect(find.byType(CircularProgressIndicator), findsNothing,
-        reason: 'not loading');
+    expect(
+      find.byType(CircularProgressIndicator),
+      findsNothing,
+      reason: 'not loading',
+    );
     expect(find.byType(LibraryView), findsOneWidget, reason: 'not loading');
 
     // Rendered three ListTiles with the data returned by MockFirebaseService

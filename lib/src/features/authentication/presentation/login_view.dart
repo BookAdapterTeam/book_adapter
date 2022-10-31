@@ -17,50 +17,52 @@ class LoginView extends ConsumerWidget {
     final data = ref.watch(loginViewController);
 
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('BookAdapter'),
-        ),
-        body: SingleChildScrollView(
-          reverse: true,
-          child: Padding(
-              padding: const EdgeInsets.all(35.0),
-              child: Form(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                key: _formKey,
-                child: AutofillGroup(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: <Widget>[
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height * 1 / 9,
-                      ),
-                      // Page title
-                      const _LoginTitleText(),
-                      const SizedBox(
-                        height: 60,
-                      ),
-
-                      // Enter email
-                      _EmailTextField(data: data),
-                      const SizedBox(
-                        height: 8,
-                      ),
-
-                      // Enter password
-                      _PasswordTextField(data: data),
-                      const SizedBox(
-                        height: 4,
-                      ),
-
-                      const _LoginButton(),
-                      const _SignupButton(),
-                      const _ResetPasswordButton(),
-                    ],
+      appBar: AppBar(
+        title: const Text('BookAdapter'),
+      ),
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Padding(
+          padding: const EdgeInsets.all(35.0),
+          child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            key: _formKey,
+            child: AutofillGroup(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: <Widget>[
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 1 / 9,
                   ),
-                ),
-              )),
-        ));
+                  // Page title
+                  const _LoginTitleText(),
+                  const SizedBox(
+                    height: 60,
+                  ),
+
+                  // Enter email
+                  _EmailTextField(data: data),
+                  const SizedBox(
+                    height: 8,
+                  ),
+
+                  // Enter password
+                  _PasswordTextField(data: data),
+                  const SizedBox(
+                    height: 4,
+                  ),
+
+                  const _LoginButton(),
+                  const _SignupButton(),
+                  const _ResetPasswordButton(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
@@ -131,24 +133,28 @@ class _LoginButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
     return ElevatedButton(
-        child: const Text(
-          'Login',
-          style: TextStyle(fontSize: 20.0),
-        ),
-        onPressed: () async {
-          final res = await ref.read(loginViewController.notifier).login();
-          res.fold(
-            (failure) {
-              log.e(failure.message);
-              final snackBar = SnackBar(
-                  content: Text(failure is FirebaseFailure
-                      ? '${failure.code}: ${failure.message}'
-                      : failure.message));
-              ScaffoldMessenger.of(context).showSnackBar(snackBar);
-            },
-            (user) => null,
-          );
-        });
+      child: const Text(
+        'Login',
+        style: TextStyle(fontSize: 20.0),
+      ),
+      onPressed: () async {
+        final res = await ref.read(loginViewController.notifier).login();
+        res.fold(
+          (failure) {
+            log.e(failure.message);
+            final snackBar = SnackBar(
+              content: Text(
+                failure is FirebaseFailure
+                    ? '${failure.code}: ${failure.message}'
+                    : failure.message,
+              ),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          },
+          (user) => null,
+        );
+      },
+    );
   }
 }
 
@@ -159,13 +165,14 @@ class _ResetPasswordButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TextButton(
-      child: const Text('Reset Password', style: TextStyle(fontSize: 12.0)),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const ResetPasswordView()),
-        );
-      });
+        child: const Text('Reset Password', style: TextStyle(fontSize: 12.0)),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ResetPasswordView()),
+          );
+        },
+      );
 }
 
 class _SignupButton extends StatelessWidget {
@@ -175,8 +182,9 @@ class _SignupButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ElevatedButton(
-      child: const Text('Signup', style: TextStyle(fontSize: 20.0)),
-      onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterView()));
-      });
+        child: const Text('Signup', style: TextStyle(fontSize: 20.0)),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterView()));
+        },
+      );
 }

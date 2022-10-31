@@ -28,8 +28,8 @@ class SeriesView extends HookConsumerWidget {
     final series = Series.fromMapFirebase(bookMap);
     final data = ref.watch(libraryViewControllerProvider);
 
-    final books = data.books?.where((book) => series.id == book.seriesId).toList();
-    books?.sort((a, b) => a.title.compareTo(b.title));
+    final books = data.books.where((book) => series.id == book.seriesId).toList()
+      ..sort((a, b) => a.title.compareTo(b.title));
 
     final imageUrl = series.imageUrl;
 
@@ -44,7 +44,7 @@ class SeriesView extends HookConsumerWidget {
         slivers: [
           _SliverBackgroundAppBar(imageUrl: imageUrl, series: series),
           SliverImplicitlyAnimatedList<Book>(
-            items: books ?? [],
+            items: books,
             itemBuilder: (
               context,
               animation,

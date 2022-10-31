@@ -40,8 +40,12 @@ class MockFirebaseService implements FirebaseService {
       // ignore: prefer_const_constructors
       return Right(books);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books', e.code));
+      return Left(
+        FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books',
+          e.code,
+        ),
+      );
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Refresh Books'));
     }
@@ -99,8 +103,12 @@ class MockFirebaseService implements FirebaseService {
       await auth.sendPasswordResetEmail(email: email);
       return const Right(null);
     } on FirebaseException catch (e) {
-      return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email', e.code));
+      return Left(
+        FirebaseFailure(
+          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email',
+          e.code,
+        ),
+      );
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Send Reset Email'));
     }

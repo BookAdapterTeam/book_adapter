@@ -26,27 +26,36 @@ class HttpUtils {
     Map<String, dynamic>? headers,
   }) {
     HttpUtils.downloadTimeout = downloadTimeout;
-    sDio = Dio(BaseOptions(
+    sDio = Dio(
+      BaseOptions(
         baseUrl: baseUrl,
         connectTimeout: updateCheckTimeout,
         sendTimeout: updateCheckTimeout,
         receiveTimeout: updateCheckTimeout,
-        headers: headers));
+        headers: headers,
+      ),
+    );
     // Add interceptor - 添加拦截器
-    sDio.interceptors.add(InterceptorsWrapper(onRequest: (
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-    ) {
-      _log.i('Before handling request');
-      handler.next(options);
-    }, onResponse: (Response response, handler) {
-      _log.i('Before handling response');
-      handler.next(response);
-    }, onError: (DioError e, handler) {
-      _log.i('Before handling error');
-      handleError(e);
-      handler.next(e);
-    }));
+    sDio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (
+          options,
+          handler,
+        ) {
+          _log.i('Before handling request');
+          handler.next(options);
+        },
+        onResponse: (response, handler) {
+          _log.i('Before handling response');
+          handler.next(response);
+        },
+        onError: (e, handler) {
+          _log.i('Before handling error');
+          handleError(e);
+          handler.next(e);
+        },
+      ),
+    );
   }
 
   /// Error processing

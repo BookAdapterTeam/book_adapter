@@ -68,91 +68,92 @@ class _SectionWidgetState extends State<SectionWidget> with SingleTickerProvider
   Widget _buildHeader(BuildContext context) {
     if (widget.hideHeader) return Container();
     return Consumer(
-        builder: (_, ref, __) => Container(
-              color: Colors.blueGrey[700],
-              child: ListTile(
-                title: Text(
-                  widget.section.header,
-                ),
-                leading: RotationTransition(
-                  turns: _iconTurns as Animation<double>,
-                  child: const Icon(
-                    Icons.expand_more,
-                    color: Colors.white70,
-                  ),
-                ),
-                minLeadingWidth: 0,
-                // Add pop up menu with option for removing the collection
-                trailing: widget.section.header == 'Default'
-                    ? null
-                    : PopupMenuButton(
-                        offset: const Offset(0, kToolbarHeight),
-                        icon: const Icon(Icons.more_vert),
-                        itemBuilder: (context) => <PopupMenuEntry>[
-                          PopupMenuItem(
-                            onTap: () async {
-                              final shouldDelete = await Future<bool?>.delayed(
-                                const Duration(),
-                                () => showDialog<bool>(
-                                  context: context,
-                                  builder: (BuildContext context) => AlertDialog(
-                                    title: const Text('Remove Collection'),
-                                    content: const Text('Are you sure you want to remove this '
-                                        'collection? Items inside the collection '
-                                        'will not be deleted.'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop(false);
-                                        },
-                                        child: const Text('CANCEL'),
-                                      ),
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context).pop(true),
-                                        child: Text(
-                                          'REMOVE',
-                                          style: DefaultTextStyle.of(context).style.copyWith(
-                                                fontWeight: FontWeight.w500,
-                                                color: Colors.redAccent,
-                                              ),
+      builder: (_, ref, __) => Container(
+        color: Colors.blueGrey[700],
+        child: ListTile(
+          title: Text(
+            widget.section.header,
+          ),
+          leading: RotationTransition(
+            turns: _iconTurns as Animation<double>,
+            child: const Icon(
+              Icons.expand_more,
+              color: Colors.white70,
+            ),
+          ),
+          minLeadingWidth: 0,
+          // Add pop up menu with option for removing the collection
+          trailing: widget.section.header == 'Default'
+              ? null
+              : PopupMenuButton(
+                  offset: const Offset(0, kToolbarHeight),
+                  icon: const Icon(Icons.more_vert),
+                  itemBuilder: (context) => <PopupMenuEntry>[
+                    PopupMenuItem(
+                      onTap: () async {
+                        final shouldDelete = await Future<bool?>.delayed(
+                          Duration.zero,
+                          () => showDialog<bool>(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('Remove Collection'),
+                              content: const Text('Are you sure you want to remove this '
+                                  'collection? Items inside the collection '
+                                  'will not be deleted.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop(false);
+                                  },
+                                  child: const Text('CANCEL'),
+                                ),
+                                TextButton(
+                                  onPressed: () => Navigator.of(context).pop(true),
+                                  child: Text(
+                                    'REMOVE',
+                                    style: DefaultTextStyle.of(context).style.copyWith(
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.redAccent,
                                         ),
-                                      ),
-                                    ],
                                   ),
                                 ),
-                              );
-                              if (shouldDelete == null || !shouldDelete) return;
-                              final collection = widget.section.collection;
-                              final failure = await ref
-                                  .read(libraryViewControllerProvider.notifier)
-                                  .removeBookCollection(collection);
-
-                              if (failure == null) return;
-
-                              ToastUtils.error(failure.message);
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(Icons.delete),
-                                SizedBox(
-                                  width: 8,
-                                ),
-                                Text('Remove Collection'),
                               ],
                             ),
                           ),
-                        ],
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(kCornerRadius),
+                        );
+                        if (shouldDelete == null || !shouldDelete) return;
+                        final collection = widget.section.collection;
+                        final failure = await ref
+                            .read(libraryViewControllerProvider.notifier)
+                            .removeBookCollection(collection);
+
+                        if (failure == null) return;
+
+                        ToastUtils.error(failure.message);
+                      },
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.delete),
+                          SizedBox(
+                            width: 8,
                           ),
-                        ),
+                          Text('Remove Collection'),
+                        ],
                       ),
-                onTap: _onTap,
-              ),
-            ));
+                    ),
+                  ],
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(kCornerRadius),
+                    ),
+                  ),
+                ),
+          onTap: _onTap,
+        ),
+      ),
+    );
   }
 
   void _onTap() {

@@ -8,7 +8,8 @@ import '../../../shared/controller/firebase_controller.dart';
 import '../../../shared/data/failure.dart';
 
 final loginViewController = StateNotifierProvider<LoginViewController, LoginViewData>(
-    (ref) => LoginViewController(ref.read));
+  (ref) => LoginViewController(ref.read),
+);
 
 // State is if the view is loading
 class LoginViewController extends StateNotifier<LoginViewData> {

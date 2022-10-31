@@ -16,7 +16,7 @@ class DeleteButton extends ConsumerWidget {
         onPressed: () async {
           final shouldDelete = await showDialog<bool>(
             context: context,
-            builder: (BuildContext context) => AlertDialog(
+            builder: (context) => AlertDialog(
               title: const Text('Remove Downloads'),
               content: const Text(
                 'Are you sure you remove the downloads of all selected books?',
