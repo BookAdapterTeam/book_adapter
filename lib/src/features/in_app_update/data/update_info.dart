@@ -88,49 +88,43 @@ class UpdateInfo {
     required this.apkSize,
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'Code': code,
-      'Msg': msg,
-      'UpdateStatus': updateStatus,
-      'VersionCode': versionCode,
-      'VersionName': versionName,
-      'UploadTime': uploadTime,
-      'ModifyContent': modifyContent,
-      'DownloadUrl': androidDownloadUrl,
-      'GithubReleaseUrl': githubReleaseUrl,
-      'ApkMd5': apkMd5,
-      'ApkSize': apkSize,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'Code': code,
+        'Msg': msg,
+        'UpdateStatus': updateStatus,
+        'VersionCode': versionCode,
+        'VersionName': versionName,
+        'UploadTime': uploadTime,
+        'ModifyContent': modifyContent,
+        'DownloadUrl': androidDownloadUrl,
+        'GithubReleaseUrl': githubReleaseUrl,
+        'ApkMd5': apkMd5,
+        'ApkSize': apkSize,
+      };
 
-  static UpdateInfo fromMap(Map<String, dynamic> map) {
-    return UpdateInfo(
-      code: map['Code']?.toInt(),
-      msg: map['Msg'],
-      updateStatus: map['UpdateStatus']?.toInt(),
-      versionCode: map['VersionCode']?.toInt(),
-      versionName: map['VersionName'],
-      uploadTime: map['UploadTime'],
-      modifyContent: map['ModifyContent'],
-      androidDownloadUrl: map['DownloadUrl'],
-      githubReleaseUrl: map['GithubReleaseUrl'],
-      apkMd5: map['ApkMd5'],
-      apkSize: map['ApkSize']?.toInt(),
-    );
-  }
+  factory UpdateInfo.fromMap(Map<String, dynamic> map) => UpdateInfo(
+        code: map['Code']?.toInt(),
+        msg: map['Msg'],
+        updateStatus: map['UpdateStatus']?.toInt(),
+        versionCode: map['VersionCode']?.toInt(),
+        versionName: map['VersionName'],
+        uploadTime: map['UploadTime'],
+        modifyContent: map['ModifyContent'],
+        androidDownloadUrl: map['DownloadUrl'],
+        githubReleaseUrl: map['GithubReleaseUrl'],
+        apkMd5: map['ApkMd5'],
+        apkSize: map['ApkSize']?.toInt(),
+      );
 
   String toJson() => json.encode(toMap());
 
-  static UpdateInfo fromJson(String source) => fromMap(json.decode(source));
+  factory UpdateInfo.fromJson(String source) => UpdateInfo.fromMap(json.decode(source));
 
   @override
-  String toString() {
-    return 'UpdateInfo(Code: $code, Msg: $msg, UpdateStatus: $updateStatus, '
-        'VersionCode: $versionCode, VersionName: $versionName, '
-        'UploadTime: $uploadTime, ModifyContent: $modifyContent, '
-        'DownloadUrl: $androidDownloadUrl, '
-        'GithubReleaseUrl: $githubReleaseUrl, '
-        'ApkMd5: $apkMd5, ApkSize: $apkSize)';
-  }
+  String toString() => 'UpdateInfo(Code: $code, Msg: $msg, UpdateStatus: $updateStatus, '
+      'VersionCode: $versionCode, VersionName: $versionName, '
+      'UploadTime: $uploadTime, ModifyContent: $modifyContent, '
+      'DownloadUrl: $androidDownloadUrl, '
+      'GithubReleaseUrl: $githubReleaseUrl, '
+      'ApkMd5: $apkMd5, ApkSize: $apkSize)';
 }

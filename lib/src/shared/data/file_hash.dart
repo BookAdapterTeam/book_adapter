@@ -35,37 +35,31 @@ class FileHash extends Equatable {
     String? collectionName,
     String? md5,
     String? sha1,
-  }) {
-    return FileHash(
-      filepath: filepath ?? this.filepath,
-      collectionName: collectionName ?? this.collectionName,
-      md5: md5 ?? this.md5,
-      sha1: sha1 ?? this.sha1,
-    );
-  }
+  }) =>
+      FileHash(
+        filepath: filepath ?? this.filepath,
+        collectionName: collectionName ?? this.collectionName,
+        md5: md5 ?? this.md5,
+        sha1: sha1 ?? this.sha1,
+      );
 
-  Map<String, dynamic> toMap() {
-    return {
-      'filepath': filepath,
-      'collectionName': collectionName,
-      'md5': md5,
-      'sha1': sha1,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'filepath': filepath,
+        'collectionName': collectionName,
+        'md5': md5,
+        'sha1': sha1,
+      };
 
-  factory FileHash.fromMap(Map<String, dynamic> map) {
-    return FileHash(
-      filepath: map['filepath'] ?? '',
-      collectionName: map['collectionName'] ?? '',
-      md5: map['md5'] ?? '',
-      sha1: map['sha1'] ?? '',
-    );
-  }
+  factory FileHash.fromMap(Map<String, dynamic> map) => FileHash(
+        filepath: map['filepath'] ?? '',
+        collectionName: map['collectionName'] ?? '',
+        md5: map['md5'] ?? '',
+        sha1: map['sha1'] ?? '',
+      );
 
   String toJson() => json.encode(toMap());
 
-  factory FileHash.fromJson(String source) =>
-      FileHash.fromMap(json.decode(source));
+  factory FileHash.fromJson(String source) => FileHash.fromMap(json.decode(source));
 
   @override
   String toString() => 'FileHash('

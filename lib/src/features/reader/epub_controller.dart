@@ -12,13 +12,12 @@ EpubController useEpubController({
   required Future<EpubBook> document,
   String? epubCfi,
   FutureOr<void> Function(String? lastReadCfiLocation)? beforeDispose,
-}) {
-  return use(_EpubControllerHook(
-    document: document,
-    epubCfi: epubCfi,
-    beforeDispose: beforeDispose,
-  ));
-}
+}) =>
+    use(_EpubControllerHook(
+      document: document,
+      epubCfi: epubCfi,
+      beforeDispose: beforeDispose,
+    ));
 
 class _EpubControllerHook extends Hook<EpubController> {
   const _EpubControllerHook({
@@ -34,16 +33,14 @@ class _EpubControllerHook extends Hook<EpubController> {
   _EpubControllerHookState createState() => _EpubControllerHookState();
 }
 
-class _EpubControllerHookState
-    extends HookState<EpubController, _EpubControllerHook> {
+class _EpubControllerHookState extends HookState<EpubController, _EpubControllerHook> {
   late final EpubController _controller;
 
   void rebuild() => setState(() {});
 
   @override
   void initHook() {
-    _controller =
-        EpubController(document: hook.document, epubCfi: hook.epubCfi);
+    _controller = EpubController(document: hook.document, epubCfi: hook.epubCfi);
     super.initHook();
   }
 

@@ -17,34 +17,28 @@ class AppCollection extends Equatable {
     String? id,
     String? userId,
     String? name,
-  }) {
-    return AppCollection(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      name: name ?? this.name,
-    );
-  }
+  }) =>
+      AppCollection(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        name: name ?? this.name,
+      );
 
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'userId': userId,
-      'name': name,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'userId': userId,
+        'name': name,
+      };
 
   String toJson() => json.encode(toMap());
 
-  factory AppCollection.fromMap(Map<String, dynamic> map) {
-    return AppCollection(
-      id: map['id'],
-      userId: map['userId'],
-      name: map['name'],
-    );
-  }
+  factory AppCollection.fromMap(Map<String, dynamic> map) => AppCollection(
+        id: map['id'],
+        userId: map['userId'],
+        name: map['name'],
+      );
 
-  factory AppCollection.fromJson(String source) =>
-      AppCollection.fromMap(json.decode(source));
+  factory AppCollection.fromJson(String source) => AppCollection.fromMap(json.decode(source));
 
   @override
   bool get stringify => true;

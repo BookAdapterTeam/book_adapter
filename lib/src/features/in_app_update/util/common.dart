@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:app_installer/app_installer.dart';
-import 'package:book_adapter/src/features/in_app_update/data/update_data.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../data/update_data.dart';
 
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/utils/common.dart
 
@@ -31,9 +32,8 @@ class CommonUtils {
   ///
   /// 获取下载缓存路径
   static Future<String> getDownloadDirPath() async {
-    final Directory directory = Platform.isAndroid
-        ? await getExternalStorageDirectory() ??
-            await getApplicationDocumentsDirectory()
+    final directory = Platform.isAndroid
+        ? await getExternalStorageDirectory() ?? await getApplicationDocumentsDirectory()
         : await getApplicationDocumentsDirectory();
     return directory.path;
   }
@@ -44,9 +44,8 @@ class CommonUtils {
   static Future<File> getApkFileByUpdateData(
     UpdateData updateData,
   ) async {
-    final String appName =
-        getApkNameByDownloadUrl(updateData.androidDownloadUrl);
-    final String dirPath = await getDownloadDirPath();
+    final appName = getApkNameByDownloadUrl(updateData.androidDownloadUrl);
+    final dirPath = await getDownloadDirPath();
     return File('$dirPath/${updateData.versionName}/$appName');
   }
 
@@ -57,7 +56,7 @@ class CommonUtils {
     if (downloadUrl.isEmpty) {
       return 'temp_${currentTimeMillis()}.apk';
     } else {
-      String appName = downloadUrl.substring(downloadUrl.lastIndexOf('/') + 1);
+      var appName = downloadUrl.substring(downloadUrl.lastIndexOf('/') + 1);
       if (!appName.endsWith('.apk')) {
         appName = 'temp_${currentTimeMillis()}.apk';
       }
@@ -65,22 +64,18 @@ class CommonUtils {
     }
   }
 
-  static int currentTimeMillis() {
-    return DateTime.now().millisecondsSinceEpoch;
-  }
+  static int currentTimeMillis() => DateTime.now().millisecondsSinceEpoch;
 
   /// Get application package information
   ///
   /// 获取应用包信息
-  static Future<PackageInfo> getPackageInfo() {
-    return PackageInfo.fromPlatform();
-  }
+  static Future<PackageInfo> getPackageInfo() => PackageInfo.fromPlatform();
 
   /// Get the application version number
   ///
   /// 获取应用版本号
   static Future<String> getVersionCode() async {
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final packageInfo = await PackageInfo.fromPlatform();
     return packageInfo.buildNumber;
   }
 
@@ -88,7 +83,7 @@ class CommonUtils {
   ///
   /// 获取应用包名
   static Future<String> getPackageName() async {
-    final PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    final packageInfo = await PackageInfo.fromPlatform();
     return packageInfo.packageName;
   }
 
@@ -105,8 +100,7 @@ class CommonUtils {
 
       // 需要先允许读取存储权限才可以
       // You need to allow read storage permissions first
-      final requestInstallPackages =
-          await Permission.requestInstallPackages.request();
+      final requestInstallPackages = await Permission.requestInstallPackages.request();
       if (requestInstallPackages == PermissionStatus.granted) {
         try {
           await AppInstaller.installApk(filePath);

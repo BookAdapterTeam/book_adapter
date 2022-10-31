@@ -1,17 +1,18 @@
 import 'dart:io' as io;
 
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/features/library/data/book_status_enum.dart';
-import 'package:book_adapter/src/service/storage_service.dart';
-import 'package:book_adapter/src/shared/controller/storage_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:watcher/watcher.dart';
+
+import '../../../service/storage_service.dart';
+import '../../../shared/controller/storage_controller.dart';
+import '../data/book_item.dart';
+import '../data/book_status_enum.dart';
 
 final bookStatusProvider = StateNotifierProvider.family
     .autoDispose<BookStatusNotifier, AsyncValue<BookStatus>, Book>((ref, book) {
   final asyncWatchEvent = ref.watch(fileStreamProvider(book));
 
-  final AsyncValue<BookStatus> status = asyncWatchEvent.map(
+  final status = asyncWatchEvent.map<AsyncValue<BookStatus>>(
     data: (fileChangeData) {
       final changeType = fileChangeData.value.type;
       switch (changeType) {
@@ -36,8 +37,7 @@ final bookStatusProvider = StateNotifierProvider.family
 });
 
 class BookStatusNotifier extends StateNotifier<AsyncValue<BookStatus>> {
-  BookStatusNotifier(this._read, this.book, AsyncValue<BookStatus> status)
-      : super(status) {
+  BookStatusNotifier(this._read, this.book, AsyncValue<BookStatus> status) : super(status) {
     updateStatus();
   }
 

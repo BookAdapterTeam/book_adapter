@@ -16,7 +16,7 @@ class DefaultItemImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double height = width * 3;
+    final height = width * 3;
 
     return SizedBox(
       width: width,
@@ -78,14 +78,12 @@ class _CustomBackground extends StatelessWidget {
       Colors.black,
       Colors.purple,
     ];
-    final Random random = Random(seed);
+    final random = Random(seed);
     return predefinedColors[random.nextInt(predefinedColors.length)];
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: generateRandomColor(),
-    );
-  }
+  Widget build(BuildContext context) => Container(
+        color: generateRandomColor(),
+      );
 }

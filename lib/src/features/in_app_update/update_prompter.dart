@@ -1,12 +1,13 @@
 import 'dart:io';
 
-import 'package:book_adapter/src/features/in_app_update/data/update_data.dart';
-import 'package:book_adapter/src/features/in_app_update/update.dart';
-import 'package:book_adapter/src/features/in_app_update/util/common.dart';
-import 'package:book_adapter/src/features/in_app_update/util/http_utils.dart';
-import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_update_dialog/flutter_update_dialog.dart';
+
+import 'data/update_data.dart';
+import 'update.dart';
+import 'util/common.dart';
+import 'util/http_utils.dart';
+import 'util/toast_utils.dart';
 
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/update/update_prompter.dart
 
@@ -45,8 +46,8 @@ class UpdatePrompter {
       return;
     }
 
-    final String title = 'Upgrade to ${updateData.versionName}?';
-    final String updateContent = getUpdateContent();
+    final title = 'Upgrade to ${updateData.versionName}?';
+    final updateContent = getUpdateContent();
     if (Platform.isAndroid) {
       _apkFile = await CommonUtils.getApkFileByUpdateData(updateData);
     }
@@ -87,14 +88,13 @@ class UpdatePrompter {
   }
 
   String getUpdateContent() {
-    final String targetSize =
-        CommonUtils.getTargetSize(updateData.apkSize.toDouble());
-    String updateContent = '';
+    final targetSize = CommonUtils.getTargetSize(updateData.apkSize.toDouble());
+    var updateContent = '';
     if (targetSize.isNotEmpty) {
-      updateContent += 'New Version Size：$targetSize\n';
+      updateContent += 'New Version Size: $targetSize\n';
     }
-    updateContent += updateData.updateContent;
-    return updateContent;
+
+    return updateContent + updateData.updateContent;
   }
 
   Future<void> onUpdate() async {
@@ -127,7 +127,6 @@ class UpdatePrompter {
   /// 安装
   void doInstall() {
     _dialog?.dismiss();
-    onInstall.call(
-        _apkFile != null ? _apkFile!.path : updateData.androidDownloadUrl);
+    onInstall.call(_apkFile != null ? _apkFile!.path : updateData.androidDownloadUrl);
   }
 }

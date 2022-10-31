@@ -1,13 +1,5 @@
 import 'dart:async';
 
-import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/exceptions/app_exception.dart';
-import 'package:book_adapter/src/features/library/data/book_collection.dart';
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/features/library/data/series_item.dart';
-import 'package:book_adapter/src/service/firebase_service_auth_mixin.dart';
-import 'package:book_adapter/src/service/firebase_service_storage_mixin.dart';
-import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -16,18 +8,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
+import '../constants/constants.dart';
+import '../exceptions/app_exception.dart';
+import '../features/library/data/book_collection.dart';
+import '../features/library/data/book_item.dart';
+import '../features/library/data/series_item.dart';
+import '../shared/data/failure.dart';
+import 'firebase_service_auth_mixin.dart';
+import 'firebase_service_storage_mixin.dart';
+
 /// Provider to easily get access to the [FirebaseService] functions
-final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) {
-  return FirebaseService(
-    firestore: FirebaseFirestore.instance,
-    auth: FirebaseAuth.instance,
-    storage: FirebaseStorage.instance,
-  );
-});
+final firebaseServiceProvider = Provider.autoDispose<FirebaseService>((ref) => FirebaseService(
+      firestore: FirebaseFirestore.instance,
+      auth: FirebaseAuth.instance,
+      storage: FirebaseStorage.instance,
+    ));
 
 /// A utility class to handle all Firebase calls
-class FirebaseService
-    with FirebaseServiceAuthMixin, FirebaseServiceStorageMixin {
+class FirebaseService with FirebaseServiceAuthMixin, FirebaseServiceStorageMixin {
   FirebaseService({
     required this.firestore,
     required this.storage,
@@ -49,23 +47,19 @@ class FirebaseService
   // Database ******************************************************************
 
   /// Firestore BookCollections reference
-  CollectionReference<AppCollection> get _collectionsRef => firestore
-      .collection(kCollectionsCollectionName)
-      .withConverter<AppCollection>(
-        fromFirestore: (doc, _) {
-          final data = doc.data();
-          data!.addAll({'id': doc.id});
-          return AppCollection.fromMap(data);
-        },
-        toFirestore: (collection, _) => collection.toMap(),
-      );
+  CollectionReference<AppCollection> get _collectionsRef =>
+      firestore.collection(kCollectionsCollectionName).withConverter<AppCollection>(
+            fromFirestore: (doc, _) {
+              final data = doc.data();
+              data!.addAll({'id': doc.id});
+              return AppCollection.fromMap(data);
+            },
+            toFirestore: (collection, _) => collection.toMap(),
+          );
 
   /// Get book collections stream
-  Stream<QuerySnapshot<AppCollection>> get collectionsStream {
-    return _collectionsRef
-        .where('userId', isEqualTo: currentUserUid)
-        .snapshots();
-  }
+  Stream<QuerySnapshot<AppCollection>> get collectionsStream =>
+      _collectionsRef.where('userId', isEqualTo: currentUserUid).snapshots();
 
   /// Get a book collection document from Firestore by its document id
   ///
@@ -85,9 +79,8 @@ class FirebaseService
           );
 
   /// Get books stream
-  Stream<QuerySnapshot<Book>> get booksStream {
-    return _booksRef.where('userId', isEqualTo: currentUserUid).snapshots();
-  }
+  Stream<QuerySnapshot<Book>> get booksStream =>
+      _booksRef.where('userId', isEqualTo: currentUserUid).snapshots();
 
   /// Get a book document from Firestore by its document id
   ///
@@ -107,9 +100,8 @@ class FirebaseService
           );
 
   /// Get series stream
-  Stream<QuerySnapshot<Series>> get seriesStream {
-    return _seriesRef.where('userId', isEqualTo: currentUserUid).snapshots();
-  }
+  Stream<QuerySnapshot<Series>> get seriesStream =>
+      _seriesRef.where('userId', isEqualTo: currentUserUid).snapshots();
 
   /// Get a series document from Firestore by its document id
   ///
@@ -130,9 +122,7 @@ class FirebaseService
         throw AppException('user-null');
       }
 
-      await _booksRef
-          .doc(bookId)
-          .update({'lastReadCfiLocation': lastReadCfiLocation});
+      await _booksRef.doc(bookId).update({'lastReadCfiLocation': lastReadCfiLocation});
     } catch (e) {
       if (e is AppException) {
         rethrow;
@@ -149,8 +139,7 @@ class FirebaseService
         return Left(Failure('User not logged in'));
       }
 
-      final bookQuery =
-          await _booksRef.where('userId', isEqualTo: userId).get();
+      final bookQuery = await _booksRef.where('userId', isEqualTo: userId).get();
       final books = bookQuery.docs.map((doc) => doc.data()).toList();
 
       // Return our books to the caller in case they care
@@ -158,8 +147,7 @@ class FirebaseService
       return Right(books);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books',
-          e.code));
+          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books', e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Refresh Books'));
     }
@@ -255,8 +243,7 @@ class FirebaseService
 
       collectionIds ??= [];
       if (collectionIds.isEmpty) {
-        final String defaultCollection =
-            getDefaultCollectionName(currentUserUid!);
+        final defaultCollection = getDefaultCollectionName(currentUserUid!);
         collectionIds.add(defaultCollection);
       }
 
@@ -288,8 +275,7 @@ class FirebaseService
 
       collectionIds ??= [];
       if (collectionIds.isEmpty) {
-        final String defaultCollection =
-            getDefaultCollectionName(currentUserUid!);
+        final defaultCollection = getDefaultCollectionName(currentUserUid!);
         collectionIds.add(defaultCollection);
       }
 
@@ -307,9 +293,8 @@ class FirebaseService
   /// Update a book's series
   ///
   /// Throws AppException if the book does not exist in Firestore
-  Future<void> updateBookSeries(String bookId, String? seriesId) async {
-    return _booksRef.doc(bookId).update({'seriesId': seriesId});
-  }
+  Future<void> updateBookSeries(String bookId, String? seriesId) async =>
+      _booksRef.doc(bookId).update({'seriesId': seriesId});
 
   // Series *********************************************
 

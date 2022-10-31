@@ -1,7 +1,8 @@
-import 'package:book_adapter/src/app.dart';
-import 'package:book_adapter/src/features/in_app_update/update.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import 'src/app.dart';
+import 'src/features/in_app_update/update.dart';
 
 void main() async {
   await init();

@@ -1,6 +1,7 @@
-import 'package:book_adapter/src/features/library/data/book_item.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+
+import '../../library/data/book_item.dart';
 
 @immutable
 class UserData extends Equatable {
@@ -16,11 +17,10 @@ class UserData extends Equatable {
   // "Dart Data Class Generator"
   UserData copyWith({
     List<Book>? books,
-  }) {
-    return UserData(
-      books: books ?? this.books,
-    );
-  }
+  }) =>
+      UserData(
+        books: books ?? this.books,
+      );
 
   @override
   bool get stringify => true;

@@ -1,6 +1,7 @@
-import 'package:book_adapter/src/features/profile/profile_view_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../profile_view_controller.dart';
 
 class LogOutButton extends ConsumerWidget {
   const LogOutButton({
@@ -8,26 +9,21 @@ class LogOutButton extends ConsumerWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextButton.icon(
-      key: const ValueKey('signOut'),
-      icon: const Icon(
-        Icons.logout,
-        color: Colors.redAccent,
-      ),
-      label: Text(
-        'Sign out',
-        style: Theme.of(context)
-            .textTheme
-            .button
-            ?.copyWith(color: Colors.redAccent),
-      ),
-      onPressed: () {
-        // Log out the user
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
+  Widget build(BuildContext context, WidgetRef ref) => TextButton.icon(
+        key: const ValueKey('signOut'),
+        icon: const Icon(
+          Icons.logout,
+          color: Colors.redAccent,
+        ),
+        label: Text(
+          'Sign out',
+          style: Theme.of(context).textTheme.button?.copyWith(color: Colors.redAccent),
+        ),
+        onPressed: () {
+          // Log out the user
+          showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
               title: const Text('Are you sure you want to sign out?'),
               content: const Text(
                 'Downloaded books will remain on your device.',
@@ -53,10 +49,8 @@ class LogOutButton extends ConsumerWidget {
                   ),
                 ),
               ],
-            );
-          },
-        );
-      },
-    );
-  }
+            ),
+          );
+        },
+      );
 }

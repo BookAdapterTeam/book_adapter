@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:book_adapter/src/features/library/data/item.dart';
-import 'package:book_adapter/src/features/library/presentation/series_view.dart';
+import '../presentation/series_view.dart';
+import 'item.dart';
 
 class Series implements Item {
   @override
@@ -44,57 +44,48 @@ class Series implements Item {
     String? firebaseCoverImagePath,
     String? description,
     Set<String>? collectionIds,
-  }) {
-    return Series(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      title: title ?? this.title,
-      subtitle: subtitle ?? this.subtitle,
-      imageUrl: imageUrl ?? this.imageUrl,
-      firebaseCoverImagePath:
-          firebaseCoverImagePath ?? this.firebaseCoverImagePath,
-      description: description ?? this.description,
-      collectionIds: collectionIds ?? this.collectionIds,
-    );
-  }
+  }) =>
+      Series(
+        id: id ?? this.id,
+        userId: userId ?? this.userId,
+        title: title ?? this.title,
+        subtitle: subtitle ?? this.subtitle,
+        imageUrl: imageUrl ?? this.imageUrl,
+        firebaseCoverImagePath: firebaseCoverImagePath ?? this.firebaseCoverImagePath,
+        description: description ?? this.description,
+        collectionIds: collectionIds ?? this.collectionIds,
+      );
 
   @override
-  Map<String, dynamic> toMapFirebase() {
-    return {
-      'id': id,
-      'userId': userId,
-      'title': title,
-      'subtitle': subtitle,
-      'imageUrl': imageUrl,
-      'firebaseCoverImagePath': firebaseCoverImagePath,
-      'description': description,
-      'collectionIds': collectionIds.toList()
-    };
-  }
+  Map<String, dynamic> toMapFirebase() => {
+        'id': id,
+        'userId': userId,
+        'title': title,
+        'subtitle': subtitle,
+        'imageUrl': imageUrl,
+        'firebaseCoverImagePath': firebaseCoverImagePath,
+        'description': description,
+        'collectionIds': collectionIds.toList()
+      };
 
   @override
-  Map<String, dynamic> toMapSerializable() {
-    return toMapFirebase();
-  }
+  Map<String, dynamic> toMapSerializable() => toMapFirebase();
 
-  factory Series.fromMapFirebase(Map<String, dynamic> map) {
-    return Series(
-      id: map['id'],
-      userId: map['userId'],
-      title: map['title'],
-      subtitle: map['subtitle'],
-      imageUrl: map['imageUrl'],
-      firebaseCoverImagePath: map['firebaseCoverImagePath'],
-      description: map['description'],
-      collectionIds: List<String>.from(map['collectionIds']).toSet(),
-    );
-  }
+  factory Series.fromMapFirebase(Map<String, dynamic> map) => Series(
+        id: map['id'],
+        userId: map['userId'],
+        title: map['title'],
+        subtitle: map['subtitle'],
+        imageUrl: map['imageUrl'],
+        firebaseCoverImagePath: map['firebaseCoverImagePath'],
+        description: map['description'],
+        collectionIds: List<String>.from(map['collectionIds']).toSet(),
+      );
 
   @override
   String toJsonFirebase() => json.encode(toMapFirebase());
 
-  factory Series.fromJsonFirebase(String source) =>
-      Series.fromMapFirebase(json.decode(source));
+  factory Series.fromJsonFirebase(String source) => Series.fromMapFirebase(json.decode(source));
 
   @override
   bool get stringify => true;

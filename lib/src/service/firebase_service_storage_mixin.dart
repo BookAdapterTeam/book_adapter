@@ -1,9 +1,10 @@
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/src/exceptions/app_exception.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:logger/logger.dart';
+
+import '../exceptions/app_exception.dart';
 
 mixin FirebaseServiceStorageMixin {
   FirebaseStorage get storage;
@@ -15,9 +16,7 @@ mixin FirebaseServiceStorageMixin {
   /// List the files the user has uploaded to their folder
   Future<List<String>> listFilenames(String userId) async {
     final firebaseUploadedBooks = await storage.ref(userId).list();
-    return firebaseUploadedBooks.items
-        .map((listedItem) => listedItem.name)
-        .toList();
+    return firebaseUploadedBooks.items.map((listedItem) => listedItem.name).toList();
   }
 
   /// Upload a book to Firebase Storage
@@ -26,7 +25,7 @@ mixin FirebaseServiceStorageMixin {
     required Uint8List bytes,
     Map<String, String>? customMetadata,
   }) async {
-    const String epubContentType = 'application/epub+zip';
+    const epubContentType = 'application/epub+zip';
 
     final uploadTask = await uploadBytes(
       contentType: epubContentType,
@@ -44,7 +43,7 @@ mixin FirebaseServiceStorageMixin {
     required String localFilePath,
     Map<String, String>? customMetadata,
   }) async {
-    const String epubContentType = 'application/epub+zip';
+    const epubContentType = 'application/epub+zip';
 
     final uploadTask = await uploadFile(
       contentType: epubContentType,
@@ -80,8 +79,7 @@ mixin FirebaseServiceStorageMixin {
   }) async {
     try {
       // Check if file exists, return null if it does
-      // ignore: unused_local_variable
-      final downloadUrl = await storage.ref(firebaseFilePath).getDownloadURL();
+      await storage.ref(firebaseFilePath).getDownloadURL();
       return null;
     } on FirebaseException catch (e, st) {
       if (e.code != 'unauthorized') {
@@ -91,14 +89,13 @@ mixin FirebaseServiceStorageMixin {
 
       try {
         // File does not exist, continue uploading
-        final UploadTask uploadTask = storage.ref(firebaseFilePath).putData(
+        return storage.ref(firebaseFilePath).putData(
               bytes,
               SettableMetadata(
                 contentType: contentType,
                 customMetadata: customMetadata,
               ),
             );
-        return uploadTask;
       } on FirebaseException catch (e, st) {
         _log.e('${e.code} + ${e.message ?? ''}', e, st);
         rethrow;
@@ -126,7 +123,7 @@ mixin FirebaseServiceStorageMixin {
 
       // File does not exist, continue uploading
       try {
-        final UploadTask task = storage.ref(firebaseFilePath).putFile(
+        final task = storage.ref(firebaseFilePath).putFile(
               io.File(localFilePath),
               SettableMetadata(
                 contentType: contentType,
@@ -142,9 +139,8 @@ mixin FirebaseServiceStorageMixin {
     }
   }
 
-  Future<String> getFileDownloadUrl(String storagePath) async {
-    return storage.ref(storagePath).getDownloadURL();
-  }
+  Future<String> getFileDownloadUrl(String storagePath) =>
+      storage.ref(storagePath).getDownloadURL();
 
   /// Download a file to memory
   ///
@@ -153,12 +149,11 @@ mixin FirebaseServiceStorageMixin {
     required String firebaseFilePath,
     required String downloadToLocation,
   }) {
-    final io.File downloadToFile = io.File(downloadToLocation);
+    final downloadToFile = io.File(downloadToLocation);
 
     try {
       final fileRef = storage.ref(firebaseFilePath);
-      final DownloadTask task = fileRef.writeToFile(downloadToFile);
-      return task;
+      return fileRef.writeToFile(downloadToFile);
     } on FirebaseException catch (e, st) {
       _log.e(e.message, e, st);
       throw AppException(e.message, e.code);
@@ -179,7 +174,5 @@ mixin FirebaseServiceStorageMixin {
     }
   }
 
-  Future<void> deleteFile(String firebaseFilePath) async {
-    await storage.ref(firebaseFilePath).delete();
-  }
+  Future<void> deleteFile(String firebaseFilePath) => storage.ref(firebaseFilePath).delete();
 }

@@ -1,16 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/exceptions/app_exception.dart';
-import 'package:book_adapter/src/features/library/data/book_collection.dart';
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/features/library/data/item.dart';
-import 'package:book_adapter/src/features/library/data/series_item.dart';
-import 'package:book_adapter/src/service/firebase_service.dart';
-import 'package:book_adapter/src/service/storage_service.dart';
-import 'package:book_adapter/src/shared/data/failure.dart';
-import 'package:book_adapter/src/shared/data/file_hash.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,9 +9,19 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../constants/constants.dart';
+import '../../exceptions/app_exception.dart';
+import '../../features/library/data/book_collection.dart';
+import '../../features/library/data/book_item.dart';
+import '../../features/library/data/item.dart';
+import '../../features/library/data/series_item.dart';
+import '../../service/firebase_service.dart';
+import '../../service/storage_service.dart';
+import '../data/failure.dart';
+import '../data/file_hash.dart';
+
 /// Provider to easily get access to the user stream from [FirebaseService]
-final authStateChangesProvider =
-    StreamProvider.autoDispose<User?>((ref) async* {
+final authStateChangesProvider = StreamProvider.autoDispose<User?>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
 
   final authStates = firebaseController.authStateChange;
@@ -42,8 +42,7 @@ final userChangesProvider = StreamProvider.autoDispose<User?>((ref) async* {
 });
 
 // Provide the stream with riverpod for easy access
-final collectionsStreamProvider =
-    StreamProvider.autoDispose<List<AppCollection>>((ref) async* {
+final collectionsStreamProvider = StreamProvider.autoDispose<List<AppCollection>>((ref) async* {
   final firebaseController = ref.watch(firebaseControllerProvider);
   // Parse the value received and emit a Message instance
   try {
@@ -65,8 +64,7 @@ final bookStreamProvider = StreamProvider.autoDispose<List<Book>>((ref) async* {
 });
 
 // Provide the stream with riverpod for easy access
-final seriesStreamProvider =
-    StreamProvider.autoDispose<List<Series>>((ref) async* {
+final seriesStreamProvider = StreamProvider.autoDispose<List<Series>>((ref) async* {
   final firebaseController = ref.watch(firebaseServiceProvider);
   // Parse the value received and emit a Message instance
   try {
@@ -76,8 +74,7 @@ final seriesStreamProvider =
   } on FirebaseException catch (_) {}
 });
 
-final firebaseControllerProvider =
-    Provider.autoDispose<FirebaseController>((ref) {
+final firebaseControllerProvider = Provider.autoDispose<FirebaseController>((ref) {
   final firebaseService = ref.watch(firebaseServiceProvider);
   final storageService = ref.watch(storageServiceProvider);
   return FirebaseController(
@@ -110,9 +107,7 @@ class FirebaseController {
   /// You should not use this getter to determine the users current state,
   /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
   /// subscribe to updates.
-  User? get currentUser {
-    return _firebaseService.currentUser;
-  }
+  User? get currentUser => _firebaseService.currentUser;
 
   /// Notifies about changes to any user updates.
   ///
@@ -176,7 +171,7 @@ class FirebaseController {
     return await res.fold(
       Left.new,
       (userCred) async {
-        final User? user = userCred.user;
+        final user = userCred.user;
         if (user == null) {
           return Left(Failure('Sign In Failed, User is NULL'));
         }
@@ -234,7 +229,7 @@ class FirebaseController {
     return await res.fold(
       Left.new,
       (userCred) async {
-        final User? user = userCred.user;
+        final user = userCred.user;
         if (user == null) {
           return Left(Failure('Sign Up Failed, User is NULL'));
         }
@@ -252,107 +247,89 @@ class FirebaseController {
   /// Signs out the current user.
   ///
   /// If successful, it also update the stream [authStateChange]
-  Future<void> signOut() async {
-    return _firebaseService.signOut();
-  }
+  Future<void> signOut() async => _firebaseService.signOut();
 
   /// Send reset password email
-  Future<Either<Failure, void>> resetPassword(String email) async {
-    return _firebaseService.resetPassword(email);
-  }
+  Future<Either<Failure, void>> resetPassword(String email) async =>
+      _firebaseService.resetPassword(email);
 
   /// Set display name
   ///
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
-  Future<bool> setDisplayName(String name) async {
-    return _firebaseService.setDisplayName(name);
-  }
+  Future<bool> setDisplayName(String name) async => _firebaseService.setDisplayName(name);
 
   /// Set profile photo
   ///
   /// Returns [true] if successful
   /// Returns [false] if the user is not authenticated
-  Future<bool> setProfilePhoto(String photoURL) async {
-    return _firebaseService.setProfilePhoto(photoURL);
-  }
+  Future<bool> setProfilePhoto(String photoURL) async => _firebaseService.setProfilePhoto(photoURL);
 
   // Database
   Stream<QuerySnapshot<Book>> get booksStream => _firebaseService.booksStream;
-  Stream<QuerySnapshot<AppCollection>> get collectionsStream =>
-      _firebaseService.collectionsStream;
-  Stream<QuerySnapshot<Series>> get seriesStream =>
-      _firebaseService.seriesStream;
+  Stream<QuerySnapshot<AppCollection>> get collectionsStream => _firebaseService.collectionsStream;
+  Stream<QuerySnapshot<Series>> get seriesStream => _firebaseService.seriesStream;
 
   /// Save the last read cfi location in firebase
   Future<void> saveLastCfiLocation({
     required String cfi,
     required String bookId,
-  }) async {
-    return _firebaseService.saveLastReadCfiLocation(
-      lastReadCfiLocation: cfi,
-      bookId: bookId,
-    );
-  }
+  }) async =>
+      _firebaseService.saveLastReadCfiLocation(
+        lastReadCfiLocation: cfi,
+        bookId: bookId,
+      );
 
   /// Get a list of books from the user's database
-  Future<Either<Failure, List<Book>>> getBooks() async {
-    return _firebaseService.getAllBooks();
-  }
+  Future<Either<Failure, List<Book>>> getBooks() async => _firebaseService.getAllBooks();
 
   Future<UploadTask?> uploadCoverImage({
     required String firebaseFilepath,
     required Uint8List bytes,
-  }) async {
-    return _firebaseService.uploadCoverPhoto(
-      uploadToPath: firebaseFilepath,
-      bytes: bytes,
-    );
-  }
+  }) async =>
+      _firebaseService.uploadCoverPhoto(
+        uploadToPath: firebaseFilepath,
+        bytes: bytes,
+      );
 
-  Future<void> uploadBookDocument(Book book) async {
-    return _firebaseService.addBookToFirestore(book: book);
-  }
+  Future<void> uploadBookDocument(Book book) async =>
+      _firebaseService.addBookToFirestore(book: book);
 
   Future<UploadTask?> uploadBookData({
     required String userId,
     required Uint8List bytes,
     required String firebaseFilepath,
     required FileHash fileHash,
-  }) async {
-    return _firebaseService.uploadBookDataToFirebaseStorage(
-      firebaseFilePath: firebaseFilepath,
-      bytes: bytes,
-      customMetadata: {
-        StorageService.kFileHashKey: fileHash.toJson(),
-      },
-    );
-  }
+  }) async =>
+      _firebaseService.uploadBookDataToFirebaseStorage(
+        firebaseFilePath: firebaseFilepath,
+        bytes: bytes,
+        customMetadata: {
+          StorageService.kFileHashKey: fileHash.toJson(),
+        },
+      );
 
   Future<UploadTask?> uploadBookFile({
     required String userId,
     required String cacheFilepath,
     required String firebaseFilepath,
     required FileHash fileHash,
-  }) async {
-    return _firebaseService.uploadBookFileToFirebaseStorage(
-      firebaseFilePath: firebaseFilepath,
-      localFilePath: cacheFilepath,
-      customMetadata: {
-        StorageService.kFileHashKey: fileHash.toJson(),
-      },
-    );
-  }
+  }) async =>
+      _firebaseService.uploadBookFileToFirebaseStorage(
+        firebaseFilePath: firebaseFilepath,
+        localFilePath: cacheFilepath,
+        customMetadata: {
+          StorageService.kFileHashKey: fileHash.toJson(),
+        },
+      );
 
-  Future<bool> fileHashExists(String md5, String sha1) async {
-    return _firebaseService.fileHashExists(md5: md5, sha1: sha1);
-  }
+  Future<bool> fileHashExists(String md5, String sha1) =>
+      _firebaseService.fileHashExists(md5: md5, sha1: sha1);
 
   /// Create a collection
-  Future<Either<Failure, AppCollection>> addCollection(String name) async {
-    // Create collection document
-    return _firebaseService.addCollection(name);
-  }
+  // Create collection document
+  Future<Either<Failure, AppCollection>> addCollection(String name) =>
+      _firebaseService.addCollection(name);
 
   /// Add a list of books to a collection
   ///
@@ -393,7 +370,7 @@ class FirebaseController {
   }) async {
     try {
       // Get list of collections to put the new series in
-      final Set<String> collectionIds = {};
+      final collectionIds = <String>{};
       for (final book in selectedBooks) {
         collectionIds.addAll(book.collectionIds);
       }
@@ -489,7 +466,7 @@ class FirebaseController {
     required Book book,
     required Series series,
   }) async {
-    final Set<String> collectionIds = series.collectionIds;
+    final collectionIds = series.collectionIds;
     collectionIds.addAll(book.collectionIds);
 
     try {
@@ -508,15 +485,13 @@ class FirebaseController {
     }
   }
 
-  Future<String> getFileDownloadUrl(String storagePath) async {
-    return _firebaseService.getFileDownloadUrl(storagePath);
-  }
+  Future<String> getFileDownloadUrl(String storagePath) async =>
+      _firebaseService.getFileDownloadUrl(storagePath);
 
   /// Download a file and copy it to documents
   ///
   /// Thorws `AppException` if it fails
-  DownloadTask downloadFile(
-      String firebaseStorageFilePath, String downloadToLocation) {
+  DownloadTask downloadFile(String firebaseStorageFilePath, String downloadToLocation) {
     try {
       return _firebaseService.downloadFile(
         firebaseFilePath: firebaseStorageFilePath,
@@ -533,13 +508,12 @@ class FirebaseController {
   /// Check if a file exists on the server
   ///
   /// Throws `AppException` if user is not logged in
-  Future<bool> fileExists(String firebaseFilePath) async {
-    return _firebaseService.fileExists(firebaseFilePath);
-  }
+  Future<bool> fileExists(String firebaseFilePath) async =>
+      _firebaseService.fileExists(firebaseFilePath);
 
   /// List the files the user has uploaded to their folder
   Future<List<String>> listFilenames() async {
-    final String? userId = _firebaseService.currentUser?.uid;
+    final userId = _firebaseService.currentUser?.uid;
     if (userId == null) {
       throw AppException('User not authenticated.');
     }
@@ -581,9 +555,8 @@ class FirebaseController {
     return deletedBooks;
   }
 
-  List<Book> _getSeriesItems(Series series, List<Book> allBooks) {
-    return allBooks.where((book) => book.seriesId == series.id).toList();
-  }
+  List<Book> _getSeriesItems(Series series, List<Book> allBooks) =>
+      allBooks.where((book) => book.seriesId == series.id).toList();
 
   Future<void> _deleteFirebaseStorageBookFiles(String filepath) async {
     try {
@@ -592,8 +565,7 @@ class FirebaseController {
       if (error.code != 'object-not-found') rethrow;
     }
     try {
-      await _firebaseService
-          .deleteFile(filepath + kFirebaseStorageImageExtension);
+      await _firebaseService.deleteFile(filepath + kFirebaseStorageImageExtension);
     } on FirebaseException catch (error) {
       if (error.code != 'object-not-found') rethrow;
     }
@@ -638,9 +610,7 @@ class FirebaseController {
     try {
       for (final item in collectionItems) {
         //remove collection id. Dart implements remove function inplace
-        final List<String> collectionIds = [
-          ...item.collectionIds.toList()..remove(collection.id)
-        ];
+        final collectionIds = <String>[...item.collectionIds.toList()..remove(collection.id)];
         if (item is Book) {
           await _firebaseService.updateBookCollections(
             bookId: item.id,

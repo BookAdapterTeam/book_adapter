@@ -46,30 +46,28 @@ class _ProfileImage extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) {
-    return ClipOval(
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          child: CachedNetworkImage(
-            imageUrl: imageUrl,
-            width: 200,
-            height: 200,
-            fit: BoxFit.cover,
+  Widget build(BuildContext context) => ClipOval(
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onPressed,
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              width: 200,
+              height: 200,
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
 
-        // Ink.image(
-        //   image: image,
-        //   fit: BoxFit.cover,
-        //   width: 200,
-        //   height: 200,
-        //   child: InkWell(onTap: onPressed),
-        // ),
-      ),
-    );
-  }
+          // Ink.image(
+          //   image: image,
+          //   fit: BoxFit.cover,
+          //   width: 200,
+          //   height: 200,
+          //   child: InkWell(onTap: onPressed),
+          // ),
+        ),
+      );
 }
 
 class _EditIcon extends StatelessWidget {
@@ -82,24 +80,22 @@ class _EditIcon extends StatelessWidget {
   final VoidCallback onPressed;
 
   @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onPressed,
-      child: _Circle(
-        color: Colors.white,
-        all: 3,
+  Widget build(BuildContext context) => InkWell(
+        onTap: onPressed,
         child: _Circle(
-          color: color,
-          all: 8,
-          child: const Icon(
-            Icons.edit,
-            color: Colors.white,
-            size: 30,
+          color: Colors.white,
+          all: 3,
+          child: _Circle(
+            color: color,
+            all: 8,
+            child: const Icon(
+              Icons.edit,
+              color: Colors.white,
+              size: 30,
+            ),
           ),
         ),
-      ),
-    );
-  }
+      );
 }
 
 class _Circle extends StatelessWidget {
@@ -114,13 +110,11 @@ class _Circle extends StatelessWidget {
   final Color color;
 
   @override
-  Widget build(BuildContext context) {
-    return ClipOval(
-      child: Container(
-        padding: EdgeInsets.all(all),
-        color: color,
-        child: child,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => ClipOval(
+        child: Container(
+          padding: EdgeInsets.all(all),
+          color: color,
+          child: child,
+        ),
+      );
 }

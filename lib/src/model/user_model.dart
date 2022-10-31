@@ -1,12 +1,12 @@
-import 'package:book_adapter/src/exceptions/app_exception.dart';
-import 'package:book_adapter/src/features/authentication/data/user_data.dart';
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/model/queue_model.dart';
-import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final userModelProvider =
-    StateNotifierProvider.autoDispose<UserModel, UserData>((ref) {
+import '../exceptions/app_exception.dart';
+import '../features/authentication/data/user_data.dart';
+import '../features/library/data/book_item.dart';
+import '../shared/controller/firebase_controller.dart';
+import 'queue_model.dart';
+
+final userModelProvider = StateNotifierProvider.autoDispose<UserModel, UserData>((ref) {
   final books = ref.watch(bookStreamProvider);
   final userData = UserData(books: books.asData?.value);
 
@@ -25,14 +25,12 @@ class UserModel extends StateNotifier<UserData> {
     downloadQueueNotifier.addToQueue(book);
   }
 
-  List<Book> get downloadQueue {
-    return _read(queueBookProvider).queueListItems;
-  }
+  List<Book> get downloadQueue => _read(queueBookProvider).queueListItems;
 
   Future<void> updateDownloadedFilenames() async {
     final firebaseController = _read(firebaseControllerProvider);
 
-    final String? userId = firebaseController.currentUser?.uid;
+    final userId = firebaseController.currentUser?.uid;
     if (userId == null) {
       throw AppException('User not logged in');
     }

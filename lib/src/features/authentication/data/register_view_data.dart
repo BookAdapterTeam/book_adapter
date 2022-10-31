@@ -31,16 +31,15 @@ class RegisterViewData {
     String? photoUrl,
     bool? isLoading,
     bool? isButtonEnabled,
-  }) {
-    return RegisterViewData(
-      username: username ?? this.username,
-      email: email ?? this.email,
-      password: password ?? this.password,
-      verifyPassword: verifyPassword ?? this.verifyPassword,
-      photoUrl: photoUrl ?? this.photoUrl,
-      isLoading: isLoading ?? this.isLoading,
-      isButtonEnabled: isButtonEnabled ?? this.isButtonEnabled,
-    );
-  }
+  }) =>
+      RegisterViewData(
+        username: username ?? this.username,
+        email: email ?? this.email,
+        password: password ?? this.password,
+        verifyPassword: verifyPassword ?? this.verifyPassword,
+        photoUrl: photoUrl ?? this.photoUrl,
+        isLoading: isLoading ?? this.isLoading,
+        isButtonEnabled: isButtonEnabled ?? this.isButtonEnabled,
+      );
 //</editor-fold>
 }

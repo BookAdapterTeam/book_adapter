@@ -3,12 +3,13 @@ import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:async/async.dart';
-import 'package:book_adapter/src/shared/data/file_hash.dart';
 import 'package:crypto/crypto.dart';
 // ignore: implementation_imports
 import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
 import 'package:image/image.dart' as img;
 import 'package:logger/logger.dart';
+
+import '../shared/data/file_hash.dart';
 
 class IsolateService {
   /// Spawns an isolate and asynchronously sends List<T> for it to
@@ -343,12 +344,10 @@ class IsolateService {
         for (final fileRef in fileRefs) {
           // Read and decode the file.
           final imageContent = await fileRef.readContent();
-          final img.Image? cover = img.decodeImage(imageContent);
+          final cover = img.decodeImage(imageContent);
 
           // Use the first image that has the correct dimensions
-          if (coverImage == null &&
-              cover != null &&
-              cover.height > cover.width) {
+          if (coverImage == null && cover != null && cover.height > cover.width) {
             coverImage = cover;
             break;
           }

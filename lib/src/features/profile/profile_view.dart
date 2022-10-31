@@ -1,14 +1,15 @@
 // Handles profile page information
 
-import 'package:book_adapter/src/features/profile/edit_profile_view.dart';
-import 'package:book_adapter/src/features/profile/widgets/change_password_button.dart';
-import 'package:book_adapter/src/features/profile/widgets/check_update_button.dart';
-import 'package:book_adapter/src/features/profile/widgets/log_out_button.dart';
-import 'package:book_adapter/src/features/profile/widgets/profile_widget.dart';
-import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+
+import '../../shared/controller/firebase_controller.dart';
+import 'edit_profile_view.dart';
+import 'widgets/change_password_button.dart';
+import 'widgets/check_update_button.dart';
+import 'widgets/log_out_button.dart';
+import 'widgets/profile_widget.dart';
 
 class ProfileView extends ConsumerWidget {
   const ProfileView({Key? key}) : super(key: key);
@@ -19,7 +20,7 @@ class ProfileView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final userStreamAsyncValue = ref.watch(userChangesProvider);
     final user = userStreamAsyncValue.asData?.value;
-    const String title = 'Profile Page';
+    const title = 'Profile Page';
 
     return Scaffold(
       appBar: AppBar(
@@ -36,8 +37,7 @@ class ProfileView extends ConsumerWidget {
                 applicationName: 'BookAdapter',
                 applicationVersion: version,
                 applicationIcon: const FlutterLogo(),
-                applicationLegalese:
-                    '(Temporary logo above) By using this app, you agree to '
+                applicationLegalese: '(Temporary logo above) By using this app, you agree to '
                     'only use it with books you own.',
               );
             },
@@ -58,8 +58,7 @@ class ProfileView extends ConsumerWidget {
                 ProfileWidget(
                   photoUrl: user.photoURL ?? 'https://i.imgur.com/WxNkK7J.png',
                   onPressed: () {
-                    Navigator.restorablePushNamed(
-                        context, EditProfileView.routeName);
+                    Navigator.restorablePushNamed(context, EditProfileView.routeName);
                   },
                 ) /*: const Icon(Icons.account_circle, size: 128,)*/,
                 const SizedBox(height: 24),

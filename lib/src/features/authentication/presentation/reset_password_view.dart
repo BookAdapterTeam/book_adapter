@@ -1,9 +1,10 @@
-import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/features/authentication/controller/reset_password_view_controller.dart';
-import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../../constants/constants.dart';
+import '../../../shared/data/failure.dart';
+import '../controller/reset_password_view_controller.dart';
 
 final _formKey = GlobalKey<FormState>();
 
@@ -84,21 +85,19 @@ class _CancelButton extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return TextButton(
-      style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(kCornerRadius),
+  Widget build(BuildContext context) => TextButton(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(kCornerRadius),
+            ),
           ),
         ),
-      ),
-      onPressed: () {
-        Navigator.of(context).pop();
-      },
-      child: const Text('Cancel'),
-    );
-  }
+        onPressed: () {
+          Navigator.of(context).pop();
+        },
+        child: const Text('Cancel'),
+      );
 }
 
 class _SendResetEmailButton extends StatelessWidget {
@@ -159,17 +158,15 @@ class _EmailTextField extends StatelessWidget {
   final ResetPasswordViewController viewController;
 
   @override
-  Widget build(BuildContext context) {
-    return TextFormField(
-      initialValue: data.email,
-      autofocus: true,
-      decoration: const InputDecoration(
-        border: UnderlineInputBorder(),
-        labelText: 'Email',
-      ),
-      validator: viewController.validate,
-      onChanged: (emailValue) => viewController.updateData(email: emailValue),
-      autofillHints: const [AutofillHints.email],
-    );
-  }
+  Widget build(BuildContext context) => TextFormField(
+        initialValue: data.email,
+        autofocus: true,
+        decoration: const InputDecoration(
+          border: UnderlineInputBorder(),
+          labelText: 'Email',
+        ),
+        validator: viewController.validate,
+        onChanged: (emailValue) => viewController.updateData(email: emailValue),
+        autofillHints: const [AutofillHints.email],
+      );
 }

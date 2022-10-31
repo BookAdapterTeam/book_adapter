@@ -1,6 +1,7 @@
-import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
+
+import 'toast_utils.dart';
 
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/utils/http.dart
 
@@ -100,7 +101,7 @@ class HttpUtils {
     String savePath, {
     ProgressCallback? onReceiveProgress,
   }) async {
-    final Response response = await sDio.download(
+    final response = await sDio.download(
       urlPath,
       savePath,
       onReceiveProgress: onReceiveProgress,

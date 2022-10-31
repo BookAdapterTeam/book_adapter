@@ -2,8 +2,6 @@ import 'dart:io' as io;
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/service/isolate_service.dart';
 import 'package:epubx/epubx.dart';
 // ignore: implementation_imports
 import 'package:epubx/src/ref_entities/epub_byte_content_file_ref.dart';
@@ -11,9 +9,10 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:uuid/uuid.dart';
 
-final epubServiceProvider = Provider<EPUBParseController>((ref) {
-  return EPUBParseController();
-});
+import '../../features/library/data/book_item.dart';
+import '../../service/isolate_service.dart';
+
+final epubServiceProvider = Provider<EPUBParseController>((ref) => EPUBParseController());
 
 /// A utility class to handle all Firebase calls
 class EPUBParseController {
@@ -38,14 +37,13 @@ class EPUBParseController {
     required String collectionName,
     String? id,
   }) async {
-    final String idValue = id ?? _uuid.v4();
+    final idValue = id ?? _uuid.v4();
 
     final file = io.File(cacheFilePath);
     final openedBook = await EpubReader.openBook(bytes);
 
     final title = openedBook.Title ?? '';
-    final subtitle =
-        openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
+    final subtitle = openedBook.AuthorList?.join(', ') ?? openedBook.Author ?? '';
     final filesize = await file.length();
 
     // Filename: Max filename is 127 characters
@@ -76,7 +74,7 @@ class EPUBParseController {
 
     // Put the ID before the extension
     final extension = splitFilename.last;
-    final String filename = '${_removeExtension(ioFilename)}-$id.$extension';
+    final filename = '${_removeExtension(ioFilename)}-$id.$extension';
 
     // Make sure the filename is not too long for android
     final startingIndex = max(0, filename.length - 127);
@@ -86,7 +84,7 @@ class EPUBParseController {
 
   /// Remove file extension from a string
   String _removeExtension(String filePath) {
-    final List<String> splitString = filePath.split('.');
+    final splitString = filePath.split('.');
 
     // No extension
     if (splitString.length == 1) return filePath;
@@ -102,7 +100,7 @@ class EPUBParseController {
     final ioFilename = cacheFilePath.split('/').last;
 
     // Put the ID before the extension
-    final String filename = '${_removeExtension(ioFilename)}-$id.$extension';
+    final filename = '${_removeExtension(ioFilename)}-$id.$extension';
 
     // Make sure the filename is not too long for android
     final startingIndex = max(0, filename.length - 127);
@@ -127,7 +125,7 @@ class EPUBParseController {
   Future<Uint8List?> getCoverImage(Uint8List bookBytes) async {
     final log = Logger();
     final openedBook = await EpubReader.openBook(bookBytes);
-    Image? coverImage = await openedBook.readCover();
+    var coverImage = await openedBook.readCover();
 
     if (coverImage == null) {
       // No cover image, use the first image instead
@@ -141,8 +139,7 @@ class EPUBParseController {
       // Use the first image that has a height greater than width
       // to avoid using banners and copyright notices
       log.i('Decoding Images');
-      final imageFuture = IsolateService.sendListAndReceiveSingle<
-          EpubByteContentFileRef, Image?>(
+      final imageFuture = IsolateService.sendListAndReceiveSingle<EpubByteContentFileRef, Image?>(
         imagesRef.values.toList(),
         receiveAndReturnService: IsolateService.readAndDecodeImageService,
       );
@@ -166,8 +163,7 @@ class EPUBParseController {
     // Could not get cover image for upload
     if (coverImage == null) return null;
 
-    final encodeImageFuture =
-        IsolateService.sendSingleAndReceive<Image, Uint8List>(
+    final encodeImageFuture = IsolateService.sendSingleAndReceive<Image, Uint8List>(
       coverImage,
       receiveAndReturnService: IsolateService.readAndEncodeImageService,
     );

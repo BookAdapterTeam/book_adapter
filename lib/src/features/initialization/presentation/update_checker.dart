@@ -1,6 +1,7 @@
-import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/features/in_app_update/update.dart';
 import 'package:flutter/material.dart';
+
+import '../../../constants/constants.dart';
+import '../../in_app_update/update.dart';
 
 class UpdateChecker extends StatefulWidget {
   const UpdateChecker({
@@ -27,19 +28,15 @@ class _UpdateCheckerState extends State<UpdateChecker> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return widget.ignoreUpdate
-        ? widget.child
-        : FutureBuilder<void>(
-            future: UpdateManager.checkUpdate(
-              context: context,
-              url: kUpdateUrl,
-              onIgnore: widget.onIgnore,
-              onClose: widget.onClose,
-            ),
-            builder: (BuildContext context, AsyncSnapshot snapshot) {
-              return widget.child;
-            },
-          );
-  }
+  Widget build(BuildContext context) => widget.ignoreUpdate
+      ? widget.child
+      : FutureBuilder<void>(
+          future: UpdateManager.checkUpdate(
+            context: context,
+            url: kUpdateUrl,
+            onIgnore: widget.onIgnore,
+            onClose: widget.onClose,
+          ),
+          builder: (BuildContext context, AsyncSnapshot snapshot) => widget.child,
+        );
 }

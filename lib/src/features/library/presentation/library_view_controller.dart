@@ -1,31 +1,27 @@
-import 'package:book_adapter/src/exceptions/app_exception.dart';
-import 'package:book_adapter/src/features/authentication/data/user_data.dart';
-import 'package:book_adapter/src/features/library/data/book_collection.dart';
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/features/library/data/book_status_enum.dart';
-import 'package:book_adapter/src/features/library/data/item.dart';
-import 'package:book_adapter/src/features/library/data/series_item.dart';
-import 'package:book_adapter/src/features/library/model/book_status_notifier.dart';
-import 'package:book_adapter/src/model/queue_model.dart';
-import 'package:book_adapter/src/model/user_model.dart';
-import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
-import 'package:book_adapter/src/shared/controller/storage_controller.dart';
-import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
-final fileUrlProvider =
-    FutureProvider.family<String, String>((ref, firebasePath) async {
-  return ref
-      .read(libraryViewControllerProvider.notifier)
-      .getFileDownloadUrl(firebasePath);
-});
+import '../../../exceptions/app_exception.dart';
+import '../../../model/queue_model.dart';
+import '../../../model/user_model.dart';
+import '../../../shared/controller/firebase_controller.dart';
+import '../../../shared/controller/storage_controller.dart';
+import '../../../shared/data/failure.dart';
+import '../../authentication/data/user_data.dart';
+import '../data/book_collection.dart';
+import '../data/book_item.dart';
+import '../data/book_status_enum.dart';
+import '../data/item.dart';
+import '../data/series_item.dart';
+import '../model/book_status_notifier.dart';
+
+final fileUrlProvider = FutureProvider.family<String, String>((ref, firebasePath) async =>
+    ref.read(libraryViewControllerProvider.notifier).getFileDownloadUrl(firebasePath));
 
 final libraryViewControllerProvider =
-    StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>(
-        (ref) {
+    StateNotifierProvider.autoDispose<LibraryViewController, LibraryViewData>((ref) {
   final books = ref.watch(bookStreamProvider);
   final collections = ref.watch(collectionsStreamProvider);
   final series = ref.watch(seriesStreamProvider);
@@ -44,15 +40,13 @@ final libraryViewControllerProvider =
 
 // State is if the view is loading
 class LibraryViewController extends StateNotifier<LibraryViewData> {
-  LibraryViewController(this._read, {required LibraryViewData data})
-      : super(data);
+  LibraryViewController(this._read, {required LibraryViewData data}) : super(data);
 
   final Reader _read;
   final log = Logger();
 
   Stream<String> addBooks() async* {
-    await for (final message
-        in _read(storageControllerProvider).pickAndUploadMultipleBooks()) {
+    await for (final message in _read(storageControllerProvider).pickAndUploadMultipleBooks()) {
       log.i(message);
       yield message;
     }
@@ -124,10 +118,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
 
     // Put series in collections the book was in
     // TODO: Get input from user to decide collection
-    selectedBooks
-        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
-    selectedSeries
-        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    selectedBooks.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    selectedSeries.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
 
     try {
       final series = await read(firebaseControllerProvider).mergeToSeries(
@@ -170,10 +162,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     try {
       deselectAllItems();
       // Remove file
-      final selectedFilenameList =
-          selectedBooks.map((book) => book.filename).toList();
-      await _read(storageControllerProvider)
-          .deleteFiles(filenameList: selectedFilenameList);
+      final selectedFilenameList = selectedBooks.map((book) => book.filename).toList();
+      await _read(storageControllerProvider).deleteFiles(filenameList: selectedFilenameList);
 
       return null;
     } catch (e, st) {
@@ -218,7 +208,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
   }
 
   Future<Either<Failure, AppCollection>> addNewCollection(String name) async {
-    final bool foundCollection = collectionExist(name);
+    final foundCollection = collectionExist(name);
     if (foundCollection) {
       return Left(Failure('Collection Already Exists'));
     }
@@ -232,9 +222,8 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
     return names.contains(name);
   }
 
-  Future<String> getFileDownloadUrl(String firebasePath) async {
-    return _read(firebaseControllerProvider).getFileDownloadUrl(firebasePath);
-  }
+  Future<String> getFileDownloadUrl(String firebasePath) async =>
+      _read(firebaseControllerProvider).getFileDownloadUrl(firebasePath);
 
   Future<Failure?> queueDownloadBook(Book book) async {
     // TODO: Fix only able to download one book at a time
@@ -248,8 +237,7 @@ class LibraryViewController extends StateNotifier<LibraryViewData> {
       }
 
       // Check if file exists on server before downloading
-      final bool existsInFirebase =
-          await _read(firebaseControllerProvider).fileExists(book.filepath);
+      final existsInFirebase = await _read(firebaseControllerProvider).fileExists(book.filepath);
 
       if (!existsInFirebase) {
         return Failure('Could not find file on server');
@@ -330,64 +318,48 @@ class LibraryViewData {
     List<Series>? series,
     UserData? userData,
     QueueNotifierData<Book>? queueData,
-  }) {
-    return LibraryViewData(
-      books: books ?? this.books,
-      collections: collections ?? this.collections,
-      selectedItems: selectedItems ?? this.selectedItems,
-      series: series ?? this.series,
-      userData: userData ?? this.userData,
-      queueData: queueData ?? this.queueData,
-    );
-  }
+  }) =>
+      LibraryViewData(
+        books: books ?? this.books,
+        collections: collections ?? this.collections,
+        selectedItems: selectedItems ?? this.selectedItems,
+        series: series ?? this.series,
+        userData: userData ?? this.userData,
+        queueData: queueData ?? this.queueData,
+      );
 
   List<Item> getCollectionItems(String collectionId) {
-    final List<Item> items = books
-            ?.where((book) => book.collectionIds.contains(collectionId))
-            .toList() ??
-        [];
+    final items = books?.where((book) => book.collectionIds.contains(collectionId)).toList() ?? [];
     // Remove books with a seriesId
-    items.removeWhere((item) {
-      if (item is Book) {
-        return item.hasSeries;
-      }
-      return false;
-    });
+    items.removeWhere((item) => item.hasSeries);
 
     // Add series objects to items if it is in this collection
     final seriesList = series;
-    List<Item> seriesInCollection = [];
+    var seriesInCollection = <Item>[];
     if (seriesList != null) {
-      seriesInCollection = seriesList
-          .where((s) => s.collectionIds.contains(collectionId))
-          .toList();
+      seriesInCollection = seriesList.where((s) => s.collectionIds.contains(collectionId)).toList();
     }
-    final List<Item> allBooks = [...items, ...seriesInCollection];
+    final allBooks = <Item>[...items, ...seriesInCollection];
 
-    allBooks
-        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    allBooks.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return allBooks;
   }
 
   List<Book> getSeriesItems(String seriesId) {
-    final List<Book> items =
-        books?.where((book) => book.seriesId == seriesId).toList() ?? [];
+    final items = books?.where((book) => book.seriesId == seriesId).toList() ?? [];
 
-    items
-        .sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+    items.sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
     return items;
   }
 
   /// Get the selected book items including the books inside a series
   Set<Book> get allSelectedBooksWithBooksInSeries {
-    final Set<Book> books = {};
+    final books = <Book>{};
     for (final item in selectedItems) {
       if (item is Book) {
         books.add(item);
       } else if (item is Series) {
-        final seriesBooks =
-            this.books?.where((book) => book.seriesId == item.id).toList() ??
-                [];
+        final seriesBooks = this.books?.where((book) => book.seriesId == item.id).toList() ?? [];
         books.addAll(seriesBooks);
       }
     }

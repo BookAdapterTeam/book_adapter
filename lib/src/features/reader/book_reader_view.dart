@@ -1,8 +1,3 @@
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/features/reader/book_reader_view_controller.dart';
-import 'package:book_adapter/src/features/reader/current_book.dart';
-import 'package:book_adapter/src/features/reader/epub_controller.dart';
-import 'package:book_adapter/src/shared/controller/storage_controller.dart';
 import 'package:epub_view/epub_view.dart';
 // ignore: implementation_imports
 import 'package:epub_view/src/data/models/chapter_view_value.dart';
@@ -11,6 +6,11 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../shared/controller/storage_controller.dart';
+import 'book_reader_view_controller.dart';
+import 'current_book.dart';
+import 'epub_controller.dart';
 
 class BookReaderView extends StatefulHookConsumerWidget {
   static const routeName = '/book_reader';
@@ -25,7 +25,7 @@ class _BookReaderViewState extends ConsumerState<BookReaderView> {
   @override
   Widget build(BuildContext context) {
     final log = Logger();
-    final Book? book = ref.read(currentBookProvider);
+    final book = ref.read(currentBookProvider);
 
     if (book == null) {
       return const Scaffold(

@@ -30,7 +30,7 @@ class MockFirebaseService implements FirebaseService {
   @override
   Future<Either<Failure, List<Book>>> getAllBooks() async {
     try {
-      const List<Book> books = [
+      const books = <Book>[
         // Book(title: 'Book 0', id: '0'),
         // Book(title: 'Book 1', id: '1'),
         // Book(title: 'Book 2', id: '2'),
@@ -41,8 +41,7 @@ class MockFirebaseService implements FirebaseService {
       return Right(books);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books',
-          e.code));
+          e.message ?? 'Unknown Firebase Exception, Could Not Refresh Books', e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Refresh Books'));
     }
@@ -54,8 +53,8 @@ class MockFirebaseService implements FirebaseService {
     required String password,
   }) async {
     try {
-      final userCredential = await auth.signInWithEmailAndPassword(
-          email: email, password: password);
+      final userCredential =
+          await auth.signInWithEmailAndPassword(email: email, password: password);
       // Return the data incase the caller needs it
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
@@ -83,8 +82,7 @@ class MockFirebaseService implements FirebaseService {
       // Return the data incase the caller needs it
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
-      return Left(
-          FirebaseFailure(e.message ?? 'Signup Not Successful', e.code));
+      return Left(FirebaseFailure(e.message ?? 'Signup Not Successful', e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not SignUp'));
     }
@@ -102,8 +100,7 @@ class MockFirebaseService implements FirebaseService {
       return const Right(null);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email',
-          e.code));
+          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email', e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Send Reset Email'));
     }
@@ -190,8 +187,7 @@ class MockFirebaseService implements FirebaseService {
 
   @override
   // TODO: implement collectionsStream
-  Stream<QuerySnapshot<AppCollection>> get collectionsStream =>
-      throw UnimplementedError();
+  Stream<QuerySnapshot<AppCollection>> get collectionsStream => throw UnimplementedError();
 
   @override
   // TODO: implement seriesStream
@@ -261,12 +257,10 @@ class MockFirebaseService implements FirebaseService {
   }
 
   @override
-  Future<List<String>> listFilenames(String userId) async {
-    return [
-      'fhiasjflasjfl;as',
-      'fdshfhdskhfkjdsfkd',
-    ];
-  }
+  Future<List<String>> listFilenames(String userId) async => [
+        'fhiasjflasjfl;as',
+        'fdshfhdskhfkjdsfkd',
+      ];
 
   @override
   Future<void> deleteFile(String firebaseFilePath) {

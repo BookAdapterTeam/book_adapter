@@ -1,6 +1,6 @@
-import 'package:book_adapter/src/features/in_app_update/data/update_data.dart';
-import 'package:book_adapter/src/features/in_app_update/data/update_info.dart';
-import 'package:book_adapter/src/features/in_app_update/util/common.dart';
+import 'data/update_data.dart';
+import 'data/update_info.dart';
+import 'util/common.dart';
 
 // From: https://github.com/xuexiangjys/flutter_app_update_example/blob/master/lib/update/entity/update_info.dart
 
@@ -12,16 +12,16 @@ class UpdateParser {
   ///
   /// 解析器
   static Future<UpdateData?> parseJson(String json) async {
-    final UpdateInfo updateInfo = UpdateInfo.fromJson(json);
+    final updateInfo = UpdateInfo.fromJson(json);
     if (updateInfo.code != 0) {
       return null;
     }
 
     // Perform a second check
     // 进行二次校验
-    bool hasUpdate = updateInfo.updateStatus != noNewVersion;
+    var hasUpdate = updateInfo.updateStatus != noNewVersion;
     if (hasUpdate) {
-      final String versionCode = await CommonUtils.getVersionCode();
+      final versionCode = await CommonUtils.getVersionCode();
       // The latest version returned by the server is less than or
       // equal to the current version, no need to update.
       // 服务器返回的最新版本小于等于现在的版本，不需要更新

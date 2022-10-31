@@ -10,15 +10,13 @@ class DeleteButton extends ConsumerWidget {
   final VoidCallback onDelete;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
-      tooltip: 'Delete',
-      icon: const Icon(Icons.delete),
-      onPressed: () async {
-        final bool? shouldDelete = await showDialog<bool>(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
+  Widget build(BuildContext context, WidgetRef ref) => IconButton(
+        tooltip: 'Delete',
+        icon: const Icon(Icons.delete),
+        onPressed: () async {
+          final shouldDelete = await showDialog<bool>(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
               title: const Text('Remove Downloads'),
               content: const Text(
                 'Are you sure you remove the downloads of all selected books?',
@@ -45,12 +43,10 @@ class DeleteButton extends ConsumerWidget {
                   child: const Text('REMOVE'),
                 ),
               ],
-            );
-          },
-        );
-        if (shouldDelete == null || !shouldDelete) return;
-        onDelete.call();
-      },
-    );
-  }
+            ),
+          );
+          if (shouldDelete == null || !shouldDelete) return;
+          onDelete.call();
+        },
+      );
 }

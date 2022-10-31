@@ -70,45 +70,39 @@ class UpdateData {
     this.apkMd5 = '',
   });
 
-  Map<String, dynamic> toMap() {
-    return {
-      'hasUpdate': hasUpdate,
-      'isForce': isForce,
-      'versionCode': versionCode,
-      'versionName': versionName,
-      'updateContent': updateContent,
-      'downloadUrl': androidDownloadUrl,
-      'githubReleaseUrl': githubReleaseUrl,
-      'apkSize': apkSize,
-      'apkMd5': apkMd5,
-    };
-  }
+  Map<String, dynamic> toMap() => {
+        'hasUpdate': hasUpdate,
+        'isForce': isForce,
+        'versionCode': versionCode,
+        'versionName': versionName,
+        'updateContent': updateContent,
+        'downloadUrl': androidDownloadUrl,
+        'githubReleaseUrl': githubReleaseUrl,
+        'apkSize': apkSize,
+        'apkMd5': apkMd5,
+      };
 
-  static UpdateData fromMap(Map<String, dynamic> map) {
-    return UpdateData(
-      hasUpdate: map['hasUpdate'],
-      isForce: map['isForce'],
-      versionCode: map['versionCode']?.toInt(),
-      versionName: map['versionName'],
-      updateContent: map['updateContent'],
-      androidDownloadUrl: map['downloadUrl'],
-      githubReleaseUrl: map['githubReleaseUrl'],
-      apkSize: map['apkSize']?.toInt(),
-      apkMd5: map['apkMd5'],
-    );
-  }
+  factory UpdateData.fromMap(Map<String, dynamic> map) => UpdateData(
+        hasUpdate: map['hasUpdate'],
+        isForce: map['isForce'],
+        versionCode: map['versionCode']?.toInt(),
+        versionName: map['versionName'],
+        updateContent: map['updateContent'],
+        androidDownloadUrl: map['downloadUrl'],
+        githubReleaseUrl: map['githubReleaseUrl'],
+        apkSize: map['apkSize']?.toInt(),
+        apkMd5: map['apkMd5'],
+      );
 
   String toJson() => json.encode(toMap());
 
-  static UpdateData fromJson(String source) => fromMap(json.decode(source));
+  factory UpdateData.fromJson(String source) => UpdateData.fromMap(json.decode(source));
 
   @override
-  String toString() {
-    return 'UpdateEntity(hasUpdate: $hasUpdate, isForce: $isForce, '
-        'versionCode: $versionCode, '
-        'versionName: $versionName, updateContent: $updateContent, '
-        'downloadUrl: $androidDownloadUrl, '
-        'githubReleaseUrl: $githubReleaseUrl, '
-        'apkSize: $apkSize, apkMd5: $apkMd5)';
-  }
+  String toString() => 'UpdateEntity(hasUpdate: $hasUpdate, isForce: $isForce, '
+      'versionCode: $versionCode, '
+      'versionName: $versionName, updateContent: $updateContent, '
+      'downloadUrl: $androidDownloadUrl, '
+      'githubReleaseUrl: $githubReleaseUrl, '
+      'apkSize: $apkSize, apkMd5: $apkMd5)';
 }

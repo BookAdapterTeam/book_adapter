@@ -1,17 +1,18 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/features/library/data/item.dart';
-import 'package:book_adapter/src/features/library/model/book_status_notifier.dart';
-import 'package:book_adapter/src/shared/controller/storage_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 
+import '../features/library/data/book_item.dart';
+import '../features/library/data/item.dart';
+import '../features/library/model/book_status_notifier.dart';
+import '../shared/controller/storage_controller.dart';
+
 /// A queue that will process the items in the queue
 /// whenever it is not empty
-final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
-    QueueNotifierData<Book>>((ref) {
+final queueBookProvider =
+    StateNotifierProvider.autoDispose<QueueNotifier<Book>, QueueNotifierData<Book>>((ref) {
   final storageController = ref.read(storageControllerProvider);
   final data = QueueNotifierData<Book>(
     queueListItems: [],
@@ -38,8 +39,7 @@ final queueBookProvider = StateNotifierProvider.autoDispose<QueueNotifier<Book>,
 /// - `processItem` A function that takes an argument of
 /// the same type as the class and runs code using it,
 /// such as downloading a file and saving it to the device.
-class QueueNotifier<T extends Item>
-    extends StateNotifier<QueueNotifierData<T>> {
+class QueueNotifier<T extends Item> extends StateNotifier<QueueNotifierData<T>> {
   QueueNotifier({
     required QueueNotifierData<T> data,
     this.processItem,
@@ -60,7 +60,7 @@ class QueueNotifier<T extends Item>
   /// Add an item to the queue immediately
   void addToQueue(T item) {
     whenItemQueued?.call(item);
-    final bool isEmpty = state.queue.isEmpty;
+    final isEmpty = state.queue.isEmpty;
     state.queue.add(item);
     state.queueListItems.add(item);
     log.i(
@@ -107,10 +107,9 @@ class QueueNotifierData<T> {
   QueueNotifierData<T> copyWith({
     Queue<T>? queue,
     List<T>? queueListItems,
-  }) {
-    return QueueNotifierData<T>(
-      queue: queue ?? this.queue,
-      queueListItems: queueListItems ?? this.queueListItems,
-    );
-  }
+  }) =>
+      QueueNotifierData<T>(
+        queue: queue ?? this.queue,
+        queueListItems: queueListItems ?? this.queueListItems,
+      );
 }

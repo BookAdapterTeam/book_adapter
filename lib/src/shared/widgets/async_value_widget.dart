@@ -19,27 +19,18 @@ class AsyncValueWidget<T> extends StatelessWidget {
   final Widget Function(Object, StackTrace?)? error;
 
   @override
-  Widget build(BuildContext context) {
-    return value.when(
-      data: data,
-      loading: loading ??
-          () {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-      error: error ??
-          (e, st) {
-            return Center(
-              child: Text(
-                e.toString(),
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6!
-                    .copyWith(color: Colors.red),
-              ),
-            );
-          },
-    );
-  }
+  Widget build(BuildContext context) => value.when(
+        data: data,
+        loading: loading ??
+            () => const Center(
+                  child: CircularProgressIndicator(),
+                ),
+        error: error ??
+            (e, st) => Center(
+                  child: Text(
+                    e.toString(),
+                    style: Theme.of(context).textTheme.headline6!.copyWith(color: Colors.red),
+                  ),
+                ),
+      );
 }

@@ -2,11 +2,6 @@ import 'dart:async';
 import 'dart:io' as io;
 import 'dart:typed_data';
 
-import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/exceptions/app_exception.dart';
-import 'package:book_adapter/src/service/isolate_service.dart';
-import 'package:book_adapter/src/shared/data/failure.dart';
-import 'package:book_adapter/src/shared/data/file_hash.dart';
 import 'package:dartz/dartz.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -14,14 +9,18 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../constants/constants.dart';
+import '../exceptions/app_exception.dart';
+import '../shared/data/failure.dart';
+import '../shared/data/file_hash.dart';
+import 'isolate_service.dart';
+
 final storageServiceInitProvider = FutureProvider<void>((ref) async {
   await ref.watch(storageServiceProvider).init();
 });
 
 /// Provider to easily get access to the [FirebaseService] functions
-final storageServiceProvider = Provider<StorageService>((ref) {
-  return StorageService();
-});
+final storageServiceProvider = Provider<StorageService>((ref) => StorageService());
 
 /// A utility class to handle all Firebase calls
 class StorageService {
@@ -142,8 +141,7 @@ class StorageService {
     return _uploadQueueBox!.delete(filepath);
   }
 
-  String getAppFilePath(String filepath) =>
-      '${appBookAdaptDirectory.path}/$filepath';
+  String getAppFilePath(String filepath) => '${appBookAdaptDirectory.path}/$filepath';
 
   String getPathFromFilename({
     required String userId,
@@ -154,8 +152,7 @@ class StorageService {
   /// Method to create a directory for the user when they login
   Future<io.Directory> createUserDirectory(String userId) async {
     try {
-      return await io.Directory('${appBookAdaptDirectory.path}/$userId')
-          .create();
+      return await io.Directory('${appBookAdaptDirectory.path}/$userId').create();
     } on Exception catch (e, st) {
       _log.e(e.toString(), e, st);
       rethrow;
@@ -166,8 +163,7 @@ class StorageService {
   static Future<io.Directory> _getAppDirectory() async {
     io.Directory dir;
     if (io.Platform.isAndroid) {
-      dir = (await getExternalStorageDirectory()) ??
-          await getApplicationSupportDirectory();
+      dir = (await getExternalStorageDirectory()) ?? await getApplicationSupportDirectory();
     } else {
       dir = await getApplicationDocumentsDirectory();
     }
@@ -200,12 +196,10 @@ class StorageService {
   ///
   /// Note: Some Android paths are protected, hence can't be accessed and will return `/` instead.
   Future<Either<Failure, String>> pickDirectory({String? dialogTitle}) async {
-    final String? selectedDirectory =
-        await FilePicker.platform.getDirectoryPath(dialogTitle: dialogTitle);
+    final selectedDirectory = await FilePicker.platform.getDirectoryPath(dialogTitle: dialogTitle);
 
     if (selectedDirectory == null) {
-      return Left(Failure(
-          'User canceled the directory picker or Android SDK not 21 or above'));
+      return Left(Failure('User canceled the directory picker or Android SDK not 21 or above'));
     }
 
     return Right(selectedDirectory);
@@ -221,8 +215,7 @@ class StorageService {
     bool followLinks = true,
   }) {
     try {
-      final userDirectory =
-          io.Directory('${appBookAdaptDirectory.path}/$userId');
+      final userDirectory = io.Directory('${appBookAdaptDirectory.path}/$userId');
       final files = userDirectory.listSync(
         recursive: recursive,
         followLinks: followLinks,
@@ -302,7 +295,7 @@ class StorageService {
     //   await FilePicker.platform.clearTemporaryFiles();
     // }
 
-    final FilePickerResult? result = await FilePicker.platform.pickFiles(
+    final result = await FilePicker.platform.pickFiles(
       dialogTitle: dialogTitle,
       type: type,
       allowedExtensions: allowedExtensions,
@@ -325,16 +318,10 @@ class StorageService {
     }
   }
 
-  List<PlatformFile> _handleSingle(FilePickerResult result) {
-    final PlatformFile file = result.files.first;
+  List<PlatformFile> _handleSingle(FilePickerResult result) =>
+      [result.files.first].whereType<PlatformFile>().toList();
 
-    return [file];
-  }
-
-  List<PlatformFile> _handleMultiple(FilePickerResult result) {
-    final List<PlatformFile> files = result.files;
-    return files;
-  }
+  List<PlatformFile> _handleMultiple(FilePickerResult result) => result.files;
 
   // /// Opens a save file dialog which lets the user select a file path and a file
   // /// name to save a file.
@@ -376,7 +363,7 @@ class StorageService {
   /// Converts a [PlatformFile] object to dart io [File], returns either
   /// left `Failure` or right `File`
   Either<Failure, io.File> convertPlatformFileToIOFile(PlatformFile file) {
-    final String? path = file.path;
+    final path = file.path;
     if (path == null) {
       return Left(Failure("File's path was null"));
     }
@@ -384,9 +371,8 @@ class StorageService {
   }
 
   /// Check if a file exists on the device given the filename
-  Future<bool> appFileExists(
-      {required String userId, required String filename}) async {
-    final String path = getPathFromFilename(userId: userId, filename: filename);
+  Future<bool> appFileExists({required String userId, required String filename}) async {
+    final path = getPathFromFilename(userId: userId, filename: filename);
     if (await io.File(path).exists()) {
       return true;
     }
@@ -395,7 +381,7 @@ class StorageService {
 
   /// Check if a file exists on the device given the filename
   bool appFileExistsSync({required String userId, required String filename}) {
-    final String path = getPathFromFilename(userId: userId, filename: filename);
+    final path = getPathFromFilename(userId: userId, filename: filename);
     if (io.File(path).existsSync()) {
       return true;
     }
@@ -409,7 +395,7 @@ class StorageService {
     bool overwrite = false,
   }) async {
     try {
-      final String path = getAppFilePath(filepath);
+      final path = getAppFilePath(filepath);
       final fileRef = io.File(path);
 
       if (overwrite == false && await fileRef.exists()) {
@@ -431,8 +417,7 @@ class StorageService {
 
   /// Takes a list of files and calculates the hash of each.
   Stream<FileHash> hashFileList(List<String> filePathList) {
-    final fileHashStream =
-        IsolateService.sendListAndReceiveStream<String, FileHash>(
+    final fileHashStream = IsolateService.sendListAndReceiveStream<String, FileHash>(
       filePathList,
       receiveAndReturnService: IsolateService.readAndHashFileService,
     );
@@ -441,7 +426,7 @@ class StorageService {
 
   void saveToUploadQueueBox(List<FileHash> fileHashList) {
     for (final fileHash in fileHashList) {
-      final String filepath = fileHash.filepath;
+      final filepath = fileHash.filepath;
 
       _log.i('${filepath.split('/').last} Queued For Upload');
 

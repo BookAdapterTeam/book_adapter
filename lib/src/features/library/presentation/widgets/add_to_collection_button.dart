@@ -1,8 +1,9 @@
-import 'package:book_adapter/src/features/library/data/book_collection.dart';
-import 'package:book_adapter/src/features/library/presentation/library_view_controller.dart';
-import 'package:book_adapter/src/features/library/presentation/widgets/add_new_collection_button.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../data/book_collection.dart';
+import '../library_view_controller.dart';
+import 'add_new_collection_button.dart';
 
 class AddToCollectionButton extends StatelessWidget {
   const AddToCollectionButton({
@@ -15,34 +16,28 @@ class AddToCollectionButton extends StatelessWidget {
   final void Function(String) onAddNewCollection;
 
   @override
-  Widget build(BuildContext context) {
-    return IconButton(
-      onPressed: () async {
-        // Show popup for user to choose which collection to move the items to
-        final List<String>? collectionIds =
-            await showModalBottomSheet<List<String>?>(
-          isScrollControlled: true,
-          context: context,
-          builder: (context) {
+  Widget build(BuildContext context) => IconButton(
+        onPressed: () async {
+          // Show popup for user to choose which collection to move the items to
+          final collectionIds = await showModalBottomSheet<List<String>?>(
+            isScrollControlled: true,
+            context: context,
+
             // Using Wrap makes the bottom sheet height the
             //   height of the content.
             // Otherwise, the height will be half the height of the screen.
-            return ChooseCollectionsBottomSheet(
+            builder: (context) => ChooseCollectionsBottomSheet(
               onAddNewCollection: onAddNewCollection,
-            );
-          },
-        );
-        if (collectionIds == null || collectionIds.isEmpty) return;
-        onMove.call(collectionIds);
-      },
-      icon: const Icon(Icons.collections_bookmark_rounded),
-    );
-  }
+            ),
+          );
+          if (collectionIds == null || collectionIds.isEmpty) return;
+          onMove.call(collectionIds);
+        },
+        icon: const Icon(Icons.collections_bookmark_rounded),
+      );
 }
 
-final chosenCollectionsProvider = StateProvider<List<String>>((ref) {
-  return [];
-});
+final chosenCollectionsProvider = StateProvider<List<String>>((ref) => []);
 
 class ChooseCollectionsBottomSheet extends ConsumerStatefulWidget {
   const ChooseCollectionsBottomSheet({
@@ -53,19 +48,16 @@ class ChooseCollectionsBottomSheet extends ConsumerStatefulWidget {
   final void Function(String) onAddNewCollection;
 
   @override
-  ConsumerState<ChooseCollectionsBottomSheet> createState() =>
-      _ChooseCollectionsBottomSheetState();
+  ConsumerState<ChooseCollectionsBottomSheet> createState() => _ChooseCollectionsBottomSheetState();
 }
 
-class _ChooseCollectionsBottomSheetState
-    extends ConsumerState<ChooseCollectionsBottomSheet> {
+class _ChooseCollectionsBottomSheetState extends ConsumerState<ChooseCollectionsBottomSheet> {
   final List<String> chosenCollections = [];
 
   @override
   Widget build(BuildContext context) {
     final data = ref.watch(libraryViewControllerProvider);
-    final collectionList = data.collections
-      ?..sort((a, b) => a.name.compareTo(b.name));
+    final collectionList = data.collections?..sort((a, b) => a.name.compareTo(b.name));
 
     return SingleChildScrollView(
       child: Wrap(

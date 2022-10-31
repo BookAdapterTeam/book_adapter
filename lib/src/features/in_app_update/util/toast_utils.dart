@@ -1,6 +1,7 @@
-import 'package:book_adapter/src/constants/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:oktoast/oktoast.dart';
+
+import '../../../constants/constants.dart';
 
 const defaultToastColor = Color(0xFF424242);
 
@@ -12,20 +13,18 @@ class ToastUtils {
   /// Initialize Toast configuration globally, child is MaterialApp
   ///
   /// 全局初始化Toast配置, child为MaterialApp
-  static Widget init({required Widget child}) {
-    return OKToast(
-      /// Front Size
-      ///
-      /// 字体大小
-      textStyle: const TextStyle(fontSize: 16, color: Colors.white),
-      backgroundColor: defaultToastColor,
-      radius: 10,
-      dismissOtherOnShow: true,
-      textPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-      duration: kSnackBarDuration,
-      child: child,
-    );
-  }
+  static Widget init({required Widget child}) => OKToast(
+        /// Front Size
+        ///
+        /// 字体大小
+        textStyle: const TextStyle(fontSize: 16, color: Colors.white),
+        backgroundColor: defaultToastColor,
+        radius: 10,
+        dismissOtherOnShow: true,
+        textPadding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+        duration: kSnackBarDuration,
+        child: child,
+      );
 
   static void toast(
     String msg, {

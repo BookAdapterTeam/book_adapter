@@ -1,11 +1,11 @@
-import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+import '../../shared/controller/firebase_controller.dart';
 
 final editProfileViewController =
     StateNotifierProvider<EditProfileViewController, EditProfileViewData>(
-        (ref) {
-  return EditProfileViewController(ref.read);
-});
+  (ref) => EditProfileViewController(ref.read),
+);
 
 // State is if the view is loading
 class EditProfileViewController extends StateNotifier<EditProfileViewData> {
@@ -19,8 +19,7 @@ class EditProfileViewController extends StateNotifier<EditProfileViewData> {
 
   Future<bool> submit() async {
     state = state.copyWith(isLoading: true);
-    final result =
-        await _read(firebaseControllerProvider).setDisplayName(state.username);
+    final result = await _read(firebaseControllerProvider).setDisplayName(state.username);
     state = state.copyWith(isLoading: false);
     return result;
   }
@@ -38,10 +37,9 @@ class EditProfileViewData {
   EditProfileViewData copyWith({
     String? username,
     bool? isLoading,
-  }) {
-    return EditProfileViewData(
-      username: username ?? this.username,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
+  }) =>
+      EditProfileViewData(
+        username: username ?? this.username,
+        isLoading: isLoading ?? this.isLoading,
+      );
 }

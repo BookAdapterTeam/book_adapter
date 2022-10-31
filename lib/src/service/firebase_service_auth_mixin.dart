@@ -1,6 +1,7 @@
-import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+import '../shared/data/failure.dart';
 
 mixin FirebaseServiceAuthMixin {
   FirebaseAuth get auth;
@@ -98,8 +99,7 @@ mixin FirebaseServiceAuthMixin {
       // Return the data incase the caller needs it
       return Right(userCredential);
     } on FirebaseAuthException catch (e) {
-      return Left(
-          FirebaseFailure(e.message ?? 'Signup Not Successful', e.code));
+      return Left(FirebaseFailure(e.message ?? 'Signup Not Successful', e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not SignUp'));
     }
@@ -118,9 +118,7 @@ mixin FirebaseServiceAuthMixin {
   /// You should not use this getter to determine the users current state,
   /// instead use [authStateChanges], [idTokenChanges] or [userChanges] to
   /// subscribe to updates.
-  User? get currentUser {
-    return auth.currentUser;
-  }
+  User? get currentUser => auth.currentUser;
 
   /// Send reset password email
   Future<Either<Failure, void>> resetPassword(String email) async {
@@ -129,8 +127,7 @@ mixin FirebaseServiceAuthMixin {
       return const Right(null);
     } on FirebaseException catch (e) {
       return Left(FirebaseFailure(
-          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email',
-          e.code));
+          e.message ?? 'Unknown Firebase Exception, Could Not Send Reset Email', e.code));
     } on Exception catch (_) {
       return Left(Failure('Unexpected Exception, Could Not Send Reset Email'));
     }

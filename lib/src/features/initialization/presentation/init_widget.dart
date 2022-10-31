@@ -1,13 +1,14 @@
-import 'package:book_adapter/firebase_options.dart';
-import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/src/features/initialization/presentation/loading_page.dart';
-import 'package:book_adapter/src/service/storage_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../../../firebase_options.dart';
+import '../../../service/storage_service.dart';
+import '../../in_app_update/util/toast_utils.dart';
+import 'loading_page.dart';
 
 final providerForInitStream = StreamProvider.autoDispose<String?>((ref) async* {
   yield* _initStream(ref);
@@ -47,7 +48,7 @@ class InitWidget extends ConsumerWidget {
 
     return asyncValue.map(
       data: (asyncData) {
-        final String? message = asyncData.value;
+        final message = asyncData.value;
         // Done loading when null is sent
         if (message == null) {
           return child;
@@ -77,10 +78,7 @@ class InitWidget extends ConsumerWidget {
             body: Center(
               child: Text(
                 error.message,
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6!
-                    .copyWith(color: Colors.red),
+                style: Theme.of(context).textTheme.headline6!.copyWith(color: Colors.red),
               ),
             ),
           );
@@ -92,10 +90,7 @@ class InitWidget extends ConsumerWidget {
             body: Center(
               child: Text(
                 error.message,
-                style: Theme.of(context)
-                    .textTheme
-                    .headline6!
-                    .copyWith(color: Colors.red),
+                style: Theme.of(context).textTheme.headline6!.copyWith(color: Colors.red),
               ),
             ),
           );
@@ -106,17 +101,12 @@ class InitWidget extends ConsumerWidget {
           body: Center(
             child: Text(
               error.toString(),
-              style: Theme.of(context)
-                  .textTheme
-                  .headline6!
-                  .copyWith(color: Colors.red),
+              style: Theme.of(context).textTheme.headline6!.copyWith(color: Colors.red),
             ),
           ),
         );
       },
-      loading: (loading) {
-        return const LoadingPage(message: 'Loading...');
-      },
+      loading: (loading) => const LoadingPage(message: 'Loading...'),
     );
   }
 }

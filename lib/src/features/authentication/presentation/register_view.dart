@@ -1,11 +1,12 @@
-import 'package:book_adapter/src/features/authentication/controller/register_view_controller.dart';
-import 'package:book_adapter/src/features/authentication/data/register_view_data.dart';
-import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../../shared/data/failure.dart';
+import '../controller/register_view_controller.dart';
+import '../data/register_view_data.dart';
 
 class RegisterView extends ConsumerWidget {
   RegisterView({Key? key}) : super(key: key);
@@ -14,7 +15,7 @@ class RegisterView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final RegisterViewData data = ref.watch(registerViewController);
+    final data = ref.watch(registerViewController);
 
     return Scaffold(
         appBar: AppBar(
@@ -81,8 +82,7 @@ class _RegisterButton extends ConsumerWidget {
     final log = Logger();
     return ElevatedButton(
       style: !data.isButtonEnabled
-          ? ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.black38))
+          ? ButtonStyle(backgroundColor: MaterialStateProperty.all<Color>(Colors.black38))
           : null,
       onPressed: () async {
         if (!data.isButtonEnabled) {
@@ -116,35 +116,31 @@ class _VerifyPasswordTextField extends ConsumerWidget {
   final RegisterViewData data;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextFormField(
-      initialValue: data.verifyPassword,
-      keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          border: OutlineInputBorder(), labelText: 'Re-enter Password'),
-      obscureText: true,
-      validator: (verifyPassword) {
-        if (verifyPassword == null) {
-          return null;
-        }
-        if (verifyPassword.isEmpty) {
-          return 'Verify password field is empty';
-        }
-        if (verifyPassword != data.password) {
-          return 'Passwords are not the same';
-        }
+  Widget build(BuildContext context, WidgetRef ref) => TextFormField(
+        initialValue: data.verifyPassword,
+        keyboardType: TextInputType.text,
+        decoration:
+            const InputDecoration(border: OutlineInputBorder(), labelText: 'Re-enter Password'),
+        obscureText: true,
+        validator: (verifyPassword) {
+          if (verifyPassword == null) {
+            return null;
+          }
+          if (verifyPassword.isEmpty) {
+            return 'Verify password field is empty';
+          }
+          if (verifyPassword != data.password) {
+            return 'Passwords are not the same';
+          }
 
-        return null;
-      },
-      onChanged: (verifyPasswordValue) {
-        ref
-            .read(registerViewController.notifier)
-            .updateData(verifyPassword: verifyPasswordValue);
-      },
-      autofillHints: const [AutofillHints.password],
-      textInputAction: TextInputAction.done,
-    );
-  }
+          return null;
+        },
+        onChanged: (verifyPasswordValue) {
+          ref.read(registerViewController.notifier).updateData(verifyPassword: verifyPasswordValue);
+        },
+        autofillHints: const [AutofillHints.password],
+        textInputAction: TextInputAction.done,
+      );
 }
 
 class _PasswordTextField extends ConsumerWidget {
@@ -156,37 +152,32 @@ class _PasswordTextField extends ConsumerWidget {
   final RegisterViewData data;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextFormField(
-      initialValue: data.password,
-      keyboardType: TextInputType.text,
-      decoration: const InputDecoration(
-          border: OutlineInputBorder(), labelText: 'Password'),
-      obscureText: true,
-      validator: (passwordValue) {
-        if (passwordValue == null) {
+  Widget build(BuildContext context, WidgetRef ref) => TextFormField(
+        initialValue: data.password,
+        keyboardType: TextInputType.text,
+        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Password'),
+        obscureText: true,
+        validator: (passwordValue) {
+          if (passwordValue == null) {
+            return null;
+          }
+          if (passwordValue.isEmpty) {
+            return 'Password cannot be empty';
+          }
+
+          if (passwordValue.length < 6) {
+            return 'Password must be 6 or more characters';
+          }
+
           return null;
-        }
-        if (passwordValue.isEmpty) {
-          return 'Password cannot be empty';
-        }
-
-        if (passwordValue.length < 6) {
-          return 'Password must be 6 or more characters';
-        }
-
-        return null;
-      },
-      onChanged: (passwordValue) {
-        ref
-            .read(registerViewController.notifier)
-            .updateData(password: passwordValue);
-      },
-      autofillHints: const [AutofillHints.password],
-      onEditingComplete: TextInput.finishAutofillContext,
-      textInputAction: TextInputAction.next,
-    );
-  }
+        },
+        onChanged: (passwordValue) {
+          ref.read(registerViewController.notifier).updateData(password: passwordValue);
+        },
+        autofillHints: const [AutofillHints.password],
+        onEditingComplete: TextInput.finishAutofillContext,
+        textInputAction: TextInputAction.next,
+      );
 }
 
 class _EmailTextField extends ConsumerWidget {
@@ -198,31 +189,28 @@ class _EmailTextField extends ConsumerWidget {
   final RegisterViewData data;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextFormField(
-      initialValue: data.email,
-      keyboardType: TextInputType.emailAddress,
-      decoration: const InputDecoration(
-          border: OutlineInputBorder(), labelText: 'Email'),
-      validator: (email) {
-        if (email == null) {
+  Widget build(BuildContext context, WidgetRef ref) => TextFormField(
+        initialValue: data.email,
+        keyboardType: TextInputType.emailAddress,
+        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Email'),
+        validator: (email) {
+          if (email == null) {
+            return null;
+          }
+          if (email.isEmpty) {
+            return 'Please Enter an Email';
+          }
+          if (!EmailValidator.validate(email)) {
+            return 'Please use a valid email';
+          }
           return null;
-        }
-        if (email.isEmpty) {
-          return 'Please Enter an Email';
-        }
-        if (!EmailValidator.validate(email)) {
-          return 'Please use a valid email';
-        }
-        return null;
-      },
-      onChanged: (emailValue) {
-        ref.read(registerViewController.notifier).updateData(email: emailValue);
-      },
-      autofillHints: const [AutofillHints.email],
-      textInputAction: TextInputAction.next,
-    );
-  }
+        },
+        onChanged: (emailValue) {
+          ref.read(registerViewController.notifier).updateData(email: emailValue);
+        },
+        autofillHints: const [AutofillHints.email],
+        textInputAction: TextInputAction.next,
+      );
 }
 
 class _UsernameTextField extends ConsumerWidget {
@@ -234,21 +222,16 @@ class _UsernameTextField extends ConsumerWidget {
   final RegisterViewData data;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextFormField(
-      initialValue: data.username,
-      decoration: const InputDecoration(
-          border: OutlineInputBorder(), labelText: 'Username'),
-      onChanged: (usernameValue) {
-        ref
+  Widget build(BuildContext context, WidgetRef ref) => TextFormField(
+        initialValue: data.username,
+        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Username'),
+        onChanged: (usernameValue) {
+          ref.read(registerViewController.notifier).updateData(username: usernameValue);
+        },
+        validator: (username) => ref
             .read(registerViewController.notifier)
-            .updateData(username: usernameValue);
-      },
-      validator: (username) => ref
-          .read(registerViewController.notifier)
-          .validate(string: username, message: "Username can't be empty"),
-      textInputAction: TextInputAction.next,
-      autofillHints: const [AutofillHints.username],
-    );
-  }
+            .validate(string: username, message: "Username can't be empty"),
+        textInputAction: TextInputAction.next,
+        autofillHints: const [AutofillHints.username],
+      );
 }

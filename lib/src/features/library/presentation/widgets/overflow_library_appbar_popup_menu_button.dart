@@ -1,5 +1,6 @@
-import 'package:book_adapter/src/constants/constants.dart';
 import 'package:flutter/material.dart';
+
+import '../../../../constants/constants.dart';
 
 class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
   const OverflowLibraryAppBarPopupMenuButton({
@@ -14,17 +15,15 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
   final VoidCallback onDownload;
 
   @override
-  Widget build(BuildContext context) {
-    return PopupMenuButton(
-      offset: const Offset(0, kToolbarHeight),
-      icon: const Icon(Icons.more_vert),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(kCornerRadius),
+  Widget build(BuildContext context) => PopupMenuButton(
+        offset: const Offset(0, kToolbarHeight),
+        icon: const Icon(Icons.more_vert),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(kCornerRadius),
+          ),
         ),
-      ),
-      itemBuilder: (context) {
-        return <PopupMenuEntry>[
+        itemBuilder: (context) => <PopupMenuEntry>[
           PopupMenuItem(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -75,40 +74,35 @@ class OverflowLibraryAppBarPopupMenuButton extends StatelessWidget {
             onTap: () async {
               // Weird work around
               // See here for details: https://stackoverflow.com/questions/69568862/flutter-showdialog-is-not-shown-on-popupmenuitem-tap
-              final bool? shouldDelete = await Future<bool?>.delayed(
+              final shouldDelete = await Future<bool?>.delayed(
                 const Duration(),
                 () => showDialog<bool>(
                   context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text('Delete Permanently'),
-                      content: const Text(
-                          'Are you sure you want to delete all selected books '
-                          'and series? This cannot be undone.'),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(false);
-                          },
-                          child: const Text('CANCEL'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(true);
-                          },
-                          child: const Text('DELETE'),
-                        ),
-                      ],
-                    );
-                  },
+                  builder: (BuildContext context) => AlertDialog(
+                    title: const Text('Delete Permanently'),
+                    content: const Text('Are you sure you want to delete all selected books '
+                        'and series? This cannot be undone.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(false);
+                        },
+                        child: const Text('CANCEL'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop(true);
+                        },
+                        child: const Text('DELETE'),
+                      ),
+                    ],
+                  ),
                 ),
               );
               if (shouldDelete == null || !shouldDelete) return;
               onDeletePermanently.call();
             },
           ),
-        ];
-      },
-    );
-  }
+        ],
+      );
 }

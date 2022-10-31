@@ -1,17 +1,18 @@
-import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/features/library/data/book_status_enum.dart';
-import 'package:book_adapter/src/features/library/data/item.dart';
-import 'package:book_adapter/src/features/library/data/series_item.dart';
-import 'package:book_adapter/src/features/library/model/book_status_notifier.dart';
-import 'package:book_adapter/src/features/library/presentation/library_view_controller.dart';
-import 'package:book_adapter/src/features/library/presentation/widgets/default_item_image.dart';
-import 'package:book_adapter/src/features/reader/current_book.dart';
-import 'package:book_adapter/src/shared/controller/storage_controller.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../../../constants/constants.dart';
+import '../../../../shared/controller/storage_controller.dart';
+import '../../../reader/current_book.dart';
+import '../../data/book_item.dart';
+import '../../data/book_status_enum.dart';
+import '../../data/item.dart';
+import '../../data/series_item.dart';
+import '../../model/book_status_notifier.dart';
+import '../library_view_controller.dart';
+import 'default_item_image.dart';
 
 class ItemListTileWidget extends ConsumerWidget {
   const ItemListTileWidget({
@@ -25,7 +26,7 @@ class ItemListTileWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
+    final data = ref.watch(libraryViewControllerProvider);
 
     final isSelected = data.selectedItems.contains(item);
 
@@ -51,8 +52,7 @@ class ItemListTileWidget extends ConsumerWidget {
                   isBook: false,
                 ),
               ),
-              const Positioned(
-                  left: 0, bottom: 0, child: Icon(Icons.collections_bookmark)),
+              const Positioned(left: 0, bottom: 0, child: Icon(Icons.collections_bookmark)),
             ],
           );
 
@@ -108,22 +108,20 @@ class _ItemListTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final log = Logger();
-    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
+    final data = ref.watch(libraryViewControllerProvider);
     final imageUrl = item.imageUrl;
     final firebaseCoverImagePath = item.firebaseCoverImagePath;
     final subtitle = item.subtitle != null ? Text(item.subtitle!) : null;
     final isSelected = data.selectedItems.contains(item);
-    final bookStatus =
-        item is Book ? ref.watch(bookStatusProvider(item as Book)) : null;
+    final bookStatus = item is Book ? ref.watch(bookStatusProvider(item as Book)) : null;
 
-    final bool legacyImage = imageUrl != null && firebaseCoverImagePath == null;
-    final asyncV = firebaseCoverImagePath == null
-        ? null
-        : ref.watch(fileUrlProvider(firebaseCoverImagePath));
+    final legacyImage = imageUrl != null && firebaseCoverImagePath == null;
+    final asyncV =
+        firebaseCoverImagePath == null ? null : ref.watch(fileUrlProvider(firebaseCoverImagePath));
 
     const width = 40.0;
 
-    final Widget image = legacyImage
+    final image = legacyImage
         ? ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: CachedNetworkImage(
@@ -176,7 +174,7 @@ class _ItemListTile extends ConsumerWidget {
     if (item is Book) {
       final book = item as Book;
       final Widget? trailing;
-      final Widget? icon = bookStatus?.map<Widget?>(
+      final icon = bookStatus?.map<Widget?>(
         data: (data) {
           final bookStatus = data.value;
           switch (bookStatus) {
@@ -198,7 +196,7 @@ class _ItemListTile extends ConsumerWidget {
         error: (error) => const Icon(Icons.error_outline),
         loading: (loading) => const CircularProgressIndicator(),
       );
-      final VoidCallback? onPressed = bookStatus?.map<VoidCallback?>(
+      final onPressed = bookStatus?.map<VoidCallback?>(
         data: (data) {
           final bookStatus = data.value;
           switch (bookStatus) {
@@ -284,15 +282,14 @@ class _CustomListTileWidget extends ConsumerStatefulWidget {
   final BookStatus? status;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      __CustomListTileWidgetState();
+  ConsumerState<ConsumerStatefulWidget> createState() => __CustomListTileWidgetState();
 }
 
 class __CustomListTileWidgetState extends ConsumerState<_CustomListTileWidget> {
   @override
   Widget build(BuildContext context) {
     final log = Logger();
-    final LibraryViewData data = ref.watch(libraryViewControllerProvider);
+    final data = ref.watch(libraryViewControllerProvider);
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 8),
       shape: const RoundedRectangleBorder(
@@ -303,9 +300,7 @@ class __CustomListTileWidgetState extends ConsumerState<_CustomListTileWidget> {
       title: Text(
         widget.item.title,
         maxLines: widget.subtitle == null ? 3 : 2,
-        style: DefaultTextStyle.of(context)
-            .style
-            .copyWith(overflow: TextOverflow.ellipsis),
+        style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
       ),
       subtitle: widget.subtitle,
       minLeadingWidth: 0,
@@ -314,21 +309,15 @@ class __CustomListTileWidgetState extends ConsumerState<_CustomListTileWidget> {
       onLongPress: () {
         if (widget.disableSelect) return;
 
-        ref
-            .read(libraryViewControllerProvider.notifier)
-            .selectItem(widget.item);
+        ref.read(libraryViewControllerProvider.notifier).selectItem(widget.item);
       },
       onTap: () async {
         if (widget.isSelected) {
-          return ref
-              .read(libraryViewControllerProvider.notifier)
-              .deselectItem(widget.item);
+          return ref.read(libraryViewControllerProvider.notifier).deselectItem(widget.item);
         }
 
         if (data.isSelecting && !widget.disableSelect) {
-          return ref
-              .read(libraryViewControllerProvider.notifier)
-              .selectItem(widget.item);
+          return ref.read(libraryViewControllerProvider.notifier).selectItem(widget.item);
         }
 
         if (widget.item is Series) {
@@ -341,9 +330,7 @@ class __CustomListTileWidgetState extends ConsumerState<_CustomListTileWidget> {
         }
 
         if (widget.item is Book &&
-            ref
-                .read(storageControllerProvider)
-                .fileExists((widget.item as Book).filename)) {
+            ref.read(storageControllerProvider).fileExists((widget.item as Book).filename)) {
           final controller = ref.read(currentBookProvider.state);
           controller.state = widget.item as Book;
           Navigator.restorablePushNamed(
@@ -362,14 +349,14 @@ class __CustomListTileWidgetState extends ConsumerState<_CustomListTileWidget> {
             if (!mounted) return;
 
             log.e(failure.message);
-            final SnackBar snackBar = SnackBar(
+            final snackBar = SnackBar(
               content: Text(failure.message),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);
             return;
           } on Exception catch (e) {
             log.e(e.toString());
-            final SnackBar snackBar = SnackBar(
+            final snackBar = SnackBar(
               content: Text(e.toString()),
             );
             ScaffoldMessenger.of(context).showSnackBar(snackBar);

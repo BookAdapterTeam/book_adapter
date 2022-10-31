@@ -7,12 +7,10 @@ class AddBookButton extends ConsumerWidget {
   final VoidCallback onAdd;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return IconButton(
-      tooltip: 'Add a book',
-      onPressed: onAdd.call,
-      iconSize: 28,
-      icon: const Icon(Icons.add),
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => IconButton(
+        tooltip: 'Add a book',
+        onPressed: onAdd.call,
+        iconSize: 28,
+        icon: const Icon(Icons.add),
+      );
 }

@@ -1,12 +1,5 @@
 import 'dart:ui';
 
-import 'package:book_adapter/src/constants/constants.dart';
-import 'package:book_adapter/src/features/in_app_update/util/toast_utils.dart';
-import 'package:book_adapter/src/features/library/data/book_item.dart';
-import 'package:book_adapter/src/features/library/data/series_item.dart';
-import 'package:book_adapter/src/features/library/presentation/library_view_controller.dart';
-import 'package:book_adapter/src/features/library/presentation/widgets/item_list_tile_widget.dart';
-import 'package:book_adapter/src/features/library/presentation/widgets/overflow_library_appbar_popup_menu_button.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +9,14 @@ import 'package:implicitly_animated_reorderable_list/implicitly_animated_reorder
 import 'package:logger/logger.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 
+import '../../../constants/constants.dart';
+import '../../in_app_update/util/toast_utils.dart';
+import '../data/book_item.dart';
+import '../data/series_item.dart';
+import 'library_view_controller.dart';
+import 'widgets/item_list_tile_widget.dart';
+import 'widgets/overflow_library_appbar_popup_menu_button.dart';
+
 class SeriesView extends HookConsumerWidget {
   const SeriesView({Key? key}) : super(key: key);
 
@@ -23,14 +24,11 @@ class SeriesView extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final Map<String, dynamic> bookMap =
-        ModalRoute.of(context)!.settings.arguments! as Map<String, dynamic>;
+    final bookMap = ModalRoute.of(context)!.settings.arguments! as Map<String, dynamic>;
     final series = Series.fromMapFirebase(bookMap);
     final data = ref.watch(libraryViewControllerProvider);
 
-    final books = data.books?.where((book) {
-      return series.id == book.seriesId;
-    }).toList();
+    final books = data.books?.where((book) => series.id == book.seriesId).toList();
     books?.sort((a, b) => a.title.compareTo(b.title));
 
     final imageUrl = series.imageUrl;
@@ -52,18 +50,15 @@ class SeriesView extends HookConsumerWidget {
               animation,
               item,
               index,
-            ) {
-              return itemBuilder(
-                context,
-                animation,
-                item,
-                index,
-                books,
-              );
-            },
-            areItemsTheSame: (oldItem, newItem) {
-              return oldItem.id == newItem.id;
-            },
+            ) =>
+                itemBuilder(
+              context,
+              animation,
+              item,
+              index,
+              books,
+            ),
+            areItemsTheSame: (oldItem, newItem) => oldItem.id == newItem.id,
           ),
         ],
       ),
@@ -76,12 +71,11 @@ class SeriesView extends HookConsumerWidget {
     Book item,
     int index,
     List<Book>? books,
-  ) {
-    return ItemListTileWidget(
-      item: item,
-      disableSelect: false,
-    );
-  }
+  ) =>
+      ItemListTileWidget(
+        item: item,
+        disableSelect: false,
+      );
 }
 
 class _SliverBackgroundAppBar extends ConsumerStatefulWidget {
@@ -95,19 +89,17 @@ class _SliverBackgroundAppBar extends ConsumerStatefulWidget {
   final Series series;
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() =>
-      __SliverBackgroundAppBarState();
+  ConsumerState<ConsumerStatefulWidget> createState() => __SliverBackgroundAppBarState();
 }
 
-class __SliverBackgroundAppBarState
-    extends ConsumerState<_SliverBackgroundAppBar> {
+class __SliverBackgroundAppBarState extends ConsumerState<_SliverBackgroundAppBar> {
   @override
   Widget build(BuildContext context) {
     final viewController = ref.watch(libraryViewControllerProvider.notifier);
-    final bool isSelecting = ref.watch(libraryViewControllerProvider
-        .select((controller) => controller.isSelecting));
-    final int numberSelected = ref.watch(libraryViewControllerProvider
-        .select((controller) => controller.numberSelected));
+    final isSelecting =
+        ref.watch(libraryViewControllerProvider.select((controller) => controller.isSelecting));
+    final numberSelected =
+        ref.watch(libraryViewControllerProvider.select((controller) => controller.numberSelected));
     final log = Logger();
 
     return SliverStack(
@@ -120,29 +112,25 @@ class __SliverBackgroundAppBarState
             PopupMenuButton(
               offset: const Offset(0, kToolbarHeight),
               icon: const Icon(Icons.more_vert),
-              itemBuilder: (context) {
-                return <PopupMenuEntry>[
-                  PopupMenuItem(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(Icons.merge_type),
-                        SizedBox(
-                          width: 8,
-                        ),
-                        Text('Unmerge'),
-                      ],
-                    ),
-                    onTap: () {
-                      Navigator.pop(context);
-                      ref
-                          .read(libraryViewControllerProvider.notifier)
-                          .unmergeSeries(widget.series);
-                    },
+              itemBuilder: (context) => <PopupMenuEntry>[
+                PopupMenuItem(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.merge_type),
+                      SizedBox(
+                        width: 8,
+                      ),
+                      Text('Unmerge'),
+                    ],
                   ),
-                ];
-              },
+                  onTap: () {
+                    Navigator.pop(context);
+                    ref.read(libraryViewControllerProvider.notifier).unmergeSeries(widget.series);
+                  },
+                ),
+              ],
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.all(
                   Radius.circular(kCornerRadius),
@@ -165,9 +153,8 @@ class __SliverBackgroundAppBarState
             actions: [
               OverflowLibraryAppBarPopupMenuButton(
                 onRemoveDownloads: () async {
-                  final failure = await ref
-                      .read(libraryViewControllerProvider.notifier)
-                      .deleteBookDownloads();
+                  final failure =
+                      await ref.read(libraryViewControllerProvider.notifier).deleteBookDownloads();
                   if (failure == null) return;
 
                   ToastUtils.error(failure.message);
@@ -181,14 +168,13 @@ class __SliverBackgroundAppBarState
                   ToastUtils.error(failure.message);
                 },
                 onDownload: () async {
-                  final failure = await ref
-                      .read(libraryViewControllerProvider.notifier)
-                      .queueDownloadBooks();
+                  final failure =
+                      await ref.read(libraryViewControllerProvider.notifier).queueDownloadBooks();
                   if (failure == null) return;
                   if (!mounted) return;
 
                   log.e(failure.message);
-                  final SnackBar snackBar = SnackBar(
+                  final snackBar = SnackBar(
                     content: Text(failure.message),
                   );
                   ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -200,46 +186,42 @@ class __SliverBackgroundAppBarState
     );
   }
 
-  FlexibleSpaceBar _buildFlexibleSpace() {
-    return FlexibleSpaceBar(
-      title: Text(widget.series.title),
-      stretchModes: const <StretchMode>[
-        StretchMode.zoomBackground,
-        StretchMode.blurBackground,
-        StretchMode.fadeTitle,
-      ],
-      background: _buildBackground(),
-    );
-  }
+  FlexibleSpaceBar _buildFlexibleSpace() => FlexibleSpaceBar(
+        title: Text(widget.series.title),
+        stretchModes: const <StretchMode>[
+          StretchMode.zoomBackground,
+          StretchMode.blurBackground,
+          StretchMode.fadeTitle,
+        ],
+        background: _buildBackground(),
+      );
 
-  Stack _buildBackground() {
-    return Stack(
-      fit: StackFit.expand,
-      children: <Widget>[
-        BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
-          child: ImageFiltered(
-            imageFilter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
-            child: CachedNetworkImage(
-              fit: BoxFit.fitWidth,
-              imageUrl: widget.imageUrl!,
-              width: 40,
-            ), // Widget that is blurred
-          ),
-        ),
-        const DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment(0.0, 0.5),
-              end: Alignment.center,
-              colors: <Color>[
-                Color(0x60000000),
-                Color(0x00000000),
-              ],
+  Stack _buildBackground() => Stack(
+        fit: StackFit.expand,
+        children: <Widget>[
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 3.0, sigmaY: 3.0),
+            child: ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 4.0, sigmaY: 4.0),
+              child: CachedNetworkImage(
+                fit: BoxFit.fitWidth,
+                imageUrl: widget.imageUrl!,
+                width: 40,
+              ), // Widget that is blurred
             ),
           ),
-        ),
-      ],
-    );
-  }
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment(0.0, 0.5),
+                end: Alignment.center,
+                colors: <Color>[
+                  Color(0x60000000),
+                  Color(0x00000000),
+                ],
+              ),
+            ),
+          ),
+        ],
+      );
 }

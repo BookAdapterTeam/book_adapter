@@ -1,12 +1,3 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
-#
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
-
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
 analyzer:
@@ -37,24 +28,32 @@ linter:
     # Single quotes are easier to type and don't compromise on readability.
     prefer_single_quotes: true
 
-    # Type annotations are sometimes necessary for readability
-    omit_local_variable_types: false
+    # Makes things easier to read. If you need types for a specific case,
+    # just ignore it for that line
+    omit_local_variable_types: true
 
     # Better to declare variables as final
     prefer_final_locals: true
 
-    # Better to leave it up to the programmer
-    prefer_int_literals: false
+    prefer_final_fields: true
+
+    prefer_final_in_for_each: true
 
     # It is better to group related packages
     sort_pub_dependencies: false
 
     directives_ordering: true
 
+    # Some enums might need to have specific letter casing when converted to String
+    constant_identifier_names: false
+
+    unnecessary_lambdas: true
+
+    unnecessary_constructor_name: true
+
     unawaited_futures: true
 
-    prefer_relative_imports: false
-    always_use_package_imports: true
+    prefer_relative_imports: true
 
     cast_nullable_to_non_nullable: true
 
@@ -62,11 +61,17 @@ linter:
 
     lines_longer_than_80_chars: false
 
+    prefer_interpolation_to_compose_strings: true
+
     unnecessary_await_in_return: true
 
-    unnecessary_lambdas: true
+    unnecessary_late: true
+
+    unnecessary_null_aware_assignments: true
 
     unnecessary_null_checks: true
+
+    unnecessary_nullable_for_final_variable_declarations: true
 
     unnecessary_parenthesis: true
 
@@ -86,6 +91,18 @@ linter:
 
     use_to_and_as_if_applicable: true
 
+    depend_on_referenced_packages: true
+
     secure_pubspec_urls: true
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+
+    prefer_const_constructors: true
+
+    prefer_const_constructors_in_immutables: true
+
+    prefer_const_declarations: true
+
+    prefer_constructors_over_static_methods: true
+
+    join_return_with_assignment: true
+
+    prefer_expression_function_bodies: true

@@ -1,11 +1,12 @@
-import 'package:book_adapter/src/features/authentication/controller/login_view_controller.dart';
-import 'package:book_adapter/src/features/authentication/presentation/register_view.dart';
-import 'package:book_adapter/src/features/authentication/presentation/reset_password_view.dart';
-import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:logger/logger.dart';
+
+import '../../../shared/data/failure.dart';
+import '../controller/login_view_controller.dart';
+import 'register_view.dart';
+import 'reset_password_view.dart';
 
 class LoginView extends ConsumerWidget {
   LoginView({Key? key}) : super(key: key);
@@ -69,14 +70,12 @@ class _LoginTitleText extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Login',
-        style: Theme.of(context).textTheme.headline3,
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Center(
+        child: Text(
+          'Login',
+          style: Theme.of(context).textTheme.headline3,
+        ),
+      );
 }
 
 class _EmailTextField extends ConsumerWidget {
@@ -88,20 +87,16 @@ class _EmailTextField extends ConsumerWidget {
   final LoginViewData data;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextFormField(
-      initialValue: data.email,
-      decoration: const InputDecoration(
-          border: OutlineInputBorder(), labelText: 'Email'),
-      validator: (email) =>
-          ref.read(loginViewController.notifier).validateEmail(email),
-      onChanged: (email) {
-        ref.read(loginViewController.notifier).updateData(email: email);
-      },
-      textInputAction: TextInputAction.next,
-      autofillHints: const [AutofillHints.email],
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => TextFormField(
+        initialValue: data.email,
+        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Email'),
+        validator: (email) => ref.read(loginViewController.notifier).validateEmail(email),
+        onChanged: (email) {
+          ref.read(loginViewController.notifier).updateData(email: email);
+        },
+        textInputAction: TextInputAction.next,
+        autofillHints: const [AutofillHints.email],
+      );
 }
 
 class _PasswordTextField extends ConsumerWidget {
@@ -113,22 +108,18 @@ class _PasswordTextField extends ConsumerWidget {
   final LoginViewData data;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return TextFormField(
-      initialValue: data.password,
-      decoration: const InputDecoration(
-          border: OutlineInputBorder(), labelText: 'Password'),
-      onChanged: (password) {
-        ref.read(loginViewController.notifier).updateData(password: password);
-      },
-      obscureText: true,
-      validator: (password) =>
-          ref.read(loginViewController.notifier).validatePassword(password),
-      autofillHints: const [AutofillHints.password],
-      textInputAction: TextInputAction.done,
-      onEditingComplete: TextInput.finishAutofillContext,
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) => TextFormField(
+        initialValue: data.password,
+        decoration: const InputDecoration(border: OutlineInputBorder(), labelText: 'Password'),
+        onChanged: (password) {
+          ref.read(loginViewController.notifier).updateData(password: password);
+        },
+        obscureText: true,
+        validator: (password) => ref.read(loginViewController.notifier).validatePassword(password),
+        autofillHints: const [AutofillHints.password],
+        textInputAction: TextInputAction.done,
+        onEditingComplete: TextInput.finishAutofillContext,
+      );
 }
 
 class _LoginButton extends ConsumerWidget {
@@ -167,16 +158,14 @@ class _ResetPasswordButton extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return TextButton(
-        child: const Text('Reset Password', style: TextStyle(fontSize: 12.0)),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ResetPasswordView()),
-          );
-        });
-  }
+  Widget build(BuildContext context) => TextButton(
+      child: const Text('Reset Password', style: TextStyle(fontSize: 12.0)),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ResetPasswordView()),
+        );
+      });
 }
 
 class _SignupButton extends StatelessWidget {
@@ -185,12 +174,9 @@ class _SignupButton extends StatelessWidget {
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return ElevatedButton(
-        child: const Text('Signup', style: TextStyle(fontSize: 20.0)),
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => RegisterView()));
-        });
-  }
+  Widget build(BuildContext context) => ElevatedButton(
+      child: const Text('Signup', style: TextStyle(fontSize: 20.0)),
+      onPressed: () {
+        Navigator.push(context, MaterialPageRoute(builder: (context) => RegisterView()));
+      });
 }

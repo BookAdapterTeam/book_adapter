@@ -1,15 +1,14 @@
-import 'package:book_adapter/src/shared/controller/firebase_controller.dart';
-import 'package:book_adapter/src/shared/data/failure.dart';
 import 'package:dartz/dartz.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-final loginViewController =
-    StateNotifierProvider<LoginViewController, LoginViewData>((ref) {
-  return LoginViewController(ref.read);
-});
+import '../../../shared/controller/firebase_controller.dart';
+import '../../../shared/data/failure.dart';
+
+final loginViewController = StateNotifierProvider<LoginViewController, LoginViewData>(
+    (ref) => LoginViewController(ref.read));
 
 // State is if the view is loading
 class LoginViewController extends StateNotifier<LoginViewData> {
@@ -81,12 +80,11 @@ class LoginViewData {
     String? email,
     String? password,
     bool? isLoading,
-  }) {
-    return LoginViewData(
-      email: email ?? this.email,
-      password: password ?? this.password,
-      isLoading: isLoading ?? this.isLoading,
-    );
-  }
+  }) =>
+      LoginViewData(
+        email: email ?? this.email,
+        password: password ?? this.password,
+        isLoading: isLoading ?? this.isLoading,
+      );
 //</editor-fold>
 }
