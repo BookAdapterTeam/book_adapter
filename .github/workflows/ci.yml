@@ -15,12 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: "12.x"
+        uses: actions/checkout@v3
 
       - name: Install and set Flutter version
         uses: subosito/flutter-action@v1
@@ -45,11 +40,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: "12.x"
+        uses: actions/checkout@v3
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
@@ -142,7 +133,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Firebase google services and setup keystore for signing
         env:
           KEY_JKS_BASE64: ${{ secrets.KEY_JKS }}
@@ -155,10 +146,6 @@ jobs:
           # import keystore from secrets
           echo -n "$KEY_PROPERTIES_BASE64" | base64 --decode  > $KEY_PROPERTIES_PATH
           echo -n "$KEY_JKS_BASE64" | base64 --decode > $KEYSTORE_PATH
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: "12.x"
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
@@ -179,7 +166,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Install Firebase google services and setup keystore for signing
         env:
           KEY_JKS_BASE64: ${{ secrets.KEY_JKS }}
@@ -192,10 +179,6 @@ jobs:
           # import keystore from secrets
           echo -n "$KEY_PROPERTIES_BASE64" | base64 --decode  > $KEY_PROPERTIES_PATH
           echo -n "$KEY_JKS_BASE64" | base64 --decode > $KEYSTORE_PATH
-      - name: Setup Java
-        uses: actions/setup-java@v1
-        with:
-          java-version: "12.x"
       - name: Setup Flutter
         uses: subosito/flutter-action@v1
         with:
