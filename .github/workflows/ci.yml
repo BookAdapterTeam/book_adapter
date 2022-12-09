@@ -59,7 +59,7 @@ jobs:
           cd ..
           zip -r bookadapt_unsigned.ipa Payload
       - name: Upload IPA
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ios_ipa
           path: build/ios/iphoneos/*.ipa
@@ -118,7 +118,7 @@ jobs:
   #         cd ..
   #         zip -r app.ipa Payload
   #     - name: Upload IPA
-  #       uses: actions/upload-artifact@v2
+  #       uses: actions/upload-artifact@v3
   #       with:
   #         name: ios_ipa
   #         path: build/ios/iphoneos/
@@ -151,7 +151,7 @@ jobs:
       - name: Build Android AppBundle
         run: flutter build appbundle --release
       - name: Upload appbundle
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: android_appbundle
           path: build/app/outputs/bundle/release/app-release.aab
@@ -184,7 +184,7 @@ jobs:
       - name: Build Android APK
         run: flutter build apk --release
       - name: Upload apk
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: android_apk
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -204,7 +204,7 @@ jobs:
   #     - run: flutter build windows
   #     - run: flutter pub run msix:create
   #     - name: Upload msix
-  #       uses: actions/upload-artifact@v2
+  #       uses: actions/upload-artifact@v3
   #       with:
   #         name: app
   #         path: build/windows/runner/Release/shodana_reader.msix
