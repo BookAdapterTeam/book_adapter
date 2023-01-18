@@ -76,7 +76,7 @@ android {
             shrinkResources false
         }
     }
-    namespace 'com.example.book_adapter'
+    namespace 'com.bookadapterteam.bookadapter'
 }
 
 flutter {
